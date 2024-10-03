@@ -1,0 +1,13 @@
+/* src/pages/Home/Home.module.css */
+.container {
+  padding: 20px;
+  text-align: center;
+}
+
+.container h2 {
+  color: #333;
+}
+
+.container p {
+  color: #666;
+}

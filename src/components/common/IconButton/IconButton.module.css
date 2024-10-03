@@ -1,0 +1,32 @@
+/* src/components/IconButton/IconButton.module.css */
+.iconButton {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #55636e; /* Обычное состояние: светло-синий */
+    color: white; /* Белый текст и иконка */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень в обычном состоянии */
+}
+
+.iconButton:hover {
+    background-color: #495762; /* Наведение: темно-синий */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Более выраженная тень */
+}
+
+.iconButton:active {
+    background-color: #34447d; /* Нажатое состояние: оранжевый */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Уменьшение тени */
+}
+
+.icon {
+    margin-right: 8px; /* Отступ между иконкой и текстом */
+}
+
+.label {
+    font-size: 16px;
+}

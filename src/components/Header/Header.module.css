@@ -1,0 +1,53 @@
+/* src/components/Header/Header.module.css */
+.header {
+    background-color: #b9d2d5;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative; /* Логотип будет позиционироваться относительно header */
+    height: 80px; /* Высота header */
+    overflow: visible; /* Разрешаем логотипу выходить за пределы header */
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 1; /* Убедимся, что логотип выше других элементов */
+}
+
+.logoImage {
+    position: absolute; /* Абсолютное позиционирование */
+    top: 0; /* Верхняя часть логотипа касается верхней части header */
+    left: 0;
+    height: 140px; /* Высота логотипа больше на 30% относительно header */
+    width: auto;
+    transform: translateY(-25%); /* Сдвигаем логотип ввниз */
+    z-index: 2; /* Логотип выше остальных элементов */
+}
+
+.nav {
+    display: flex;
+    gap: 20px;
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    gap: 8px; /* Расстояние между иконкой и текстом */
+}
+
+.iconButton:hover {
+    color: #007bff;
+}
