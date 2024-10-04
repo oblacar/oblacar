@@ -1,0 +1,28 @@
+/* src/components/ButtonMenu/ButtonMenu.module.css */
+
+.buttonMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer; /* Указывает, что элемент кликабельный */
+  position: relative; /* Устанавливаем относительное позиционирование для ButtonMenu */
+  transition: color 0.3s ease; /* Плавный переход цвета */
+}
+
+.icon {
+    width: 20px; /* Ширина иконки */
+    height: 20px; /* Высота иконки */
+    margin-bottom: 5px; /* Отступ между иконкой и текстом */
+    filter: brightness(0) invert(1); /* Делает иконку белой */
+}
+
+.label {
+    color: rgb(87, 87, 142); /* Цвет текста по умолчанию */
+    transition: color 0.2s ease; /* Плавный переход цвета */
+    font-family: Arial, sans-serif; /* Задаем шрифт Arial */
+    font-weight: 550;
+}
+
+.buttonMenu:hover .label {
+    color: white; /* Цвет текста при наведении */
+}

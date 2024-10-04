@@ -1,0 +1,10 @@
+/* src/components/ButtonMenuList/ButtonMenuList.module.css */
+
+.buttonMenuList {
+  position: absolute; /* Устанавливаем абсолютное позиционирование для выпадающего меню */
+  background-color: white; /* Белый фон для выпадающего меню */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень */
+  border-radius: 5px; /* Скругленные углы */
+  padding: 10px; /* Отступы внутри меню */
+  z-index: 10; /* Чтобы меню было над другими элементами */
+}

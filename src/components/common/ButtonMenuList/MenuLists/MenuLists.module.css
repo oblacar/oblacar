@@ -1,0 +1,12 @@
+/* src/components/ButtonMenuList/MenuLists/MenuLists.module.css */
+
+.iconText {
+  display: flex;
+  align-items: center;
+  padding: 5px 0; /* Отступы между элементами */
+  color: blue; /* Цвет текста */
+}
+
+.iconText:hover {
+  color: darkblue; /* Цвет текста при наведении */
+}

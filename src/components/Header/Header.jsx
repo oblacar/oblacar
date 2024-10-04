@@ -1,50 +1,39 @@
 // src/components/Header/Header.js
-import React from 'react';
-import { Link } from 'react-router-dom';
-import styles from './Header.module.css';
-import IconButton from '../common/IconButton/IconButton'; // Импортируем новый компонент
-import { FaUser, FaTruck, FaBox } from 'react-icons/fa'; // Иконки
 
-function Header() {
+import React from 'react';
+import { FaUser, FaTruck } from 'react-icons/fa'; // Импортируем иконки
+import ButtonMenu from '../common/ButtonMenu/ButtonMenu';
+import ButtonMenuList from '../common/ButtonMenuList/ButtonMenuList';
+import styles from './Header.module.css'; // Импортируем стили
+
+const Header = () => {
     return (
         <header className={styles.header}>
             <div className={styles.container}>
-                {/* Логотип */}
-                <Link
-                    to='/'
-                    className={styles.logo}
-                >
+                <div className={styles.logo}>
+                    {/* Ваш логотип здесь */}
                     <img
                         src='/logo/logo-oblacar.png'
-                        alt='Oblacar Logo'
+                        alt='Логотип'
                         className={styles.logoImage}
                     />
-                </Link>
-
-                {/* Иконки с кнопками */}
+                </div>
                 <nav className={styles.nav}>
-                    <Link to='/profile'>
-                        <IconButton
-                            icon={FaUser}
-                            label='Профиль'
-                        />
-                    </Link>
-                    <Link to='/find-vehicle'>
-                        <IconButton
-                            icon={FaTruck}
-                            label='Найти машину'
-                        />
-                    </Link>
-                    <Link to='/find-cargo'>
-                        <IconButton
-                            icon={FaBox}
-                            label='Найти груз'
-                        />
-                    </Link>
+                    {/* Добавляем ButtonMenu с соответствующими списками */}
+                    <ButtonMenu
+                        icon={FaUser}
+                        label='Профиль'
+                        MenuContent={ButtonMenuList}
+                    />
+                    <ButtonMenu
+                        icon={FaTruck}
+                        label='Грузы'
+                        MenuContent={ButtonMenuList}
+                    />
                 </nav>
             </div>
         </header>
     );
-}
+};
 
 export default Header;
