@@ -3,8 +3,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom'; // Используем Outlet для рендеринга вложенных маршрутов
 import Header from './Header/Header';
-import Footer from './Footer/Footer'; // Импортируем компонент Footer
-import styles from '../styles/Layout.module.css'; // Импортируем стили
+import Footer from './Footer/Footer';
+import styles from '../styles/Layout.module.css';
 
 const Layout = () => {
     return (

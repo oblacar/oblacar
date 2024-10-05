@@ -41,7 +41,7 @@ export const HoverUserCard = ({
                     </Link>
 
                     <p>или зарегистрироваться</p>
-                    <Link to='/join'>
+                    <Link to='/register'>
                         <button
                             className='btn-hover-user-card auth cu-btn-pink '
                             onClick={handleMouseLeave}
