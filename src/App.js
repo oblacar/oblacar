@@ -7,8 +7,6 @@ import Home from './pages/Home/Home';
 import Register from './components/Register/Register';
 import Login from './components/Login/Login'; // Импортируйте Login
 
-import { IconDropdownMenuBar } from './components/IconHoverCardBar/IconHoverCardBar';
-
 const App = () => {
     return (
         <Router>
@@ -17,8 +15,7 @@ const App = () => {
                 <Header />
                 {/* Маршрутизация */}
                 
-                {/* <IconDropdownMenuBar/>
-                <div>
+                {/* 
                     <Register />
                     <Login />
                 </div> */}
