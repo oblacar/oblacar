@@ -1,0 +1,49 @@
+.hover-card.visible {
+    display: block;
+}
+
+.hover-card {
+    display: none;
+    width: 300px;
+    position: absolute;
+    background-color: #fff;
+    /* background-color: rgb(255, 241, 247); */
+    /* border: 3px solid rgb(179, 195, 108); */
+
+    /* border-top: 6px solid rgb(255, 136, 0);
+    border-bottom: 10px solid rgb(255, 136, 0);
+     */
+    border-top: 6px solid #ff6600;
+    border-bottom: 10px solid #ff6600;
+    /* border-bottom: 10px solid #e65087; */
+
+    border-radius: 5px;
+
+    color: rgb(99, 99, 99);
+    /* padding: 20px 20px 50px 20px; */
+    /* padding: 20px 20px 50px 20px; */
+    z-index: 1;
+
+    -webkit-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
+
+    top: 0; /* Для проверки */
+    left: 0; /* Для проверки */
+    /* padding: 0; Убери padding для отладки */
+}
+
+/* Внутренний блок для контента */
+.hover-card-content {
+    padding: 20px 20px 50px 20px; /* Здесь отступы внутри, но они не влияют на внешнее смещение */
+}
+
+.hover-card-title {
+    font-weight: 500;
+    margin-top: 0;
+    color: black;
+}
+
+.btn-hover-user-card {
+    width: 100%;
+}

@@ -1,0 +1,37 @@
+/* Контейнер для всех иконок с меню */
+.iconsArea {
+    display: flex;
+    margin-right: 50px; /* Сдвиг влево */
+    gap: 50px; /* Отступ между иконками */
+}
+
+.iconHoverArea {
+    position: relative; /* Для позиционирования меню относительно иконки */
+}
+
+.headerMarketIcon {
+    position: relative; /* Убедитесь, что у родительского контейнера есть позиционирование */
+}
+.iconHover {
+    color: white;
+    font-size: 22px;
+}
+
+.iconContainer {
+    display: flex; /* Используем Flexbox для центрирования */
+    flex-direction: column; /* Элементы располагаются вертикально */
+    align-items: center; /* Центрируем по горизонтали */
+    cursor: pointer; /* Изменяем курсор на pointer */
+}
+
+.iconLabel {
+    display: block; /* Блоковое отображение для нового текста */
+    text-align: center; /* Центрируем текст */
+    color: gray; /* Серый цвет текста */
+    margin-top: 5px; /* Отступ сверху от иконки */
+    transition: color 0.2s ease; /* Плавный переход цвета */
+}
+
+.headerMarketIcon:hover .iconLabel {
+    color: white; /* Меняем цвет на белый при наведении */
+}

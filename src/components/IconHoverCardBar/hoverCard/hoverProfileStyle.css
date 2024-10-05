@@ -1,0 +1,84 @@
+.hpc-section-name {
+    text-align: left;
+    cursor: pointer;
+    margin: 10px 0 0 0;
+    color: #393939;
+    font-weight: 500;
+}
+
+.hpc-section-name:hover {
+    color: #e65087;
+}
+
+.hpc-section-name.without-icon {
+    margin: 10px 0 0 33px;
+}
+
+.hpc-spacer {
+    margin: 2rem 0;
+}
+
+.hpc-last-spacer {
+    height: 4px;
+    border-radius: 2px;
+    background-color: #ffe6ef;
+}
+
+.hpc-personal-data {
+    display: flex;
+    align-items: center; /* Центрируем по вертикали */
+    cursor: pointer;
+}
+
+.hpc-personal-photo {
+    width: 100px; /* Ширина фото (задайте нужное значение) */
+    height: 100px; /* Высота фото (задайте нужное значение) */
+    background-color: #fbe2e2; /* Цвет фото (замените на свое изображение или цвет) */
+    border-radius: 50%;
+
+    margin-right: 10px; /* Расстояние между фото и информацией (задайте нужное значение) */
+    position: relative; /* Для позиционирования ::after псевдоэлемента */
+    color: #fdf7f7;
+    font-size: 70px;
+    font-weight: 700;
+}
+
+.hpc-personal-photo::after {
+    content: 'А';
+    position: absolute;
+    top: -12px;
+    left: 5px;
+    right: 0;
+    bottom: 0;
+}
+
+.hpc-personal-info {
+    flex: 1;
+    text-align: left;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.hover-personal-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.hover-personal-phone {
+    color: #454545;
+    font-size: 12px;
+}
+.hover-personal-page-link {
+    color: rgb(215, 64, 109);
+    font-weight: 500;
+}
+
+.hpc-section-name {
+    display: flex; /* Используем flex-контейнер для выравнивания */
+    align-items: center; /* Выравниваем по центру по вертикали */
+}
+
+.hpc-section-name i {
+    margin-right: 8px; /* Добавляем немного отступа между иконкой и текстом */
+}

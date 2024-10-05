@@ -2,35 +2,33 @@
 
 import React from 'react';
 import { FaUser, FaTruck } from 'react-icons/fa'; // Импортируем иконки
-import ButtonMenu from '../common/ButtonMenu/ButtonMenu';
-import ButtonMenuList from '../common/ButtonMenuList/ButtonMenuList';
+// import ButtonMenu from '../common/ButtonMenu/ButtonMenu';
+// import ButtonMenuList from '../common/ButtonMenuList/ButtonMenuList';
 import styles from './Header.module.css'; // Импортируем стили
+
+import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';
 
 const Header = () => {
     return (
         <header className={styles.header}>
-            <div className={styles.container}>
-                <div className={styles.logo}>
-                    {/* Ваш логотип здесь */}
-                    <img
-                        src='/logo/logo-oblacar.png'
-                        alt='Логотип'
-                        className={styles.logoImage}
-                    />
+            <div className={styles.topLine}>
+                <div className={styles.container}>
+                    <div className={styles.logo}>
+                        <img
+                            src='/logo/logo-oblacar.png'
+                            alt='Логотип'
+                            className={styles.logoImage}
+                        />
+                    </div>
                 </div>
-                <nav className={styles.nav}>
-                    {/* Добавляем ButtonMenu с соответствующими списками */}
-                    <ButtonMenu
-                        icon={FaUser}
-                        label='Профиль'
-                        MenuContent={ButtonMenuList}
-                    />
-                    <ButtonMenu
-                        icon={FaTruck}
-                        label='Грузы'
-                        MenuContent={ButtonMenuList}
-                    />
-                </nav>
+            </div>
+            <div className='styles.middleLine'>
+                <div className={styles.headerSlogan}>
+                    Простота в поиске, надежность в перевозке.
+                </div>
+            </div>
+            <div className={styles.bottomLine}>
+                <IconDropdownMenuBar className={styles.iconsArea} />
             </div>
         </header>
     );

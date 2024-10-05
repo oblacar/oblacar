@@ -24,8 +24,8 @@ const ButtonMenu = ({ icon: Icon, label, MenuContent }) => {
             console.log(dropdownWidth);
 
             // Устанавливаем верхнюю позицию
-            dropdownRef.current.style.top = `${buttonRect.bottom}px`;
-
+            // dropdownRef.current.style.top = `${buttonRect.bottom}px`;
+   dropdownRef.current.style.top = `100%`;
             // Проверяем, помещается ли меню в окно
             const isOverflowingRight =
                 Math.round(buttonRect.right + dropdownWidth) >
