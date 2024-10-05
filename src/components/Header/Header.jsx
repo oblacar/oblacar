@@ -1,9 +1,6 @@
 // src/components/Header/Header.js
 
 import React from 'react';
-import { FaUser, FaTruck } from 'react-icons/fa'; // Импортируем иконки
-// import ButtonMenu from '../common/ButtonMenu/ButtonMenu';
-// import ButtonMenuList from '../common/ButtonMenuList/ButtonMenuList';
 import styles from './Header.module.css'; // Импортируем стили
 
 import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';

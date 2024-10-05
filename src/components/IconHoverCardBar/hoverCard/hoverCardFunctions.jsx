@@ -1,6 +1,6 @@
 // метод размещает Hover под иконкой по середине, и не позволяет уйти за границы экрана
 export const setTopLeftHover = (iconCoordinates, windowWidth) => {
-    const hoverTopCompensation = -5; //подбираем в ручную, что бы небыло пробеыла с иконкой
+    const hoverTopCompensation = 0; //подбираем в ручную, что бы небыло пробеыла с иконкой
     const hoverWidth = 300; // ширина меню
 
     const iconWidth = iconCoordinates.right - iconCoordinates.left;

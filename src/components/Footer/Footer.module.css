@@ -1,0 +1,10 @@
+/* src/components/Footer/Footer.module.css */
+
+.footer {
+  width: 100%; /* Нижний колонтитул на всю ширину */
+  background-color: #f8f9fa; /* Цвет фона нижнего колонтитула */
+  padding: 10px 0; /* Отступы сверху и снизу, убираем боковые отступы */
+  text-align: center; /* Центрируем текст */
+  position: relative; /* Для правильного позиционирования */
+  bottom: 0; /* Чтобы всегда быть внизу */
+}
