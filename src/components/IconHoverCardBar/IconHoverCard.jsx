@@ -42,8 +42,7 @@ const IconHoverCard = ({
                             isHovered ? styles.iconHovered : ''
                         }`}
                     >
-                        {type}{' '}
-                        {/* Здесь можно заменить на текст, если необходимо */}
+                        {type}
                     </span>
                 </div>
             </div>

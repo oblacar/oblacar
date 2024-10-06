@@ -19,7 +19,8 @@
 }
 
 .iconHover.iconHovered, .iconLabel.iconHovered {
-    color: #ff6600;
+    /* color: #ff6600; */
+      color: #0a00bd;
 }
 .iconContainer {
     display: flex; /* Используем Flexbox для центрирования */

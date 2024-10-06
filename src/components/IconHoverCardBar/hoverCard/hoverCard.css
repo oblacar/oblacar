@@ -13,8 +13,11 @@
     /* border-top: 6px solid rgb(255, 136, 0);
     border-bottom: 10px solid rgb(255, 136, 0);
      */
-    border-top: 6px solid #ff6600;
-    border-bottom: 10px solid #ff6600;
+
+         /* border-top: 6px solid #ff6600;
+    border-bottom: 10px solid #ff6600; */
+    border-top: 6px solid #0a00bd;
+    border-bottom: 10px solid #7d93db;
     /* border-bottom: 10px solid #e65087; */
 
     border-radius: 5px;

@@ -19,7 +19,7 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className='styles.middleLine'>
+            <div className={styles.middleLine}>
                 <div className={styles.headerSlogan}>
                     Простота в поиске, надежность в перевозке.
                 </div>
