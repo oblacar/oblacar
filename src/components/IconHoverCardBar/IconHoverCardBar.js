@@ -117,16 +117,28 @@ function IconDropdownMenuBar() {
     return (
         <>
             <div className={styles.iconsArea}>
-                <div className={styles.iconHoverArea}>
+                <div
+                    className={styles.iconHoverArea}
+                    onMouseEnter={() => handleMouseEnter('USER')}
+                    onMouseLeave={() => handleMouseLeave('USER')}
+                >
                     <div
                         className={styles.headerMarketIcon}
                         ref={iconUserRef}
-                        onMouseEnter={() => handleMouseEnter('USER')}
-                        onMouseLeave={() => handleMouseLeave('USER')}
                     >
                         <div className={styles.iconContainer}>
-                            <FaUser className={styles.iconHover} />
-                            <span className={styles.iconLabel}>Профиль</span>
+                            <FaUser
+                                className={`${styles.iconHover} ${
+                                    isUserHovered ? styles.iconHovered : ''
+                                }`}
+                            />
+                            <span
+                                className={`${styles.iconLabel} ${
+                                    isUserHovered ? styles.iconHovered : ''
+                                }`}
+                            >
+                                Профиль
+                            </span>
                         </div>
                     </div>
                     <HoverUserCard

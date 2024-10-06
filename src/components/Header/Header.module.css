@@ -1,23 +1,4 @@
 /* src/components/Header/Header.module.css */
-
-/* .header {
-    background-color: #a0b8e7;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center; */
-/*position: relative; /* Логотип будет позиционироваться относительно header */
-/*height: 80px; /* Высота header */
-/*overflow: visible; /* Разрешаем логотипу выходить за пределы header */
-/* } */
-
-/* .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-*/
 .logo {
     position: relative;
     display: flex;
@@ -34,15 +15,6 @@
     transform: translateY(-0%); /* Сдвигаем логотип вниз */
     z-index: 2; /* Логотип выше остальных элементов */
 }
-/*
-.iconsArea {
-    padding-bottom: 10px; /* Смещаем иконки вниз на 10px */
-/*}
-
-.nav {
-    display: flex;
-    gap: 20px;
-} */
 
 .header {
     width: 100%;
@@ -56,7 +28,7 @@
     align-items: center;
     height: 10px;
     padding: 10px 20px; /* Отступы вокруг содержимого */
-    background-color: #1f1f1f; /* Цвет фона верхней полосы */
+    background-color: #76d2fd; /* Цвет фона верхней полосы */
 }
 
 /* Нижняя полоса */
@@ -64,7 +36,7 @@
     display: flex;
     justify-content: flex-end; /* Центрируем иконки */
     padding: 10px; /* Отступы снизу */
-    background-color: #1f1f1f; /* Цвет фона нижней полосы */
+    background-color: #d1f1ff; /* Цвет фона нижней полосы */
 }
 
 .iconsArea {

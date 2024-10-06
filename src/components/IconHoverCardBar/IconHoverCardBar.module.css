@@ -13,10 +13,14 @@
     position: relative; /* Убедитесь, что у родительского контейнера есть позиционирование */
 }
 .iconHover {
-    color: white;
+    /* color: #ff6600; */
+    color: #293049;
     font-size: 22px;
 }
 
+.iconHover.iconHovered, .iconLabel.iconHovered {
+    color: #ff6600;
+}
 .iconContainer {
     display: flex; /* Используем Flexbox для центрирования */
     flex-direction: column; /* Элементы располагаются вертикально */
@@ -30,8 +34,4 @@
     color: gray; /* Серый цвет текста */
     margin-top: 5px; /* Отступ сверху от иконки */
     transition: color 0.2s ease; /* Плавный переход цвета */
-}
-
-.headerMarketIcon:hover .iconLabel {
-    color: white; /* Меняем цвет на белый при наведении */
 }
