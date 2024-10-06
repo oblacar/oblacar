@@ -30,8 +30,6 @@ export const setTopLeftHover = (iconCoordinates, windowWidth) => {
             left: `${halfIcon - halfHover}px`,
         };
 
-        console.log('1-hover входит по ширине: ' + elementStyle);
-
         return elementStyle;
     }
 

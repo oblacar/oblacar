@@ -17,8 +17,6 @@ export const HoverCartCard = ({
         setIsHoveredCard(false);
     };
 
-    console.log(windowWidth);
-
     return (
         <>
             <div

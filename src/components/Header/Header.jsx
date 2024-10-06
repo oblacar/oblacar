@@ -5,7 +5,12 @@ import styles from './Header.module.css'; // Импортируем стили
 
 import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';
 
+import { Link } from 'react-router-dom';
+import useAuth from '../../hooks/Authorization/useAuth'; // Импортируем useAuth
+
 const Header = () => {
+    const { user, isAuthenticated, logout } = useAuth(); // Получаем информацию о пользователе из моего хука
+
     return (
         <header className={styles.header}>
             <div className={styles.topLine}>
@@ -20,9 +25,20 @@ const Header = () => {
                 </div>
             </div>
             <div className={styles.middleLine}>
-                <div className={styles.headerSlogan}>
+                <span className={styles.headerSlogan}>
                     Простота в поиске, надежность в перевозке.
-                </div>
+                </span>
+                {isAuthenticated ? (
+                    <>
+                        <span>Привет, {user.email}!</span>
+                        <button onClick={logout}>Выйти</button>
+                    </>
+                ) : (
+                    <>
+                        <Link to='/login'>Вход</Link>
+                        <Link to='/register'>Регистрация</Link>
+                    </>
+                )}
             </div>
             <div className={styles.bottomLine}>
                 <IconDropdownMenuBar className={styles.iconsArea} />
