@@ -43,14 +43,7 @@ class UserService {
                 credentials.email,
                 credentials.password
             );
-            const user = userCredential.user;
 
-            console.log('Пользователь вошел:', user);
-            // return {
-            //     uid: userCredential.user.uid, // Убедитесь, что вы возвращаете uid
-            //     email: userCredential.user.email, // Можно вернуть и другие данные
-            // };
-            //  return user; // Возвращаем объект пользователя
             return userCredential.user;
         } catch (error) {
             console.error('Ошибка входа:', error);

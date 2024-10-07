@@ -1,6 +1,6 @@
 // src/hooks/Authorization/AuthContext.js
 
-import React, { createContext, useReducer, useContext, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect } from 'react';
 import authReducer from './authReducer'; // Импортируем ваш редюсер
 import { userService } from '../../services/UserService'; // Импортируем UserService для аутентификации
 
@@ -12,23 +12,37 @@ export const AuthProvider = ({ children }) => {
 
     // Эффект для проверки наличия токена при загрузке
     useEffect(() => {
-        console.log('Проверяем токен на старте');
         const token = localStorage.getItem('authToken'); // Проверяем наличие токена
-        console.log('Проверили токен на старте');
+
         if (token) {
-            console.log('Проверили токен - вошли в странный блок');
-            const user = { email: 'example@example.com' }; // Здесь должна быть логика извлечения пользователя из токена
-            dispatch({ type: 'LOGIN', payload: user }); // Обновляем состояние при входе
+            //TODO токен уже существует в системе, нужно как-то подтягивать данные юзера для этого пользователя
+            console.log('токен существует: ', token);
+
+            const email = localStorage.getItem('authEmail');
+
+            if (email) {
+                const user = { email: email };
+                dispatch({ type: 'LOGIN', payload: user }); // Обновляем состояние при входе
+            } else {
+                console.log(
+                    'Почта пользователя (логин) отсуствует при обновлении страницы.'
+                );
+            }
         }
     }, []);
 
     // Функция для входа
-    const login = async (email, password) => {
+    const login = async (email, password, isRememberUser) => {
         try {
             const user = await userService.loginUser({ email, password }); // Вход через UserService
 
-            localStorage.setItem('authToken', user.uid); // Сохраняем uid в localStorage
+            if (isRememberUser) {
+                // внесем uid и емэйл в localStorage
+                localStorage.setItem('authToken', user.uid); // Сохраняем uid в localStorage
+                localStorage.setItem('authEmail', user.email); // Сохраняем uid в localStorages
+            }
 
+            //TODO нужно протестировать после подготовки формы Пользователя
             dispatch({ type: 'LOGIN', payload: user }); // Обновляем состояние с новым пользователем
         } catch (error) {
             console.error('Ошибка входа:', error.message); // Обработка ошибок
@@ -41,7 +55,8 @@ export const AuthProvider = ({ children }) => {
             await userService.logoutUser(); // Выход через UserService
 
             localStorage.removeItem('authToken'); // Очистка токена из localStorage
-            
+            localStorage.removeItem('authEmail'); // Очистка токена из localStorage
+
             dispatch({ type: 'LOGOUT' }); // Обновляем состояние при выходе
         } catch (error) {
             console.error('Ошибка выхода:', error.message); // Обработка ошибок

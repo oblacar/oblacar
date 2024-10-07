@@ -1,8 +1,11 @@
 // src/components/Login/Login.js
 
 import React, { useState, useContext } from 'react';
+import { Link } from 'react-router-dom'; // Импортируем Link для навигации
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
+import Button from '../common/Button/Button'; // Импортируем новый компонент Button
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 
@@ -11,6 +14,7 @@ import './Login.css'; // Импортируйте стили
 const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const { login, logout } = useContext(AuthContext); // Получаем функцию login из AuthContext
+    const [rememberMe, setRememberMe] = useState(true);
 
     const formik = useFormik({
         initialValues: {
@@ -25,7 +29,11 @@ const Login = () => {
         }),
         onSubmit: async (values) => {
             try {
-                const user = await login(values.email, values.password); // Используем функцию login из AuthContext
+                const user = await login(
+                    values.email,
+                    values.password,
+                    rememberMe
+                ); // Используем функцию login из AuthContext
 
                 console.log('Вход выполнен успешно!', user);
             } catch (error) {
@@ -34,14 +42,14 @@ const Login = () => {
         },
     });
 
-    const handleLogout = async () => {
-        try {
-            await logout(); // Используем await для ожидания завершения выхода
-            localStorage.removeItem('authToken'); // Очистка токена из localStorage
-        } catch (error) {
-            console.error('Ошибка выхода:', error.message); // Обработка ошибок
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         await logout(); // Используем await для ожидания завершения выхода
+    //         localStorage.removeItem('authToken'); // Очистка токена из localStorage
+    //     } catch (error) {
+    //         console.error('Ошибка выхода:', error.message); // Обработка ошибок
+    //     }
+    // };
 
     return (
         <div className='login-container'>
@@ -63,7 +71,6 @@ const Login = () => {
                         </div>
                     ) : null}
                 </div>
-
                 <div>
                     <label htmlFor='password'>Пароль</label>
                     <input
@@ -80,14 +87,46 @@ const Login = () => {
                         </div>
                     ) : null}
                 </div>
-
-                <button type='submit'>Войти</button>
-                <button
-                    type='button'
-                    onClick={handleLogout}
+                <div className='remember-me-container'>
+                    <input
+                        type='checkbox'
+                        id='rememberMe'
+                        name='rememberMe'
+                        className='remember-me-checkbox'
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)} // Обновляем состояние флажка
+                    />
+                    <span
+                        htmlFor='rememberMe'
+                        className='remember-me-label'
+                        onClick={() => setRememberMe(() => !rememberMe)}
+                    >
+                        Запомнить меня
+                    </span>
+                </div>
+                <div>
+                    <Button
+                        type='submit'
+                        size='wide'
+                    >
+                        Войти
+                    </Button>
+                    {/* <button type='submit'>Войти</button> */}
+                    {/* <button
+                        type='button'
+                        onClick={handleLogout}
+                    >
+                        Выйти
+                    </button> */}
+                </div>
+                <div className='remember-me-line'></div> {/* Линия сверху */}
+                <span className='or-word'>или</span>
+                <Link
+                    className='link-word'
+                    to='/register'
                 >
-                    Выйти
-                </button>
+                    Зарегистрироваться
+                </Link>
             </form>
             {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
         </div>
