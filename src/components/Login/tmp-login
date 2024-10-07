@@ -1,16 +1,13 @@
 // src/components/Login/Login.js
 
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-
-import AuthContext from '../../hooks/Authorization/AuthContext';
-
+import { userService } from '../../services/UserService'; // Импортируйте userService
 import './Login.css'; // Импортируйте стили
 
 const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
-    const { login, logout } = useContext(AuthContext); // Получаем функцию login из AuthContext
 
     const formik = useFormik({
         initialValues: {
@@ -25,22 +22,24 @@ const Login = () => {
         }),
         onSubmit: async (values) => {
             try {
-                const user = await login(values.email, values.password); // Используем функцию login из AuthContext
+                const user = await userService.loginUser({
+                    email: values.email,
+                    password: values.password,
+                });
 
-                console.log('Вход выполнен успешно!', user);
+                // Сохранение токена (или ID пользователя) в localStorage
+                localStorage.setItem('authToken', user.uid); // Используем UID пользователя
+                alert('Вход выполнен успешно!'); // Успешный вход
             } catch (error) {
                 setErrorMessage('Ошибка входа: ' + error.message); // Обработка ошибок
             }
         },
     });
 
-    const handleLogout = async () => {
-        try {
-            await logout(); // Используем await для ожидания завершения выхода
-            localStorage.removeItem('authToken'); // Очистка токена из localStorage
-        } catch (error) {
-            console.error('Ошибка выхода:', error.message); // Обработка ошибок
-        }
+    const handleLogout = () => {
+        userService.logoutUser(); // Вызов функции выхода
+        localStorage.removeItem('authToken'); // Очистка токена из localStorage
+        alert('Вы вышли из системы'); // Уведомление о выходе
     };
 
     return (

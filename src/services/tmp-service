@@ -46,19 +46,14 @@ class UserService {
             const user = userCredential.user;
 
             console.log('Пользователь вошел:', user);
-            // return {
-            //     uid: userCredential.user.uid, // Убедитесь, что вы возвращаете uid
-            //     email: userCredential.user.email, // Можно вернуть и другие данные
-            // };
-            //  return user; // Возвращаем объект пользователя
-            return userCredential.user;
+            return user; // Возвращаем объект пользователя
         } catch (error) {
             console.error('Ошибка входа:', error);
             throw error; // Перебрасываем ошибку для обработки в компоненте
         }
     }
 
-    async logoutUser() {
+    logoutUser() {
         return auth.signOut().then(() => {
             console.log('Пользователь вышел из системы');
         });

@@ -1,15 +1,23 @@
 // src/components/Header/Header.js
 
-import React from 'react';
+import React, {useContext} from 'react';
 import styles from './Header.module.css'; // Импортируем стили
 
 import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';
 
 import { Link } from 'react-router-dom';
-import useAuth from '../../hooks/Authorization/useAuth'; // Импортируем useAuth
+import AuthContext from '../../hooks/Authorization/AuthContext';
 
 const Header = () => {
-    const { user, isAuthenticated, logout } = useAuth(); // Получаем информацию о пользователе из моего хука
+    const { logout, isAuthenticated, user } = useContext(AuthContext); // Получаем функцию login из AuthContext
+
+     const handleLogout = async () => {
+         try {
+             await logout(); // Используем await для ожидания завершения выхода
+         } catch (error) {
+             console.error('Ошибка выхода:', error.message); // Обработка ошибок
+         }
+     };
 
     return (
         <header className={styles.header}>
@@ -31,12 +39,18 @@ const Header = () => {
                 {isAuthenticated ? (
                     <>
                         <span>Привет, {user.email}!</span>
-                        <button onClick={logout}>Выйти</button>
+                        <button onClick={handleLogout}>Выйти</button>
                     </>
                 ) : (
                     <>
                         <Link to='/login'>Вход</Link>
                         <Link to='/register'>Регистрация</Link>
+
+                        {isAuthenticated ? (
+                            <span>+++Правда++</span>
+                        ) : (
+                            <span>--Ложь--</span>
+                        )}
                     </>
                 )}
             </div>

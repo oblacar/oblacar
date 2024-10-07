@@ -37,6 +37,7 @@
     justify-content: center; /* Центрируем содержимое по горизонтали */
     align-items: center; /* Центрируем содержимое по вертикали */
     background-color: #1f1f1f; /* Убедись, что фон виден, если это нужно */
+    color: #d5defe; /* Белый цвет текста */
 }
 
 .headerSlogan {
@@ -44,7 +45,7 @@
     justify-content: center; /* Центрируем содержимое по горизонтали */
     align-items: center; /* Центрируем по вертикали */
     font-size: 16px; /* Оптимальный размер шрифта */
-    color: #d5defe; /* Белый цвет текста */
+    /* color: #d5defe; Белый цвет текста */
     text-align: center; /* Центрируем текст внутри блока */
     font-family: Arial, sans-serif; /* Шрифт, можно заменить на другой */
 }
@@ -61,4 +62,3 @@
     display: flex;
     gap: 20px; /* Расстояние между иконками */
 }
-
