@@ -1,0 +1,51 @@
+/* src/components/UserProfile/UserProfile.css */
+
+.user-profile {
+    padding: 20px; /* Отступы внутри контейнера */
+    border: 1px solid #ccc; /* Рамка вокруг профиля */
+    border-radius: 8px; /* Скругленные углы */
+    background-color: #f9f9f9; /* Светлый фон */
+    max-width: 600px; /* Максимальная ширина профиля */
+    margin: 20px auto; /* Центрируем профиль по горизонтали */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Тень для профиля */
+}
+
+.user-profile h1 {
+    font-size: 24px; /* Размер заголовка */
+    margin-bottom: 20px; /* Отступ снизу */
+}
+
+.user-profile label {
+    display: block; /* Каждый label будет на новой строке */
+    margin: 10px 0 5px; /* Отступы вокруг label */
+    font-weight: bold; /* Жирный текст для меток */
+}
+
+.user-profile input,
+.user-profile textarea {
+    width: 100%; /* Ширина инпутов на 100% */
+    padding: 10px; /* Отступы внутри инпутов */
+    margin-bottom: 15px; /* Отступ снизу */
+    border: 1px solid #ccc; /* Рамка инпутов */
+    border-radius: 4px; /* Скругленные углы */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Тень для инпутов */
+}
+
+.user-profile button {
+    padding: 10px 15px; /* Отступы внутри кнопок */
+    margin-right: 10px; /* Отступ между кнопками */
+    border: none; /* Убираем рамку */
+    border-radius: 4px; /* Скругленные углы */
+    cursor: pointer; /* Изменяем курсор на указатель при наведении */
+    background-color: #007bff; /* Цвет кнопки */
+    color: white; /* Цвет текста кнопки */
+    transition: background-color 0.3s ease; /* Анимация перехода цвета */
+}
+
+.user-profile button:hover {
+    background-color: #0056b3; /* Цвет кнопки при наведении */
+}
+
+.user-profile button:active {
+    background-color: #004494; /* Цвет кнопки при нажатии */
+}

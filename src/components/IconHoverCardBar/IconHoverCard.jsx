@@ -1,6 +1,7 @@
 // src/components/IconHoverCard.js
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './IconHoverCardBar.module.css'; // Импортируем стили
 
 const IconHoverCard = ({
@@ -31,20 +32,22 @@ const IconHoverCard = ({
                 className={styles.headerMarketIcon}
                 ref={iconRef}
             >
-                <div className={styles.iconContainer}>
-                    <IconComponent
-                        className={`${styles.iconHover} ${
-                            isHovered ? styles.iconHovered : ''
-                        }`}
-                    />
-                    <span
-                        className={`${styles.iconLabel} ${
-                            isHovered ? styles.iconHovered : ''
-                        }`}
-                    >
-                        {type}
-                    </span>
-                </div>
+                <Link to='/user-profile'>
+                    <div className={styles.iconContainer}>
+                        <IconComponent
+                            className={`${styles.iconHover} ${
+                                isHovered ? styles.iconHovered : ''
+                            }`}
+                        />
+                        <span
+                            className={`${styles.iconLabel} ${
+                                isHovered ? styles.iconHovered : ''
+                            }`}
+                        >
+                            {type}
+                        </span>
+                    </div>
+                </Link>
             </div>
             <HoverCardComponent
                 isHoveredIcon={isHovered}
