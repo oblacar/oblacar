@@ -3,6 +3,9 @@
 import React, { useState, useContext } from 'react';
 import UserContext from '../../hooks/UserContext';
 import './UserProfile.css'; // Импортируйте стили
+import Button from '../common/Button/Button';
+
+import UserProfile2 from './UserProfile2/UserProfile2';
 
 const UserProfile = () => {
     const { state, dispatch } = useContext(UserContext); // Получаем данные пользователя из контекста
@@ -42,105 +45,151 @@ const UserProfile = () => {
     };
 
     return (
-        <div className='user-profile'>
-            <h1>Профиль пользователя</h1>
-            {isEditing ? (
-                <div>
+        <>
+            <UserProfile2 />
+
+            <div className='user-profile'>
+                <h1>Профиль пользователя</h1>
+                {isEditing ? (
                     <div>
-                        <label htmlFor='firstName'>Имя</label>
-                        <input
-                            id='firstName'
-                            type='text'
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)} // Обновляем состояние имени
+                        <div>
+                            <label htmlFor='profilePicture'>
+                                Фото профиля (URL)
+                            </label>
+                            <input
+                                id='profilePicture'
+                                type='text'
+                                value={profilePicture}
+                                onChange={(e) =>
+                                    setProfilePicture(e.target.value)
+                                } // Обновляем состояние URL фото профиля
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor='firstName'>Имя</label>
+                            <input
+                                id='firstName'
+                                type='text'
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)} // Обновляем состояние имени
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor='lastName'>Фамилия</label>
+                            <input
+                                id='lastName'
+                                type='text'
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)} // Обновляем состояние фамилии
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor='email'>Электронная почта</label>
+                            <input
+                                id='email'
+                                type='email'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)} // Обновляем состояние email
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor='role'>Роль</label>
+                            <input
+                                id='role'
+                                type='text'
+                                value={role}
+                                onChange={(e) => setRole(e.target.value)} // Обновляем состояние роли
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor='registrationDate'>
+                                Дата регистрации
+                            </label>
+                            <input
+                                id='registrationDate'
+                                type='date'
+                                value={registrationDate}
+                                onChange={(e) =>
+                                    setRegistrationDate(e.target.value)
+                                } // Обновляем состояние даты регистрации
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor='additionalInfo'>
+                                Дополнительная информация
+                            </label>
+                            <textarea
+                                id='additionalInfo'
+                                value={additionalInfo}
+                                onChange={(e) =>
+                                    setAdditionalInfo(e.target.value)
+                                } // Обновляем состояние дополнительных данных
+                            />
+                        </div>
+                        <button
+                            className='button-user-profile'
+                            onClick={handleSave}
+                        >
+                            Сохранить
+                        </button>
+                        <button
+                            className='button-user-profile'
+                            onClick={handleEditToggle}
+                        >
+                            Отмена
+                        </button>
+                    </div>
+                ) : (
+                    <div>
+                        <p>
+                            <img
+                                src={user.profilePicture}
+                                alt='Профиль'
+                                className='profile-photo'
+                            />
+                        </p>
+                        <p>
+                            Имя:{' '}
+                            <span className='user-option'>
+                                {' '}
+                                {user.firstName}
+                            </span>{' '}
+                        </p>
+                        <p>
+                            Фамилия:{' '}
+                            <span className='user-option'>{user.lastName}</span>
+                        </p>
+                        <p>
+                            Электронная почта:{' '}
+                            <span className='user-option'>{user.email}</span>
+                        </p>
+                        <p>
+                            Роль:{' '}
+                            <span className='user-option'>{user.role}</span>
+                        </p>
+                        <p>
+                            Дата регистрации:{' '}
+                            <span className='user-option'>
+                                {user.registrationDate}
+                            </span>
+                        </p>
+                        <p>
+                            Дополнительная информация:{' '}
+                            <span className='user-option'>
+                                {user.additionalInfo}
+                            </span>
+                        </p>
+                        <Button
+                            type='button'
+                            size_width='large'
+                            size_height='medium'
+                            children='Редактировать профиль'
+                            onClick={handleEditToggle}
                         />
                     </div>
-                    <div>
-                        <label htmlFor='lastName'>Фамилия</label>
-                        <input
-                            id='lastName'
-                            type='text'
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)} // Обновляем состояние фамилии
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor='email'>Электронная почта</label>
-                        <input
-                            id='email'
-                            type='email'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)} // Обновляем состояние email
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor='role'>Роль</label>
-                        <input
-                            id='role'
-                            type='text'
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)} // Обновляем состояние роли
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor='registrationDate'>
-                            Дата регистрации
-                        </label>
-                        <input
-                            id='registrationDate'
-                            type='date'
-                            value={registrationDate}
-                            onChange={(e) =>
-                                setRegistrationDate(e.target.value)
-                            } // Обновляем состояние даты регистрации
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor='profilePicture'>
-                            Фото профиля (URL)
-                        </label>
-                        <input
-                            id='profilePicture'
-                            type='text'
-                            value={profilePicture}
-                            onChange={(e) => setProfilePicture(e.target.value)} // Обновляем состояние URL фото профиля
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor='additionalInfo'>
-                            Дополнительная информация
-                        </label>
-                        <textarea
-                            id='additionalInfo'
-                            value={additionalInfo}
-                            onChange={(e) => setAdditionalInfo(e.target.value)} // Обновляем состояние дополнительных данных
-                        />
-                    </div>
-                    <button onClick={handleSave}>Сохранить</button>
-                    <button onClick={handleEditToggle}>Отмена</button>
-                </div>
-            ) : (
-                <div>
-                    <p>Имя: {user.firstName}</p>
-                    <p>Фамилия: {user.lastName}</p>
-                    <p>Электронная почта: {user.email}</p>
-                    <p>Роль: {user.role}</p>
-                    <p>Дата регистрации: {user.registrationDate}</p>
-                    <p>
-                        Фото профиля:{' '}
-                        <img
-                            src={user.profilePicture}
-                            alt='Профиль'
-                        />
-                    </p>
-                    <p>Дополнительная информация: {user.additionalInfo}</p>
-                    <button onClick={handleEditToggle}>
-                        Редактировать профиль
-                    </button>
-                </div>
-            )}
-            {/* <button onClick={logout}>Выйти</button> Кнопка выхода */}
-        </div>
+                )}
+            </div>
+        </>
     );
 };
 

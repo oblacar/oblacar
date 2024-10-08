@@ -1,7 +1,9 @@
 /* src/components/Button/Button.css */
 
 .button {
-    background-color: rgb(73, 73, 197); /* Основной цвет */
+    /* background-color: rgb(13, 110, 253); Основной цвет */
+    background-color: rgb(41, 48, 73); /* Основной цвет */
+
     color: white; /* Цвет текста */
     height: 50px; /* Высота кнопки */
     border: none; /* Убираем рамку */
@@ -11,24 +13,7 @@
     display: flex; /* Используем flexbox для центрирования */
     justify-content: center; /* Центрируем по горизонтали */
     align-items: center; /* Центрируем по вертикали */
-    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Анимация переходов */
-}
-
-/* Размеры кнопки */
-.button.wide {
-    width: 100%; /* На всю ширину контейнера */
-}
-
-.button.small {
-    width: 60px; /* Ширина 60px */
-}
-
-.button.medium {
-    width: 100px; /* Ширина 100px */
-}
-
-.button.large {
-    width: 200px; /* Ширина 200px */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
 }
 
 /* Эффекты при наведении */
@@ -41,4 +26,35 @@
     -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
     -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
     box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+}
+
+/* Размеры кнопки */
+/*Ширина*/
+.button-width-wide {
+    width: 100%; /* На всю ширину контейнера */
+}
+
+.button-width-small {
+    width: 60px; /* Ширина 60px */
+}
+
+.button-width-medium {
+    width: 100px; /* Ширина 100px */
+}
+
+.button-width-large {
+    width: 200px; /* Ширина 200px */
+}
+/*Высота: high medium low*/
+.button-height-low {
+    height: 20px; /* Ширина 60px */
+    font-size: 14px; /* Размер шрифта */
+}
+
+.button-height-medium {
+    height: 35px; /* Ширина 100px */
+}
+
+.button-height-high {
+    height: 42px; /* Ширина 200px */
 }

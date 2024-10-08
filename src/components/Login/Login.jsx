@@ -107,17 +107,10 @@ const Login = () => {
                 <div>
                     <Button
                         type='submit'
-                        size='wide'
+                        size_width='wide'
                     >
                         Войти
                     </Button>
-                    {/* <button type='submit'>Войти</button> */}
-                    {/* <button
-                        type='button'
-                        onClick={handleLogout}
-                    >
-                        Выйти
-                    </button> */}
                 </div>
                 <div className='remember-me-line'></div> {/* Линия сверху */}
                 <span className='or-word'>или</span>

@@ -15,7 +15,8 @@ const initialState = {
         password: 'password123', // На практике не храните пароль в открытом виде!
         role: 'владелец транспорта',
         registrationDate: '2024-01-01',
-        profilePicture: 'https://example.com/profile.jpg',
+        profilePicture:
+            'https://i.postimg.cc/HndzPNv7/fotor-ai-20241008122453.jpg',
         additionalInfo: 'Телефон: +1234567890', // Пример дополнительных данных
     },
 };

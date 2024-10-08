@@ -6,21 +6,25 @@ import * as Yup from 'yup';
 import { userService } from '../../services/UserService'; // Импортируйте UserService
 import './Register.css'; // Импорт стилей
 
+import Button from '../common/Button/Button';
+
 const Register = () => {
     const formik = useFormik({
         initialValues: {
             firstName: '',
-            lastName: '',
+            phone: '',
             email: '',
             password: '',
             confirmPassword: '',
         },
         validationSchema: Yup.object({
-            firstName: Yup.string().required('Имя обязательно'),
-            lastName: Yup.string().required('Фамилия обязательна'),
+            firstName: Yup.string().required('Введите ваше Имя'),
+            phone: Yup.string().required('Введите телефон'),
             email: Yup.string()
                 .email('Неверный формат электронной почты')
-                .required('Электронная почта обязательна'),
+                .required(
+                    'Электронная почта обязательна - это будет ваш логин.'
+                ),
             password: Yup.string()
                 .min(6, 'Пароль должен содержать минимум 6 символов')
                 .required('Пароль обязателен'),
@@ -32,7 +36,7 @@ const Register = () => {
             try {
                 await userService.registerUser({
                     firstName: values.firstName,
-                    lastName: values.lastName,
+                    phone: values.phone,
                     email: values.email,
                     password: values.password,
                     role: 'владелец груза', // или другая роль по умолчанию
@@ -66,17 +70,17 @@ const Register = () => {
                 </div>
 
                 <div>
-                    <label htmlFor='lastName'>Фамилия</label>
+                    <label htmlFor='phone'>Телефон</label>
                     <input
-                        id='lastName'
-                        name='lastName'
+                        id='phone'
+                        name='phone'
                         type='text'
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         value={formik.values.lastName}
                     />
-                    {formik.touched.lastName && formik.errors.lastName ? (
-                        <div className='error'>{formik.errors.lastName}</div>
+                    {formik.touched.phone && formik.errors.phone ? (
+                        <div className='error'>{formik.errors.phone}</div>
                     ) : null}
                 </div>
 
@@ -129,8 +133,12 @@ const Register = () => {
                         </div>
                     ) : null}
                 </div>
-
-                <button type='submit'>Зарегистрироваться</button>
+                <Button
+                    type='submit'
+                    size_width='large'
+                    size_height='medium'
+                    children='Зарегистрироваться'
+                />
             </form>
         </div>
     );

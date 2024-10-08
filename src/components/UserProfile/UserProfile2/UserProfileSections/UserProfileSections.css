@@ -1,0 +1,44 @@
+.seporator-line {
+    height: 5px; /* Толщина линии */
+    /* background-color: #ebebeb; Цвет линии */
+    margin: 50px 0; /* Отступы сверху и снизу */
+    border-radius: 1px;
+    background: -webkit-linear-gradient(
+        0deg,
+        rgb(234, 234, 234) 15%,
+        rgb(255, 255, 255) 39%,
+        rgb(234, 234, 234) 91%
+    );
+    background: -moz-linear-gradient(
+        0deg,
+        rgb(234, 234, 234) 15%,
+        rgb(255, 255, 255) 39%,
+        rgb(234, 234, 234) 91%
+    );
+    background: linear-gradient(
+        0deg,
+        rgb(234, 234, 234) 15%,
+        rgb(255, 255, 255) 39%,
+        rgb(234, 234, 234) 91%
+    );
+}
+
+.personal-info-user-photo {
+    max-width: 200px;
+    width: 45%;
+}
+.personal-info-user-password {
+    padding-top: 30px;
+}
+
+.personal-info-user-name {
+    font-weight: 600;
+    font-size: large;
+    color: rgb(217, 78, 32);
+}
+
+.personal-info-user-email,
+.personal-info-user-phone {
+    font-weight: 600;
+    color: rgb(78, 78, 78);
+}

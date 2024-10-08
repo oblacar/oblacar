@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { setTopLeftHover } from './hoverCardFunctions';
 import './hoverCard.css'; // Создайте файл стилей HoverCard.css
 
+import Button from '../../common/Button/Button';
+
 export const HoverUserCard = ({
     isHoveredIcon,
     iconCoordinates,
@@ -32,22 +34,24 @@ export const HoverUserCard = ({
                     <p className='hover-card-title'>Профиль</p>
                     <p>Для оформления заказов, нужно войти в систему</p>
                     <Link to='/login'>
-                        <button
-                            className='btn-hover-user-card login cu-btn-pink '
+                        <Button
+                            type='button'
+                            size_width='wide'
+                            size_height='low'
+                            children='Войти'
                             onClick={handleMouseLeave}
-                        >
-                            Войти
-                        </button>
+                        />
                     </Link>
-
                     <p>или зарегистрироваться</p>
+
                     <Link to='/register'>
-                        <button
-                            className='btn-hover-user-card auth cu-btn-pink '
+                        <Button
+                            type='button'
+                            size_width='wide'
+                            size_height='low'
+                            children='Зарегистрироваться'
                             onClick={handleMouseLeave}
-                        >
-                            Зарегистрироваться
-                        </button>
+                        />
                     </Link>
                 </div>
             </div>

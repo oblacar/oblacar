@@ -19,6 +19,14 @@
 .header {
     width: 100%;
     background-color: #f5f5f5; /* Цвет фона для header */
+    /*наложение картинки под все*/
+    /* background-image: url('../../assets/winter_track.png'); /* Укажите путь к вашему изображению */
+    /* background-size: cover; Растянуть изображение на весь размер header */
+    /* background-position: center; Центрировать изображение */
+    /* background-repeat: no-repeat; Не повторять изображение */
+    /* position: relative; Позиционирование для последующих элементов */
+    /* height: 95px; Высота header */
+    /* z-index: 1; Убедитесь, что header выше других элементов */
 }
 
 /* Верхняя полоса */
@@ -29,7 +37,7 @@
     height: 10px;
     /*padding: 10px 20px; /* Отступы вокруг содержимого */
     /* background-color: #76d2fd; /* Цвет фона верхней полосы */
-    background-color: #6abbf8; /* Цвет фона верхней полосы */
+    background-color: #6abbf8;
 }
 .middleLine {
     height: 30px; /* Задаём высоту элемента */
@@ -37,17 +45,21 @@
     justify-content: center; /* Центрируем содержимое по горизонтали */
     align-items: center; /* Центрируем содержимое по вертикали */
     background-color: #1f1f1f; /* Убедись, что фон виден, если это нужно */
-    color: #d5defe; /* Белый цвет текста */
+
+    /* opacity: 0.6;Прозрачность для черной линии */
 }
 
 .headerSlogan {
+    color: #ffffffcc; /* Белый цвет текста */
     display: flex; /* Используем flexbox для центрирования */
     justify-content: center; /* Центрируем содержимое по горизонтали */
     align-items: center; /* Центрируем по вертикали */
     font-size: 16px; /* Оптимальный размер шрифта */
     /* color: #d5defe; Белый цвет текста */
     text-align: center; /* Центрируем текст внутри блока */
-    font-family: Arial, sans-serif; /* Шрифт, можно заменить на другой */
+
+    /* font-family: Arial, sans-serif; Шрифт, можно заменить на другой */
+    font-family: 'Century Gothic', sans-serif;
 }
 
 /* Нижняя полоса */
@@ -55,7 +67,7 @@
     display: flex;
     justify-content: flex-end; /* Центрируем иконки */
     padding: 10px 5px 3px 5px; /* Отступы снизу */
-    background-color: #d1f1ff; /* Цвет фона нижней полосы */
+    background-color: #d1f1ff;
 }
 
 .iconsArea {
