@@ -13,15 +13,24 @@ const UserProfile = () => {
 
     // Инициализируем состояния для редактирования
     const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
-    const [firstName, setFirstName] = useState(user.firstName); // Состояние для имени
-    const [lastName, setLastName] = useState(user.lastName); // Состояние для фамилии
-    const [email, setEmail] = useState(user.email); // Состояние для email
-    const [role, setRole] = useState(user.role); // Состояние для роли
-    const [registrationDate, setRegistrationDate] = useState(
-        user.registrationDate
-    ); // Состояние для даты регистрации
-    const [profilePicture, setProfilePicture] = useState(user.profilePicture); // Состояние для фото профиля
-    const [additionalInfo, setAdditionalInfo] = useState(user.additionalInfo); // Состояние для дополнительных данных
+
+    // const [firstName, setFirstName] = useState(user.firstName); // Состояние для имени
+    // const [lastName, setLastName] = useState(user.lastName); // Состояние для фамилии
+    // const [email, setEmail] = useState(user.email); // Состояние для email
+    // const [role, setRole] = useState(user.role); // Состояние для роли
+    // const [registrationDate, setRegistrationDate] = useState(
+    //     user.registrationDate
+    // ); // Состояние для даты регистрации
+    // const [profilePicture, setProfilePicture] = useState(user.profilePicture); // Состояние для фото профиля
+    // const [additionalInfo, setAdditionalInfo] = useState(user.additionalInfo); // Состояние для дополнительных данных
+
+    // Состояния данных пользователя
+    const [userPhoto, setUserPhoto] = useState(user.userPhoto); 
+    const [userName, setUserName] = useState(user.userName); 
+    const [userEmail, setUserEmail] = useState(user.userEmail); 
+    const [userPhone, setUserPhone] = useState(user.userPhone); 
+    const [userAbout, setUserAbout] = useState(user.userAbout); 
+    const [userPassword, setUserPassword] = useState(user.userPassword); 
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing); // Переключаем режим редактирования
@@ -30,13 +39,21 @@ const UserProfile = () => {
     const handleSave = () => {
         const updatedUser = {
             ...user,
-            firstName,
-            lastName,
-            email,
-            role,
-            registrationDate,
-            profilePicture,
-            additionalInfo,
+
+            userPhoto,
+            userName,
+            userEmail,
+            userPhone,
+            userAbout,
+            userPassword,
+
+            // firstName,
+            // lastName,
+            // email,
+            // role,
+            // registrationDate,
+            // profilePicture,
+            // additionalInfo,
         };
 
         dispatch({ type: 'SET_USER', payload: updatedUser }); // Сохраняем обновленного пользователя в контекст
@@ -57,73 +74,47 @@ const UserProfile = () => {
                                 Фото профиля (URL)
                             </label>
                             <input
-                                id='profilePicture'
+                                id='userPhoto'
                                 type='text'
-                                value={profilePicture}
-                                onChange={(e) =>
-                                    setProfilePicture(e.target.value)
-                                } // Обновляем состояние URL фото профиля
+                                value={userPhoto}
+                                onChange={(e) => setUserPhoto(e.target.value)} // Обновляем состояние URL фото профиля
                             />
                         </div>
                         <div>
-                            <label htmlFor='firstName'>Имя</label>
+                            <label htmlFor='userName'>Имя</label>
                             <input
-                                id='firstName'
+                                id='userName'
                                 type='text'
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)} // Обновляем состояние имени
+                                value={userName}
+                                onChange={(e) => setUserName(e.target.value)} // Обновляем состояние имени
                             />
                         </div>
                         <div>
-                            <label htmlFor='lastName'>Фамилия</label>
+                            <label htmlFor='userEmail'>Электронная почта</label>
                             <input
-                                id='lastName'
-                                type='text'
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)} // Обновляем состояние фамилии
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor='email'>Электронная почта</label>
-                            <input
-                                id='email'
+                                id='userEmail'
                                 type='email'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)} // Обновляем состояние email
+                                value={userEmail}
+                                onChange={(e) => setUserEmail(e.target.value)} // Обновляем состояние email
                             />
                         </div>
                         <div>
-                            <label htmlFor='role'>Роль</label>
+                            <label htmlFor='userPhone'>Электронная почта</label>
                             <input
-                                id='role'
+                                id='userPhone'
                                 type='text'
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)} // Обновляем состояние роли
+                                value={userPhone}
+                                onChange={(e) => setUserPhone(e.target.value)} // Обновляем состояние email
                             />
                         </div>
                         <div>
-                            <label htmlFor='registrationDate'>
-                                Дата регистрации
-                            </label>
-                            <input
-                                id='registrationDate'
-                                type='date'
-                                value={registrationDate}
-                                onChange={(e) =>
-                                    setRegistrationDate(e.target.value)
-                                } // Обновляем состояние даты регистрации
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor='additionalInfo'>
+                            <label htmlFor='userAbout'>
                                 Дополнительная информация
                             </label>
                             <textarea
-                                id='additionalInfo'
-                                value={additionalInfo}
-                                onChange={(e) =>
-                                    setAdditionalInfo(e.target.value)
-                                } // Обновляем состояние дополнительных данных
+                                id='userAbout'
+                                value={userAbout}
+                                onChange={(e) => setUserAbout(e.target.value)} // Обновляем состояние дополнительных данных
                             />
                         </div>
                         <button
@@ -143,7 +134,7 @@ const UserProfile = () => {
                     <div>
                         <p>
                             <img
-                                src={user.profilePicture}
+                                src={user.userPhoto}
                                 alt='Профиль'
                                 className='profile-photo'
                             />
@@ -152,31 +143,27 @@ const UserProfile = () => {
                             Имя:{' '}
                             <span className='user-option'>
                                 {' '}
-                                {user.firstName}
+                                {user.userName}
                             </span>{' '}
                         </p>
-                        <p>
-                            Фамилия:{' '}
-                            <span className='user-option'>{user.lastName}</span>
-                        </p>
+
                         <p>
                             Электронная почта:{' '}
-                            <span className='user-option'>{user.email}</span>
-                        </p>
-                        <p>
-                            Роль:{' '}
-                            <span className='user-option'>{user.role}</span>
-                        </p>
-                        <p>
-                            Дата регистрации:{' '}
                             <span className='user-option'>
-                                {user.registrationDate}
+                                {user.userEmail}
                             </span>
                         </p>
                         <p>
+                            Телефон:{' '}
+                            <span className='user-option'>
+                                {user.userPhone}
+                            </span>
+                        </p>
+
+                        <p>
                             Дополнительная информация:{' '}
                             <span className='user-option'>
-                                {user.additionalInfo}
+                                {user.userAbout}
                             </span>
                         </p>
                         <Button

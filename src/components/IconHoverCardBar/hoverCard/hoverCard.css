@@ -16,7 +16,7 @@
 
          /* border-top: 6px solid #ff6600;
     border-bottom: 10px solid #ff6600; */
-    border-top: 6px solid #0a00bd;
+    border-top: 6px solid #1e1a7a;
     border-bottom: 10px solid #7d93db;
     /* border-bottom: 10px solid #e65087; */
 
@@ -42,9 +42,10 @@
 }
 
 .hover-card-title {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 18px;
     margin-top: 0;
-    color: black;
+    color: rgb(206, 86, 0);
 }
 
 .btn-hover-user-card {

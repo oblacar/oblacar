@@ -42,3 +42,18 @@
     font-weight: 600;
     color: rgb(78, 78, 78);
 }
+
+.personal-info-user-item-title {
+    font-weight: 600;
+}
+
+.button-container {
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between; /* Размещает кнопки по краям */
+    width: 100%; /* Занимает всю ширину родителя */
+}
+
+.user-about {
+    width: 100%;
+}

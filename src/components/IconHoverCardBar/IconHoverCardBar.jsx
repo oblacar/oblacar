@@ -6,6 +6,7 @@ import IconHoverCard from './IconHoverCard';
 import { HoverUserCard } from './hoverCard/HoverUserCard';
 import { HoverCartCard } from './hoverCard/HoverCartCard';
 import { HoverMessageCard } from './hoverCard/HoverMessageCard';
+import { HoverDeliveryCard } from './hoverCard/HoverDeliveryCard';
 import { HoverOrdersCard } from './hoverCard/HoverOrdersCard';
 import styles from './IconHoverCardBar.module.css';
 
@@ -96,20 +97,20 @@ function IconDropdownMenuBar() {
                 />
 
                 <IconHoverCard
+                    type='Доставки'
+                    iconRef={iconCartRef}
+                    IconComponent={FaShippingFast}
+                    HoverCardComponent={HoverDeliveryCard}
+                    iconCoordinates={iconCartCoordinates}
+                    windowWidth={windowWidth}
+                />
+
+                <IconHoverCard
                     type='Заказы'
                     iconRef={iconOrdersRef}
                     IconComponent={FaClipboardList}
                     HoverCardComponent={HoverOrdersCard}
                     iconCoordinates={iconOrdersCoordinates}
-                    windowWidth={windowWidth}
-                />
-
-                <IconHoverCard
-                    type='Корзина'
-                    iconRef={iconCartRef}
-                    IconComponent={FaShoppingCart}
-                    HoverCardComponent={HoverCartCard}
-                    iconCoordinates={iconCartCoordinates}
                     windowWidth={windowWidth}
                 />
             </div>

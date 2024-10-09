@@ -11,7 +11,8 @@ import './Button.css'; // Импортируйте стили
 
 const Button = ({
     type = 'button',
-    size_width = 'medium',
+    type_btn = '', // тип кнопки: пустая - страндарт, yes - да, no - нет.
+    size_width = '',
     size_height = 'medium',
     children,
     onClick,
@@ -19,7 +20,7 @@ const Button = ({
     return (
         <button
             type={type}
-            className={`button button-width-${size_width} button-height-${size_height}`}
+            className={`button ${type_btn} button-width-${size_width} button-height-${size_height}`}
             onClick={onClick}
         >
             {children}

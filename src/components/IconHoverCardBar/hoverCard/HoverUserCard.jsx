@@ -37,7 +37,7 @@ export const HoverUserCard = ({
                         <Button
                             type='button'
                             size_width='wide'
-                            size_height='low'
+                            size_height='medium'
                             children='Войти'
                             onClick={handleMouseLeave}
                         />
@@ -48,7 +48,7 @@ export const HoverUserCard = ({
                         <Button
                             type='button'
                             size_width='wide'
-                            size_height='low'
+                            size_height='medium'
                             children='Зарегистрироваться'
                             onClick={handleMouseLeave}
                         />
