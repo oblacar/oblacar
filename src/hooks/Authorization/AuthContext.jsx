@@ -1,65 +1,111 @@
-// src/hooks/Authorization/AuthContext.js
+import React, { createContext, useReducer, useEffect, useContext } from 'react';
+import authReducer from './authReducer';
+import { userService } from '../../services/UserService'; // Импорт UserService для взаимодействия с Firebase
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Импорт аутентификации Firebase
 
-import React, { createContext, useReducer, useEffect } from 'react';
-import authReducer from './authReducer'; // Импортируем ваш редюсер
-import { userService } from '../../services/UserService'; // Импортируем UserService для аутентификации
+import UserContext from '../UserContext'; // Импортируем UserContext
 
 // Создание контекста
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(authReducer, { user: null }); // Начальное состояние
+    const [state, dispatch] = useReducer(authReducer, { user: null });
+    const auth = getAuth();
 
-    // Эффект для проверки наличия токена при загрузке
+    const { dispatch: userDispatch } = useContext(UserContext); // Получаем dispatch из UserContext напрямую
+
+    // Эффект для проверки состояния пользователя при загрузке
     useEffect(() => {
-        const token = localStorage.getItem('authToken'); // Проверяем наличие токена
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    console.log(
+                        'Пользователь аутентифицирован, UID:',
+                        user.uid
+                    );
 
-        if (token) {
-            //TODO токен уже существует в системе, нужно как-то подтягивать данные юзера для этого пользователя
-            console.log('токен существует: ', token);
+                    // Если пользователь авторизован, подтягиваем его профиль из базы данных
+                    const userProfile = await userService.getUserProfile(
+                        user.uid
+                    );
 
-            const email = localStorage.getItem('authEmail');
+                    console.log('Загружен профиль пользователя:', userProfile);
 
-            if (email) {
-                const user = { email: email };
-                dispatch({ type: 'LOGIN', payload: user }); // Обновляем состояние при входе
+                    dispatch({
+                        type: 'LOGIN',
+                        payload: { ...user, ...userProfile },
+                    });
+
+                    // Обновляем состояние в UserContext через dispatch
+                    userDispatch({
+                        type: 'SET_USER',
+                        payload: { ...user, ...userProfile },
+                    });
+                } catch (error) {
+                    console.error(
+                        'Ошибка загрузки профиля пользователя:',
+                        error.message
+                    );
+                }
             } else {
-                console.log(
-                    'Почта пользователя (логин) отсуствует при обновлении страницы.'
-                );
+                dispatch({ type: 'LOGOUT' });
+
+                // Очищаем состояние пользователя в UserContext
+                userDispatch({ type: 'CLEAR_USER' });
             }
-        }
-    }, []);
+        });
+
+        // Очистка подписки при размонтировании компонента
+        return () => unsubscribe();
+    }, [auth, userDispatch]);
 
     // Функция для входа
     const login = async (email, password, isRememberUser) => {
         try {
-            const user = await userService.loginUser({ email, password }); // Вход через UserService
+            const user = await userService.loginUser({ email, password });
 
+            // Загружаем профиль пользователя и обновляем состояние
+            const userProfile = await userService.getUserProfile(user.uid);
+
+            // Обновление состояния аутентификации
+            dispatch({ type: 'LOGIN', payload: { ...user, ...userProfile } });
+
+            // Обновляем состояние в UserContext через dispatch
+            userDispatch({
+                type: 'SET_USER',
+                payload: { ...user, ...userProfile },
+            });
+
+            // Если выбран "Запомнить меня"
             if (isRememberUser) {
-                // внесем uid и емэйл в localStorage
-                localStorage.setItem('authToken', user.uid); // Сохраняем uid в localStorage
-                localStorage.setItem('authEmail', user.email); // Сохраняем uid в localStorages
+                localStorage.setItem('authToken', user.uid); // Сохраняем UID в localStorage
+                localStorage.setItem('authEmail', user.email); // Сохраняем email в localStorage
+            } else {
+                // Если не выбран, можно очистить localStorage
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('authEmail');
             }
-
-            //TODO нужно протестировать после подготовки формы Пользователя
-            dispatch({ type: 'LOGIN', payload: user }); // Обновляем состояние с новым пользователем
         } catch (error) {
-            console.error('Ошибка входа:', error.message); // Обработка ошибок
+            console.error('Ошибка входа:', error.message);
         }
     };
 
     // Функция для выхода
     const logout = async () => {
         try {
-            await userService.logoutUser(); // Выход через UserService
+            await userService.logoutUser();
 
-            localStorage.removeItem('authToken'); // Очистка токена из localStorage
-            localStorage.removeItem('authEmail'); // Очистка токена из localStorage
+            // Обновление состояния аутентификации
+            dispatch({ type: 'LOGOUT' });
 
-            dispatch({ type: 'LOGOUT' }); // Обновляем состояние при выходе
+            // Очищаем UserContext через dispatch
+            userDispatch({ type: 'CLEAR_USER' });
+
+            // Очищаем localStorage при выходе
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authEmail');
         } catch (error) {
-            console.error('Ошибка выхода:', error.message); // Обработка ошибок
+            console.error('Ошибка выхода:', error.message);
         }
     };
 
@@ -67,8 +113,8 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider
             value={{
-                user: state.user, // Объект пользователя
-                isAuthenticated: !!state.user, // true, если пользователь существует
+                user: state.user, // Данные пользователя
+                isAuthenticated: !!state.user, // true, если пользователь авторизован
                 login, // Функция входа
                 logout, // Функция выхода
             }}

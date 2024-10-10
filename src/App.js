@@ -15,8 +15,8 @@ import { UserProvider } from './hooks/UserContext';
 
 const App = () => {
     return (
-        <AuthProvider>
-            <UserProvider>
+        <UserProvider>
+            <AuthProvider>
                 <Router>
                     <Routes>
                         <Route element={<Layout />}>
@@ -39,8 +39,8 @@ const App = () => {
                         </Route>
                     </Routes>
                 </Router>
-            </UserProvider>
-        </AuthProvider>
+            </AuthProvider>
+        </UserProvider>
     );
 };
 

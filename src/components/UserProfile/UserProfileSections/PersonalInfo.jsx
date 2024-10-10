@@ -13,12 +13,14 @@ const PersonalInfo = () => {
     // Инициализируем состояния для редактирования
     const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
 
+    // https://i.postimg.cc/HndzPNv7/fotor-ai-20241008122453.jpg
+
     const [userPhoto, setUserPhoto] = useState(user.userPhoto);
     const [userName, setUserName] = useState(user.userName);
     const [userEmail, setUserEmail] = useState(user.userEmail);
     const [userPhone, setUserPhone] = useState(user.userPhone);
     const [userAbout, setUserAbout] = useState(user.userAbout);
-    const [userPassword, setUserPassword] = useState(user.userPassword);
+    const [userPassword, setUserPassword] = useState(user.userPassword); //TODO make pass correction
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing); // Переключаем режим редактирования
@@ -37,9 +39,8 @@ const PersonalInfo = () => {
         };
 
         dispatch({ type: 'UPDATE_USER', payload: updatedUser }); // Сохраняем обновленного пользователя в контекст
-        console.log('Сохраненные данные:', updatedUser);
+
         setIsEditing(false); // Переключаем обратно на режим просмотра
-        console.log(isEditing);
     };
 
     const handleDontSave = () => {
@@ -51,6 +52,10 @@ const PersonalInfo = () => {
 
         setIsEditing(false); // Переключаем обратно на режим просмотра
     };
+
+    if (!user) {
+        return <div>Пользователь не аутентифицирован</div>;
+    }
 
     return (
         <div className='personal-info-container'>
