@@ -1,6 +1,6 @@
 // src/components/UserProfile/PersonalInfo.js
 
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import './UserProfileSections.css'; // Импортируйте стили
 import Button from '../../common/Button/Button';
 
@@ -12,20 +12,37 @@ const PersonalInfo = () => {
     const { state, dispatch } = useContext(UserContext); // Получаем данные пользователя из контекста
     const { user } = state; // Извлекаем пользователя из состояния
 
-    // Инициализируем состояние для пользователя
     const [userData, setUserData] = useState(user || {}); // Используем одно состояние для всех данных пользователя
 
-    // Инициализируем состояния для редактирования
     const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
-    // https://i.postimg.cc/HndzPNv7/fotor-ai-20241008122453.jpg
+
+    const [selectedPhoto, setSelectedPhoto] = useState(null); // Для хранения выбранного фото
+    const [previewPhoto, setPreviewPhoto] = useState(null); // Для хранения превью
+
+    const fileInputRef = useRef(null); // Создаём реф для input - используем в для загрузки фото
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing); // Переключаем режим редактирования
     };
 
     const handleSave = async () => {
+        let downloadURL = userData.userPhoto; // По умолчанию используем старую ссылку
+
+        // Если выбрано новое фото, загружаем его в Firebase
+        if (selectedPhoto) {
+            try {
+                downloadURL = await userService.uploadUserPhoto(
+                    user.userId,
+                    selectedPhoto
+                ); // Загружаем фото и получаем URL
+            } catch (error) {
+                console.error('Ошибка загрузки фото:', error.message);
+                return; // Прерываем сохранение, если произошла ошибка при загрузке фото
+            }
+        }
+
         const updatedUser = {
-            userPhoto: userData.userPhoto || '',
+            userPhoto: downloadURL || '',
             userName: userData.userName || '',
             // userEmail: userData.userEmail,
             userPhone: userData.userPhone || '',
@@ -75,6 +92,45 @@ const PersonalInfo = () => {
         });
     };
 
+    //метод загрузки фото в превью
+    const handlePhotoUpload = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            const previewUrl = URL.createObjectURL(file); // Создаём временный URL
+            setSelectedPhoto(previewUrl); // Обновляем состояние
+            setPreviewPhoto(previewUrl); // Обновляем превью
+        }
+    };
+
+    // Открытие диалога для выбора файла при клике на изображение
+    const handlePhotoClick = () => {
+        fileInputRef.current.click(); // Программно вызываем input для выбора файла
+    };
+
+    // const uploadPhoto = async (file) => {
+    //     try {
+    //         // Создаем ссылку на хранилище Firebase с уникальным именем для файла
+    //         const storageRef = storageRef(
+    //             storage,
+    //             `profilePhotos/${user.userId}`
+    //         );
+    //         await uploadBytes(storageRef, file); // Загружаем файл в Firebase Storage
+
+    //         const downloadURL = await getDownloadURL(storageRef); // Получаем URL загруженного файла
+
+    //         // Обновляем ссылку на фото в состоянии
+    //         setUserData((prevData) => ({
+    //             ...prevData,
+    //             userPhoto: downloadURL, // Сохраняем ссылку на фото в состоянии
+    //         }));
+
+    //         console.log('Фотография успешно загружена');
+    //     } catch (error) {
+    //         console.error('Ошибка загрузки фотографии:', error.message);
+    //     }
+    // };
+
     return (
         <>
             {!user ? (
@@ -82,13 +138,18 @@ const PersonalInfo = () => {
             ) : (
                 <div className='personal-info-container'>
                     <h2>Личные данные</h2>
-                    <img
-                        className='personal-info-user-photo'
-                        src='https://via.placeholder.com/200'
-                        alt='Профиль'
-                    />
+
                     {!isEditing ? (
                         <div>
+                            <img
+                                className='personal-info-user-photo'
+                                src={
+                                    previewPhoto ||
+                                    userData.userPhoto ||
+                                    'https://via.placeholder.com/200'
+                                }
+                                alt='Фото пользователя'
+                            />
                             <p className='personal-info-user-name'>
                                 {userData.userName}
                             </p>
@@ -111,6 +172,27 @@ const PersonalInfo = () => {
                         </div>
                     ) : (
                         <div>
+                            <div>
+                                <img
+                                    className='personal-info-user-photo'
+                                    src={
+                                        previewPhoto ||
+                                        userData.userPhoto ||
+                                        'https://via.placeholder.com/200'
+                                    }
+                                    alt='Профиль пользователя'
+                                    onClick={handlePhotoClick} // Открываем выбор файла при клике
+                                    style={{ cursor: 'pointer' }} // Курсор указателя для индикации клика
+                                />
+                                {/* Скрытый input для загрузки фото */}
+                                <input
+                                    type='file'
+                                    ref={fileInputRef} // Привязываем реф
+                                    style={{ display: 'none' }} // Скрываем input
+                                    accept='image/*'
+                                    onChange={handlePhotoUpload} // Обработчик загрузки файла
+                                />
+                            </div>
                             <div>
                                 <div>
                                     <label

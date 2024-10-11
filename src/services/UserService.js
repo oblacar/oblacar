@@ -149,6 +149,22 @@ class UserService {
         }
     }
 
+    // Метод для загрузки фото в Firebase Storage и получения URL
+    async uploadUserPhoto(userId, file) {
+        try {
+            const storageReference = storageRef(
+                storage,
+                `profilePhotos/${userId}`
+            );
+            await uploadBytes(storageReference, file); // Загрузка файла
+            const downloadURL = await getDownloadURL(storageReference); // Получение URL загруженного файла
+            return downloadURL; // Возвращаем URL фото
+        } catch (error) {
+            console.error('Ошибка загрузки фото:', error.message);
+            throw error; // Пробрасываем ошибку для обработки в компоненте
+        }
+    }
+
     //     // Обновляем данные пользователя в Realtime Database
     //     await update(databaseRef(db, 'users/' + user.uid), {
     //         userPhoto: photoURL,
