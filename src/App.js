@@ -18,16 +18,11 @@ import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импор�
 import { UserProvider } from './hooks/UserContext';
 
 const App = () => {
-    useEffect(() => {
-        console.log('начало');
-    }, []);
-
     return (
         <>
             <UserProvider>
                 <AuthProvider>
                     <Router>
-                        <div>App Component Rendered!</div> {/* Для отладки */}
                         <Routes>
                             <Route element={<Layout />}>
                                 <Route

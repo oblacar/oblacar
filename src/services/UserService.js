@@ -120,32 +120,45 @@ class UserService {
     }
 
     // Обновление профиля пользователя
-    async updateUserProfile(updatedData) {
-        const user = auth.currentUser;
-        if (!user) {
-            throw new Error('Пользователь не найден');
-        }
+    // async updateUserProfile(updatedData) {
+    //     const user = auth.currentUser;
+    //     if (!user) {
+    //         throw new Error('Пользователь не найден');
+    //     }
 
-        let photoURL = updatedData.userPhoto;
+    //     let photoURL = updatedData.userPhoto;
 
-        // Если есть новое фото, загружаем его
-        if (updatedData.profilePicture) {
-            photoURL = await this.uploadProfilePicture(
-                user.uid,
-                updatedData.profilePicture
+    //     // Если есть новое фото, загружаем его
+    //     if (updatedData.profilePicture) {
+    //         photoURL = await this.uploadProfilePicture(
+    //             user.uid,
+    //             updatedData.profilePicture
+    //         );
+    //     }
+
+    async updateUserProfile(userId, updatedData) {
+        const userRef = databaseRef(db, 'users/' + userId); // Ссылка на пользователя в базе
+        try {
+            await update(userRef, updatedData); // Обновляем только измененные данные
+            console.log('Профиль пользователя успешно обновлен');
+        } catch (error) {
+            console.error(
+                'Ошибка обновления профиля пользователя:',
+                error.message
             );
         }
-
-        // Обновляем данные пользователя в Realtime Database
-        await update(databaseRef(db, 'users/' + user.uid), {
-            userPhoto: photoURL,
-            userName: updatedData.userName,
-            userPhone: updatedData.userPhone,
-            userAbout: updatedData.userAbout,
-        });
-
-        console.log('Профиль пользователя обновлен');
     }
+
+    //     // Обновляем данные пользователя в Realtime Database
+    //     await update(databaseRef(db, 'users/' + user.uid), {
+    //         userPhoto: photoURL,
+    //         userName: updatedData.userName,
+    //         userPhone: updatedData.userPhone,
+    //         userAbout: updatedData.userAbout,
+    //     });
+
+    //     console.log('Профиль пользователя обновлен');
+    // }
 
     // Загрузка фотографии профиля пользователя в Firebase Storage
     async uploadProfilePicture(userId, file) {

@@ -6,74 +6,64 @@ import Button from '../../common/Button/Button';
 
 import UserContext from '../../../hooks/UserContext';
 
-import { userService } from '../../../services/UserService';
-
 const PersonalInfo = () => {
     const { state, dispatch } = useContext(UserContext); // Получаем данные пользователя из контекста
     const { user } = state; // Извлекаем пользователя из состояния
-
-    // Инициализируем состояние для пользователя
-    const [userData, setUserData] = useState(user || {}); // Используем одно состояние для всех данных пользователя
 
     // Инициализируем состояния для редактирования
     const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
     // https://i.postimg.cc/HndzPNv7/fotor-ai-20241008122453.jpg
 
+    const [userPhoto, setUserPhoto] = useState(user ? user.userPhoto : '');
+    const [userName, setUserName] = useState(user ? user.userName : '');
+    const [userEmail, setUserEmail] = useState(user ? user.userEmail : '');
+    const [userPhone, setUserPhone] = useState(user ? user.userPhone : '');
+    const [userAbout, setUserAbout] = useState(user ? user.userAbout : '');
+    const [userPassword, setUserPassword] = useState(
+        user ? user.userPassword : ''
+    ); //TODO make pass correction
+
     const handleEditToggle = () => {
         setIsEditing(!isEditing); // Переключаем режим редактирования
     };
 
-    const handleSave = async () => {
+    const handleSave = () => {
         const updatedUser = {
-            userPhoto: userData.userPhoto || '',
-            userName: userData.userName || '',
-            // userEmail: userData.userEmail,
-            userPhone: userData.userPhone || '',
-            userAbout: userData.userAbout || '',
-            // Добавь сюда только те поля, которые должны быть сохранены
+            ...user,
+
+            userPhoto,
+            userName,
+            userEmail,
+            userPhone,
+            userAbout,
+            userPassword,
         };
 
-        console.log('Обновляемый профиль:', updatedUser);
+        dispatch({ type: 'UPDATE_USER', payload: updatedUser }); // Сохраняем обновленного пользователя в контекст
 
-        // Сохраняем обновленные данные в контексте
-        dispatch({ type: 'UPDATE_USER', payload: updatedUser });
-
-        // Сохраняем обновленные данные в Firebase
-        try {
-            await userService.updateUserProfile(user.userId, updatedUser); // Обновляем данные в Firebase
-            console.log('Данные профиля успешно обновлены в Firebase');
-        } catch (error) {
-            console.error(
-                'Ошибка обновления данных в Firebase:',
-                error.message
-            );
-        }
-
-        setIsEditing(false); // Выходим из режима редактирования
-
-        // dispatch({ type: 'UPDATE_USER', payload: userData }); // Сохраняем обновленного пользователя в контекст
-
-        // setIsEditing(false); // Переключаем обратно на режим просмотра
+        setIsEditing(false); // Переключаем обратно на режим просмотра
     };
 
     const handleDontSave = () => {
-        // Возвращаем данные пользователя в исходное состояние
-        setUserData(user);
-        setIsEditing(false); // Выходим из режима редактирования
+        setUserPhoto(user.userPhoto);
+        setUserName(user.userName);
+        setUserEmail(user.userEmail);
+        setUserPhone(user.userPhone);
+        setUserAbout(user.userAbout);
+
+        setIsEditing(false); // Переключаем обратно на режим просмотра
     };
 
     useEffect(() => {
         if (user) {
-            setUserData(user);
+            setUserPhoto(user.userPhoto);
+            setUserName(user.userName);
+            setUserEmail(user.userEmail);
+            setUserPhone(user.userPhone);
+            setUserAbout(user.userAbout);
+            setUserPassword(user.userPassword);
         }
     }, [user]);
-
-    const handleInputChange = (field) => (e) => {
-        setUserData({
-            ...userData,
-            [field]: e.target.value,
-        });
-    };
 
     return (
         <>
@@ -90,16 +80,16 @@ const PersonalInfo = () => {
                     {!isEditing ? (
                         <div>
                             <p className='personal-info-user-name'>
-                                {userData.userName}
+                                {userName}
                             </p>
                             <div className='personal-info-user-email'>
-                                {userData.userEmail}
+                                {userEmail}
                             </div>
                             <div className='personal-info-user-phone'>
-                                {userData.userPhone}
+                                {userPhone}
                             </div>
                             <p className='personal-info-user-info'>
-                                {userData.userAbout}
+                                {userAbout}
                             </p>
                             {/* <div className='seporator-line'></div> */}
                             <Button
@@ -123,8 +113,10 @@ const PersonalInfo = () => {
                                     <input
                                         id='userName'
                                         type='text'
-                                        value={userData.userName || ''}
-                                        onChange={handleInputChange('userName')} // Обновляем состояние userName
+                                        value={userName}
+                                        onChange={(e) =>
+                                            setUserName(e.target.value)
+                                        } // Обновляем состояние userName
                                     />
                                 </div>
                             </div>
@@ -142,10 +134,8 @@ const PersonalInfo = () => {
                                         disabled
                                         id='userEmail'
                                         type='text'
-                                        value={userData.userEmail || ''}
-                                        // onChange={(e) => setUserEmail(e.target.value)} // Обновляем состояние userEmail. Пока комментим,
-                                        // что бы пользователь не мог вносить изменения, т.к. это его логин.
-                                        // Для смены почты нужно будет продумывать логику подтверждения через дополнительные верификации.
+                                        value={userEmail}
+                                        // onChange={(e) => setUserEmail(e.target.value)} // Обновляем состояние userEmail
                                     />
                                 </div>
                             </div>
@@ -160,10 +150,10 @@ const PersonalInfo = () => {
                                     <input
                                         id='userPhone'
                                         type='text'
-                                        value={userData.userPhone || ''}
-                                        onChange={handleInputChange(
-                                            'userPhone'
-                                        )} // Обновляем состояние userPhone
+                                        value={userPhone}
+                                        onChange={(e) =>
+                                            setUserPhone(e.target.value)
+                                        } // Обновляем состояние userEmail
                                     />
                                 </div>
                             </div>
@@ -180,8 +170,10 @@ const PersonalInfo = () => {
                                     maxLength='200'
                                     placeholder='Введите до 200 символов'
                                     id='userAbout'
-                                    value={userData.userAbout || ''}
-                                    onChange={handleInputChange('userAbout')} // Обновляем состояние дополнительных данных
+                                    value={userAbout}
+                                    onChange={(e) =>
+                                        setUserAbout(e.target.value)
+                                    } // Обновляем состояние дополнительных данных
                                 />
                             </div>
 
