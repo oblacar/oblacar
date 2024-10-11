@@ -59,6 +59,17 @@ export const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, [auth, userDispatch]);
 
+    useEffect(() => {
+        const rememberMe = localStorage.getItem('authToken');
+
+        // Если "Запомнить меня" не выбрано, делаем принудительный выход при перезагрузке
+        if (!rememberMe) {
+            auth.signOut(); // Принудительно разлогиниваем пользователя
+            dispatch({ type: 'LOGOUT' });
+            userDispatch({ type: 'CLEAR_USER' });
+        }
+    }, [dispatch, userDispatch]);
+
     // Функция для входа
     const login = async (email, password, isRememberUser) => {
         try {
@@ -119,6 +130,8 @@ export const AuthProvider = ({ children }) => {
                 logout, // Функция выхода
             }}
         >
+            {console.log('isAuthenticated: ', !!state.user)}{' '}
+            {console.log('user: ', state.user)} {/* Лог для проверки */}
             {children}
         </AuthContext.Provider>
     );
