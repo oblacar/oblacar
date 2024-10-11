@@ -119,23 +119,6 @@ class UserService {
         }
     }
 
-    // Обновление профиля пользователя
-    // async updateUserProfile(updatedData) {
-    //     const user = auth.currentUser;
-    //     if (!user) {
-    //         throw new Error('Пользователь не найден');
-    //     }
-
-    //     let photoURL = updatedData.userPhoto;
-
-    //     // Если есть новое фото, загружаем его
-    //     if (updatedData.profilePicture) {
-    //         photoURL = await this.uploadProfilePicture(
-    //             user.uid,
-    //             updatedData.profilePicture
-    //         );
-    //     }
-
     async updateUserProfile(userId, updatedData) {
         const userRef = databaseRef(db, 'users/' + userId); // Ссылка на пользователя в базе
         try {
@@ -152,29 +135,31 @@ class UserService {
     // Метод для загрузки фото в Firebase Storage и получения URL
     async uploadUserPhoto(userId, file) {
         try {
-            const storageReference = storageRef(
-                storage,
-                `profilePhotos/${userId}`
-            );
-            await uploadBytes(storageReference, file); // Загрузка файла
-            const downloadURL = await getDownloadURL(storageReference); // Получение URL загруженного файла
-            return downloadURL; // Возвращаем URL фото
+            // Проверяем, что файл не пустой
+            if (file && file.size > 0) {
+                const storageReference = storageRef(
+                    storage,
+                    `profilePhotos/${userId}`
+                );
+
+                const metadata = {
+                    contentType: file.type, // Устанавливаем MIME-тип файла
+                };
+
+                await uploadBytes(storageReference, file, metadata); // Загружаем файл с метаданными
+
+                const downloadURL = await getDownloadURL(storageReference); // Получаем URL загруженного файла
+                console.log('URL загруженного файла:', downloadURL); // Проверяем полученный URL
+
+                return downloadURL;
+            } else {
+                console.error('Неправильный или пустой файл.');
+            }
         } catch (error) {
             console.error('Ошибка загрузки фото:', error.message);
             throw error; // Пробрасываем ошибку для обработки в компоненте
         }
     }
-
-    //     // Обновляем данные пользователя в Realtime Database
-    //     await update(databaseRef(db, 'users/' + user.uid), {
-    //         userPhoto: photoURL,
-    //         userName: updatedData.userName,
-    //         userPhone: updatedData.userPhone,
-    //         userAbout: updatedData.userAbout,
-    //     });
-
-    //     console.log('Профиль пользователя обновлен');
-    // }
 
     // Загрузка фотографии профиля пользователя в Firebase Storage
     async uploadProfilePicture(userId, file) {
@@ -182,8 +167,10 @@ class UserService {
         try {
             // Загружаем файл в Firebase Storage
             const snapshot = await uploadBytes(storageReference, file);
+
             // Получаем URL загруженного файла
             const downloadURL = await getDownloadURL(snapshot.ref);
+
             return downloadURL;
         } catch (error) {
             console.error('Ошибка загрузки фотографии:', error);

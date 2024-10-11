@@ -29,10 +29,10 @@ const userReducer = (state, action) => {
     switch (action.type) {
         case 'SET_USER':
             return { ...state, user: action.payload }; // Полностью заменяем пользователя
+
         case 'UPDATE_USER':
             return { ...state, user: { ...state.user, ...action.payload } }; // Обновляем поля пользователя
-        // case 'CLEAR_USER':
-        //     return initialState; // Сбрасываем состояние пользователя
+
         case 'CLEAR_USER':
             return { ...state, user: null }; // Очищаем пользователя, возвращая null
 

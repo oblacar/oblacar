@@ -23,6 +23,11 @@ const PersonalInfo = () => {
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing); // Переключаем режим редактирования
+
+        if (!isEditing) {
+            setPreviewPhoto(userData.userPhoto); // При входе в режим редактирования показываем старую фото
+            setSelectedPhoto(null); // Очищаем выбранное фото
+        }
     };
 
     const handleSave = async () => {
@@ -34,12 +39,14 @@ const PersonalInfo = () => {
                 downloadURL = await userService.uploadUserPhoto(
                     user.userId,
                     selectedPhoto
-                ); // Загружаем фото и получаем URL
+                ); // Загружаем оригинальный файл
             } catch (error) {
                 console.error('Ошибка загрузки фото:', error.message);
                 return; // Прерываем сохранение, если произошла ошибка при загрузке фото
             }
         }
+
+        console.log(downloadURL);
 
         const updatedUser = {
             userPhoto: downloadURL || '',
@@ -67,15 +74,15 @@ const PersonalInfo = () => {
         }
 
         setIsEditing(false); // Выходим из режима редактирования
-
-        // dispatch({ type: 'UPDATE_USER', payload: userData }); // Сохраняем обновленного пользователя в контекст
-
-        // setIsEditing(false); // Переключаем обратно на режим просмотра
     };
 
     const handleDontSave = () => {
         // Возвращаем данные пользователя в исходное состояние
         setUserData(user);
+
+        setPreviewPhoto(user.userPhoto); // Сбрасываем превью на старую фото
+        setSelectedPhoto(null); // Сбрасываем выбранное фото
+
         setIsEditing(false); // Выходим из режима редактирования
     };
 
@@ -96,9 +103,11 @@ const PersonalInfo = () => {
     const handlePhotoUpload = (e) => {
         const file = e.target.files[0];
 
+        console.log('Выбранный файл:', file); // Проверка файла
+
         if (file) {
             const previewUrl = URL.createObjectURL(file); // Создаём временный URL
-            setSelectedPhoto(previewUrl); // Обновляем состояние
+            setSelectedPhoto(file); // / Сохраняем оригинальный файл для дальнейшей загрузки в Firebase
             setPreviewPhoto(previewUrl); // Обновляем превью
         }
     };
@@ -107,29 +116,6 @@ const PersonalInfo = () => {
     const handlePhotoClick = () => {
         fileInputRef.current.click(); // Программно вызываем input для выбора файла
     };
-
-    // const uploadPhoto = async (file) => {
-    //     try {
-    //         // Создаем ссылку на хранилище Firebase с уникальным именем для файла
-    //         const storageRef = storageRef(
-    //             storage,
-    //             `profilePhotos/${user.userId}`
-    //         );
-    //         await uploadBytes(storageRef, file); // Загружаем файл в Firebase Storage
-
-    //         const downloadURL = await getDownloadURL(storageRef); // Получаем URL загруженного файла
-
-    //         // Обновляем ссылку на фото в состоянии
-    //         setUserData((prevData) => ({
-    //             ...prevData,
-    //             userPhoto: downloadURL, // Сохраняем ссылку на фото в состоянии
-    //         }));
-
-    //         console.log('Фотография успешно загружена');
-    //     } catch (error) {
-    //         console.error('Ошибка загрузки фотографии:', error.message);
-    //     }
-    // };
 
     return (
         <>
@@ -144,7 +130,6 @@ const PersonalInfo = () => {
                             <img
                                 className='personal-info-user-photo'
                                 src={
-                                    previewPhoto ||
                                     userData.userPhoto ||
                                     'https://via.placeholder.com/200'
                                 }
@@ -162,7 +147,7 @@ const PersonalInfo = () => {
                             <p className='personal-info-user-info'>
                                 {userData.userAbout}
                             </p>
-                            {/* <div className='seporator-line'></div> */}
+
                             <Button
                                 type='button'
                                 size_height='medium'
