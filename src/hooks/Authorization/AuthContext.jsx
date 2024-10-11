@@ -16,6 +16,16 @@ export const AuthProvider = ({ children }) => {
 
     // Эффект для проверки состояния пользователя при загрузке
     useEffect(() => {
+        const token = localStorage.getItem('authToken');
+
+        // Если токена нет, делаем принудительный выход
+        if (!token) {
+            auth.signOut();
+            dispatch({ type: 'LOGOUT' });
+            userDispatch({ type: 'CLEAR_USER' });
+            return; // Останавливаем выполнение, если токен отсутствует
+        }
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -58,17 +68,6 @@ export const AuthProvider = ({ children }) => {
         // Очистка подписки при размонтировании компонента
         return () => unsubscribe();
     }, [auth, userDispatch]);
-
-    useEffect(() => {
-        const rememberMe = localStorage.getItem('authToken');
-
-        // Если "Запомнить меня" не выбрано, делаем принудительный выход при перезагрузке
-        if (!rememberMe) {
-            auth.signOut(); // Принудительно разлогиниваем пользователя
-            dispatch({ type: 'LOGOUT' });
-            userDispatch({ type: 'CLEAR_USER' });
-        }
-    }, [dispatch, userDispatch]);
 
     // Функция для входа
     const login = async (email, password, isRememberUser) => {
@@ -130,8 +129,6 @@ export const AuthProvider = ({ children }) => {
                 logout, // Функция выхода
             }}
         >
-            {console.log('isAuthenticated: ', !!state.user)}{' '}
-            {console.log('user: ', state.user)} {/* Лог для проверки */}
             {children}
         </AuthContext.Provider>
     );
