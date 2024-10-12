@@ -1,8 +1,28 @@
+.user-data-container {
+    margin: 0;
+    padding: 0;
+}
+
+/* .personal-info-container{
+background-color: bisque;
+} */
+
+.user-data-container {
+    padding: 20px;
+    background-color: white;
+    border-radius: 15px 15px 0px 0px;
+}
+
+.password-container {
+    border-top: 3px solid rgb(13, 0, 198);
+    padding: 20px;
+    height: 100%;
+}
+
 .personal-info-user-photo {
     max-width: 200px;
     width: 60%;
     border-radius: 10%;
-
 }
 .personal-info-user-password {
     padding-top: 30px;
@@ -33,4 +53,6 @@
 
 .user-about {
     width: 100%;
+    border: 3px solid rgb(185, 185, 253);
+    border-radius: 5px;
 }

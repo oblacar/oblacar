@@ -125,173 +125,180 @@ const PersonalInfo = () => {
                 <div>Пользователь не аутентифицирован</div>
             ) : (
                 <div className='personal-info-container'>
-                    <h2>Личные данные</h2>
-                    {!isEditing ? (
-                        <div>
-                            <img
-                                className='personal-info-user-photo'
-                                src={
-                                    userData.userPhoto ||
-                                    'https://via.placeholder.com/200'
-                                }
-                                alt='Фото пользователя'
-                            />
-                            <p className='personal-info-user-name'>
-                                {userData.userName}
-                            </p>
-                            <div className='personal-info-user-email'>
-                                {userData.userEmail}
-                            </div>
-                            <div className='personal-info-user-phone'>
-                                {userData.userPhone}
-                            </div>
-                            <p className='personal-info-user-info'>
-                                {userData.userAbout}
-                            </p>
-
-                            <Button
-                                type='button'
-                                size_height='medium'
-                                children='Редактировать профиль'
-                                onClick={handleEditToggle}
-                            />
-                        </div>
-                    ) : (
-                        <div>
+                    <div className='user-data-container'>
+                        <h2>Личные данные</h2>
+                        {!isEditing ? (
                             <div>
                                 <img
                                     className='personal-info-user-photo'
                                     src={
-                                        previewPhoto ||
                                         userData.userPhoto ||
                                         'https://via.placeholder.com/200'
                                     }
-                                    alt='Профиль пользователя'
-                                    onClick={handlePhotoClick} // Открываем выбор файла при клике
-                                    style={{ cursor: 'pointer' }} // Курсор указателя для индикации клика
+                                    alt='Фото пользователя'
                                 />
-                                {/* Скрытый input для загрузки фото */}
-                                <input
-                                    type='file'
-                                    ref={fileInputRef} // Привязываем реф
-                                    style={{ display: 'none' }} // Скрываем input
-                                    accept='image/*'
-                                    onChange={handlePhotoUpload} // Обработчик загрузки файла
+                                <p className='personal-info-user-name'>
+                                    {userData.userName}
+                                </p>
+                                <div className='personal-info-user-email'>
+                                    {userData.userEmail}
+                                </div>
+                                <div className='personal-info-user-phone'>
+                                    {userData.userPhone}
+                                </div>
+                                <p className='personal-info-user-info'>
+                                    {userData.userAbout}
+                                </p>
+
+                                <Button
+                                    type='button'
+                                    size_height='medium'
+                                    children='Редактировать профиль'
+                                    onClick={handleEditToggle}
                                 />
                             </div>
+                        ) : (
                             <div>
                                 <div>
-                                    <label
-                                        className='personal-info-user-item-title'
-                                        htmlFor='userName'
-                                    >
-                                        Имя пользователя (отображается
-                                        окружающим)
-                                    </label>
+                                    <img
+                                        className='personal-info-user-photo'
+                                        src={
+                                            previewPhoto ||
+                                            userData.userPhoto ||
+                                            'https://via.placeholder.com/200'
+                                        }
+                                        alt='Профиль пользователя'
+                                        onClick={handlePhotoClick} // Открываем выбор файла при клике
+                                        style={{ cursor: 'pointer' }} // Курсор указателя для индикации клика
+                                    />
+                                    {/* Скрытый input для загрузки фото */}
                                     <input
-                                        id='userName'
-                                        type='text'
-                                        value={userData.userName || ''}
-                                        onChange={handleInputChange('userName')} // Обновляем состояние userName
+                                        type='file'
+                                        ref={fileInputRef} // Привязываем реф
+                                        style={{ display: 'none' }} // Скрываем input
+                                        accept='image/*'
+                                        onChange={handlePhotoUpload} // Обработчик загрузки файла
                                     />
                                 </div>
-                            </div>
-                            <div>
                                 <div>
-                                    <label
-                                        className='personal-info-user-item-title'
-                                        htmlFor='userEmail'
-                                    >
-                                        Электронная почта - это{' '}
-                                        <span> Ваш логин </span>
-                                        при входе
-                                    </label>
-                                    <input
-                                        disabled
-                                        id='userEmail'
-                                        type='text'
-                                        value={userData.userEmail || ''}
-                                        // onChange={(e) => setUserEmail(e.target.value)} // Обновляем состояние userEmail. Пока комментим,
-                                        // что бы пользователь не мог вносить изменения, т.к. это его логин.
-                                        // Для смены почты нужно будет продумывать логику подтверждения через дополнительные верификации.
-                                    />
+                                    <div>
+                                        <label
+                                            className='personal-info-user-item-title'
+                                            htmlFor='userName'
+                                        >
+                                            Имя пользователя (отображается
+                                            окружающим)
+                                        </label>
+                                        <input
+                                            id='userName'
+                                            type='text'
+                                            value={userData.userName || ''}
+                                            onChange={handleInputChange(
+                                                'userName'
+                                            )} // Обновляем состояние userName
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
+                                <div>
+                                    <div>
+                                        <label
+                                            className='personal-info-user-item-title'
+                                            htmlFor='userEmail'
+                                        >
+                                            Электронная почта - это{' '}
+                                            <span> Ваш логин </span>
+                                            при входе
+                                        </label>
+                                        <input
+                                            disabled
+                                            id='userEmail'
+                                            type='text'
+                                            value={userData.userEmail || ''}
+                                            // onChange={(e) => setUserEmail(e.target.value)} // Обновляем состояние userEmail. Пока комментим,
+                                            // что бы пользователь не мог вносить изменения, т.к. это его логин.
+                                            // Для смены почты нужно будет продумывать логику подтверждения через дополнительные верификации.
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <label
+                                            className='personal-info-user-item-title'
+                                            htmlFor='userPhone'
+                                        >
+                                            Телефон
+                                        </label>
+                                        <input
+                                            id='userPhone'
+                                            type='text'
+                                            value={userData.userPhone || ''}
+                                            onChange={handleInputChange(
+                                                'userPhone'
+                                            )} // Обновляем состояние userPhone
+                                        />
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label
                                         className='personal-info-user-item-title'
-                                        htmlFor='userPhone'
+                                        htmlFor='userAbout'
                                     >
-                                        Телефон
+                                        О себе
                                     </label>
-                                    <input
-                                        id='userPhone'
-                                        type='text'
-                                        value={userData.userPhone || ''}
+                                    <textarea
+                                        className='user-about'
+                                        maxLength='200'
+                                        placeholder='Введите до 200 символов'
+                                        id='userAbout'
+                                        value={userData.userAbout || ''}
                                         onChange={handleInputChange(
-                                            'userPhone'
-                                        )} // Обновляем состояние userPhone
+                                            'userAbout'
+                                        )} // Обновляем состояние дополнительных данных
+                                    />
+                                </div>
+
+                                <div className='button-container'>
+                                    <Button
+                                        className='button-save-personal-data-correction'
+                                        type='button'
+                                        type_btn='yes'
+                                        size_height='medium'
+                                        children='Сохранить'
+                                        onClick={handleSave}
+                                    />
+
+                                    <Button
+                                        className='button-dont-save-personal-data-correction'
+                                        type='button'
+                                        type_btn='no'
+                                        size_height='medium'
+                                        children='Не сохранять'
+                                        onClick={handleDontSave}
                                     />
                                 </div>
                             </div>
-
+                        )}
+                    </div>
+                    <div className='password-container'>
+                        {!isPasswordEditing ? (
                             <div>
-                                <label
-                                    className='personal-info-user-item-title'
-                                    htmlFor='userAbout'
-                                >
-                                    О себе
-                                </label>
-                                <textarea
-                                    className='user-about'
-                                    maxLength='200'
-                                    placeholder='Введите до 200 символов'
-                                    id='userAbout'
-                                    value={userData.userAbout || ''}
-                                    onChange={handleInputChange('userAbout')} // Обновляем состояние дополнительных данных
+                                <p className='personal-info-user-password'>
+                                    Пароль: ********
+                                </p>
+                                <Button
+                                    type='button'
+                                    size_height='medium'
+                                    children='Изменить пароль'
+                                    onClick={() => setPasswordEditing(true)}
                                 />
                             </div>
-
-                            <div className='button-container'>
-                                <Button
-                                    className='button-save-personal-data-correction'
-                                    type='button'
-                                    type_btn='yes'
-                                    size_height='medium'
-                                    children='Сохранить'
-                                    onClick={handleSave}
-                                />
-
-                                <Button
-                                    className='button-dont-save-personal-data-correction'
-                                    type='button'
-                                    type_btn='no'
-                                    size_height='medium'
-                                    children='Не сохранять'
-                                    onClick={handleDontSave}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {!isPasswordEditing ? (
-                        <div>
-                            <p className='personal-info-user-password'>
-                                Пароль: ********
-                            </p>
-                            <Button
-                                type='button'
-                                size_height='medium'
-                                children='Изменить пароль'
-                                onClick={() => setPasswordEditing(true)}
+                        ) : (
+                            <UpdatePassword
+                                onCancel={() => setPasswordEditing(false)}
                             />
-                        </div>
-                    ) : (
-                        <UpdatePassword
-                            onCancel={() => setPasswordEditing(false)}
-                        />
-                    )}
+                        )}
+                    </div>
                 </div>
             )}
         </>
