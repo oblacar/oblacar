@@ -73,9 +73,3 @@ input {
 .link-word:hover {
     color: orange;
 }
-
-.error-text {
-    color: red;
-    font-size: 18px;
-    font-weight: 600;
-}

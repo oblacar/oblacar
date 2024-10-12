@@ -113,6 +113,8 @@ export const AuthProvider = ({ children }) => {
             );
         } catch (error) {
             console.error('Ошибка регистрации и входа:', error.message);
+
+            setError(error.message); // Устанавливаем сообщение об ошибке
         }
     };
 

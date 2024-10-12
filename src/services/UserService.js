@@ -74,7 +74,19 @@ class UserService {
             // );
         } catch (error) {
             console.error('Ошибка регистрации:', error);
-            throw error;
+            
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    throw new Error(
+                        'Пользователь с таким email уже существует'
+                    );
+                case 'auth/invalid-email':
+                    throw new Error('Неверный формат email');
+                case 'auth/weak-password':
+                    throw new Error('Пароль слишком слабый');
+                default:
+                    throw new Error('Ошибка регистрации. Попробуйте снова.');
+            }
         }
     }
 

@@ -4,9 +4,10 @@ import * as Yup from 'yup';
 import AuthContext from '../../hooks/Authorization/AuthContext'; // Импортируем AuthContext
 import './Register.css'; // Импорт стилей
 import Button from '../common/Button/Button';
+import ErrorText from '../common/ErrorText/ErrorText';
 
 const Register = () => {
-    const { register } = useContext(AuthContext); // Получаем функцию регистрации из контекста
+    const { register, error } = useContext(AuthContext); // Получаем функцию регистрации из контекста
 
     const formik = useFormik({
         initialValues: {
@@ -50,6 +51,9 @@ const Register = () => {
     return (
         <div className='register-container'>
             <h1>Регистрация пользователя</h1>
+
+            <ErrorText error={error} />
+
             <form onSubmit={formik.handleSubmit}>
                 <div>
                     <label htmlFor='firstName'>Имя</label>

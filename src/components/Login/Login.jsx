@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import Button from '../common/Button/Button'; // Импортируем новый компонент Button
+import ErrorText from '../common/ErrorText/ErrorText'
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 
@@ -42,26 +43,11 @@ const Login = () => {
         },
     });
 
-    // const handleLogout = async () => {
-    //     try {
-    //         await logout(); // Используем await для ожидания завершения выхода
-    //         localStorage.removeItem('authToken'); // Очистка токена из localStorage
-    //     } catch (error) {
-    //         console.error('Ошибка выхода:', error.message); // Обработка ошибок
-    //     }
-    // };
-
     return (
         <div className='login-container'>
             <h1>Вход в систему</h1>
 
-            {error ? (
-                <div>
-                    <span className='error-text'>{error}</span>
-                </div>
-            ) : (
-                ''
-            )}
+            <ErrorText error={error} />
 
             <form onSubmit={formik.handleSubmit}>
                 <div>
