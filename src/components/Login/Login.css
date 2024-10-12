@@ -67,9 +67,15 @@ input {
 }
 
 .link-word {
-    color: rgb(13,110,253);
+    color: rgb(13, 110, 253);
     font-weight: 600;
 }
 .link-word:hover {
     color: orange;
+}
+
+.error-text {
+    color: red;
+    font-size: 18px;
+    font-weight: 600;
 }

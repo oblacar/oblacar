@@ -13,7 +13,7 @@ import './Login.css'; // Импортируйте стили
 
 const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
-    const { login, logout } = useContext(AuthContext); // Получаем функцию login из AuthContext
+    const { login, error } = useContext(AuthContext); // Получаем функцию login из AuthContext
     const [rememberMe, setRememberMe] = useState(true);
 
     const formik = useFormik({
@@ -54,6 +54,15 @@ const Login = () => {
     return (
         <div className='login-container'>
             <h1>Вход в систему</h1>
+
+            {error ? (
+                <div>
+                    <span className='error-text'>{error}</span>
+                </div>
+            ) : (
+                ''
+            )}
+
             <form onSubmit={formik.handleSubmit}>
                 <div>
                     <label htmlFor='email'>Электронная почта</label>

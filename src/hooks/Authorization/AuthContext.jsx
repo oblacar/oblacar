@@ -1,4 +1,10 @@
-import React, { createContext, useReducer, useEffect, useContext } from 'react';
+import React, {
+    createContext,
+    useReducer,
+    useEffect,
+    useContext,
+    useState,
+} from 'react';
 import authReducer from './authReducer';
 import { userService } from '../../services/UserService'; // Импорт UserService для взаимодействия с Firebase
 // import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Импорт аутентификации Firebase
@@ -12,6 +18,7 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, { user: null });
     // const auth = getAuth();
     const { dispatch: userDispatch } = useContext(UserContext); // Получаем dispatch из UserContext напрямую
+    const [error, setError] = useState(''); // Состояние для ошибок
 
     // Эффект для проверки состояния пользователя при загрузке
     useEffect(() => {
@@ -126,6 +133,8 @@ export const AuthProvider = ({ children }) => {
                 payload: { ...user, ...userProfile },
             });
 
+            setError(''); // Сбрасываем ошибку при успешной аутентификации
+
             // Если выбран "Запомнить меня"
             if (isRememberUser) {
                 localStorage.setItem('authToken', user.uid); // Сохраняем UID в localStorage
@@ -137,6 +146,21 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('Ошибка входа:', error.message);
+
+            switch (error.code) {
+                case 'auth/wrong-password':
+                    setError('Неверный email или пароль');
+                    break;
+                case 'auth/user-not-found':
+                    setError('Пользователь с таким email не найден');
+                    break;
+                case 'auth/invalid-email':
+                    setError('Неверный email');
+                    break;
+                default:
+                    setError('Ошибка входа.');
+                    break;
+            }
         }
     };
 
@@ -168,6 +192,7 @@ export const AuthProvider = ({ children }) => {
                 register, // Функция регистрации
                 login, // Функция входа
                 logout, // Функция выхода
+                error, // Информация об ошибке при login
             }}
         >
             {children}
