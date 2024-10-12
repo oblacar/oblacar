@@ -1,0 +1,27 @@
+.icon-text-container {
+    position: relative;
+    padding-left: 50px; /* Отступ текста от левого края контейнера */
+    /* color: rgb(62, 59, 100);
+    cursor: pointer;
+    transition: color 0.2s ease; Плавное изменение цвета при наведении */
+    margin-bottom: 20px;
+}
+
+/* .icon-text-container:hover {
+    color: #ff6600; /* Цвет при наведении */
+/*} */
+
+.icon-text-container .icon {
+    position: absolute;
+    left: 10px; /* Иконка 10px от левого края */
+    top: 50%;
+    transform: translateY(-38%);
+    font-size: 24px; /* Задаем размер иконки */
+    /* width: 24px;
+    height: 24px; Добавляем размеры для иконки */
+}
+
+.icon-text-container span {
+    position: relative;
+    left: 0; /* Текст находится на 50px благодаря padding-left */
+}
