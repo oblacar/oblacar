@@ -1,7 +1,7 @@
 import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import authReducer from './authReducer';
 import { userService } from '../../services/UserService'; // Импорт UserService для взаимодействия с Firebase
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Импорт аутентификации Firebase
+// import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Импорт аутентификации Firebase
 
 import UserContext from '../UserContext'; // Импортируем UserContext
 
@@ -10,8 +10,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, { user: null });
-    const auth = getAuth();
-
+    // const auth = getAuth();
     const { dispatch: userDispatch } = useContext(UserContext); // Получаем dispatch из UserContext напрямую
 
     // Эффект для проверки состояния пользователя при загрузке
@@ -20,13 +19,14 @@ export const AuthProvider = ({ children }) => {
 
         // Если токена нет, делаем принудительный выход
         if (!token) {
-            auth.signOut();
+            // auth.signOut();
+            userService.logoutUser();
             dispatch({ type: 'LOGOUT' });
             userDispatch({ type: 'CLEAR_USER' });
             return; // Останавливаем выполнение, если токен отсутствует
         }
 
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = userService.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
                     console.log(
@@ -77,7 +77,37 @@ export const AuthProvider = ({ children }) => {
 
         // Очистка подписки при размонтировании компонента
         return () => unsubscribe();
-    }, [auth, userDispatch]);
+    }, [userDispatch]);
+
+    // Функция для регистрации
+    const register = async (data) => {
+        try {
+            // Регистрируем пользователя и получаем объект пользователя
+            const user = await userService.registerUser(data);
+
+            // Загружаем профиль пользователя из базы данных
+            const userProfile = await userService.getUserProfile(user.uid);
+
+            // Обновляем состояние аутентификации
+            dispatch({ type: 'LOGIN', payload: { ...user, ...userProfile } });
+
+            // Обновляем состояние в UserContext через dispatch
+            userDispatch({
+                type: 'SET_USER',
+                payload: { ...user, ...userProfile },
+            });
+
+            // Сохраняем токен в localStorage
+            localStorage.setItem('authToken', user.uid);
+            localStorage.setItem('authEmail', user.email);
+
+            console.log(
+                'Пользователь успешно вошёл в систему после регистрации'
+            );
+        } catch (error) {
+            console.error('Ошибка регистрации и входа:', error.message);
+        }
+    };
 
     // Функция для входа
     const login = async (email, password, isRememberUser) => {
@@ -135,6 +165,7 @@ export const AuthProvider = ({ children }) => {
             value={{
                 user: state.user, // Данные пользователя
                 isAuthenticated: !!state.user, // true, если пользователь авторизован
+                register, // Функция регистрации
                 login, // Функция входа
                 logout, // Функция выхода
             }}

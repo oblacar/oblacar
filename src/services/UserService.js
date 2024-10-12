@@ -1,8 +1,10 @@
-import User from '../entities/User/User';
+import User from '../entities/User/User';//TODO выяснить, почему как мы сущности обходимся
+
 import { auth, db, storage } from '../firebase'; // Импорт аутентификации, базы данных и хранилища
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    onAuthStateChanged,
 } from 'firebase/auth';
 import { ref as databaseRef, set, get, update } from 'firebase/database';
 import {
@@ -46,29 +48,43 @@ class UserService {
                 firebaseToken: user.stsTokenManager.accessToken,
             };
 
-            console.log('Данные для записи в базу данных:', userData);
+            // console.log('Данные для записи в базу данных:', userData);
 
             // Сохраняем профиль пользователя в базе данных
             await set(databaseRef(db, 'users/' + user.uid), userData);
 
-            console.log('Данные успешно сохранены в Realtime Database');
+            console.log(
+                'Данные успешно сохранены в Realtime Database: ',
+                userData
+            );
 
             // Возвращаем созданного пользователя
-            return new User(
-                user.uid,
-                profilePictureURL,
-                `${data.firstName} ${data.lastName}`,
-                data.email,
-                data.phone || '',
-                data.additionalInfo || '',
-                data.password, // Пароль лучше хранить зашифрованным
-                new Date().toISOString(),
-                user.stsTokenManager.accessToken
-            );
+            return user;
+            // return new User(
+            //     user.uid,
+            //     profilePictureURL,
+            //     `${data.firstName} ${data.lastName}`,
+            //     data.email,
+            //     data.phone || '',
+            //     data.additionalInfo || '',
+            //     data.password, // Пароль лучше хранить зашифрованным
+            //     new Date().toISOString(),
+            //     user.stsTokenManager.accessToken
+            // );
         } catch (error) {
             console.error('Ошибка регистрации:', error);
             throw error;
         }
+    }
+
+    // Метод для отслеживания состояния аутентификации
+    onAuthStateChanged(callback) {
+        return onAuthStateChanged(auth, callback);
+    }
+
+    // Метод для получения текущего пользователя
+    getCurrentUser() {
+        return auth.currentUser;
     }
 
     // Вход пользователя

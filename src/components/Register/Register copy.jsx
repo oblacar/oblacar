@@ -1,13 +1,14 @@
-import React, { useContext } from 'react';
+// src/components/Register/Register.js
+
+import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import AuthContext from '../../hooks/Authorization/AuthContext'; // Импортируем AuthContext
+import { userService } from '../../services/UserService'; // Импортируйте UserService
 import './Register.css'; // Импорт стилей
+
 import Button from '../common/Button/Button';
 
 const Register = () => {
-    const { register } = useContext(AuthContext); // Получаем функцию регистрации из контекста
-
     const formik = useFormik({
         initialValues: {
             firstName: '',
@@ -33,12 +34,14 @@ const Register = () => {
         }),
         onSubmit: async (values) => {
             try {
-                // Используем функцию регистрации из AuthContext
-                await register({
+                await userService.registerUser({
                     firstName: values.firstName,
                     phone: values.phone,
                     email: values.email,
                     password: values.password,
+                    role: 'владелец груза', // или другая роль по умолчанию
+                    profilePicture: null,
+                    additionalInfo: {},
                 });
                 alert('Регистрация успешна!'); // Успешная регистрация
             } catch (error) {
@@ -74,7 +77,7 @@ const Register = () => {
                         type='text'
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        value={formik.values.phone}
+                        value={formik.values.lastName}
                     />
                     {formik.touched.phone && formik.errors.phone ? (
                         <div className='error'>{formik.errors.phone}</div>
