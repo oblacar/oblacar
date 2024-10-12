@@ -39,18 +39,28 @@ export const AuthProvider = ({ children }) => {
                         user.uid
                     );
 
-                    console.log('Загружен профиль пользователя:', userProfile);
+                    if (userProfile) {
+                        console.log(
+                            'Загружен профиль пользователя:',
+                            userProfile
+                        );
 
-                    dispatch({
-                        type: 'LOGIN',
-                        payload: { ...user, ...userProfile },
-                    });
+                        dispatch({
+                            type: 'LOGIN',
+                            payload: { ...user, ...userProfile },
+                        });
 
-                    // Обновляем состояние в UserContext через dispatch
-                    userDispatch({
-                        type: 'SET_USER',
-                        payload: { ...user, ...userProfile },
-                    });
+                        userDispatch({
+                            type: 'SET_USER',
+                            payload: { ...user, ...userProfile },
+                        });
+                    } else {
+                        console.log(
+                            'Профиль пользователя не найден. Ожидаем его создание.'
+                        );
+                        // Здесь можно добавить логику ожидания, например, через setInterval, чтобы
+                        // повторить попытку загрузки через несколько секунд.
+                    }
                 } catch (error) {
                     console.error(
                         'Ошибка загрузки профиля пользователя:',
