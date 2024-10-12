@@ -3,6 +3,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import './UserProfileSections.css'; // Импортируйте стили
 import Button from '../../common/Button/Button';
+import UpdatePassword from '../UpdatePassword/UpdatePassword';
 
 import UserContext from '../../../hooks/UserContext';
 
@@ -15,6 +16,7 @@ const PersonalInfo = () => {
     const [userData, setUserData] = useState(user || {}); // Используем одно состояние для всех данных пользователя
 
     const [isEditing, setIsEditing] = useState(false); // Состояние для редактирования
+    const [isPasswordEditing, setPasswordEditing] = useState(false); // Состояние для редактирования password
 
     const [selectedPhoto, setSelectedPhoto] = useState(null); // Для хранения выбранного фото
     const [previewPhoto, setPreviewPhoto] = useState(null); // Для хранения превью
@@ -124,7 +126,6 @@ const PersonalInfo = () => {
             ) : (
                 <div className='personal-info-container'>
                     <h2>Личные данные</h2>
-
                     {!isEditing ? (
                         <div>
                             <img
@@ -273,16 +274,24 @@ const PersonalInfo = () => {
                             </div>
                         </div>
                     )}
-                    <div>
-                        <p className='personal-info-user-password'>
-                            Пароль: ********
-                        </p>
-                        <Button
-                            type='button'
-                            size_height='medium'
-                            children='Изменить пароль'
+
+                    {!isPasswordEditing ? (
+                        <div>
+                            <p className='personal-info-user-password'>
+                                Пароль: ********
+                            </p>
+                            <Button
+                                type='button'
+                                size_height='medium'
+                                children='Изменить пароль'
+                                onClick={() => setPasswordEditing(true)}
+                            />
+                        </div>
+                    ) : (
+                        <UpdatePassword
+                            onCancel={() => setPasswordEditing(false)}
                         />
-                    </div>
+                    )}
                 </div>
             )}
         </>

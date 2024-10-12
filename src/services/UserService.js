@@ -1,10 +1,11 @@
-import User from '../entities/User/User';//TODO выяснить, почему как мы сущности обходимся
+import User from '../entities/User/User'; //TODO выяснить, почему как мы сущности обходимся
 
 import { auth, db, storage } from '../firebase'; // Импорт аутентификации, базы данных и хранилища
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onAuthStateChanged,
+    updatePassword,
 } from 'firebase/auth';
 import { ref as databaseRef, set, get, update } from 'firebase/database';
 import {
@@ -87,14 +88,36 @@ class UserService {
         return auth.currentUser;
     }
 
+    getCurrentUserEmail() {
+        const user = auth.currentUser;
+        if (user) {
+            return user.email;
+        }
+        throw new Error('Пользователь не авторизован');
+    }
+
     // Вход пользователя
-    async loginUser(credentials) {
+    // async loginUser(credentials) {
+    //     try {
+    //         const userCredential = await signInWithEmailAndPassword(
+    //             auth,
+    //             credentials.email,
+    //             credentials.password
+    //         );
+    //         return userCredential.user;
+    //     } catch (error) {
+    //         console.error('Ошибка входа:', error);
+    //         throw error;
+    //     }
+    // }
+
+    async loginUser({ email, password }) {
         try {
             const userCredential = await signInWithEmailAndPassword(
                 auth,
-                credentials.email,
-                credentials.password
-            );
+                email,
+                password
+            ); // Передаем корректные email и пароль
             return userCredential.user;
         } catch (error) {
             console.error('Ошибка входа:', error);
@@ -190,6 +213,22 @@ class UserService {
             return downloadURL;
         } catch (error) {
             console.error('Ошибка загрузки фотографии:', error);
+            throw error;
+        }
+    }
+
+    // Смена пароля для текущего авторизованного пользователя
+    async changeUserPassword(newPassword) {
+        const user = auth.currentUser; // Получаем текущего пользователя
+        if (!user) {
+            throw new Error('Пользователь не авторизован');
+        }
+
+        try {
+            await updatePassword(user, newPassword);
+            console.log('Пароль успешно обновлён');
+        } catch (error) {
+            console.error('Ошибка при изменении пароля:', error);
             throw error;
         }
     }
