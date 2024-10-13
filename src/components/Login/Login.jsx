@@ -1,12 +1,12 @@
 // src/components/Login/Login.js
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Импортируем Link для навигации
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import Button from '../common/Button/Button'; // Импортируем новый компонент Button
-import ErrorText from '../common/ErrorText/ErrorText'
+import ErrorText from '../common/ErrorText/ErrorText';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 
@@ -14,8 +14,12 @@ import './Login.css'; // Импортируйте стили
 
 const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
-    const { login, error } = useContext(AuthContext); // Получаем функцию login из AuthContext
+    const { login, error, resetError } = useContext(AuthContext); // Получаем функцию login из AuthContext
     const [rememberMe, setRememberMe] = useState(true);
+
+    useEffect(() => {
+        resetError();
+    }, []);
 
     const formik = useFormik({
         initialValues: {

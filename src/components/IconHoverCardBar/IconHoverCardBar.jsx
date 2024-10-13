@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+
+import AuthContext from '../../hooks/Authorization/AuthContext';
 
 import IconHoverCard from './IconHoverCard';
 
 import { HoverUserCard } from './hoverCard/HoverUserCard';
-import { HoverCartCard } from './hoverCard/HoverCartCard';
 import { HoverMessageCard } from './hoverCard/HoverMessageCard';
 import { HoverDeliveryCard } from './hoverCard/HoverDeliveryCard';
 import { HoverOrdersCard } from './hoverCard/HoverOrdersCard';
@@ -16,7 +16,6 @@ import {
     FaEnvelope,
     FaShippingFast,
     FaClipboardList,
-    FaShoppingCart,
 } from 'react-icons/fa';
 
 function setCoordinates(iconUserRef, setIconCoordinates) {
@@ -43,6 +42,8 @@ const zero = {
 };
 
 function IconDropdownMenuBar() {
+    const { isAuthenticated } = useContext(AuthContext);
+
     const [iconUserCoordinates, setIconUserCoordinates] = useState(zero);
     const [iconOrdersCoordinates, setIconOrdersCoordinates] = useState(zero);
     const [iconMessageCoordinates, setIconMessageCoordinates] = useState(zero);
@@ -86,6 +87,7 @@ function IconDropdownMenuBar() {
                     HoverCardComponent={HoverUserCard}
                     iconCoordinates={iconUserCoordinates}
                     windowWidth={windowWidth}
+                    LinkTo={isAuthenticated ? '/user-profile' : '/login'}
                 />
                 <IconHoverCard
                     type='Сообщения'

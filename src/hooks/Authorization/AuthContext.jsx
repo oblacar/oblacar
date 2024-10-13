@@ -86,6 +86,11 @@ export const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, [userDispatch]);
 
+    //Обнулим текст ошибки
+    const resetError = () => {
+        setError(() => '');
+    };
+
     // Функция для регистрации
     const register = async (data) => {
         try {
@@ -195,6 +200,7 @@ export const AuthProvider = ({ children }) => {
                 login, // Функция входа
                 logout, // Функция выхода
                 error, // Информация об ошибке при login
+                resetError, // Обнуляем ошибку
             }}
         >
             {children}

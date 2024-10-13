@@ -9,8 +9,6 @@ import UserContext from '../../../hooks/UserContext'; // Подключаем Us
 
 import {
     FaTruck,
-    FaFileContract,
-    FaFileSignature,
     FaFileAlt,
     FaWallet,
     FaCreditCard,
@@ -46,10 +44,10 @@ export const HoverUserCard = ({
         setIsHoveredCard(false);
     };
 
-    const handleSectionClick = (userSection) => {
-        // selectUserProfileSection(userSection);
-        setIsHoveredCard(false);
-    };
+    // const handleSectionClick = (userSection) => {
+    //     // selectUserProfileSection(userSection);
+    //     setIsHoveredCard(false);
+    // };
 
     return (
         <>

@@ -7,6 +7,7 @@ import styles from './IconHoverCardBar.module.css'; // Импортируем с
 const IconHoverCard = ({
     type,
     iconRef,
+    LinkTo,
     IconComponent,
     HoverCardComponent,
     iconCoordinates,
@@ -28,11 +29,12 @@ const IconHoverCard = ({
                 className={styles.headerMarketIcon}
                 ref={iconRef}
             >
-                <Link to='/user-profile'>
+                <Link to={LinkTo}>
                     <div
                         className={styles.iconContainer}
                         onMouseEnter={handleMouseEnter} // Обработчик для наведения
                         onMouseLeave={handleMouseLeave} // Обработчик для ухода мыши
+                        onClick={handleMouseLeave}
                     >
                         <IconComponent
                             className={`${styles.iconHover} ${

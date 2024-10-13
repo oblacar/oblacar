@@ -13,6 +13,7 @@ import Home from './pages/Home/Home';
 import Register from './components/Register/Register';
 import Login from './components/Login/Login'; // Импортируйте Login
 import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
+import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страницы аутентификации
 
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
@@ -31,15 +32,19 @@ const App = () => {
                                 />
                                 <Route
                                     path='/register'
-                                    element={<Register />}
+                                    element={<AuthPage isLogin={false} />}
                                 />
                                 <Route
                                     path='/login'
-                                    element={<Login />}
+                                    element={<AuthPage isLogin={true} />}
                                 />
                                 <Route
                                     path='/user-profile'
                                     element={<ProfileUserPage />}
+                                />
+                                <Route
+                                    path='/auth'
+                                    element={<AuthPage />}
                                 />
                             </Route>
                         </Routes>

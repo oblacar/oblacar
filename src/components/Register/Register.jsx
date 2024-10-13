@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import AuthContext from '../../hooks/Authorization/AuthContext'; // Импортируем AuthContext
@@ -7,7 +7,11 @@ import Button from '../common/Button/Button';
 import ErrorText from '../common/ErrorText/ErrorText';
 
 const Register = () => {
-    const { register, error } = useContext(AuthContext); // Получаем функцию регистрации из контекста
+    const { register, error, resetError } = useContext(AuthContext); // Получаем функцию регистрации из контекста
+
+    useEffect(() => {
+        resetError();
+    }, []);
 
     const formik = useFormik({
         initialValues: {
