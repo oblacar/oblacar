@@ -106,7 +106,7 @@ function IconDropdownMenuBar() {
                 />
 
                 <IconHoverCard
-                    type='Заказы'
+                    type='Варианты'
                     iconRef={iconOrdersRef}
                     IconComponent={FaClipboardList}
                     HoverCardComponent={HoverOrdersCard}

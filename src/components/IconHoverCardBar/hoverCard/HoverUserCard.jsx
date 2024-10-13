@@ -10,6 +10,8 @@ import UserContext from '../../../hooks/UserContext'; // Подключаем Us
 import {
     FaTruck,
     FaFileContract,
+    FaFileSignature,
+    FaFileAlt,
     FaWallet,
     FaCreditCard,
     FaHeart,
@@ -52,10 +54,9 @@ export const HoverUserCard = ({
     return (
         <>
             <div
-                // className={`hover-card ${
-                //     isHoveredIcon || isHoveredCard ? 'visible' : ''
-                // }`}
-                className='hover-card visible'
+                className={`hover-card ${
+                    isHoveredIcon || isHoveredCard ? 'visible' : ''
+                }`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 style={setTopLeftHover(iconCoordinates, windowWidth)}
@@ -89,12 +90,7 @@ export const HoverUserCard = ({
                     ) : (
                         <div className='user-hover-container'>
                             <Link to='/user-profile'>
-                                <div
-                                    className='huc-personal-data'
-                                    // onClick={() =>
-                                    //     handleSectionClick('personal-data')
-                                    // }
-                                >
+                                <div className='huc-personal-data'>
                                     <div className='huc-user-photo-container '>
                                         <img
                                             src={
@@ -103,6 +99,7 @@ export const HoverUserCard = ({
                                             }
                                             alt='Фото пользователя'
                                             className='huc-user-photo'
+                                            onClick={handleMouseLeave}
                                         />
                                     </div>
                                     <div className='huc-personal-info'>
@@ -113,31 +110,32 @@ export const HoverUserCard = ({
                                         <p className='huc-user-phone'>
                                             {user.userPhone}
                                         </p>
-                                        {/* <p className='hover-personal-page-link'>
-                                            Личные данные
-                                        </p> */}
                                     </div>
                                 </div>
                             </Link>
                             <p className='huc-spacer'> </p>
-
                             <IconSpanBtn
                                 icon={FaTruck}
                                 title='Доставки'
                                 onClick
                             />
                             <IconSpanBtn
+                                icon={FaFileAlt}
+                                title='Заявки'
+                                onClick
+                            />
+                            <p className='huc-spacer'> </p>
+                            <IconSpanBtn
                                 icon={FaWallet}
                                 title='Баланс 0 ₽'
                                 onClick
                             />
-                            <p className='huc-spacer'> </p>
                             <IconSpanBtn
                                 icon={FaCreditCard}
                                 title='Способы оплаты'
                                 onClick
                             />
-
+                            <p className='huc-spacer'> </p>
                             <IconSpanBtn
                                 icon={FaHeart}
                                 title='Избранное'
@@ -154,30 +152,32 @@ export const HoverUserCard = ({
                                 onClick
                             />
                             <p className='huc-spacer'> </p>
-
-                            <p
-                                className='huc-section-name without-icon'
-                                // onClick={() => handleSectionClick('inquiries')}
-                            >
+                            <p className='huc-section-name without-icon'>
                                 Обращения и поддержка
                             </p>
-
                             <p
                                 className='huc-section-name without-icon'
-                                // onClick={() =>
-                                //     handleSectionClick('reviews-questions')
-                                // }
+                                я
                             >
                                 Отзывы и вопросы
                             </p>
                             <p className='huc-spacer hpc-last-spacer'> </p>
-                            <Link to='/'>
+                            {/* <Link to='/'>
                                 <p
                                     className='huc-section-name without-icon'
                                     onClick={handleExit}
                                 >
                                     Выйти
                                 </p>
+                            </Link> */}
+                            <Link to='/'>
+                                <Button
+                                    type='button'
+                                    size_width='wide'
+                                    size_height='medium'
+                                    children='Выйти'
+                                    onClick={handleExit}
+                                />
                             </Link>
                         </div>
                     )}

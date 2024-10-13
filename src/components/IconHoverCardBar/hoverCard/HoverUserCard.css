@@ -1,21 +1,10 @@
-/* .user-hover-container {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    width: 250px;
-} */
-
 .huc-personal-data {
     display: flex;
-    /* align-items: center; */
 }
 
 .huc-user-photo-container {
-    width: 100px; /* Задаем ширину контейнера */
-    height: 100px; /* Задаем высоту контейнера */
+    width: 80px; /* Задаем ширину контейнера */
+    height: 80px; /* Задаем высоту контейнера */
     border-radius: 50%; /* Делаем контейнер кругом */
     overflow: hidden; /* Прячем части изображения, выходящие за пределы контейнера */
 }
@@ -24,11 +13,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover; /* Обрезаем изображение до квадрата, заполняя контейнер */
-}
-
-.huc-personal-info {
-    /* display: flex;
-    flex-direction: column; */
 }
 
 .huc-user-name {
@@ -52,11 +36,10 @@
 }
 
 .hpc-last-spacer {
-    /* border: 1px solid black; */
     background-color: #fbae7b;
 }
 
-/*Стили и цвета для иконок-кнопок*/
+/*Стили, цвета и анимация для иконок-кнопок*/
 .icon-text-container,
 .icon-text-container .icon,
 .huc-section-name.without-icon {
@@ -66,8 +49,8 @@
     transition: color 0.2s ease; /* Плавное изменение цвета при наведении */
 }
 
-.icon-text-container :hover,
-.icon-text-container .icon:hover,
+.icon-text-container:hover span,
+.icon-text-container:hover .icon,
 .huc-section-name.without-icon:hover {
     color: #ff6600; /* Цвет при наведении */
     font-weight: 600;
