@@ -23,17 +23,17 @@ const IconHoverCard = ({
     };
 
     return (
-        <div
-            className={styles.iconHoverArea}
-            onMouseEnter={handleMouseEnter} // Обработчик для наведения
-            onMouseLeave={handleMouseLeave} // Обработчик для ухода мыши
-        >
+        <div className={styles.iconHoverArea}>
             <div
                 className={styles.headerMarketIcon}
                 ref={iconRef}
             >
                 <Link to='/user-profile'>
-                    <div className={styles.iconContainer}>
+                    <div
+                        className={styles.iconContainer}
+                        onMouseEnter={handleMouseEnter} // Обработчик для наведения
+                        onMouseLeave={handleMouseLeave} // Обработчик для ухода мыши
+                    >
                         <IconComponent
                             className={`${styles.iconHover} ${
                                 isHovered ? styles.iconHovered : ''

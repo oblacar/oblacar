@@ -90,7 +90,10 @@ export const HoverUserCard = ({
                     ) : (
                         <div className='user-hover-container'>
                             <Link to='/user-profile'>
-                                <div className='huc-personal-data'>
+                                <div
+                                    className='huc-personal-data'
+                                    onClick={handleMouseLeave}
+                                >
                                     <div className='huc-user-photo-container '>
                                         <img
                                             src={
@@ -155,10 +158,7 @@ export const HoverUserCard = ({
                             <p className='huc-section-name without-icon'>
                                 Обращения и поддержка
                             </p>
-                            <p
-                                className='huc-section-name without-icon'
-                                я
-                            >
+                            <p className='huc-section-name without-icon'>
                                 Отзывы и вопросы
                             </p>
                             <p className='huc-spacer hpc-last-spacer'> </p>
