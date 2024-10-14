@@ -25,7 +25,7 @@ const Header = () => {
             </div>
             <div className={styles.middleLine}>
                 <span className={styles.headerSlogan}>
-                    Простой поиск, надежная перевозка.
+                    Облачная легкость в поиске, контроль и надежность в перевозке.
                 </span>
             </div>
             <div className={styles.bottomLine}>
