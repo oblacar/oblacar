@@ -1,7 +1,7 @@
 // src/components/Login/Login.js
 
 import React, { useState, useContext, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Импортируем Link для навигации
+import { Link, useNavigate } from 'react-router-dom'; // Импортируем Link для навигации
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -21,6 +21,8 @@ const Login = () => {
         resetError();
     }, []);
 
+    const navigate = useNavigate(); // Создаем объект навигации
+
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -39,6 +41,8 @@ const Login = () => {
                     values.password,
                     rememberMe
                 ); // Используем функцию login из AuthContext
+
+                navigate('/');
 
                 console.log('Вход выполнен успешно!', user);
             } catch (error) {

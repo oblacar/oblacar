@@ -45,9 +45,11 @@ const Register = () => {
                     email: values.email,
                     password: values.password,
                 });
-                alert('Регистрация успешна!'); // Успешная регистрация
+                // alert('Регистрация успешна!'); // Успешная регистрация
+                console.log('Регистрация успешна!');
             } catch (error) {
-                alert('Ошибка регистрации: ' + error.message); // Обработка ошибок
+                // alert('Ошибка регистрации: ' + error.message); // Обработка ошибок
+                console.log('Ошибка регистрации: ' + error.message);
             }
         },
     });
