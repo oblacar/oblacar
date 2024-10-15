@@ -31,7 +31,7 @@ function Home() {
                 <h2>Welcome to Oblacar</h2>
                 <p>
                     Your reliable platform for finding transportation services.
-                    <button onClick={addTransportAds}>
+                    {/* <button onClick={addTransportAds}>
                         Загрузить базу из скрипта
                     </button>
                     <button onClick={testGetAdById}>
@@ -39,7 +39,7 @@ function Home() {
                     </button>
                     <button onClick={testGetAllAds}>
                         выгружаем все объекты
-                    </button>
+                    </button> */}
                 </p>
             </div>
         </>

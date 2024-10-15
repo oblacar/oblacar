@@ -236,7 +236,7 @@ const transportAds = [
 ];
 
 export const addTransportAds = async () => {
-    const transportAdsRef = ref(db, 'test'); // Ссылка на раздел transportAds в Realtime Database
+    const transportAdsRef = ref(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
 
     for (const ad of transportAds) {
         try {

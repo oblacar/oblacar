@@ -9,27 +9,23 @@ export const TransportAdProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // useEffect(() => {
-    //     const fetchAds = async () => {
-    //         setLoading(true);
+    useEffect(() => {
+        const fetchAds = async () => {
+            setLoading(true);
 
-    //         try {
-    //             console.log('1>');
-    //             const data = await TransportAdService.getAllAds();
-    //             console.log('2>');
-                
-    //             setAds(data);
-    //             console.log('3<');
-                
-    //         } catch (err) {
-    //             setError(err.message);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+            try {
+                const data = await TransportAdService.getAllAds();
 
-    //     fetchAds();
-    // }, []);
+                setAds(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAds();
+    }, []);
 
     // Функции для добавления, обновления и удаления объявлений
     const addAd = async (adData) => {
