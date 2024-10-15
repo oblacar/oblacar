@@ -22,10 +22,11 @@ const TransportAdsList = () => {
             {ads.length === 0 ? (
                 <p>No transport ads available.</p>
             ) : (
-                ads.map((ad) => (
+                ads.map((ad, index) => (
                     <TransportAdItem
                         key={ad.adId}
                         ad={ad}
+                        rowColor={index % 2 === 0 ? 'evenRow' : 'oddRow'}
                     />
                 ))
             )}

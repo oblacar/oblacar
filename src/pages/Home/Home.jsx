@@ -10,9 +10,9 @@ function Home() {
     return (
         <>
             <div className={styles.container}>
-                <h2>Welcome to Oblacar</h2>
+                {/* <h2>Welcome to Oblacar</h2> */}
                 <p>
-                    Your reliable platform for finding transportation services.
+                    {/* Your reliable platform for finding transportation services. */}
                     {/* <button onClick={addTransportAds}>
                         загрузить тестовую базу
                     </button> */}

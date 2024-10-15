@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './TransportAdItem.module.css';
+import styles from './TransportAdItem.css';
 
 /*тентованный, 20 т, 90 м3, полупр.
 верх., бок., задн.*/
@@ -19,38 +19,42 @@ import styles from './TransportAdItem.module.css';
 //         // this.description = description; // описание состояния и особенностей машины
 //         this.contactInfo = contactInfo; // информация для связи с владельцем
 
-const TransportAdItem = ({ ad }) => {
+const TransportAdItem = ({ ad, rowColor }) => {
     return (
-        <div className={styles.adItem}>
-            <div className={styles.row}>
-                <div className={`${styles.cell} ${styles.carInfo}`}>
-                    <span className={styles.vehicleType}>
+        <div className='adItem'>
+            <div className={`row ${rowColor}`}>
+                <div className='cell carInfo'>
+                    <span className='vehicleType'>
                         {ad.vehicleType ? `${ad.vehicleType}, ` : ''}
                     </span>
 
-                    <span className={styles.volume}>
+                    <span className='volume'>
                         {ad.volume ? `${ad.volume} м3, ` : ''}
                     </span>
 
-                    <span className={styles.bodyType}>
+                    <span className='bodyType'>
                         {ad.bodyType ? `${ad.bodyType}, ` : ''}
                     </span>
 
-                    <span className={styles.loadingType}>
+                    <span className='loadingType'>
                         {ad.vehicleType ? `${ad.loadingType} ` : ''}
                     </span>
                 </div>
 
-                <div className={styles.cell}>
-                    <span className={styles.location}>{ad.location}</span>
-                    <span className={styles.availabilityDate}>
+                <div className='cell'>
+                    <span className='location'>{ad.location}</span>
+                    <span className='availabilityDate'>
                         {ad.availabilityDate}
                     </span>
                 </div>
-                <div className={styles.cell}>
-                    {ad.destination || 'Не указано'}
+                <div className='cell'>
+                    <span className='destination'>
+                        {ad.destination || 'Не указано'}
+                    </span>
                 </div>
-                <div className={styles.cell}>{ad.price} руб.</div>
+                <div className='cell'>
+                    <span className='price'>{ad.price} руб.</span>
+                </div>
                 {/* <div className={styles.cell}>{ad.contactInfo}</div> */}
             </div>
         </div>

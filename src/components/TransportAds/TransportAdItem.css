@@ -8,7 +8,7 @@
     display: flex;
     justify-content: space-between; /* Распределение ячеек по ширине */
     padding: 10px;
-    background-color: #f9f9f9; /* Цвет фона для строки */
+    /* background-color: #f9f9f9; Цвет фона для строки */
 }
 
 .cell {
@@ -17,7 +17,7 @@
     font-size: 12px;
 }
 
-.volume {
+.volume, .location, .destination {
     font-weight: 600;
 }
 .carInfo {
@@ -26,4 +26,12 @@
 
 .availabilityDate {
     display: block;
+}
+
+.row.evenRow {
+    background-color: #fafafa; /* Светлый фон для четных строк */
+}
+
+.row.oddRow {
+    background-color: #ffffff; /* Белый фон для нечетных строк */
 }
