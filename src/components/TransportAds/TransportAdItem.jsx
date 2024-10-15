@@ -1,5 +1,15 @@
 import React from 'react';
-import styles from './TransportAdItem.css';
+import './TransportAdItem.css';
+import {
+    FaTruck,
+    FaUserCircle,
+    FaPlus,
+    FaCartPlus,
+    FaFolderPlus,
+    FaCheckSquare,
+    FaHandshake,
+    FaReceipt,
+} from 'react-icons/fa';
 
 /*тентованный, 20 т, 90 м3, полупр.
 верх., бок., задн.*/
@@ -21,41 +31,55 @@ import styles from './TransportAdItem.css';
 
 const TransportAdItem = ({ ad, rowColor }) => {
     return (
-        <div className='adItem'>
-            <div className={`row ${rowColor}`}>
-                <div className='cell carInfo'>
-                    <span className='vehicleType'>
-                        {ad.vehicleType ? `${ad.vehicleType}, ` : ''}
-                    </span>
-
-                    <span className='volume'>
-                        {ad.volume ? `${ad.volume} м3, ` : ''}
-                    </span>
-
-                    <span className='bodyType'>
-                        {ad.bodyType ? `${ad.bodyType}, ` : ''}
-                    </span>
-
-                    <span className='loadingType'>
-                        {ad.vehicleType ? `${ad.loadingType} ` : ''}
-                    </span>
+        <div className='ad-item'>
+            {/* <div className={`row ${rowColor}`}> */}
+            <div className='row'>
+                <div className='upper-row'>
+                    <div className='cell departure'>
+                        <span className='availability-date'>
+                            {ad.availabilityDate}
+                        </span>
+                        <span className='location city'>{ad.location}</span>
+                    </div>
+                    <div className='cell'>
+                        <span className='destination city'>
+                            {ad.destination || 'Не указано'}
+                        </span>
+                    </div>
+                    <div className='cell'>
+                        <span className='price'>{ad.price} руб.</span>
+                    </div>
                 </div>
+                <div className='down-row'>
+                    <div className='icon-car'>
+                        <FaTruck />
+                    </div>
+                    <div className=' car-info'>
+                        <span className='vehicleType'>
+                            {ad.vehicleType ? `${ad.vehicleType}, ` : ''}
+                        </span>
 
-                <div className='cell'>
-                    <span className='location'>{ad.location}</span>
-                    <span className='availabilityDate'>
-                        {ad.availabilityDate}
-                    </span>
+                        <span className='volume'>
+                            {ad.volume ? `${ad.volume} м3, ` : ''}
+                        </span>
+
+                        <span className='body-type'>
+                            {ad.bodyType ? `${ad.bodyType}, ` : ''}
+                        </span>
+
+                        <span className='loading-type'>
+                            {ad.vehicleType ? `${ad.loadingType} ` : ''}
+                        </span>
+                    </div>
+                    <div className='icon-item-ad-bar'>
+                        {/* <div className='icon-driver'>
+                            <FaUserCircle />
+                        </div> */}
+                        <div className='container-icon-add'>
+                            <div className='icon-add'>Запомнить</div>
+                        </div>
+                    </div>
                 </div>
-                <div className='cell'>
-                    <span className='destination'>
-                        {ad.destination || 'Не указано'}
-                    </span>
-                </div>
-                <div className='cell'>
-                    <span className='price'>{ad.price} руб.</span>
-                </div>
-                {/* <div className={styles.cell}>{ad.contactInfo}</div> */}
             </div>
         </div>
     );

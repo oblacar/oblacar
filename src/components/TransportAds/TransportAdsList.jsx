@@ -12,13 +12,13 @@ const TransportAdsList = () => {
     return (
         <div className={styles.adsListContainer}>
             {/* <h2>Транспортные объявления</h2> */}
-            <div className={styles.headerRow}>
+            {/* <div className={styles.headerRow}>
                 <div className={styles.cellHeader}>Транспорт</div>
                 <div className={styles.cellHeader}>Откуда</div>
                 <div className={styles.cellHeader}>Куда</div>
-                <div className={styles.cellHeader}>Ставка</div>
+                <div className={styles.cellHeader}>Ставка</div> */}
                 {/* <div className={styles.cellHeader}>Контакт</div> */}
-            </div>
+            {/* </div> */}
             {ads.length === 0 ? (
                 <p>No transport ads available.</p>
             ) : (

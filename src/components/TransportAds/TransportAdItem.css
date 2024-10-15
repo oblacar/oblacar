@@ -1,37 +1,205 @@
-.adItem {
+.ad-item {
     display: flex;
     flex-direction: column;
     margin: 10px 0;
+    /* border: 1px solid #ddd; Границы для объявления */
+    border: 1px solid #a6a6a6;
+    border-radius: 10px;
+    /* background-color: #fff; */
+    padding: 0px;
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); Легкая тень */
+    cursor: pointer;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.ad-item:hover {
+    -webkit-box-shadow: 0px 0px 0px 4px #d1f1ff;
+    -moz-box-shadow: 0px 0px 0px 4px #d1f1ff;
+    box-shadow: 0px 0px 0px 4px #d1f1ff;
+    /* -webkit-box-shadow: 0px 0px 0px 4px #6abbf8;
+    -moz-box-shadow: 0px 0px 0px 4px #6abbf8;
+    box-shadow: 0px 0px 0px 4px #6abbf8; */
 }
 
 .row {
+    /* display: flex;
+    justify-content: space-between; */
+    width: 100%;
+    box-sizing: border-box;
+    /* padding: 10px 0; */
+
+    min-height: 100px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.upper-row {
+    border-radius: 10px 10px 0 0;
     display: flex;
-    justify-content: space-between; /* Распределение ячеек по ширине */
-    padding: 10px;
-    /* background-color: #f9f9f9; Цвет фона для строки */
+    justify-content: space-between;
+    width: 100%;
+    min-height: 60px;
+    /* background-color: rgb(124, 249, 96); */
+    background-color: white;
+    align-items: flex-end;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .cell {
-    flex: 1; /* Равномерное распределение ширины ячеек */
-    padding: 5px;
-    font-size: 12px;
+    flex: 1;
+    /* padding: 5px;
+    font-size: 14px; */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+
+    /* border: 1px solid black; */
 }
 
-.volume, .location, .destination {
+/*стилизуем информацию о транспорте*/
+.car-info {
+    text-align: left;
+
+    font-size: 14px;
+    /* border: 1px solid black; */
+
+    flex-grow: 1; /* Центр занимает оставшееся пространство */
+    /* padding: 10px; */
+    box-sizing: border-box; /* Учитываем отступы внутри блока */
+}
+
+.volume {
     font-weight: 600;
 }
-.carInfo {
+
+/* .cell .vehicleType,
+.cell .volume,
+.cell .body-type,
+.cell .loading-type,
+.cell .location,
+.cell .destination,
+.cell .price {
+    font-weight: 600;
+    margin-bottom: 5px;
+} */
+
+/* .location,
+.availability-date {
+    font-size: 12px;
+    color: #666;
+} */
+
+.city {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f66104;
     text-align: start;
+    /* margin-left: 30px; */
+    margin-bottom: 10px;
+    border-radius: 10px;
 }
 
-.availabilityDate {
-    display: block;
+.availability-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #373b80;
+    text-align: start;
+    margin-bottom: 5px;
 }
 
-.row.evenRow {
-    background-color: #fafafa; /* Светлый фон для четных строк */
+.departure {
+    margin-left: 50px;
 }
 
-.row.oddRow {
-    background-color: #ffffff; /* Белый фон для нечетных строк */
+.price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3c3c46;
+    padding-bottom: 20px;
+    /* text-align: start;
+    margin-left: 45px;
+    margin-bottom: 20px; */
+}
+
+.cell.price {
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+}
+
+/* .destination {
+    font-size: 14px;
+    color: #555;
+} */
+
+.down-row {
+    /* margin-top: 10px; */
+    /* background-color: #f9f9f9; */
+    /* height: 40px; */
+    /* width: 100%; */
+    /* border-top: 1px solid #ddd; */
+    /* text-align: start; */
+    min-height: 40px; /*TODO сделать выравнивание по центру, но что бы все входило*/
+    color: #414141;
+    /* display: flex; */
+
+    display: flex;
+    justify-content: space-between; /* Выравнивание боковых блоков */
+    width: 100%; /* Контейнер занимает всю ширину */
+    box-sizing: border-box;
+
+    align-items: center; /* Вертикальное центрирование */
+}
+
+.icon-car {
+    /* border: 1px solid black; */
+    width: 60px;
+    font-size: 20px;
+    color: rgb(67, 61, 88);
+
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.icon-item-ad-bar {
+    width: 100px;
+}
+
+/* .icon-driver,
+.icon-add {
+    display: inline-block;
+} */
+.icon-add {
+    /* background-color: #fe914d; */
+    /* background-color: #fdb181; */
+    background-color: #ffffff;
+
+    /* color: white; */
+    font-size: 14px;
+    height: 28px;
+    width: 90px;
+    border-radius: 16px;
+    border: 1px solid #fc8135;
+    /* float: right; */
+    color: #fc8135;
+    display: flex;
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
+}
+
+.icon-add:hover {
+    background-color: #fc8135;
+    color: white;
+}
+
+.icon-add:active {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
+    box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
+}
+
+.container-icon-add {
+    /* display: inline-block; */
+    float: right;
+    margin-right: 3px;
 }

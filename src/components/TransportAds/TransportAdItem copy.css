@@ -1,0 +1,38 @@
+.adItem {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between; /* Распределение ячеек по ширине */
+    padding: 10px;
+    /* background-color: #f9f9f9; Цвет фона для строки */
+    border-radius: 5px;
+}
+
+.cell {
+    flex: 1; /* Равномерное распределение ширины ячеек */
+    padding: 5px;
+    font-size: 12px;
+}
+
+.volume, .location, .destination {
+    font-weight: 600;
+}
+.carInfo {
+    text-align: start;
+}
+
+.availabilityDate {
+    display: block;
+}
+
+.row.evenRow {
+    background-color: #fafafa; /* Светлый фон для четных строк */
+}
+
+.row.oddRow {
+    background-color: #ffffff; /* Белый фон для нечетных строк */
+}
