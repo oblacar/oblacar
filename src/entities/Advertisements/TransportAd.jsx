@@ -9,7 +9,11 @@ class TransportAd {
         location,
         destination,
         price,
-        description,
+        bodyType,
+        volume,
+        loadingType,
+        payment,
+        // description,
         contactInfo
     ) {
         this.adId = adId; // уникальный идентификатор объявления
@@ -19,7 +23,11 @@ class TransportAd {
         this.location = location; // город, где находится транспортное средство
         this.destination = destination; // предполагаемое направление (если есть)
         this.price = price; // стоимость перевозки
-        this.description = description; // описание состояния и особенностей машины
+        this.bodyType = bodyType; // тип кузова
+        this.volume = volume; // объем
+        this.loadingType = loadingType; // тип загрузки
+        this.payment = payment; // оплата
+        // this.description = description; // описание состояния и особенностей машины
         this.contactInfo = contactInfo; // информация для связи с владельцем
     }
 }

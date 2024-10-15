@@ -1,0 +1,29 @@
+.adItem {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between; /* Распределение ячеек по ширине */
+    padding: 10px;
+    background-color: #f9f9f9; /* Цвет фона для строки */
+}
+
+.cell {
+    flex: 1; /* Равномерное распределение ширины ячеек */
+    padding: 5px;
+    font-size: 12px;
+}
+
+.volume {
+    font-weight: 600;
+}
+.carInfo {
+    text-align: start;
+}
+
+.availabilityDate {
+    display: block;
+}
