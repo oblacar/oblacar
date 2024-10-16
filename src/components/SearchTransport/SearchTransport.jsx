@@ -63,14 +63,14 @@ const SearchTransport = () => {
                         placeholder='Вес (кг)'
                         value={weight}
                         onChange={(e) => setWeight(e.target.value)}
-                        className='search-field'
+                        className='search-field weight'
                     />
                     <input
                         type='number'
                         placeholder='Объем (м³)'
                         value={volume}
                         onChange={(e) => setVolume(e.target.value)}
-                        className='search-field'
+                        className='search-field search-volume'
                     />
                     <button
                         type='submit'

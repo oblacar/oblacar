@@ -7,7 +7,7 @@ import { addTransportAds } from '../../scripts/addTransportAds';
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
-import SingleRatingStar from '../../components/common/SingleRatingStar/SingleRatingStar';
+import CityAutocomplete from '../../components/common/CityAutocomplete/CityAutocomplete';
 
 function Home() {
     return (
@@ -20,9 +20,8 @@ function Home() {
                         загрузить тестовую базу
                     </button> */}
                 </p>
-                <div>
-                    <SingleRatingStar rating={3} />
-                </div>
+                <CityAutocomplete />
+
                 <SearchTransport />
                 <p>
                     1. добавить раздел: фото водителя и рейтинг, проверенный ли
