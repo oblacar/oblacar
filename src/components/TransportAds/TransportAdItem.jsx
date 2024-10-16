@@ -37,25 +37,35 @@ const TransportAdItem = ({ ad, rating }) => {
             {/* <div className={`row ${rowColor}`}> */}
             <div className='row'>
                 <div className='upper-ad-row'>
-                    <div className='cell departure'>
-                        <span className='availability-date'>
+                    <div className='rating-star'>
+                        {/* TODO временная реализация отображения объявлений без рейтинга */}
+                        {rating < 2 ? null : (
+                            <SingleRatingStar rating={rating} />
+                        )}
+                    </div>
+                    <div className='departure-location-date'>
+                        <div className='availability-date'>
                             {ad.availabilityDate}
-                        </span>
-                        <span className='location city'>{ad.location}</span>
+                        </div>
+                        <div className='departure-location'>
+                            {/* <div className='cell departure'>
+                            </div> */}
+                            <span className='departure location city'>
+                                {ad.location}
+                            </span>
+                            <span className='destination city'>
+                                {ad.destination || 'Не указано'}
+                            </span>
+                            {/* <div className='cell'>
+                            </div> */}
+                        </div>
                     </div>
-                    <div className='cell'>
-                        <span className='destination city'>
-                            {ad.destination || 'Не указано'}
-                        </span>
-                    </div>
-                    <div className='cell'>
-                        <span className='price'>{ad.price} руб.</span>
+                    <div className='finance'>
+                        <div className='price'>{ad.price} руб.</div>
+                        <div className='finance-details'>без НДС, торгуемся</div>
                     </div>
                 </div>
                 <div className='down-ad-row'>
-                    <div className='rating-star'>
-                        <SingleRatingStar rating={rating} />
-                    </div>
                     <div className='icon-car'>
                         <FaTruck />
                     </div>
