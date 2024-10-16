@@ -4,7 +4,10 @@ import styles from './Home.module.css'; // Подключаем стили
 
 import { addTransportAds } from '../../scripts/addTransportAds';
 
+import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
+
+import SingleRatingStar from '../../components/common/SingleRatingStar/SingleRatingStar';
 
 function Home() {
     return (
@@ -16,6 +19,14 @@ function Home() {
                     {/* <button onClick={addTransportAds}>
                         загрузить тестовую базу
                     </button> */}
+                </p>
+                <div>
+                    <SingleRatingStar rating={3} />
+                </div>
+                <SearchTransport />
+                <p>
+                    1. добавить раздел: фото водителя и рейтинг, проверенный ли
+                    водитель, проверенная ли машшина.
                 </p>
                 <TransportAdsList />
             </div>

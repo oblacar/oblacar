@@ -1,0 +1,51 @@
+.rating-star-item {
+    width: 30px;
+    /* border: 1px solid red; */
+}
+
+.rating-star-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Центрируем по горизонтали */
+    text-align: center; /* Центрируем текст */
+}
+
+.star-wrapper {
+    display: inline-block;
+    width: 18.5px; /* Задаем точный размер, равный ширине звезды */
+    height: 22px; /* Высота тоже равна высоте звезды */
+    position: relative;
+    font-size: 24px; /* Размер звезды */
+    line-height: 24px; /* Соответствует высоте */
+
+    /* border: 1px solid black; */
+}
+
+.star-background,
+.star-foreground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.star-background {
+    color: gray; /* Цвет неактивной звезды */
+}
+
+.star-foreground {
+    color: gold; /* Цвет активной звезды */
+    overflow: hidden; /* Обрезка по ширине */
+    width: 0;
+}
+
+.rating-number {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin-top: -1px; /* Отступ между звездой и числом */
+    font-size: 12px;
+    text-align: center;
+    color: #414141;
+}

@@ -1,0 +1,95 @@
+/* Контейнер формы поиска */
+.search-transport-container {
+    width: calc(100% + 40px); /* Полная ширина */
+    max-width: 1200px;
+    margin: 0 -20px;
+
+    /* box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); */
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Сбрасываем padding у родителя */
+/* .search-form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+} */
+
+/* Верхний ряд с полями поиска */
+.upper-search-row {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 10px 10px 5px 10px;
+    /* border: 1px solid black; */
+}
+
+.search-field {
+    flex: 1;
+    margin-right: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    height: 40px;
+}
+
+.search-field:last-child {
+    margin-right: 0;
+}
+
+.search-button {
+    padding: 10px 20px;
+    height: 40px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+/* Нижняя полоса */
+.lower-search-row {
+    display: flex;
+    justify-content: center;
+    /* margin-top: 10px; */
+}
+
+.additional-button {
+    padding: 8px 16px;
+    background-color: #f1f1f1;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.additional-button:hover {
+    background-color: #e2e2e2;
+}
+
+/* Дополнительные опции */
+.additional-options {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    animation: slide-down 0.2s ease-out forwards;
+}
+
+@keyframes slide-down {
+    from {
+        height: 0;
+        opacity: 0;
+    }
+    to {
+        height: auto;
+        opacity: 1;
+    }
+}

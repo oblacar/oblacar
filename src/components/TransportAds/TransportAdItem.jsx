@@ -11,6 +11,8 @@ import {
     FaReceipt,
 } from 'react-icons/fa';
 
+import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
+
 /*тентованный, 20 т, 90 м3, полупр.
 верх., бок., задн.*/
 
@@ -29,12 +31,12 @@ import {
 //         // this.description = description; // описание состояния и особенностей машины
 //         this.contactInfo = contactInfo; // информация для связи с владельцем
 
-const TransportAdItem = ({ ad, rowColor }) => {
+const TransportAdItem = ({ ad, rating }) => {
     return (
         <div className='ad-item'>
             {/* <div className={`row ${rowColor}`}> */}
             <div className='row'>
-                <div className='upper-row'>
+                <div className='upper-ad-row'>
                     <div className='cell departure'>
                         <span className='availability-date'>
                             {ad.availabilityDate}
@@ -50,7 +52,10 @@ const TransportAdItem = ({ ad, rowColor }) => {
                         <span className='price'>{ad.price} руб.</span>
                     </div>
                 </div>
-                <div className='down-row'>
+                <div className='down-ad-row'>
+                    <div className='rating-star'>
+                        <SingleRatingStar rating={rating} />
+                    </div>
                     <div className='icon-car'>
                         <FaTruck />
                     </div>

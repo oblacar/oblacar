@@ -33,7 +33,7 @@
     border-radius: 10px;
 }
 
-.upper-row {
+.upper-ad-row {
     border-radius: 10px 10px 0 0;
     display: flex;
     justify-content: space-between;
@@ -131,7 +131,7 @@
     color: #555;
 } */
 
-.down-row {
+.down-ad-row {
     /* margin-top: 10px; */
     /* background-color: #f9f9f9; */
     /* height: 40px; */
@@ -150,13 +150,17 @@
     align-items: center; /* Вертикальное центрирование */
 }
 
+.rating-star {
+    margin: -100px 0px 0px 10px;
+}
+
 .icon-car {
     /* border: 1px solid black; */
-    width: 60px;
+    /* width: 60px; */
     font-size: 20px;
     color: rgb(67, 61, 88);
 
-    margin-left: 10px;
+    margin-right: 10px;
     margin-top: 5px;
 }
 

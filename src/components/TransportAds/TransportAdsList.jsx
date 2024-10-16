@@ -9,16 +9,12 @@ const TransportAdsList = () => {
     if (loading) return <div className={styles.loadingMessage}>Loading...</div>;
     if (error) return <div className={styles.errorMessage}>Error: {error}</div>;
 
+    const getRandomRating = () => {
+        return Math.floor(Math.random() * 50) / 10;
+    };
+
     return (
         <div className={styles.adsListContainer}>
-            {/* <h2>Транспортные объявления</h2> */}
-            {/* <div className={styles.headerRow}>
-                <div className={styles.cellHeader}>Транспорт</div>
-                <div className={styles.cellHeader}>Откуда</div>
-                <div className={styles.cellHeader}>Куда</div>
-                <div className={styles.cellHeader}>Ставка</div> */}
-                {/* <div className={styles.cellHeader}>Контакт</div> */}
-            {/* </div> */}
             {ads.length === 0 ? (
                 <p>No transport ads available.</p>
             ) : (
@@ -26,7 +22,8 @@ const TransportAdsList = () => {
                     <TransportAdItem
                         key={ad.adId}
                         ad={ad}
-                        rowColor={index % 2 === 0 ? 'evenRow' : 'oddRow'}
+                        // rowColor={index % 2 === 0 ? 'evenRow' : 'oddRow'}
+                        rating={Math.floor(Math.random() * 50) / 10}
                     />
                 ))
             )}

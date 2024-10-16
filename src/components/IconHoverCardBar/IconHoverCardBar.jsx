@@ -16,6 +16,12 @@ import {
     FaEnvelope,
     FaShippingFast,
     FaClipboardList,
+    //
+    FaEdit,
+    FaPen,
+    FaClipboard,
+    FaFileAlt,
+    FaStickyNote,
 } from 'react-icons/fa';
 
 function setCoordinates(iconUserRef, setIconCoordinates) {
@@ -80,6 +86,14 @@ function IconDropdownMenuBar() {
     return (
         <>
             <div className={styles.iconsArea}>
+                <IconHoverCard
+                    type='Создать'
+                    iconRef={iconOrdersRef}
+                    IconComponent={FaPen}
+                    HoverCardComponent={HoverOrdersCard}
+                    iconCoordinates={iconOrdersCoordinates}
+                    windowWidth={windowWidth}
+                />
                 <IconHoverCard
                     type='Профиль'
                     iconRef={iconUserRef}
