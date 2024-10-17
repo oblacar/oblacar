@@ -7,6 +7,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './SearchTransport.css';
 
+import CitySearch from '../common/CitySearch/CitySearch';
+
 const SearchTransport = () => {
     // Состояния для полей
     const [departureCity, setDepartureCity] = useState('');
@@ -14,6 +16,18 @@ const SearchTransport = () => {
     const [date, setDate] = useState(null); // Используем null для React Datepicker
     const [volume, setVolume] = useState('');
     const [weight, setWeight] = useState('');
+
+    // const [selectedCity, setSelectedCity] = useState(null);
+
+    const handleDepartureCitySelected = (city) => {
+        setDepartureCity(city);
+        console.log('Выбранный город отправления:', city);
+    };
+
+    const handleDestinationCitySelected = (city) => {
+        setDestinationCity(city);
+        console.log('Выбранный город отправления:', city);
+    };
 
     // Управление состоянием для нижней полосы с дополнительными опциями
     const [showAdditionalOptions, setShowAdditionalOptions] = useState(false);
@@ -37,20 +51,32 @@ const SearchTransport = () => {
                 className='search-form'
             >
                 <div className='upper-search-row'>
-                    <input
+                    {/* <input
                         type='text'
                         placeholder='От куда'
                         value={departureCity}
                         onChange={(e) => setDepartureCity(e.target.value)}
                         className='search-field departure-city'
+                    /> */}
+
+                    <CitySearch
+                        onCitySelected={handleDepartureCitySelected}
+                        // inputStyle='departure-city-search' // Задание размеров и стилей
+                        inputClassName='departure-city' // Задание классов
                     />
-                    <input
+                    <CitySearch
+                        onCitySelected={handleDestinationCitySelected}
+                        // inputStyle='departure-city-search' // Задание размеров и стилей
+                        inputClassName='destination-city' // Задание классов
+                    />
+
+                    {/* <input
                         type='text'
                         placeholder='Куда'
                         value={destinationCity}
                         onChange={(e) => setDestinationCity(e.target.value)}
                         className='search-field destination-city'
-                    />
+                    /> */}
                     <DatePicker
                         selected={date}
                         onChange={(date) => setDate(date)}
@@ -81,6 +107,11 @@ const SearchTransport = () => {
                 </div>
 
                 <div className='lower-search-row'>
+                    {/* <CitySearch
+                        onCitySelected={handleDepartureCitySelected}
+                        // inputStyle='departure-city-search' // Задание размеров и стилей
+                        inputClassName='city-search-input' // Задание классов
+                    /> */}
                     <button
                         type='button'
                         className='additional-button'

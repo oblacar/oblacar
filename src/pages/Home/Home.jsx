@@ -7,7 +7,7 @@ import { addTransportAds } from '../../scripts/addTransportAds';
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
-import CityAutocomplete from '../../components/common/CityAutocomplete/CityAutocomplete';
+import CitySearch from '../../components/common/CitySearch/CitySearch';
 
 function Home() {
     return (
@@ -20,7 +20,7 @@ function Home() {
                         загрузить тестовую базу
                     </button> */}
                 </p>
-                <CityAutocomplete />
+                <CitySearch />
 
                 <SearchTransport />
                 <p>
