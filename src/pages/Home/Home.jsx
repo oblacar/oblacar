@@ -7,8 +7,6 @@ import { addTransportAds } from '../../scripts/addTransportAds';
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
-import CitySearch from '../../components/common/CitySearch/CitySearch';
-
 function Home() {
     return (
         <>
@@ -20,14 +18,13 @@ function Home() {
                         загрузить тестовую базу
                     </button> */}
                 </p>
-                <CitySearch />
 
                 <SearchTransport />
-                <p>
+                {/* <p>
                     1. добавить раздел: фото водителя и рейтинг, проверенный ли
                     водитель, проверенная ли машшина. 2. возле цены можно
                     заместить важную инфомрацию по оплате, кроме цены
-                </p>
+                </p> */}
                 <TransportAdsList />
             </div>
         </>

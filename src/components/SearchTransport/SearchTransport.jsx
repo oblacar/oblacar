@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './SearchTransport.css';
 
 import CitySearch from '../common/CitySearch/CitySearch';
+import Button from '../common/Button/Button';
 
 const SearchTransport = () => {
     // Состояния для полей
@@ -44,6 +45,45 @@ const SearchTransport = () => {
         });
     };
 
+    // Функция для добавления пробелов между тысячами
+    const formatNumber = (value) => {
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    };
+
+    // Функция для обработки изменений веса инпута
+    const handleWeightChange = (e) => {
+        // Проверяем, что введен только допустимый символ (цифры)
+        const value = e.target.value.replace(/\D/g, '');
+
+        // Сохраняем числовое значение в state
+        setWeight(value);
+    };
+    //Функция для обработки изменений объема инпута
+    const handleVolumeChange = (e) => {
+        const value = e.target.value.replace(/\D/g, '');
+        setVolume(value);
+    };
+
+    // Ограничиваем ввод только цифрами, разрешая стрелки, Delete, Backspace
+    const handleKeyDown = (e) => {
+        const allowedKeys = [
+            'ArrowUp',
+            'ArrowDown',
+            'ArrowLeft',
+            'ArrowRight',
+            'Backspace',
+            'Delete',
+            'Tab',
+        ];
+
+        if (
+            !allowedKeys.includes(e.key) && // Разрешаем навигационные клавиши
+            !/[0-9]/.test(e.key) // Разрешаем цифры
+        ) {
+            e.preventDefault(); // Запрещаем все остальное
+        }
+    };
+
     return (
         <div className='search-transport-container'>
             <form
@@ -63,11 +103,13 @@ const SearchTransport = () => {
                         onCitySelected={handleDepartureCitySelected}
                         // inputStyle='departure-city-search' // Задание размеров и стилей
                         inputClassName='departure-city' // Задание классов
+                        placeholder='От куда'
                     />
                     <CitySearch
                         onCitySelected={handleDestinationCitySelected}
                         // inputStyle='departure-city-search' // Задание размеров и стилей
                         inputClassName='destination-city' // Задание классов
+                        placeholder='Куда'
                     />
 
                     {/* <input
@@ -81,29 +123,37 @@ const SearchTransport = () => {
                         selected={date}
                         onChange={(date) => setDate(date)}
                         dateFormat='dd/MM/yyyy'
-                        placeholderText='Дата отправки'
+                        placeholderText='Дата'
                         className='search-field date'
                     />
                     <input
-                        type='number'
+                        type='text'
                         placeholder='Вес (кг)'
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
+                        value={weight ? `${formatNumber(weight)} кг` : ''}
+                        onChange={handleWeightChange}
+                        onKeyDown={handleKeyDown} // Ограничение на ввод только цифр
                         className='search-field weight'
                     />
                     <input
-                        type='number'
+                        type='text'
                         placeholder='Объем (м³)'
-                        value={volume}
-                        onChange={(e) => setVolume(e.target.value)}
+                        value={volume ? `${formatNumber(volume)} м³` : ''}
+                        onChange={handleVolumeChange}
+                        onKeyDown={handleKeyDown} // Ограничение на ввод только цифр
                         className='search-field search-volume'
                     />
-                    <button
+                    {/* <button
                         type='submit'
                         className='search-button'
                     >
                         Поиск
-                    </button>
+                    </button> */}
+
+                    <Button
+                        type='submit'
+                        size_height='high'
+                        children='Поиск'
+                    />
                 </div>
 
                 <div className='lower-search-row'>

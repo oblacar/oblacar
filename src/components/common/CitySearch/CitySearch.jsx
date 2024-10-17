@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchCities } from '../../../services/CityService'; // Импортируем функцию из сервиса
 import './CitySearch.css';
 
-const CitySearch = ({ onCitySelected, inputStyle, inputClassName }) => {
+const CitySearch = ({ onCitySelected, placeholder, inputClassName }) => {
     const [query, setQuery] = useState(''); // Введённый пользователем текст
     const [cities, setCities] = useState([]); // Список городов для отображения
     const [showDropdown, setShowDropdown] = useState(false); // Управление видимостью выпадающего списка
@@ -98,7 +98,7 @@ const CitySearch = ({ onCitySelected, inputStyle, inputClassName }) => {
                 value={query}
                 onChange={handleInputChange}
                 // onChange={(e) => setQuery(e.target.value)} // Обновляем состояние при вводе
-                placeholder='Введите город'
+                placeholder={placeholder}
                 // style={inputStyle} // Динамические стили
                 className={`city-search-input  ${inputClassName}`} // Динамические классы
                 onClick={handleEnterInput}
