@@ -26,6 +26,20 @@
     min-width: 200px;
     border-radius: 0px;
 }
+
+.departure-city {
+    width: 200px;
+    border-radius: 5px 0px 0px 5px;
+}
+.destination-city:focus,
+.departure-city:focus {
+    outline: none; /* Убираем стандартное выделение */
+    border: 1px solid #ff9e5d;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px #ff9e5d; /* Внутренний "border" */
+    /* transition: box-shadow 0.2s ease; Плавный переход */
+}
+
 .search-field.date {
     max-width: 100px;
     border-radius: 0px;
