@@ -14,7 +14,7 @@ import AuthContext from '../../hooks/Authorization/AuthContext';
 import './Login.css'; // Импортируйте стили
 
 const Login = () => {
-    const [errorMessage, setErrorMessage] = useState('');
+    // const [errorMessage, setErrorMessage] = useState('');
     const { login, erMessage, resetError } = useContext(AuthContext); // Получаем функцию login из AuthContext
     const [rememberMe, setRememberMe] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -46,12 +46,12 @@ const Login = () => {
                     rememberMe
                 ); // Используем функцию login из AuthContext
 
-                navigate('/');
-
                 console.log('Вход выполнен успешно!', user);
+
+                navigate('/');
             } catch (error) {
                 setLoading(false); // Скрываем прелоадер после завершения аутентификации
-                setErrorMessage('Ошибка входа: ' + error.message); // Обработка ошибок
+                // setErrorMessage('Ошибка входа: ' + error.message); // Обработка ошибок
             } finally {
                 setLoading(false); // Скрываем прелоадер после завершения аутентификации
             }
@@ -140,7 +140,6 @@ const Login = () => {
                     <Preloader />
                 </div>
             )}
-            {/* Показать прелоадер, если loading = true */}
         </>
     );
 };
