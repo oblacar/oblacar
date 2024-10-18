@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, { user: null });
     // const auth = getAuth();
     const { dispatch: userDispatch } = useContext(UserContext); // Получаем dispatch из UserContext напрямую
-    const [error, setError] = useState(''); // Состояние для ошибок
+    const [erMessage, setErMessage] = useState(''); // Состояние для ошибок
 
     // Эффект для проверки состояния пользователя при загрузке
     useEffect(() => {
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
 
     //Обнулим текст ошибки
     const resetError = () => {
-        setError(() => '');
+        setErMessage(() => '');
     };
 
     // Функция для регистрации
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Ошибка регистрации и входа:', error.message);
 
-            setError(error.message); // Устанавливаем сообщение об ошибке
+            setErMessage(error.message); // Устанавливаем сообщение об ошибке
         }
     };
 
@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }) => {
                 payload: { ...user, ...userProfile },
             });
 
-            setError(''); // Сбрасываем ошибку при успешной аутентификации
+            setErMessage(''); // Сбрасываем ошибку при успешной аутентификации
 
             // Если выбран "Запомнить меня"
             if (isRememberUser) {
@@ -156,18 +156,21 @@ export const AuthProvider = ({ children }) => {
 
             switch (error.code) {
                 case 'auth/wrong-password':
-                    setError('Неверный email или пароль');
+                    setErMessage('Неверный email или пароль');
                     break;
                 case 'auth/user-not-found':
-                    setError('Пользователь с таким email не найден');
+                    setErMessage('Пользователь с таким email не найден');
                     break;
                 case 'auth/invalid-email':
-                    setError('Неверный email');
+                    setErMessage('Неверный email');
                     break;
                 default:
-                    setError('Ошибка входа.');
+                    setErMessage('Ошибка входа.');
                     break;
             }
+
+            // Выбросываем ошибку
+            throw new Error(erMessage); // Пробрасываем ошибку дальше
         }
     };
 
@@ -199,7 +202,7 @@ export const AuthProvider = ({ children }) => {
                 register, // Функция регистрации
                 login, // Функция входа
                 logout, // Функция выхода
-                error, // Информация об ошибке при login
+                erMessage, // Информация об ошибке при login
                 resetError, // Обнуляем ошибку
             }}
         >

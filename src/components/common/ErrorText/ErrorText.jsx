@@ -1,12 +1,12 @@
 import React from 'react';
 import './ErrorText.css'; // Подключаем стили для ErrorText
 
-const ErrorText = ({ error }) => {
+const ErrorText = ({ errorMessage }) => {
     return (
         <>
-            {error ? (
+            {errorMessage ? (
                 <div>
-                    <span className='error-text'>{error}</span>
+                    <span className='error-text'>{errorMessage}</span>
                 </div>
             ) : null}
         </>
