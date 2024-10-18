@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, { user: null });
     // const auth = getAuth();
     const { dispatch: userDispatch } = useContext(UserContext); // Получаем dispatch из UserContext напрямую
-    const [erMessage, setErMessage] = useState(''); // Состояние для ошибок
+    // const [erMessage, setErMessage] = useState(''); // Состояние для ошибок
 
     // Эффект для проверки состояния пользователя при загрузке
     useEffect(() => {
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
                             payload: { ...user, ...userProfile },
                         });
                     } else {
-                        console.log(
+                        console.error(
                             'Профиль пользователя не найден. Ожидаем его создание.'
                         );
                         // Здесь можно добавить логику ожидания, например, через setInterval, чтобы
@@ -87,9 +87,9 @@ export const AuthProvider = ({ children }) => {
     }, [userDispatch]);
 
     //Обнулим текст ошибки
-    const resetError = () => {
-        setErMessage(() => '');
-    };
+    // const resetError = () => {
+    //     // setErMessage(() => '');
+    // };
 
     // Функция для регистрации
     const register = async (data) => {
@@ -117,9 +117,12 @@ export const AuthProvider = ({ children }) => {
                 'Пользователь успешно вошёл в систему после регистрации'
             );
         } catch (error) {
-            console.error('Ошибка регистрации и входа:', error.message);
+            // console.error('Ошибка регистрации и входа:', error.message);
 
-            setErMessage(error.message); // Устанавливаем сообщение об ошибке
+            // setErMessage(error.message); // Устанавливаем сообщение об ошибке
+
+            // Выбросываем ошибку
+            throw new Error(error.message); // Пробрасываем ошибку дальше
         }
     };
 
@@ -140,7 +143,7 @@ export const AuthProvider = ({ children }) => {
                 payload: { ...user, ...userProfile },
             });
 
-            setErMessage(''); // Сбрасываем ошибку при успешной аутентификации
+            // setErMessage(''); // Сбрасываем ошибку при успешной аутентификации
 
             // Если выбран "Запомнить меня"
             if (isRememberUser) {
@@ -152,25 +155,25 @@ export const AuthProvider = ({ children }) => {
                 localStorage.removeItem('authEmail');
             }
         } catch (error) {
-            console.error('Ошибка входа:', error.message);
+            // console.error('Ошибка входа:', error.message);
 
-            switch (error.code) {
-                case 'auth/wrong-password':
-                    setErMessage('Неверный email или пароль');
-                    break;
-                case 'auth/user-not-found':
-                    setErMessage('Пользователь с таким email не найден');
-                    break;
-                case 'auth/invalid-email':
-                    setErMessage('Неверный email');
-                    break;
-                default:
-                    setErMessage('Ошибка входа.');
-                    break;
-            }
+            // switch (error.code) {
+            //     case 'auth/wrong-password':
+            //         setErMessage('Неверный email или пароль');
+            //         break;
+            //     case 'auth/user-not-found':
+            //         setErMessage('Пользователь с таким email не найден');
+            //         break;
+            //     case 'auth/invalid-email':
+            //         setErMessage('Неверный email');
+            //         break;
+            //     default:
+            //         setErMessage('Ошибка входа.');
+            //         break;
+            // }
 
             // Выбросываем ошибку
-            throw new Error(erMessage); // Пробрасываем ошибку дальше
+            throw new Error(error.message); // Пробрасываем ошибку дальше
         }
     };
 
@@ -202,8 +205,8 @@ export const AuthProvider = ({ children }) => {
                 register, // Функция регистрации
                 login, // Функция входа
                 logout, // Функция выхода
-                erMessage, // Информация об ошибке при login
-                resetError, // Обнуляем ошибку
+                // erMessage, // Информация об ошибке при login
+                // resetError, // Обнуляем ошибку
             }}
         >
             {children}

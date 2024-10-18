@@ -73,7 +73,7 @@ class UserService {
             //     user.stsTokenManager.accessToken
             // );
         } catch (error) {
-            console.error('Ошибка регистрации:', error);
+            // console.error('Ошибка регистрации:', error);
             
             switch (error.code) {
                 case 'auth/email-already-in-use':
@@ -132,8 +132,22 @@ class UserService {
             ); // Передаем корректные email и пароль
             return userCredential.user;
         } catch (error) {
-            console.error('Ошибка входа:', error);
-            throw error;
+            // console.error('Ошибка входа:', error);
+
+            switch (error.code) {
+                case 'auth/wrong-password':
+                     throw new Error('Неверный email или пароль');
+      
+                case 'auth/user-not-found':
+                    throw new Error('Пользователь с таким email не найден');
+       
+                case 'auth/invalid-email':
+                     throw new Error('Неверный email');
+   
+                default:
+              throw new Error('Ошибка входа.');
+
+            }
         }
     }
 

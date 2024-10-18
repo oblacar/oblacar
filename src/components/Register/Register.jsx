@@ -10,11 +10,15 @@ import ErrorText from '../common/ErrorText/ErrorText';
 import Preloader from '../common/Preloader/Preloader';
 
 const Register = () => {
-    const { register, erMessage, resetError } = useContext(AuthContext); // Получаем функцию регистрации из контекста
+    const {
+        register,
+        // , erMessage, resetError
+    } = useContext(AuthContext); // Получаем функцию регистрации из контекста
     const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        resetError();
+        setErrorMessage('');
     }, []);
 
     const navigate = useNavigate(); // Создаем объект навигации
@@ -59,7 +63,10 @@ const Register = () => {
                 navigate('/');
             } catch (error) {
                 setLoading(false); // Скрываем прелоадер после завершения аутентификации
-                console.log('Ошибка регистрации: ' + error.message);
+
+                console.error('Ошибка регистрации: ' + error.message);
+
+                setErrorMessage(error.message);
             } finally {
                 setLoading(false); // Скрываем прелоадер после завершения аутентификации
             }
@@ -71,7 +78,7 @@ const Register = () => {
             <div className='register-container'>
                 <h1>Регистрация пользователя</h1>
 
-                <ErrorText errorMessage={erMessage} />
+                <ErrorText errorMessage={errorMessage} />
 
                 <form onSubmit={formik.handleSubmit}>
                     <div>
