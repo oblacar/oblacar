@@ -1,6 +1,6 @@
 .adsListContainer {
     /* margin: 20px; */
-    font-family: Verdana, "Dejavu Sans", Geneva, Tahoma, sans_serif;
+    font-family: Verdana, 'Dejavu Sans', Geneva, Tahoma, sans_serif;
 }
 
 .headerRow {
@@ -15,4 +15,9 @@
     flex: 1; /* Равномерное распределение ширины заголовков */
     /* padding: 10px; */
     text-align: center; /* Центрируем текст заголовков */
+}
+
+.preloader {
+    display: inline-block;
+    margin: 50px auto;
 }
