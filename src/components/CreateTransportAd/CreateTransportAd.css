@@ -1,11 +1,3 @@
-.create-transport-ad-form {
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* gap: 20px; */
-    /* max-width: 600px; */
-    /* margin: 0 auto; */
-}
-
 .new-transport-ad {
     display: flex;
 }
@@ -14,10 +6,8 @@
     font-size: 20px;
     padding: 0;
     font-weight: 600;
-    /* margin: 0 0 10px 10px; */
-    /* margin-bottom: 10px; */
     padding: 20px 0;
-    /* border: 1px green solid; */
+
     border-radius: 10px 10px 0 0;
     background-color: blueviolet;
     color: #ffffff !important;
@@ -42,8 +32,6 @@
 .new-ad-departure,
 .new-ad-destination,
 .new-ad-date {
-    /* border: 1px green solid; */
-    /* text-align: left !important; Этот элемент будет выравнен по левому краю */
     display: inline-block !important; /* Добавляем, чтобы корректно сбросить центровку */
 }
 
@@ -55,19 +43,6 @@
 h2 {
     text-align: center;
 }
-/* 
-label {
-    display: flex;
-    flex-direction: column;
-} */
-
-/* .route-info,
-.financial-info,
-.truck-info {
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 5px;
-} */
 
 button {
     padding: 10px;
@@ -82,16 +57,8 @@ button:hover {
     background-color: #45a049;
 }
 
-.checkboxes {
-    /* display: flex;
-    flex-direction: column;  */
-}
-
 /*Блок чекбоксов*/
 .checkbox-item {
-    /* display: flex;
-    align-items: center; */
-    /* margin-bottom: 10px;  */
     width: 100%;
     height: 20px;
     margin-bottom: 1px;
@@ -127,8 +94,6 @@ button:hover {
 
 .checkbox-title {
     display: inline-flex;
-    /* border: 1px solid rgb(9, 9, 9); */
-    /* margin-top: 15px; */
     font-size: 16px;
 
     position: absolute;
@@ -156,10 +121,6 @@ button:hover {
     cursor: pointer;
 }
 
-/* .radio-label:hover {
-    background-color: #d1f2ff;
-} */
-
 .input-radio {
     /* margin-right: 10px; */
     width: 20px;
@@ -173,8 +134,6 @@ button:hover {
 
 .radio-title {
     display: inline-flex;
-    /* border: 1px solid rgb(9, 9, 9); */
-    /* margin-top: 15px; */
     font-size: 16px;
 
     position: absolute;
@@ -183,7 +142,6 @@ button:hover {
 }
 
 .select-transport-type {
-    /* margin-top: -30px; */
     width: 100%;
     height: 30px;
     cursor: pointer;
@@ -199,8 +157,6 @@ button:hover {
 
 .value-dimension {
     display: flex; /* Используем flex для размещения в линию */
-    /* justify-content: space-between; Распределяем элементы по линии */
-    margin: 0 10px;
 }
 
 .dimension-item {
@@ -215,29 +171,26 @@ button:hover {
 .label-dimension {
     display: block; /* Подпись отображается как блок */
     margin-bottom: 5px; /* Отступ между подписью и полем ввода */
-    /* font-weight: bold;  */
     text-align: center;
 }
 
 .weight-dimension {
     width: 100%;
+
     display: flex;
+    align-items: center;
 }
 
 .weight-label {
     width: 80px;
-    margin-left: 10px;
+
     font-weight: 600;
+    display: block;
 }
 
-.weight-input {
-    /* width: 100%; */
+input.weight-input {
     margin-left: 10px;
-    margin-right: 10px;
-}
-.truck-capacity .new-ad-title {
-    margin-left: 10px;
-    margin-bottom: 0px;
+    margin-bottom: 0 !important;
 }
 
 .use-truck {
@@ -246,26 +199,19 @@ button:hover {
 }
 
 .use-truck-message p {
-    /* height: 40px; */
     display: block;
     margin: 0px;
 }
 
-.use-truck-message,
-.use-truck-button {
-    /* border: 1px solid red; */
-}
-
 .truck-name-photo {
-    display: flex; /* Используем flex для размещения в линию */
+    display: flex; /* Используем flex для размещения элементов в линию */
+    justify-content: space-between; /* Размещаем элементы по краям */
     align-items: center; /* Выравнивание по центру по вертикали */
-    margin-bottom: 20px; /* Отступ между строками */
 }
 
-.truck-name,
-.truck-photo {
+.truck-name {
+    flex: 1; /* Занимает всё доступное пространство */
     margin-right: 20px; /* Отступ между элементами */
-    flex: 1; /* Позволяет элементам занимать равное пространство */
 }
 
 label.label-dimension {
@@ -287,6 +233,7 @@ label.label-dimension {
     align-items: center; /* Центрируем по вертикали */
     cursor: pointer; /* Изменяем курсор при наведении */
     transition: background-color 0.3s; /* Плавный переход цвета */
+    margin-bottom: -20px;
 }
 
 .photo-circle:hover {
