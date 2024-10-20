@@ -14,18 +14,32 @@ const transportAdsRef = ref(db, 'transportAds'); // Ссылка на разде
 
 const TransportAdService = {
     // Метод для добавления нового объявления
+    // createAd: async (adData) => {
+    //     try {
+    //         const newAdRef = push(transportAdsRef); // Создает уникальный ключ для нового объявления
+    //         await set(newAdRef, adData); // Сохраняет данные в базе
+    //         return { id: newAdRef.key, ...adData }; // Возвращает объявление с ID
+    //     } catch (error) {
+    //         console.error('Ошибка при добавлении объявления: ', error);
+    //         throw new Error(
+    //             'Не удалось создать объявление. Попробуйте еще раз.'
+    //         );
+    //     }
+    // },
+    //В режиме разработки не отправляем данные в базу
     createAd: async (adData) => {
-        try {
-            const newAdRef = push(transportAdsRef); // Создает уникальный ключ для нового объявления
-            await set(newAdRef, adData); // Сохраняет данные в базе
-            return { id: newAdRef.key, ...adData }; // Возвращает объявление с ID
-        } catch (error) {
-            console.error('Ошибка при добавлении объявления: ', error);
-            throw new Error(
-                'Не удалось создать объявление. Попробуйте еще раз.'
-            );
-        }
+        // Здесь можно добавить логику для отправки данных в базу данных
+        console.log('Создание нового объявления о транспорте:', adData);
+
+        // Пример имитации задержки
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve('Объявление успешно создано!');
+            }, 1000);
+        });
     },
+    // В будущем можно добавить больше методов, таких как:
+    // fetchTransports, updateTransportAd и т.д.
 
     // Метод для получения всех объявлений
     getAllAds: async () => {

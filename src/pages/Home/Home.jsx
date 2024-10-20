@@ -4,6 +4,8 @@ import styles from './Home.module.css'; // Подключаем стили
 
 import { addTransportAds } from '../../scripts/addTransportAds';
 
+import CreateTransportAd from '../../components/CreateTransportAd/CreateTransportAd';
+
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
@@ -18,14 +20,14 @@ function Home() {
                         загрузить тестовую базу
                     </button> */}
                 </p>
-
-                <SearchTransport />
+                <CreateTransportAd />
+                {/* <SearchTransport /> */}
                 {/* <p>
                     1. добавить раздел: фото водителя и рейтинг, проверенный ли
                     водитель, проверенная ли машшина. 2. возле цены можно
                     заместить важную инфомрацию по оплате, кроме цены
                 </p> */}
-                <TransportAdsList />
+                {/* <TransportAdsList /> */}
             </div>
         </>
     );

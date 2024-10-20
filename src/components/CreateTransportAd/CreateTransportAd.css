@@ -1,0 +1,300 @@
+.create-transport-ad-form {
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* gap: 20px; */
+    /* max-width: 600px; */
+    /* margin: 0 auto; */
+}
+
+.new-transport-ad {
+    display: flex;
+}
+
+.new-ad-division-title {
+    font-size: 20px;
+    padding: 0;
+    font-weight: 600;
+    /* margin: 0 0 10px 10px; */
+    /* margin-bottom: 10px; */
+    padding: 20px 0;
+    /* border: 1px green solid; */
+    border-radius: 10px 10px 0 0;
+    background-color: blueviolet;
+    color: #ffffff !important;
+    margin-top: 0px;
+    text-align: center;
+}
+.new-ad-section {
+    border: 1px rgb(144, 174, 255) solid;
+    /* border: 1px blueviolet solid; */
+    width: 250px;
+    min-height: 450px;
+    margin: 5px;
+    border-radius: 10px;
+    text-align: left; /* Этот элемент будет выравнен по левому краю */
+    display: inline-block;
+}
+
+.new-ad-card-main-area {
+    margin: 10px;
+}
+
+.new-ad-departure,
+.new-ad-destination,
+.new-ad-date {
+    /* border: 1px green solid; */
+    /* text-align: left !important; Этот элемент будет выравнен по левому краю */
+    display: inline-block !important; /* Добавляем, чтобы корректно сбросить центровку */
+}
+
+.new-ad-title {
+    font-weight: 600;
+    color: rgb(40, 40, 40) !important;
+}
+
+h2 {
+    text-align: center;
+}
+/* 
+label {
+    display: flex;
+    flex-direction: column;
+} */
+
+/* .route-info,
+.financial-info,
+.truck-info {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+} */
+
+button {
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.checkboxes {
+    /* display: flex;
+    flex-direction: column;  */
+}
+
+/*Блок чекбоксов*/
+.checkbox-item {
+    /* display: flex;
+    align-items: center; */
+    /* margin-bottom: 10px;  */
+    width: 100%;
+    height: 20px;
+    margin-bottom: 1px;
+
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 5px;
+
+    position: relative;
+}
+
+.checkbox-item:hover {
+    background-color: rgb(187, 193, 255);
+}
+
+.checkbox-label {
+    cursor: pointer;
+}
+
+.checkbox-label:hover {
+    background-color: #d1f2ff;
+}
+
+.input-checkbox {
+    /* margin-right: 10px; */
+    width: 20px;
+    /* border: 1px solid red; */
+    height: 15px;
+
+    position: absolute;
+    top: 0;
+    left: 0px;
+}
+
+.checkbox-title {
+    display: inline-flex;
+    /* border: 1px solid rgb(9, 9, 9); */
+    /* margin-top: 15px; */
+    font-size: 16px;
+
+    position: absolute;
+    top: 0;
+    left: 30px;
+}
+
+/*Блок радиобатаннов*/
+.radio-item {
+    width: 100%;
+    height: 20px;
+    margin-bottom: -10px;
+
+    /* border: 1px solid rgb(10, 31, 152); */
+    border-radius: 5px;
+
+    position: relative;
+}
+
+.radio-item:hover {
+    background-color: rgb(187, 193, 255);
+}
+
+.radio-item {
+    cursor: pointer;
+}
+
+/* .radio-label:hover {
+    background-color: #d1f2ff;
+} */
+
+.input-radio {
+    /* margin-right: 10px; */
+    width: 20px;
+    /* border: 1px solid red; */
+    height: 15px;
+
+    position: absolute;
+    top: 0;
+    left: 0px;
+}
+
+.radio-title {
+    display: inline-flex;
+    /* border: 1px solid rgb(9, 9, 9); */
+    /* margin-top: 15px; */
+    font-size: 16px;
+
+    position: absolute;
+    top: 0;
+    left: 30px;
+}
+
+.select-transport-type {
+    /* margin-top: -30px; */
+    width: 100%;
+    height: 30px;
+    cursor: pointer;
+}
+
+.without-bottom-margine {
+    margin-bottom: 0;
+}
+/**/
+.truck-capacity {
+    margin: 20px 0; /* Отступ сверху и снизу */
+}
+
+.value-dimension {
+    display: flex; /* Используем flex для размещения в линию */
+    /* justify-content: space-between; Распределяем элементы по линии */
+    margin: 0 10px;
+}
+
+.dimension-item {
+    flex: 1; /* Каждый элемент занимает равное пространство */
+    margin-right: 0px; /* Отступ между элементами */
+}
+
+.dimension-item:last-child {
+    margin-right: 0; /* Убираем отступ у последнего элемента */
+}
+
+.label-dimension {
+    display: block; /* Подпись отображается как блок */
+    margin-bottom: 5px; /* Отступ между подписью и полем ввода */
+    /* font-weight: bold;  */
+    text-align: center;
+}
+
+.weight-dimension {
+    width: 100%;
+    display: flex;
+}
+
+.weight-label {
+    width: 80px;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.weight-input {
+    /* width: 100%; */
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.truck-capacity .new-ad-title {
+    margin-left: 10px;
+    margin-bottom: 0px;
+}
+
+.use-truck {
+    display: flex;
+    align-items: center;
+}
+
+.use-truck-message p {
+    /* height: 40px; */
+    display: block;
+    margin: 0px;
+}
+
+.use-truck-message,
+.use-truck-button {
+    /* border: 1px solid red; */
+}
+
+.truck-name-photo {
+    display: flex; /* Используем flex для размещения в линию */
+    align-items: center; /* Выравнивание по центру по вертикали */
+    margin-bottom: 20px; /* Отступ между строками */
+}
+
+.truck-name,
+.truck-photo {
+    margin-right: 20px; /* Отступ между элементами */
+    flex: 1; /* Позволяет элементам занимать равное пространство */
+}
+
+label.label-dimension {
+    display: block; /* Подпись отображается как блок */
+    margin-bottom: 5px; /* Отступ между подписью и полем ввода */
+}
+
+.truck-photo {
+    position: relative; /* Устанавливаем относительное позиционирование */
+}
+
+.photo-circle {
+    width: 70px; /* Ширина круга */
+    height: 70px; /* Высота круга */
+    border-radius: 50%; /* Круглая форма */
+    background-color: #ccc; /* Серый цвет фона */
+    display: flex; /* Используем flex для центрирования содержимого */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    cursor: pointer; /* Изменяем курсор при наведении */
+    transition: background-color 0.3s; /* Плавный переход цвета */
+}
+
+.photo-circle:hover {
+    background-color: #bbb; /* Цвет при наведении */
+}
+
+.photo-preview {
+    width: 70px; /* Ширина изображения */
+    height: 70px; /* Высота изображения */
+    border-radius: 50%; /* Круглая форма изображения */
+}
