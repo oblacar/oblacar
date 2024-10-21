@@ -221,7 +221,7 @@ input.weight-input {
     margin: 0 auto;
     font-size: 18px;
 
-    transition: color 0.2s ease;
+    transition: color 0.4s ease;
 
     color: rgb(71, 96, 177);
 }

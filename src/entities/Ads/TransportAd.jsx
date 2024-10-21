@@ -1,35 +1,44 @@
-// models/TransportAd.js
-
-class TransportAd {
-    constructor(
+export class TransportAd {
+    constructor({
         adId,
         ownerId,
-        vehicleType,
         availabilityDate,
-        location,
-        destination,
+        departureCity,
+        destinationCity,
         price,
-        bodyType,
-        volume,
-        loadingType,
-        payment,
-        // description,
-        contactInfo
-    ) {
+        paymentUnit,
+        readyToNegotiate,
+        paymentOptions,
+        truckId,
+        truckName,
+        truckPhotoUrl,
+        vehicleType,
+        loadingTypes,
+        truckWeight,
+        truckHeight,
+        truckWidth,
+        truckDepth,
+    }) {
         this.adId = adId; // уникальный идентификатор объявления
         this.ownerId = ownerId; // идентификатор владельца машины
-        this.vehicleType = vehicleType; // тип транспортного средства (например, грузовик, фура)
+        // Детали маршрута
         this.availabilityDate = availabilityDate; // дата, когда машина доступна
-        this.location = location; // город, где находится транспортное средство
-        this.destination = destination; // предполагаемое направление (если есть)
+        this.departureCity = departureCity; // город, где находится транспортное средство
+        this.destinationCity = destinationCity; // предполагаемое направление (если есть)
+        // Детали оплаты
         this.price = price; // стоимость перевозки
-        this.bodyType = bodyType; // тип кузова
-        this.volume = volume; // объем
-        this.loadingType = loadingType; // тип загрузки
-        this.payment = payment; // оплата
-        // this.description = description; // описание состояния и особенностей машины
-        this.contactInfo = contactInfo; // информация для связи с владельцем
+        this.paymentUnit = paymentUnit; // единица стоимости (тыс.руб, руб, руб/км и т.д.)
+        this.readyToNegotiate = readyToNegotiate; // готовность к торгу
+        this.paymentOptions = paymentOptions; // условия оплаты: нал, б/нал, с НДС, без НДС и т.д.
+        // Детали транспорта
+        this.truckId = truckId; // id карточки машины в базе машин
+        this.truckName = truckName; // имя карточки машины
+        this.truckPhotoUrl = truckPhotoUrl; // ссылка на фото машины
+        this.vehicleType = vehicleType; // тип транспортного средства (например, грузовик, фура)
+        this.loadingTypes = loadingTypes; // тип загрузки
+        this.truckWeight = truckWeight; // вес загрузки
+        this.truckHeight = truckHeight; // высота
+        this.truckWidth = truckWidth; // ширина
+        this.truckDepth = truckDepth; // глубина
     }
 }
-
-export default TransportAd;
