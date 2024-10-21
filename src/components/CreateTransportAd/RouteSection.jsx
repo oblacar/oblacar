@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker'; // Убедитесь, что у вас установлен react-datepicker
-import 'react-datepicker/dist/react-datepicker.css'; // Импортируйте стили для DatePicker
-import CitySearch from '../common/CitySearch/CitySearch'; // Импортируйте ваш компонент CitySearch
+import React from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import CitySearch from '../common/CitySearch/CitySearch';
 
-const RouteSection = ({
-    handleDepartureCitySelected,
-    handleDestinationCitySelected,
-}) => {
-    const [date, setDate] = useState(null); // Состояние для даты
+const RouteSection = ({ formData, updateFormData }) => {
+    const handleDateChange = (date) => {
+        if (date) {
+            // Форматируем дату в 'dd.mm.yyyy'
+            const formattedDate = date.toLocaleDateString('ru-RU'); // Формат даты
+            updateFormData({ availabilityDate: formattedDate }); // Обновляем дату
+        }
+    };
+
+    const handleDepartureCityChange = (city) => {
+        console.log(city);
+        updateFormData({ departureCity: city }); // Обновляем город отправления
+    };
+
+    const handleDestinationCityChange = (city) => {
+        updateFormData({ destinationCity: city }); // Обновляем город назначения
+    };
 
     return (
         <div className='new-ad-section'>
@@ -16,14 +28,23 @@ const RouteSection = ({
                 <p className='new-ad-title'>Начало маршрута:</p>
                 <p>Когда и где транспорт будет готов к перевозке</p>
                 <DatePicker
-                    selected={date}
-                    onChange={(date) => setDate(date)}
+                    selected={
+                        formData.availabilityDate
+                            ? new Date(
+                                  formData.availabilityDate
+                                      .split('.')
+                                      .reverse()
+                                      .join('-')
+                              )
+                            : null
+                    }
+                    onChange={handleDateChange} // Устанавливаем дату
                     dateFormat='dd.MM.yyyy'
                     placeholderText='Дата'
                     className='new-ad-date'
                 />
                 <CitySearch
-                    onCitySelected={handleDepartureCitySelected}
+                    onCitySelected={handleDepartureCityChange} // Передаем функцию
                     inputClassName='new-ad-departure'
                     placeholder='Населенный пункт'
                 />
@@ -33,7 +54,7 @@ const RouteSection = ({
                     ничего не пишите.
                 </p>
                 <CitySearch
-                    onCitySelected={handleDestinationCitySelected}
+                    onCitySelected={handleDestinationCityChange} // Передаем функцию
                     inputClassName='new-ad-destination'
                     placeholder='Пункт назначения'
                 />

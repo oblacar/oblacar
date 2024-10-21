@@ -1,30 +1,13 @@
 import React, { useState } from 'react';
-
 import { FaUpload } from 'react-icons/fa';
-
-import Button from '../common/Button/Button'; // Импортируйте ваш компонент Button
 import { truckTypesWithLoading } from '../../constants/transportAdData'; // Импортируйте ваш массив типов грузовиков
 
-const TransportSection = () => {
-    const [formData, setFormData] = useState({
-        truckName: '',
-        truckPhoto: '',
-        height: '',
-        width: '',
-        depth: '',
-        weight: '',
-        transportType: '',
-        loadingTypes: [],
-    });
-    const [transportType, setTransportType] = useState('');
+const TransportSection = ({ updateFormData, formData }) => {
     const [loadingTypes, setLoadingTypes] = useState([]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
+        updateFormData({ [name]: value }); // Передаем данные в родительский компонент
     };
 
     const handleFileChange = (e) => {
@@ -33,10 +16,7 @@ const TransportSection = () => {
             const file = files[0];
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData((prevState) => ({
-                    ...prevState,
-                    truckPhoto: reader.result,
-                }));
+                updateFormData({ truckPhoto: reader.result }); // Обновляем состояние с помощью updateFormData
             };
             reader.readAsDataURL(file);
         }
@@ -45,17 +25,32 @@ const TransportSection = () => {
     const handleTransportTypeChange = (e) => {
         const transportTypeName = e.target.value;
 
-        setTransportType(transportTypeName);
-
-        setFormData((prevState) => ({
-            ...prevState,
-            transportType: e.target.value,
-        }));
+        updateFormData({ transportType: transportTypeName }); // Обновляем состояние с помощью updateFormData
 
         const transportOptions = truckTypesWithLoading.find(
             (transport) => transport.name === transportTypeName
         );
-        setLoadingTypes(() => transportOptions.loadingTypes);
+        // if (transportOptions) {
+        //     updateFormData({ loadingTypes: transportOptions.loadingTypes }); // Обновляем состояние загрузки
+        // }
+        if (transportOptions) {
+            setLoadingTypes(transportOptions.loadingTypes); // Обновляем локальное состояние типов загрузки
+        }
+    };
+
+    const handleLoadingTypeChange = (e) => {
+        const { value, checked } = e.target;
+
+        // Если чекбокс был установлен
+        if (checked) {
+            updateFormData({ loadingTypes: [...formData.loadingTypes, value] }); // Добавляем в массив
+        } else {
+            updateFormData({
+                loadingTypes: formData.loadingTypes.filter(
+                    (type) => type !== value
+                ),
+            }); // Убираем из массива
+        }
     };
 
     return (
@@ -67,11 +62,6 @@ const TransportSection = () => {
                         <p>Выберите одну из своих машин</p>
                     </div>
                     <div className='use-truck-button'>
-                        {/* <Button
-                            type='button'
-                            size_width='wide'
-                            children='Выбрать'
-                        /> */}
                         <FaUpload className='use-truck-btn-icon' />
                     </div>
                 </div>
@@ -121,7 +111,7 @@ const TransportSection = () => {
                 <p className='new-ad-title without-bottom-margine'>Тип:</p>
                 <select
                     name='transportType'
-                    value={transportType}
+                    value={formData.transportType}
                     onChange={handleTransportTypeChange}
                     className='select-transport-type'
                 >
@@ -141,6 +131,29 @@ const TransportSection = () => {
                     ))}
                 </select>
 
+                {/* <p className='new-ad-title without-bottom-margine'>
+                    Вариант загрузки:
+                </p>
+                {formData.loadingTypes.map((loadingType, index) => (
+                    <div
+                        key={loadingType}
+                        className='checkbox-item'
+                    >
+                        <label className='checkbox-label'>
+                            <input
+                                type='checkbox'
+                                id={`loadingType-${index}`}
+                                value={loadingType}
+                                className='input-checkbox'
+                                // Если нужно, добавьте обработчик для управления состоянием
+                            />
+                            <span className='checkbox-title'>
+                                {loadingType}
+                            </span>
+                        </label>
+                    </div>
+                ))} */}
+
                 <p className='new-ad-title without-bottom-margine'>
                     Вариант загрузки:
                 </p>
@@ -155,6 +168,7 @@ const TransportSection = () => {
                                 id={`loadingType-${index}`}
                                 value={loadingType}
                                 className='input-checkbox'
+                                onChange={handleLoadingTypeChange} // Добавляем обработчик для изменения состояния чекбокса
                             />
                             <span className='checkbox-title'>
                                 {loadingType}
@@ -177,7 +191,6 @@ const TransportSection = () => {
                                     onChange={handleInputChange}
                                     placeholder='Высота'
                                     min='0'
-                                    required
                                 />
                             </div>
                             <div className='dimension-item'>
@@ -188,7 +201,6 @@ const TransportSection = () => {
                                     onChange={handleInputChange}
                                     placeholder='Ширина'
                                     min='0'
-                                    required
                                 />
                             </div>
                             <div className='dimension-item'>
@@ -199,7 +211,6 @@ const TransportSection = () => {
                                     onChange={handleInputChange}
                                     placeholder='Глубина'
                                     min='0'
-                                    required
                                 />
                             </div>
                         </div>
@@ -215,7 +226,6 @@ const TransportSection = () => {
                                 onChange={handleInputChange}
                                 placeholder='Введите вес'
                                 min='0'
-                                required
                             />
                         </div>
                     </div>

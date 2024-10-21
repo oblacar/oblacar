@@ -1,32 +1,13 @@
 import React from 'react';
-import { paymentUnits, paymentOptions } from '../../constants/paymentData'; // Импортируйте ваши константы
 
-const PaymentSection = ({ formData, updateFormData }) => {
-    const handlePriceInputChange = (e) => {
-        const { name, value } = e.target;
-        updateFormData({ [name]: value }); // Передаем данные в родительский компонент
-    };
-
-    const handleRadioChange = (e) => {
-        const { value } = e.target;
-        updateFormData({ paymentMethod: value }); // Передаем данные в родительский компонент
-    };
-
-    const handleCheckboxChange = (e) => {
-        const { name, value, checked } = e.target;
-
-        if (name === 'readyToNegotiate') {
-            updateFormData({ readyToNegotiate: checked }); // Обновляем состояние готовности к торгу
-        } else {
-            // Обрабатываем условия оплаты
-            const updatedPaymentOptions = checked
-                ? [...formData.paymentOptions, value] // Добавляем в массив
-                : formData.paymentOptions.filter((option) => option !== value); // Убираем из массива
-
-            updateFormData({ paymentOptions: updatedPaymentOptions }); // Передаем данные в родительский компонент
-        }
-    };
-
+const PaymentSection = ({
+    formData,
+    handlePriceInputChange,
+    paymentUnits,
+    paymentOptions,
+    handleRadioChange,
+    handleCheckboxChange,
+}) => {
     return (
         <div className='new-ad-section'>
             <p className='new-ad-division-title'>Оплата</p>
@@ -36,9 +17,10 @@ const PaymentSection = ({ formData, updateFormData }) => {
                 <input
                     type='text'
                     name='price'
+                    value={formData.price}
+                    onChange={handlePriceInputChange}
                     placeholder='Сумма'
                     className='without-bottom-margine'
-                    onChange={handlePriceInputChange} // Обработчик для ввода стоимости
                 />
 
                 {/* Радиобатоны */}
@@ -53,7 +35,8 @@ const PaymentSection = ({ formData, updateFormData }) => {
                                 name='paymentMethod'
                                 value={unit}
                                 className='input-radio'
-                                onChange={handleRadioChange} // Обработчик для радиокнопок
+                                checked={formData.paymentMethod === unit}
+                                onChange={handleRadioChange}
                             />
                             <span className='radio-title'>{unit}</span>
                         </label>
@@ -69,7 +52,8 @@ const PaymentSection = ({ formData, updateFormData }) => {
                             name='readyToNegotiate'
                             type='checkbox'
                             className='input-checkbox'
-                            onChange={handleCheckboxChange} // Обработчик для чекбокса
+                            checked={formData.readyToNegotiate}
+                            onChange={handleCheckboxChange} // Обработчик изменени
                         />
                         <span className='checkbox-title'>Торг</span>
                     </label>
@@ -92,7 +76,10 @@ const PaymentSection = ({ formData, updateFormData }) => {
                                     value={paymentOption}
                                     className='input-checkbox'
                                     name='paymentOptions'
-                                    onChange={handleCheckboxChange} // Обработчик для условий оплаты
+                                    checked={formData.paymentOptions.includes(
+                                        paymentOption
+                                    )}
+                                    onChange={handleCheckboxChange}
                                 />
                                 <span className='checkbox-title'>
                                     {paymentOption}
