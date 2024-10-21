@@ -1,8 +1,8 @@
 // paymentOptions.js
 export const paymentOptions = [
-    'Наличная оплата',
-    'Б/нал с НДС',
-    'Б/нал без НДС',
+    'наличные',
+    'б/нал с НДС',
+    'б/нал без НДС',
 ];
 
-export const paymentUnits = ['тыс. руб', 'руб', 'руб/км', 'руб/час'];
+export const paymentUnits = ['руб', 'тыс. руб', 'руб/км', 'руб/час'];

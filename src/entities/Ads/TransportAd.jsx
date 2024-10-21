@@ -12,7 +12,7 @@ export class TransportAd {
         truckId,
         truckName,
         truckPhotoUrl,
-        vehicleType,
+        transportType,
         loadingTypes,
         truckWeight,
         truckHeight,
@@ -34,7 +34,7 @@ export class TransportAd {
         this.truckId = truckId; // id карточки машины в базе машин
         this.truckName = truckName; // имя карточки машины
         this.truckPhotoUrl = truckPhotoUrl; // ссылка на фото машины
-        this.vehicleType = vehicleType; // тип транспортного средства (например, грузовик, фура)
+        this.transportType = transportType; // тип транспортного средства (например, грузовик, фура)
         this.loadingTypes = loadingTypes; // тип загрузки
         this.truckWeight = truckWeight; // вес загрузки
         this.truckHeight = truckHeight; // высота

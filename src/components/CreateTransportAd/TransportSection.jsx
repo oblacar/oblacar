@@ -25,14 +25,17 @@ const TransportSection = ({ updateFormData, formData }) => {
     const handleTransportTypeChange = (e) => {
         const transportTypeName = e.target.value;
 
-        updateFormData({ transportType: transportTypeName }); // Обновляем состояние с помощью updateFormData
+        // Обнуляем loadingTypes и передаем пустой массив в updateFormData
+        setLoadingTypes([]); // Сбрасываем состояние локального loadingTypes
+        updateFormData({
+            transportType: transportTypeName,
+            loadingTypes: [], // Обнуляем loadingTypes в родительском компоненте
+        });
 
         const transportOptions = truckTypesWithLoading.find(
             (transport) => transport.name === transportTypeName
         );
-        // if (transportOptions) {
-        //     updateFormData({ loadingTypes: transportOptions.loadingTypes }); // Обновляем состояние загрузки
-        // }
+
         if (transportOptions) {
             setLoadingTypes(transportOptions.loadingTypes); // Обновляем локальное состояние типов загрузки
         }
@@ -40,17 +43,17 @@ const TransportSection = ({ updateFormData, formData }) => {
 
     const handleLoadingTypeChange = (e) => {
         const { value, checked } = e.target;
+        let updatedLoadingTypes;
 
-        // Если чекбокс был установлен
         if (checked) {
-            updateFormData({ loadingTypes: [...formData.loadingTypes, value] }); // Добавляем в массив
+            updatedLoadingTypes = [...formData.loadingTypes, value]; // Добавляем в массив
         } else {
-            updateFormData({
-                loadingTypes: formData.loadingTypes.filter(
-                    (type) => type !== value
-                ),
-            }); // Убираем из массива
+            updatedLoadingTypes = formData.loadingTypes.filter(
+                (type) => type !== value
+            ); // Убираем из массива
         }
+
+        updateFormData({ loadingTypes: updatedLoadingTypes }); // Обновляем состояние в родительском компоненте
     };
 
     return (
@@ -131,44 +134,27 @@ const TransportSection = ({ updateFormData, formData }) => {
                     ))}
                 </select>
 
-                {/* <p className='new-ad-title without-bottom-margine'>
-                    Вариант загрузки:
-                </p>
-                {formData.loadingTypes.map((loadingType, index) => (
-                    <div
-                        key={loadingType}
-                        className='checkbox-item'
-                    >
-                        <label className='checkbox-label'>
-                            <input
-                                type='checkbox'
-                                id={`loadingType-${index}`}
-                                value={loadingType}
-                                className='input-checkbox'
-                                // Если нужно, добавьте обработчик для управления состоянием
-                            />
-                            <span className='checkbox-title'>
-                                {loadingType}
-                            </span>
-                        </label>
-                    </div>
-                ))} */}
-
                 <p className='new-ad-title without-bottom-margine'>
                     Вариант загрузки:
                 </p>
+
                 {loadingTypes.map((loadingType, index) => (
                     <div
-                        key={loadingType}
+                        key={`${loadingType}-${index}`}
                         className='checkbox-item'
                     >
+                        {' '}
+                        {/* Уникальный ключ */}
                         <label className='checkbox-label'>
                             <input
                                 type='checkbox'
                                 id={`loadingType-${index}`}
                                 value={loadingType}
                                 className='input-checkbox'
-                                onChange={handleLoadingTypeChange} // Добавляем обработчик для изменения состояния чекбокса
+                                onChange={handleLoadingTypeChange}
+                                checked={formData.loadingTypes.includes(
+                                    loadingType
+                                )} // Устанавливаем состояние чекбокса
                             />
                             <span className='checkbox-title'>
                                 {loadingType}
@@ -176,8 +162,20 @@ const TransportSection = ({ updateFormData, formData }) => {
                         </label>
                     </div>
                 ))}
-
                 <div className='truck-capacity'>
+                    <div className='weight-dimension'>
+                        <p className='new-ad-title weight-label'>Вес (т):</p>
+                        <input
+                            className='weight-input'
+                            type='number'
+                            name='weight'
+                            value={formData.weight}
+                            onChange={handleInputChange}
+                            placeholder='Введите вес'
+                            min='0'
+                        />
+                    </div>
+
                     <p className='new-ad-title without-bottom-margine'>
                         Объем (м3) ВхШхГ:
                     </p>
@@ -213,20 +211,6 @@ const TransportSection = ({ updateFormData, formData }) => {
                                     min='0'
                                 />
                             </div>
-                        </div>
-                        <div className='weight-dimension'>
-                            <p className='new-ad-title weight-label'>
-                                Вес (т):
-                            </p>
-                            <input
-                                className='weight-input'
-                                type='number'
-                                name='weight'
-                                value={formData.weight}
-                                onChange={handleInputChange}
-                                placeholder='Введите вес'
-                                min='0'
-                            />
                         </div>
                     </div>
                 </div>

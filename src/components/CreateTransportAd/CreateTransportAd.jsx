@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import TransportAdItem from '../TransportAds/TransportAdItem';
+
 import RouteSection from './RouteSection';
 import PaymentSection from './PaymentSection';
 import TransportSection from './TransportSection';
@@ -53,7 +55,7 @@ const CreateTransportAd = () => {
             truckId: 'truck456', // TODO Замените на реальный truckId
             truckName: formData.truckName,
             truckPhotoUrl: formData.truckPhoto,
-            vehicleType: formData.transportType,
+            transportType: formData.transportType,
             loadingTypes: formData.loadingTypes,
             truckWeight: formData.weight,
             truckHeight: formData.height,
@@ -71,6 +73,16 @@ const CreateTransportAd = () => {
             className='create-transport-ad-form'
         >
             <h2>Новое объявление</h2>
+            <div className='new-ad-show'>
+                <div className='ad-example'>
+                    <TransportAdItem
+                        ad={formData}
+                        rating='4'
+                    />
+                </div>
+
+                <button type='submit'>Создать объявление</button>
+            </div>
             <div className='new-transport-ad'>
                 <RouteSection
                     updateFormData={updateFormData}
@@ -87,8 +99,6 @@ const CreateTransportAd = () => {
                     formData={formData}
                 />
             </div>
-
-            <button type='submit'>Создать объявление</button>
         </form>
     );
 };

@@ -13,7 +13,6 @@ const RouteSection = ({ formData, updateFormData }) => {
     };
 
     const handleDepartureCityChange = (city) => {
-        console.log(city);
         updateFormData({ departureCity: city }); // Обновляем город отправления
     };
 
@@ -27,22 +26,24 @@ const RouteSection = ({ formData, updateFormData }) => {
             <div className='new-ad-card-main-area'>
                 <p className='new-ad-title'>Начало маршрута:</p>
                 <p>Когда и где транспорт будет готов к перевозке</p>
-                <DatePicker
-                    selected={
-                        formData.availabilityDate
-                            ? new Date(
-                                  formData.availabilityDate
-                                      .split('.')
-                                      .reverse()
-                                      .join('-')
-                              )
-                            : null
-                    }
-                    onChange={handleDateChange} // Устанавливаем дату
-                    dateFormat='dd.MM.yyyy'
-                    placeholderText='Дата'
-                    className='new-ad-date'
-                />
+                <div className='new-ad-date'> 
+                    <DatePicker
+                        selected={
+                            formData.availabilityDate
+                                ? new Date(
+                                      formData.availabilityDate
+                                          .split('.')
+                                          .reverse()
+                                          .join('-')
+                                  )
+                                : null
+                        }
+                        onChange={handleDateChange} // Устанавливаем дату
+                        dateFormat='dd.MM.yyyy'
+                        placeholderText='Дата'
+                        className='new-ad-date'
+                    />
+                </div>
                 <CitySearch
                     onCitySelected={handleDepartureCityChange} // Передаем функцию
                     inputClassName='new-ad-departure'

@@ -1,37 +1,45 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
-import {
-    FaTruck,
-    FaUserCircle,
-    FaPlus,
-    FaCartPlus,
-    FaFolderPlus,
-    FaCheckSquare,
-    FaHandshake,
-    FaReceipt,
-} from 'react-icons/fa';
+import { FaTruck } from 'react-icons/fa';
 
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 
-/*тентованный, 20 т, 90 м3, полупр.
-верх., бок., задн.*/
-
-//         this.vehicleType = vehicleType; // тип транспортного средства (например, грузовик, фура)
-//         this.volume = volume; // объем
-//         this.bodyType = bodyType; // тип кузова
-//         this.loadingType = loadingType; // тип загрузки
-
-//  this.adId = adId; // уникальный идентификатор объявления
-//         this.ownerId = ownerId; // идентификатор владельца машины
-//         this.availabilityDate = availabilityDate; // дата, когда машина доступна
-//         this.location = location; // город, где находится транспортное средство
-//         this.destination = destination; // предполагаемое направление (если есть)
-//         this.price = price; // стоимость перевозки
-//         this.payment = payment; // оплата
-//         // this.description = description; // описание состояния и особенностей машины
-//         this.contactInfo = contactInfo; // информация для связи с владельцем
+//ad:{
+//         truckName: '',
+//         truckPhoto: '',
+//        * height: '',
+//        * width: '',
+//        * depth: '',
+//        * weight: '',
+//         *-transportType: '',
+//         *-loadingTypes: [], // массив возможных типов загрузки
+//        * availabilityDate: '', // дата, когда машина доступна
+//        * departureCity: '', // город, где находится транспортное средство
+//        * destinationCity: '', // предполагаемое направление (если есть)
+//        * price: '', // стоимость перевозки
+//        * paymentUnit: '', // единица стоимости (тыс.руб, руб, руб/км и т.д.)
+//        * readyToNegotiate: false, // готовность к торгу
+//        * paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
+//}
 
 const TransportAdItem = ({ ad, rating }) => {
+    const [truckValue, setTruckValue] = useState(0);
+
+    useEffect(() => {
+        if (ad.width && ad.height && ad.depth) {
+            const truckValue = ad.width * ad.height * ad.depth;
+
+            setTruckValue(() => truckValue); // Обновляем состояние
+        }
+    }, [
+        ad.transportType,
+        ad.weight,
+        ad.width,
+        ad.height,
+        ad.depth,
+        ad.loadingTypes,
+    ]);
+
     return (
         <div className='ad-item'>
             {/* <div className={`row ${rowColor}`}> */}
@@ -48,21 +56,36 @@ const TransportAdItem = ({ ad, rating }) => {
                             {ad.availabilityDate}
                         </div>
                         <div className='departure-location'>
-                            {/* <div className='cell departure'>
-                            </div> */}
                             <span className='departure location city'>
-                                {ad.location}
+                                {ad.departureCity}
                             </span>
                             <span className='destination city'>
-                                {ad.destination || 'Не указано'}
+                                {ad.destinationCity || 'Россия'}
                             </span>
-                            {/* <div className='cell'>
-                            </div> */}
                         </div>
                     </div>
                     <div className='finance'>
-                        <div className='price'>{ad.price} руб.</div>
-                        <div className='finance-details'>без НДС, торгуемся</div>
+                        <div className='price'>
+                            {ad.price} {ad.paymentUnit}
+                        </div>
+                        <div className='finance-details'>
+                            {ad.paymentOptions && ad.paymentOptions.length > 0
+                                ? ad.paymentOptions.map((option, index) => (
+                                      <span key={option}>
+                                          {option}
+                                          {index < ad.paymentOptions.length - 1
+                                              ? ', '
+                                              : ''}
+                                      </span>
+                                  ))
+                                : ''}
+                            {ad.readyToNegotiate && (
+                                <span>
+                                    {ad.paymentOptions.length > 0 ? ', ' : ''}
+                                    торг
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className='down-ad-row'>
@@ -70,20 +93,50 @@ const TransportAdItem = ({ ad, rating }) => {
                         <FaTruck />
                     </div>
                     <div className=' car-info'>
-                        <span className='vehicleType'>
-                            {ad.vehicleType ? `${ad.vehicleType}, ` : ''}
+                        <span>
+                            {ad.transportType ? `${ad.transportType}, ` : ''}
+                        </span>
+                        <span>
+                            {ad.weight ? (
+                                <>
+                                    <strong>{ad.weight} т</strong>,{' '}
+                                </>
+                            ) : (
+                                ''
+                            )}
+                        </span>
+                        <span>
+                            {truckValue ? (
+                                <>
+                                    <strong>
+                                        {truckValue} м<sup>3</sup>
+                                    </strong>
+                                    ,{' '}
+                                </>
+                            ) : (
+                                ''
+                            )}
                         </span>
 
-                        <span className='volume'>
-                            {ad.volume ? `${ad.volume} м3, ` : ''}
-                        </span>
-
-                        <span className='body-type'>
-                            {ad.bodyType ? `${ad.bodyType}, ` : ''}
-                        </span>
-
-                        <span className='loading-type'>
-                            {ad.vehicleType ? `${ad.loadingType} ` : ''}
+                        <span>
+                            {ad.loadingTypes.length !== 0 ? (
+                                <>
+                                    {'загрузка: '}
+                                    {ad.loadingTypes.map(
+                                        (loadingType, index) => (
+                                            <React.Fragment key={loadingType}>
+                                                {/* Используем React.Fragment для оборачивания */}
+                                                {loadingType}
+                                                {index <
+                                                    ad.loadingTypes.length -
+                                                        1 && ', '}
+                                            </React.Fragment>
+                                        )
+                                    )}
+                                </>
+                            ) : (
+                                ''
+                            )}
                         </span>
                     </div>
                     <div className='icon-item-ad-bar'>

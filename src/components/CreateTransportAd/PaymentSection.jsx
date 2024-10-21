@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { paymentUnits, paymentOptions } from '../../constants/paymentData'; // Импортируйте ваши константы
 
 const PaymentSection = ({ formData, updateFormData }) => {
+    const [selectedPaymentUnit, setSelectedPaymentUnit] = useState(
+        paymentUnits[0]
+    ); // Устанавливаем первый элемент по умолчанию
+
     const handlePriceInputChange = (e) => {
         const { name, value } = e.target;
         updateFormData({ [name]: value }); // Передаем данные в родительский компонент
     };
 
+    useEffect(() => {
+        // Устанавливаем значение по умолчанию при первом рендере
+        if (paymentUnits.length > 0) {
+            setSelectedPaymentUnit(paymentUnits[0]); // Выбираем первый элемент по умолчанию
+            updateFormData({ paymentUnit: paymentUnits[0] }); // Обновляем значение в родительском компоненте
+        }
+    }, [paymentUnits]); // Зависимость для выполнения при изменении paymentUnits
+
     const handleRadioChange = (e) => {
+        setSelectedPaymentUnit(e.target.value); // Обновляем состояние при изменении
+
         const { value } = e.target;
-        updateFormData({ paymentMethod: value }); // Передаем данные в родительский компонент
+        updateFormData({ paymentUnit: value }); // Передаем данные в родительский компонент
     };
 
     const handleCheckboxChange = (e) => {
@@ -43,17 +57,18 @@ const PaymentSection = ({ formData, updateFormData }) => {
 
                     {/* Радиобатоны */}
                     <div className='radio-buttons'>
-                        {paymentUnits.map((unit) => (
+                        {paymentUnits.map((unit, index) => (
                             <label
                                 key={unit}
                                 className='radio-item'
                             >
                                 <input
                                     type='radio'
-                                    name='paymentMethod'
+                                    name='paymentUnit'
                                     value={unit}
                                     className='input-radio'
                                     onChange={handleRadioChange} // Обработчик для радиокнопок
+                                    checked={selectedPaymentUnit === unit} // Проверяем, является ли этот элемент выбранным
                                 />
                                 <span className='radio-title'>{unit}</span>
                             </label>

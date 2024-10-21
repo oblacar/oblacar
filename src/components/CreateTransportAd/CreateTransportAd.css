@@ -35,6 +35,10 @@
     margin: 10px;
 }
 
+.new-ad-date {
+    font-size: 16px;
+}
+
 .new-ad-departure,
 .new-ad-destination,
 .new-ad-date {
@@ -46,9 +50,9 @@
     color: rgb(40, 40, 40) !important;
 }
 
-h2 {
+/* h2 {
     text-align: center;
-}
+} */
 
 button {
     padding: 10px;
@@ -271,6 +275,7 @@ label.label-dimension {
     /* max-width: 150px; */
     margin-right: 10px;
     flex: 1;
+    font-size: 16px;
 }
 
 .price-section .radio-buttons {
