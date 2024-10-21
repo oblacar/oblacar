@@ -8,6 +8,7 @@
 .personal-info {
     flex: 1; /* Занимает 1/4 пространства */
     padding: 20px; /* Отступы */
+    min-width: 320px;
 }
 
 .side-info {
@@ -44,7 +45,7 @@ h2 {
 
 .profile-section:hover {
     /* background-color: rgb(255, 205, 143); */
-    background-color: orange;
+    background-color: rgb(255, 254, 193);
 }
 
 .profile-section:active {

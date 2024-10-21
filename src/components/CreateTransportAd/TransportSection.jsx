@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+
+import { FaUpload } from 'react-icons/fa';
+
 import Button from '../common/Button/Button'; // Импортируйте ваш компонент Button
 import { truckTypesWithLoading } from '../../constants/transportAdData'; // Импортируйте ваш массив типов грузовиков
 
@@ -15,8 +18,6 @@ const TransportSection = () => {
     });
     const [transportType, setTransportType] = useState('');
     const [loadingTypes, setLoadingTypes] = useState([]);
-
-    // const loadingTypes = ['Верхняя', 'Боковая', 'Задняя']; // Пример вариантов загрузки
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -66,11 +67,12 @@ const TransportSection = () => {
                         <p>Выберите одну из своих машин</p>
                     </div>
                     <div className='use-truck-button'>
-                        <Button
+                        {/* <Button
                             type='button'
                             size_width='wide'
                             children='Выбрать'
-                        />
+                        /> */}
+                        <FaUpload className='use-truck-btn-icon' />
                     </div>
                 </div>
                 <p>или введите новую</p>

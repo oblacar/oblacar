@@ -20,9 +20,15 @@ background-color: bisque;
 }
 
 .personal-info-user-photo {
-    max-width: 200px;
-    width: 60%;
-    border-radius: 10%;
+    /* max-width: 200px; */
+    width: 30%;
+    min-width: 100px;
+
+    /* width: 100px;
+    height: 100px;
+    overflow: hidden; */
+    /* border-radius: 10%; */
+    border-radius: 5px;
 }
 .personal-info-user-password {
     padding-top: 30px;
