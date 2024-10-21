@@ -32,32 +32,33 @@ const PaymentSection = ({ formData, updateFormData }) => {
             <p className='new-ad-division-title'>Оплата</p>
             <div className='new-ad-card-main-area'>
                 <p className='new-ad-title'>Стоимость услуги:</p>
+                <div className='price-section'>
+                    <input
+                        type='text'
+                        name='price'
+                        placeholder='Сумма'
+                        className='without-bottom-margine'
+                        onChange={handlePriceInputChange} // Обработчик для ввода стоимости
+                    />
 
-                <input
-                    type='text'
-                    name='price'
-                    placeholder='Сумма'
-                    className='without-bottom-margine'
-                    onChange={handlePriceInputChange} // Обработчик для ввода стоимости
-                />
-
-                {/* Радиобатоны */}
-                <div className='radio-buttons'>
-                    {paymentUnits.map((unit) => (
-                        <label
-                            key={unit}
-                            className='radio-item'
-                        >
-                            <input
-                                type='radio'
-                                name='paymentMethod'
-                                value={unit}
-                                className='input-radio'
-                                onChange={handleRadioChange} // Обработчик для радиокнопок
-                            />
-                            <span className='radio-title'>{unit}</span>
-                        </label>
-                    ))}
+                    {/* Радиобатоны */}
+                    <div className='radio-buttons'>
+                        {paymentUnits.map((unit) => (
+                            <label
+                                key={unit}
+                                className='radio-item'
+                            >
+                                <input
+                                    type='radio'
+                                    name='paymentMethod'
+                                    value={unit}
+                                    className='input-radio'
+                                    onChange={handleRadioChange} // Обработчик для радиокнопок
+                                />
+                                <span className='radio-title'>{unit}</span>
+                            </label>
+                        ))}
+                    </div>
                 </div>
 
                 <p className='new-ad-title without-bottom-margine'>
