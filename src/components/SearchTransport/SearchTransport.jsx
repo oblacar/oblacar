@@ -46,7 +46,7 @@ const SearchTransport = () => {
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     };
 
-    // Функция для обработки изменений веса инпута
+    // Функция для обработки изменений веса инпута ??
     const handleWeightChange = (e) => {
         // Проверяем, что введен только допустимый символ (цифры)
         const value = e.target.value.replace(/\D/g, '');

@@ -6,8 +6,16 @@ const PaymentSection = ({ formData, updateFormData }) => {
         paymentUnits[0]
     ); // Устанавливаем первый элемент по умолчанию
 
+    const [inputPrice, setInputPrice] = useState(''); //значение суммы
+
     const handlePriceInputChange = (e) => {
-        const { name, value } = e.target;
+        // Проверяем, что введен только допустимый символ (цифры)
+        const value = e.target.value.replace(/\D/g, '');
+
+        // Сохраняем числовое значение в state
+        setInputPrice(value);
+
+        const { name } = e.target;
         updateFormData({ [name]: value }); // Передаем данные в родительский компонент
     };
 
@@ -41,6 +49,41 @@ const PaymentSection = ({ formData, updateFormData }) => {
         }
     };
 
+    // Методы разрешающие ставить только цифры и расставляющие пробелы между разрядами тысяч
+    // Функция для добавления пробелов между тысячами
+    const formatNumber = (value) => {
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    };
+
+    // // Функция для обработки изменений Цены инпута
+    // const handlePriceChange = (e) => {
+    //     // Проверяем, что введен только допустимый символ (цифры)
+    //     const value = e.target.value.replace(/\D/g, '');
+
+    //     // Сохраняем числовое значение в state
+    //     getInputPrice(value);
+    // };
+
+    // Ограничиваем ввод только цифрами, разрешая стрелки, Delete, Backspace
+    const handlePriceKeyDown = (e) => {
+        const allowedKeys = [
+            'ArrowUp',
+            'ArrowDown',
+            'ArrowLeft',
+            'ArrowRight',
+            'Backspace',
+            'Delete',
+            'Tab',
+        ];
+
+        if (
+            !allowedKeys.includes(e.key) && // Разрешаем навигационные клавиши
+            !/[0-9]/.test(e.key) // Разрешаем цифры
+        ) {
+            e.preventDefault(); // Запрещаем все остальное
+        }
+    };
+
     return (
         <div className='new-ad-section'>
             <p className='new-ad-division-title'>Оплата</p>
@@ -52,7 +95,9 @@ const PaymentSection = ({ formData, updateFormData }) => {
                         name='price'
                         placeholder='Сумма'
                         className='without-bottom-margine'
+                        value={inputPrice ? `${formatNumber(inputPrice)}` : ''}
                         onChange={handlePriceInputChange} // Обработчик для ввода стоимости
+                        onKeyDown={handlePriceKeyDown} // Ограничение на ввод только цифр
                     />
 
                     {/* Радиобатоны */}

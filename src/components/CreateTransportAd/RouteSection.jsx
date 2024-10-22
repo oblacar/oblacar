@@ -26,7 +26,7 @@ const RouteSection = ({ formData, updateFormData }) => {
             <div className='new-ad-card-main-area'>
                 <p className='new-ad-title'>Начало маршрута:</p>
                 <p>Когда и где транспорт будет готов к перевозке</p>
-                <div className='new-ad-date'> 
+                <div className='new-ad-date'>
                     <DatePicker
                         selected={
                             formData.availabilityDate
@@ -47,7 +47,7 @@ const RouteSection = ({ formData, updateFormData }) => {
                 <CitySearch
                     onCitySelected={handleDepartureCityChange} // Передаем функцию
                     inputClassName='new-ad-departure'
-                    placeholder='Населенный пункт'
+                    placeholder='Пункт отправления'
                 />
                 <p className='new-ad-title'>Конец маршрута:</p>
                 <p>
@@ -57,7 +57,7 @@ const RouteSection = ({ formData, updateFormData }) => {
                 <CitySearch
                     onCitySelected={handleDestinationCityChange} // Передаем функцию
                     inputClassName='new-ad-destination'
-                    placeholder='Пункт назначения'
+                    placeholder='Пункт назначения (Россия)'
                 />
             </div>
         </div>

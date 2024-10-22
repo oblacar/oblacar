@@ -40,6 +40,11 @@ const TransportAdItem = ({ ad, rating }) => {
         ad.loadingTypes,
     ]);
 
+    // выставляем пробелы между разрядами
+    const formatNumber = (value) => {
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    };
+
     return (
         <div className='ad-item'>
             {/* <div className={`row ${rowColor}`}> */}
@@ -66,7 +71,7 @@ const TransportAdItem = ({ ad, rating }) => {
                     </div>
                     <div className='finance'>
                         <div className='price'>
-                            {ad.price} {ad.paymentUnit}
+                            {formatNumber(ad.price)} {ad.paymentUnit}
                         </div>
                         <div className='finance-details'>
                             {ad.paymentOptions && ad.paymentOptions.length > 0
@@ -99,7 +104,7 @@ const TransportAdItem = ({ ad, rating }) => {
                         <span>
                             {ad.weight ? (
                                 <>
-                                    <strong>{ad.weight} т</strong>,{' '}
+                                    <strong>{ad.weight}т</strong>,{' '}
                                 </>
                             ) : (
                                 ''
@@ -109,9 +114,14 @@ const TransportAdItem = ({ ad, rating }) => {
                             {truckValue ? (
                                 <>
                                     <strong>
-                                        {truckValue} м<sup>3</sup>
+                                        {truckValue}м<sup>3</sup>
                                     </strong>
-                                    ,{' '}
+                                    {` (${ad.width}м x ${ad.height}м x ${ad.depth}м)`}
+                                    {ad.loadingTypes.length !== 0 ? (
+                                        <>{', '}</>
+                                    ) : (
+                                        ''
+                                    )}
                                 </>
                             ) : (
                                 ''
@@ -121,7 +131,7 @@ const TransportAdItem = ({ ad, rating }) => {
                         <span>
                             {ad.loadingTypes.length !== 0 ? (
                                 <>
-                                    {'загрузка: '}
+                                    <strong>загрузка: </strong>
                                     {ad.loadingTypes.map(
                                         (loadingType, index) => (
                                             <React.Fragment key={loadingType}>
