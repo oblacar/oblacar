@@ -44,11 +44,6 @@ export const HoverUserCard = ({
         setIsHoveredCard(false);
     };
 
-    // const handleSectionClick = (userSection) => {
-    //     // selectUserProfileSection(userSection);
-    //     setIsHoveredCard(false);
-    // };
-
     return (
         <>
             <div

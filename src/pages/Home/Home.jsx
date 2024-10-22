@@ -20,7 +20,7 @@ function Home() {
                         загрузить тестовую базу
                     </button> */}
                 </p>
-                <CreateTransportAd />
+                {/* <CreateTransportAd /> */}
                 {/* <SearchTransport /> */}
                 {/* <p>
                     1. добавить раздел: фото водителя и рейтинг, проверенный ли

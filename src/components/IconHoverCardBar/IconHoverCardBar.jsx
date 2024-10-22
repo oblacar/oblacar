@@ -8,6 +8,7 @@ import { HoverUserCard } from './hoverCard/HoverUserCard';
 import { HoverMessageCard } from './hoverCard/HoverMessageCard';
 import { HoverDeliveryCard } from './hoverCard/HoverDeliveryCard';
 import { HoverOrdersCard } from './hoverCard/HoverOrdersCard';
+import { HoverNewAdCard } from './hoverCard/HoverNewAdCard';
 import styles from './IconHoverCardBar.module.css';
 
 //импорт иконок из Font Awesome коллекции в react-icons. При необходимости можно выбрать другие коллекции и иконки
@@ -50,11 +51,13 @@ const zero = {
 function IconDropdownMenuBar() {
     const { isAuthenticated } = useContext(AuthContext);
 
+    const [iconNewAdCoordinates, setIconNewAdCoordinates] = useState(zero);
     const [iconUserCoordinates, setIconUserCoordinates] = useState(zero);
     const [iconOrdersCoordinates, setIconOrdersCoordinates] = useState(zero);
     const [iconMessageCoordinates, setIconMessageCoordinates] = useState(zero);
     const [iconCartCoordinates, setIconCartCoordinates] = useState(zero);
 
+    const iconNewAdRef = useRef(null);
     const iconUserRef = useRef(null);
     const iconOrdersRef = useRef(null);
     const iconMessageRef = useRef(null);
@@ -68,6 +71,7 @@ function IconDropdownMenuBar() {
         const handleResize = () => {
             setWindowWidth(document.documentElement.clientWidth);
 
+            setCoordinates(iconNewAdRef, setIconNewAdCoordinates);
             setCoordinates(iconUserRef, setIconUserCoordinates);
             setCoordinates(iconOrdersRef, setIconOrdersCoordinates);
             setCoordinates(iconMessageRef, setIconMessageCoordinates);
@@ -88,10 +92,10 @@ function IconDropdownMenuBar() {
             <div className={styles.iconsArea}>
                 <IconHoverCard
                     type='Создать'
-                    iconRef={iconOrdersRef}
+                    iconRef={iconNewAdRef}
                     IconComponent={FaPen}
-                    HoverCardComponent={HoverOrdersCard}
-                    iconCoordinates={iconOrdersCoordinates}
+                    HoverCardComponent={HoverNewAdCard}
+                    iconCoordinates={iconNewAdCoordinates}
                     windowWidth={windowWidth}
                 />
                 <IconHoverCard
