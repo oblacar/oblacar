@@ -6,6 +6,8 @@ import RouteSection from './RouteSection';
 import PaymentSection from './PaymentSection';
 import TransportSection from './TransportSection';
 
+import Button from '../common/Button/Button';
+
 // import TransportAdContext from '../../hooks/TransportAdContext'; // Импортируйте ваш TransportAdContext
 // import TransportContext from '../../hooks/TransportContext'; // Импортируйте ваш TransportContext
 import { TransportAd } from '../../entities/Ads/TransportAd';
@@ -78,10 +80,17 @@ const CreateTransportAd = () => {
                     <TransportAdItem
                         ad={formData}
                         rating='4'
+                        isViewMode={true}
                     />
                 </div>
-
-                <button type='submit'>Создать объявление</button>
+                <div className='button-submit-ad-div'>
+                    {/* <button type='submit'>Создать объявление</button> */}
+                    <Button
+                        type='submit'
+                        type_btn='yes'
+                        children='Разместить'
+                    />
+                </div>
             </div>
             <div className='new-transport-ad'>
                 <RouteSection

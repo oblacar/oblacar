@@ -21,6 +21,20 @@
     box-shadow: 0px 0px 0px 4px #6abbf8; */
 }
 
+/*Режим просмотра --->*/
+.view-mode:hover {
+    box-shadow: none;
+}
+
+.view-mode {
+    cursor: default;
+}
+
+.container-icon-add.view-mode {
+    visibility: hidden;
+}
+
+/*<---*/
 .row {
     width: 100%;
     box-sizing: border-box;
@@ -138,6 +152,7 @@
 /*Область фото на объявлении, которая иконка, если нет фото*/
 .car-photo-icon {
     width: 50px;
+    min-width: 50px;
     height: 50px;
 
     border: 1px rgb(241, 241, 241) solid;

@@ -196,6 +196,7 @@ const TransportSection = ({ updateFormData, formData }) => {
                                         onChange={handleInputChange}
                                         placeholder='Высота'
                                         min='0'
+                                        step='0.01'
                                     />
                                 </div>
                                 <div className='dimension-item'>
@@ -206,6 +207,7 @@ const TransportSection = ({ updateFormData, formData }) => {
                                         onChange={handleInputChange}
                                         placeholder='Ширина'
                                         min='0'
+                                        step='0.01'
                                     />
                                 </div>
                                 <div className='dimension-item'>
@@ -216,6 +218,7 @@ const TransportSection = ({ updateFormData, formData }) => {
                                         onChange={handleInputChange}
                                         placeholder='Глубина'
                                         min='0'
+                                        step='0.01'
                                     />
                                 </div>
                             </div>

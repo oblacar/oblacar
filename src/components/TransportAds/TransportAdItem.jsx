@@ -22,7 +22,7 @@ import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 //        * paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
 //}
 
-const TransportAdItem = ({ ad, rating }) => {
+const TransportAdItem = ({ ad, rating, isViewMode }) => {
     const [truckValue, setTruckValue] = useState(0);
 
     useEffect(() => {
@@ -48,7 +48,7 @@ const TransportAdItem = ({ ad, rating }) => {
     };
 
     return (
-        <div className='ad-item'>
+        <div className={`ad-item ${isViewMode ? 'view-mode' : ''}`}>
             {/* <div className={`row ${rowColor}`}> */}
             <div className='row'>
                 <div className='upper-ad-row'>
@@ -169,10 +169,14 @@ const TransportAdItem = ({ ad, rating }) => {
                         </span>
                     </div>
                     <div className='icon-item-ad-bar'>
-                        <div className='icon-driver'>
+                        {/* <div className='icon-driver'>
                             <FaUserCircle />
-                        </div>
-                        <div className='container-icon-add'>
+                        </div> */}
+                        <div
+                            className={`container-icon-add ${
+                                isViewMode ? 'view-mode' : ''
+                            }`}
+                        >
                             <div className='icon-add'>Запомнить</div>
                         </div>
                     </div>

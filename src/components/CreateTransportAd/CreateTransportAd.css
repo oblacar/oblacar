@@ -5,7 +5,38 @@
 .without-bottom-margine {
     margin-bottom: 0;
 }
+/*Стилизация демонстрации получившегося нового объявления -->*/
+.new-ad-show {
+    display: flex;
+    justify-content: space-between; /* Размещаем элементы по краям */
+    align-items: center;
+}
 
+.ad-example {
+    flex: 1; /* Занимает всё доступное пространство */
+    margin-right: 20px; /* Отступ между элементами */
+    margin-left: 5px;
+}
+
+.button-submit-ad-div {
+    margin-right: 5px;
+
+}
+
+button {
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/*<---*/
 .new-ad-section {
     flex: 1;
     border: 1px rgb(144, 174, 255) solid;
@@ -53,19 +84,6 @@
 /* h2 {
     text-align: center;
 } */
-
-button {
-    padding: 10px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
 
 /*Блок чекбоксов*/
 .checkbox-item {
