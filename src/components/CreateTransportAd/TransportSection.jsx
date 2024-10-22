@@ -69,147 +69,155 @@ const TransportSection = ({ updateFormData, formData }) => {
                     </div>
                 </div>
                 <p>или введите новую</p>
-                <div className='truck-name-photo'>
-                    <div className='truck-name'>
-                        <p className='new-ad-title without-bottom-margine'>
-                            Название:
-                        </p>
-                        <input
-                            type='text'
-                            id='truckName'
-                            name='truckName'
-                            value={formData.truckName}
-                            onChange={handleInputChange}
-                            placeholder='Название'
-                        />
-                    </div>
-                    <div className='truck-photo'>
-                        <input
-                            type='file'
-                            id='truckPhoto'
-                            name='truckPhoto'
-                            accept='image/*'
-                            onChange={handleFileChange}
-                            style={{ display: 'none' }} // Скрываем стандартное поле ввода
-                        />
-                        <div
-                            onClick={() =>
-                                document.getElementById('truckPhoto').click()
-                            }
-                            className='photo-circle'
-                        >
-                            {formData.truckPhoto ? (
-                                <img
-                                    src={formData.truckPhoto}
-                                    alt='Превью фото машины'
-                                    className='photo-preview'
-                                />
-                            ) : (
-                                <span>Фото</span>
-                            )}
+
+                {/* TODO Нужно сделать Отдельную компоненту. Стиль в truck-corrector еще не задан. Нужно будет его перенести в компоненту*/}
+                <div className='truck-corrector '>
+                    <div className='truck-name-photo'>
+                        <div className='truck-name'>
+                            <p className='new-ad-title without-bottom-margine'>
+                                Название:
+                            </p>
+                            <input
+                                type='text'
+                                id='truckName'
+                                name='truckName'
+                                value={formData.truckName}
+                                onChange={handleInputChange}
+                                placeholder='Название'
+                            />
+                        </div>
+                        <div className='truck-photo'>
+                            <input
+                                type='file'
+                                id='truckPhoto'
+                                name='truckPhoto'
+                                accept='image/*'
+                                onChange={handleFileChange}
+                                style={{ display: 'none' }} // Скрываем стандартное поле ввода
+                            />
+                            <div
+                                onClick={() =>
+                                    document
+                                        .getElementById('truckPhoto')
+                                        .click()
+                                }
+                                className='photo-circle'
+                            >
+                                {formData.truckPhoto ? (
+                                    <img
+                                        src={formData.truckPhoto}
+                                        alt='Превью фото машины'
+                                        className='photo-preview'
+                                    />
+                                ) : (
+                                    <span>Фото</span>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <p className='new-ad-title without-bottom-margine'>Тип:</p>
-                <select
-                    name='transportType'
-                    value={formData.transportType}
-                    onChange={handleTransportTypeChange}
-                    className='select-transport-type'
-                >
-                    <option
-                        value=''
-                        disabled
+                    <p className='new-ad-title without-bottom-margine'>Тип:</p>
+                    <select
+                        name='transportType'
+                        value={formData.transportType}
+                        onChange={handleTransportTypeChange}
+                        className='select-transport-type'
                     >
-                        Выберите
-                    </option>
-                    {truckTypesWithLoading.map((transport) => (
                         <option
-                            key={transport.name}
-                            value={transport.name}
+                            value=''
+                            disabled
                         >
-                            {transport.name}
+                            Выберите
                         </option>
-                    ))}
-                </select>
-
-                <p className='new-ad-title without-bottom-margine'>
-                    Вариант загрузки:
-                </p>
-
-                {loadingTypes.map((loadingType, index) => (
-                    <div
-                        key={`${loadingType}-${index}`}
-                        className='checkbox-item'
-                    >
-                        {' '}
-                        {/* Уникальный ключ */}
-                        <label className='checkbox-label'>
-                            <input
-                                type='checkbox'
-                                id={`loadingType-${index}`}
-                                value={loadingType}
-                                className='input-checkbox'
-                                onChange={handleLoadingTypeChange}
-                                checked={formData.loadingTypes.includes(
-                                    loadingType
-                                )} // Устанавливаем состояние чекбокса
-                            />
-                            <span className='checkbox-title'>
-                                {loadingType}
-                            </span>
-                        </label>
-                    </div>
-                ))}
-                <div className='truck-capacity'>
-                    <div className='weight-dimension'>
-                        <p className='new-ad-title weight-label'>Вес (т):</p>
-                        <input
-                            className='weight-input'
-                            type='number'
-                            name='weight'
-                            value={formData.weight}
-                            onChange={handleInputChange}
-                            placeholder='Введите вес'
-                            min='0'
-                        />
-                    </div>
+                        {truckTypesWithLoading.map((transport) => (
+                            <option
+                                key={transport.name}
+                                value={transport.name}
+                            >
+                                {transport.name}
+                            </option>
+                        ))}
+                    </select>
 
                     <p className='new-ad-title without-bottom-margine'>
-                        Объем (м3) ВхШхГ:
+                        Вариант загрузки:
                     </p>
-                    <div className='dimensions'>
-                        <div className='value-dimension'>
-                            <div className='dimension-item'>
+
+                    {loadingTypes.map((loadingType, index) => (
+                        <div
+                            key={`${loadingType}-${index}`}
+                            className='checkbox-item'
+                        >
+                            {' '}
+                            {/* Уникальный ключ */}
+                            <label className='checkbox-label'>
                                 <input
-                                    type='number'
-                                    name='height'
-                                    value={formData.height}
-                                    onChange={handleInputChange}
-                                    placeholder='Высота'
-                                    min='0'
+                                    type='checkbox'
+                                    id={`loadingType-${index}`}
+                                    value={loadingType}
+                                    className='input-checkbox'
+                                    onChange={handleLoadingTypeChange}
+                                    checked={formData.loadingTypes.includes(
+                                        loadingType
+                                    )} // Устанавливаем состояние чекбокса
                                 />
-                            </div>
-                            <div className='dimension-item'>
-                                <input
-                                    type='number'
-                                    name='width'
-                                    value={formData.width}
-                                    onChange={handleInputChange}
-                                    placeholder='Ширина'
-                                    min='0'
-                                />
-                            </div>
-                            <div className='dimension-item'>
-                                <input
-                                    type='number'
-                                    name='depth'
-                                    value={formData.depth}
-                                    onChange={handleInputChange}
-                                    placeholder='Глубина'
-                                    min='0'
-                                />
+                                <span className='checkbox-title'>
+                                    {loadingType}
+                                </span>
+                            </label>
+                        </div>
+                    ))}
+                    <div className='truck-capacity'>
+                        <div className='weight-dimension'>
+                            <p className='new-ad-title weight-label'>
+                                Вес (т):
+                            </p>
+                            <input
+                                className='weight-input'
+                                type='number'
+                                name='weight'
+                                value={formData.weight}
+                                onChange={handleInputChange}
+                                placeholder='Введите вес'
+                                min='0'
+                            />
+                        </div>
+
+                        <p className='new-ad-title without-bottom-margine'>
+                            Объем (м3) ВхШхГ:
+                        </p>
+                        <div className='dimensions'>
+                            <div className='value-dimension'>
+                                <div className='dimension-item'>
+                                    <input
+                                        type='number'
+                                        name='height'
+                                        value={formData.height}
+                                        onChange={handleInputChange}
+                                        placeholder='Высота'
+                                        min='0'
+                                    />
+                                </div>
+                                <div className='dimension-item'>
+                                    <input
+                                        type='number'
+                                        name='width'
+                                        value={formData.width}
+                                        onChange={handleInputChange}
+                                        placeholder='Ширина'
+                                        min='0'
+                                    />
+                                </div>
+                                <div className='dimension-item'>
+                                    <input
+                                        type='number'
+                                        name='depth'
+                                        value={formData.depth}
+                                        onChange={handleInputChange}
+                                        placeholder='Глубина'
+                                        min='0'
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

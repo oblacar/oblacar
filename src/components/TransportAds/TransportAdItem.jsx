@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
-import { FaTruck } from 'react-icons/fa';
+import { FaTruck, FaUserCircle } from 'react-icons/fa';
 
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 
@@ -11,8 +11,8 @@ import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 //        * width: '',
 //        * depth: '',
 //        * weight: '',
-//         *-transportType: '',
-//         *-loadingTypes: [], // массив возможных типов загрузки
+//        * transportType: '',
+//        * loadingTypes: [], // массив возможных типов загрузки
 //        * availabilityDate: '', // дата, когда машина доступна
 //        * departureCity: '', // город, где находится транспортное средство
 //        * destinationCity: '', // предполагаемое направление (если есть)
@@ -30,6 +30,8 @@ const TransportAdItem = ({ ad, rating }) => {
             const truckValue = ad.width * ad.height * ad.depth;
 
             setTruckValue(() => truckValue); // Обновляем состояние
+        } else {
+            setTruckValue(() => 0);
         }
     }, [
         ad.transportType,
@@ -94,12 +96,29 @@ const TransportAdItem = ({ ad, rating }) => {
                     </div>
                 </div>
                 <div className='down-ad-row'>
-                    <div className='icon-car'>
-                        <FaTruck />
+                    <div className='car-photo-icon'>
+                        {ad.truckPhoto ? ( // Проверяем, есть ли фото
+                            <img
+                                src={ad.truckPhoto}
+                                alt='Фото машины'
+                                className='photo-car' // Добавьте классы для стилизации
+                            />
+                        ) : (
+                            <div className='icon-car'>
+                                <FaTruck />
+                            </div>
+                        )}
                     </div>
                     <div className=' car-info'>
                         <span>
-                            {ad.transportType ? `${ad.transportType}, ` : ''}
+                            {ad.transportType ? `${ad.transportType}` : ''}
+                            {ad.weight ||
+                            ad.loadingTypes.length !== 0 ||
+                            truckValue ? (
+                                <>{', '}</>
+                            ) : (
+                                ''
+                            )}
                         </span>
                         <span>
                             {ad.weight ? (
@@ -150,9 +169,9 @@ const TransportAdItem = ({ ad, rating }) => {
                         </span>
                     </div>
                     <div className='icon-item-ad-bar'>
-                        {/* <div className='icon-driver'>
+                        <div className='icon-driver'>
                             <FaUserCircle />
-                        </div> */}
+                        </div>
                         <div className='container-icon-add'>
                             <div className='icon-add'>Запомнить</div>
                         </div>

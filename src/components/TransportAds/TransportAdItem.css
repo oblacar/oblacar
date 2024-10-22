@@ -135,13 +135,42 @@
 
     align-items: center; /* Вертикальное центрирование */
 }
+/*Область фото на объявлении, которая иконка, если нет фото*/
+.car-photo-icon {
+    width: 50px;
+    height: 50px;
+
+    border: 1px rgb(241, 241, 241) solid;
+    border-radius: 50%;
+    margin: 5px;
+
+    background-color: #ffffff;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden; /* Скрываем лишнее, если изображение больше круга */
+}
+
+.photo-car {
+    width: 100%; /* Задаем ширину и высоту изображения */
+    height: 100%;
+    object-fit: cover; /* Обеспечиваем обрезку изображения, чтобы оно заполнило круг */
+}
 
 .icon-car {
     font-size: 20px;
-    color: rgb(67, 61, 88);
-
+    color: rgb(190, 190, 193);
+    /* 
     margin: 0px 10px 0px 20px;
-    margin-top: 5px;
+    margin-top: 5px; */
+    display: block;
+    /* border: 1px solid black; */
+    text-align: center;
+    width: 100%;
+    font-size: 22px;
+    padding-left: 5px;
+    padding-top: 5px;
 }
 
 .icon-item-ad-bar {

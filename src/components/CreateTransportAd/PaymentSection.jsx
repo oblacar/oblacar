@@ -55,15 +55,6 @@ const PaymentSection = ({ formData, updateFormData }) => {
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     };
 
-    // // Функция для обработки изменений Цены инпута
-    // const handlePriceChange = (e) => {
-    //     // Проверяем, что введен только допустимый символ (цифры)
-    //     const value = e.target.value.replace(/\D/g, '');
-
-    //     // Сохраняем числовое значение в state
-    //     getInputPrice(value);
-    // };
-
     // Ограничиваем ввод только цифрами, разрешая стрелки, Delete, Backspace
     const handlePriceKeyDown = (e) => {
         const allowedKeys = [
