@@ -4,7 +4,7 @@ import CreateTransportAd from '../../../components/CreateTransportAd/CreateTrans
 const NewTransportAd = () => {
     return (
         <div>
-            <CreateTransportAd /> {/* Встраиваем компонент UserProfile */}
+            <CreateTransportAd /> 
         </div>
     );
 };

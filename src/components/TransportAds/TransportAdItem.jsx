@@ -3,6 +3,7 @@ import './TransportAdItem.css';
 import { FaTruck, FaUserCircle } from 'react-icons/fa';
 
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
+import { NumberSchema } from 'yup';
 
 //ad:{
 //         truckName: '',
@@ -27,7 +28,13 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
     useEffect(() => {
         if (ad.width && ad.height && ad.depth) {
-            const truckValue = ad.width * ad.height * ad.depth;
+            const tempWidth = Number(ad.width);
+            const tempHeight = Number(ad.height);
+            const tempDepth = Number(ad.depth);
+
+            const truckValue = tempWidth * tempHeight * tempDepth;
+
+            console.log('tempDepth = ', truckValue);
 
             setTruckValue(() => truckValue); // Обновляем состояние
         } else {
@@ -35,16 +42,37 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
         }
     }, [
         ad.transportType,
-        ad.weight,
-        ad.width,
-        ad.height,
-        ad.depth,
+        ad.truckWeight,
+        ad.truckWidth,
+        ad.truckHeight,
+        ad.truckDepth,
         ad.loadingTypes,
     ]);
 
+    useEffect(() => {
+        console.log(ad);
+        if (ad.truckWidth && ad.truckHeight && ad.truckDepth) {
+            const tempWidth = Number(ad.truckWidth);
+            const tempHeight = Number(ad.truckHeight);
+            const tempDepth = Number(ad.truckDepth);
+
+            const truckValue = tempWidth * tempHeight * tempDepth;
+
+            console.log('tempDepth = ', truckValue);
+
+            setTruckValue(() => truckValue); // Обновляем состояние
+        } else {
+            setTruckValue(() => 0);
+        }
+    }, []);
+
     // выставляем пробелы между разрядами
     const formatNumber = (value) => {
-        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        const textValue = String(value);
+
+        console.log(textValue);
+
+        return textValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     };
 
     return (
@@ -135,7 +163,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                                     <strong>
                                         {truckValue}м<sup>3</sup>
                                     </strong>
-                                    {` (${ad.width}м x ${ad.height}м x ${ad.depth}м)`}
+                                    {` (${ad.truckWidth}м x ${ad.truckHeight}м x ${ad.truckDepth}м)`}
                                     {ad.loadingTypes.length !== 0 ? (
                                         <>{', '}</>
                                     ) : (

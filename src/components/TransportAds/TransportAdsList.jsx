@@ -8,11 +8,12 @@ import Preloader from '../common/Preloader/Preloader';
 const TransportAdsList = () => {
     const { ads, loading, error } = useContext(TransportAdContext);
 
-    if (loading) return (
-        <div className={styles.preloader}>
-            <Preloader />
-        </div>
-    );
+    if (loading)
+        return (
+            <div className={styles.preloader}>
+                <Preloader />
+            </div>
+        );
     if (error) return <div className={styles.errorMessage}>Error: {error}</div>;
 
     // const getRandomRating = () => {
@@ -24,14 +25,17 @@ const TransportAdsList = () => {
             {ads.length === 0 ? (
                 <p>No transport ads available.</p>
             ) : (
-                ads.map((ad, index) => (
-                    <TransportAdItem
-                        key={ad.adId}
-                        ad={ad}
-                        // rowColor={index % 2 === 0 ? 'evenRow' : 'oddRow'}
-                        rating={Math.floor(Math.random() * 50) / 10}
-                    />
-                ))
+                ads.map(
+                    (ad, index) => {return  ad && (
+                            <TransportAdItem
+                                key={ad.adId}
+                                ad={ad}
+                                rating={Math.floor(Math.random() * 50) / 10}
+                            />
+                        );
+                    }
+                    // console.log(ad)
+                )
             )}
         </div>
     );

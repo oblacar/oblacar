@@ -34,8 +34,8 @@ export const HoverNewAdCard = ({
                 onMouseLeave={handleMouseLeave}
                 style={setTopLeftHover(iconCoordinates, windowWidth)}
             >
-                <p className='hover-card-title'>Новое объявление</p>
                 <div className='hover-card-content '>
+                    <p className='hover-card-title'>Новое объявление</p>
                     {!isAuthenticated ? (
                         <div>
                             <p>
@@ -45,7 +45,7 @@ export const HoverNewAdCard = ({
                         </div>
                     ) : (
                         <div>
-                            <p>Для оформления заказов, нужно войти в систему</p>
+                            <p>Разместите объявление о Транспорте</p>
                             <Link to='/new-tansport-ad'>
                                 <Button
                                     type='button'
@@ -55,6 +55,7 @@ export const HoverNewAdCard = ({
                                     onClick={handleMouseLeave}
                                 />
                             </Link>
+                            <p>или о Грузе</p>
                         </div>
                     )}
                 </div>

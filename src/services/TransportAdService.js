@@ -1,5 +1,8 @@
 // src/services/TransportAdService.js
 import { db } from '../firebase'; // Импортируйте ваш экземпляр Firebase
+
+import testAds from '../constants/testData.json'; // Импортируйте тестовые данные
+
 import {
     ref,
     set,
@@ -40,6 +43,17 @@ const TransportAdService = {
     },
     // В будущем можно добавить больше методов, таких как:
     // fetchTransports, updateTransportAd и т.д.
+
+    getTestAds: async () => {
+        // Например, если вы хотите использовать тестовые данные
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // console.log(testAds); // Выводим объект в консоль
+
+                resolve(testAds);
+            }, 1000); // Задержка для имитации асинхронной загрузки
+        });
+    },
 
     // Метод для получения всех объявлений
     getAllAds: async () => {
