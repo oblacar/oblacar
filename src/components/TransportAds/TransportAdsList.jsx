@@ -26,12 +26,15 @@ const TransportAdsList = () => {
                 <p>No transport ads available.</p>
             ) : (
                 ads.map(
-                    (ad, index) => {return  ad && (
-                            <TransportAdItem
-                                key={ad.adId}
-                                ad={ad}
-                                rating={Math.floor(Math.random() * 50) / 10}
-                            />
+                    (ad, index) => {
+                        return (
+                            ad && (
+                                <TransportAdItem
+                                    key={ad.adId || index}
+                                    ad={ad}
+                                    rating={Math.floor(Math.random() * 50) / 10}
+                                />
+                            )
                         );
                     }
                     // console.log(ad)

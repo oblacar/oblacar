@@ -8,10 +8,10 @@ import { NumberSchema } from 'yup';
 //ad:{
 //         truckName: '',
 //         truckPhoto: '',
-//        * height: '',
-//        * width: '',
-//        * depth: '',
-//        * weight: '',
+//        * truckHeight: '',
+//        * truckWidth: '',
+//        * truckDepth: '',
+//        * truckWeight: '',
 //        * transportType: '',
 //        * loadingTypes: [], // массив возможных типов загрузки
 //        * availabilityDate: '', // дата, когда машина доступна
@@ -25,6 +25,31 @@ import { NumberSchema } from 'yup';
 
 const TransportAdItem = ({ ad, rating, isViewMode }) => {
     const [truckValue, setTruckValue] = useState(0);
+    //добавление фото прямо из списка объявлений:
+    const [selectedPhoto, setSelectedPhoto] = useState(null);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSelectedPhoto(reader.result);
+                // Здесь можно также обновить состояние контекста или родительского компонента
+                // updateFormData({ truckPhotoUrl: reader.result });
+            };
+
+            reader.readAsDataURL(file);
+
+            ad.truckPhotoUrl = file; // Прямое изменение объекта, вы можете использовать метод, если он у вас есть
+
+            console.log(ad);
+        }
+    };
+
+    const handleClick = () => {
+        document.getElementById(`fileInput-${ad.adId}`).click(); // Программный клик по скрытому инпуту
+    };
+    //<----
 
     useEffect(() => {
         if (ad.width && ad.height && ad.depth) {
@@ -34,7 +59,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
-            console.log('tempDepth = ', truckValue);
+            // console.log('tempDepth = ', truckValue);
 
             setTruckValue(() => truckValue); // Обновляем состояние
         } else {
@@ -50,7 +75,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
     ]);
 
     useEffect(() => {
-        console.log(ad);
+        // console.log(ad);
         if (ad.truckWidth && ad.truckHeight && ad.truckDepth) {
             const tempWidth = Number(ad.truckWidth);
             const tempHeight = Number(ad.truckHeight);
@@ -58,7 +83,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
-            console.log('tempDepth = ', truckValue);
+            // console.log('tempDepth = ', truckValue);
 
             setTruckValue(() => truckValue); // Обновляем состояние
         } else {
@@ -69,8 +94,6 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
     // выставляем пробелы между разрядами
     const formatNumber = (value) => {
         const textValue = String(value);
-
-        console.log(textValue);
 
         return textValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     };
@@ -124,7 +147,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                     </div>
                 </div>
                 <div className='down-ad-row'>
-                    <div className='car-photo-icon'>
+                    {/* <div className='car-photo-icon'>
                         {ad.truckPhoto ? ( // Проверяем, есть ли фото
                             <img
                                 src={ad.truckPhoto}
@@ -136,7 +159,32 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                                 <FaTruck />
                             </div>
                         )}
+                    </div> */}
+
+                    <div
+                        className='car-photo-icon'
+                        onClick={handleClick}
+                    >
+                        {selectedPhoto || ad.truckPhoto ? ( // Проверяем, есть ли фото
+                            <img
+                                src={selectedPhoto || ad.truckPhoto}
+                                alt='Фото машины'
+                                className='photo-car' // Добавьте классы для стилизации
+                            />
+                        ) : (
+                            <div className='icon-car'>
+                                <FaTruck />
+                            </div>
+                        )}
+                        <input
+                            type='file'
+                            id={`fileInput-${ad.adId}`} // Уникальный ID для каждого инпута
+                            style={{ display: 'none' }} // Скрываем стандартное поле ввода
+                            onChange={handleFileChange}
+                            accept='image/*' // Указываем, что это изображение
+                        />
                     </div>
+
                     <div className=' car-info'>
                         <span>
                             {ad.transportType ? `${ad.transportType}` : ''}
