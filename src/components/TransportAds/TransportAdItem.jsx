@@ -52,10 +52,10 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
     //<----
 
     useEffect(() => {
-        if (ad.width && ad.height && ad.depth) {
-            const tempWidth = Number(ad.width);
-            const tempHeight = Number(ad.height);
-            const tempDepth = Number(ad.depth);
+        if (ad.truckWidth && ad.truckHeight && ad.truckDepth) {
+            const tempWidth = Number(ad.truckWidth);
+            const tempHeight = Number(ad.truckHeight);
+            const tempDepth = Number(ad.truckDepth);
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
@@ -157,10 +157,10 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                     </div>
                 </div>
                 <div className='down-ad-row'>
-                    {/* <div className='car-photo-icon'>
-                        {ad.truckPhoto ? ( // Проверяем, есть ли фото
+                    <div className='car-photo-icon'>
+                        {ad.truckPhotoUrl ? ( // Проверяем, есть ли фото
                             <img
-                                src={ad.truckPhoto}
+                                src={ad.truckPhotoUrl}
                                 alt='Фото машины'
                                 className='photo-car' // Добавьте классы для стилизации
                             />
@@ -169,9 +169,9 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                                 <FaTruck />
                             </div>
                         )}
-                    </div> */}
+                    </div>
 
-                    <div
+                    {/* <div
                         className='car-photo-icon'
                         onClick={handleClick}
                     >
@@ -193,7 +193,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             onChange={handleFileChange}
                             accept='image/*' // Указываем, что это изображение
                         />
-                    </div>
+                    </div> */}
 
                     <div className=' car-info'>
                         <span>

@@ -1,19 +1,26 @@
 // src/services/TransportAdService.js
-import { db } from '../firebase'; // Импортируйте ваш экземпляр Firebase
-
-import testAds from '../constants/testData.json'; // Импортируйте тестовые данные
+import { db, storage } from '../firebase'; // Измените путь, если необходимо
 
 import {
-    ref,
+    ref as storageRef,
+    uploadBytes,
+    getDownloadURL,
+} from 'firebase/storage';
+
+import {
+    ref as databaseRef,
     set,
     get,
+    update,
     query,
     limitToFirst,
     child,
     push,
 } from 'firebase/database';
 
-const transportAdsRef = ref(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
+import testAds from '../constants/testData.json'; // Импортируйте тестовые данные
+
+const transportAdsRef = databaseRef(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
 
 const TransportAdService = {
     // Метод для добавления нового объявления
@@ -85,7 +92,7 @@ const TransportAdService = {
 
     // Метод для получения одного объявления по ID
     getAdById: async (adId) => {
-        const adRef = ref(db, `transportAds/${adId}`); // Ссылка на конкретное объявление
+        const adRef = databaseRef(db, `transportAds/${adId}`); // Ссылка на конкретное объявление
 
         try {
             const snapshot = await get(adRef);
@@ -121,6 +128,63 @@ const TransportAdService = {
         } catch (error) {
             console.error('Ошибка при поиске объявлений: ', error);
             throw new Error('Не удалось выполнить поиск. Попробуйте еще раз.');
+        }
+    },
+
+    uploadPhoto: async (file) => {
+        if (!file) return;
+
+        const photoRef = storageRef(storage, `truckPhotos/${file.name}`); // создаем уникальную ссылку для фото
+        await uploadBytes(photoRef, file); // загружаем фото
+        const photoUrl = await getDownloadURL(photoRef); // получаем ссылку на загруженное фото
+        return photoUrl; // возвращаем ссылку
+    },
+
+    uploadAdsToFirebase: async (ads) => {
+        try {
+            const dbRef = databaseRef(db, 'transportAds'); // Создаем ссылку на узел "transportAds"
+
+            // Очистка предыдущих данных (если нужно)
+            await set(dbRef, null); // Очищаем узел перед загрузкой новых данных
+
+            const adsToUpload = ads.map(async (ad) => {
+                const newAdRef = push(dbRef); // Создаем уникальный ключ для нового объявления
+
+                await set(newAdRef, {
+                    adId: newAdRef.key,
+                    ownerId: ad.ownerId,
+                    availabilityDate: ad.availabilityDate,
+                    departureCity: ad.departureCity,
+                    destinationCity: ad.destinationCity,
+                    price: ad.price,
+                    paymentUnit: ad.paymentUnit,
+                    readyToNegotiate: ad.readyToNegotiate,
+                    paymentOptions: ad.paymentOptions,
+                    truckId: ad.truckId,
+                    truckName: ad.truckName,
+                    truckPhotoUrl: '', // Пустое поле для ссылки на фото
+                    transportType: ad.transportType,
+                    loadingTypes: ad.loadingTypes,
+                    truckWeight: ad.truckWeight,
+                    truckHeight: ad.truckHeight,
+                    truckWidth: ad.truckWidth,
+                    truckDepth: ad.truckDepth,
+                });
+
+                // Проверяем, есть ли файл в truckPhotoUrl
+                if (ad.truckPhotoUrl && ad.truckPhotoUrl instanceof File) {
+                    const photoUrl = await TransportAdService.uploadPhoto(
+                        ad.truckPhotoUrl
+                    ); // Загрузка фото и получение URL
+                    await update(newAdRef, { truckPhotoUrl: photoUrl }); // Обновляем ссылку на фото в объявлении
+                }
+
+                return newAdRef.key; // Возвращаем id нового объявления, если нужно
+            });
+
+            await Promise.all(adsToUpload); // Ждем завершения загрузки всех объявлений
+        } catch (error) {
+            console.error('Error uploading ads:', error);
         }
     },
 };

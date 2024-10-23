@@ -8,39 +8,42 @@ export const TransportAdProvider = ({ children }) => {
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
     //закоментим подкрузку объявлений из базы. Временно, для отладки.
-    // useEffect(() => {
-    //     const fetchAds = async () => {
-    //         setLoading(true);
-
-    //         try {
-    //             const data = await TransportAdService.getAllAds();
-
-    //             setAds(data);
-    //         } catch (err) {
-    //             setError(err.message);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchAds();
-    // }, []);
-
     useEffect(() => {
-        const loadAds = async () => {
+        const fetchAds = async () => {
+            setLoading(true);
+
             try {
-                const adsData = await TransportAdService.getTestAds(); // Получаем данные из сервиса
-                setAds(adsData);
+                const data = await TransportAdService.getAllAds();
+
+                setAds(data);
             } catch (err) {
-                setError(err);
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadAds();
+        fetchAds();
     }, []);
+
+    // выгрузка из тестового файла --->>>
+    // useEffect(() => {
+    //     const loadAds = async () => {
+    //         try {
+    //             const adsData = await TransportAdService.getTestAds(); // Получаем данные из сервиса
+    //             setAds(adsData);
+    //         } catch (err) {
+    //             setError(err);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     loadAds();
+    // }, []);
+    //<<<---
 
     // Функции для добавления, обновления и удаления объявлений
     const addAd = async (adData) => {
