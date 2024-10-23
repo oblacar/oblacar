@@ -61,7 +61,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
             // console.log('tempDepth = ', truckValue);
 
-            setTruckValue(() => truckValue); // Обновляем состояние
+            setTruckValue(() => cutNumber(truckValue)); // Обновляем состояние
         } else {
             setTruckValue(() => 0);
         }
@@ -83,9 +83,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
-            // console.log('tempDepth = ', truckValue);
-
-            setTruckValue(() => truckValue); // Обновляем состояние
+            setTruckValue(() => cutNumber(truckValue)); // Обновляем состояние
         } else {
             setTruckValue(() => 0);
         }
@@ -98,6 +96,18 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
         return textValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     };
 
+    // Обрезаем по третий знак после запятой:
+    const cutNumber = (num) => {
+        // Умножение трех чисел
+        const result = num; // Замените на ваше умножение
+
+        // Обрезаем число до трех знаков после запятой
+        const trimmed =
+            Math.abs(result) < 1e-10 ? 0 : Number(result.toFixed(3));
+
+        // Форматируем число с запятой
+        return trimmed.toString().replace('.', ',');
+    };
     return (
         <div className={`ad-item ${isViewMode ? 'view-mode' : ''}`}>
             {/* <div className={`row ${rowColor}`}> */}
