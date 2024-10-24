@@ -9,6 +9,8 @@ export const TransportAdProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [reviewAds, setReviewAds] = useState([]);
+
     //закоментим подкрузку объявлений из базы. Временно, для отладки.
     useEffect(() => {
         const fetchAds = async () => {
@@ -28,6 +30,8 @@ export const TransportAdProvider = ({ children }) => {
         fetchAds();
     }, []);
 
+
+    
     // выгрузка из тестового файла --->>>
     // useEffect(() => {
     //     const loadAds = async () => {

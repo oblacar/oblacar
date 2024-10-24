@@ -26,6 +26,9 @@ import { NumberSchema } from 'yup';
 const TransportAdItem = ({ ad, rating, isViewMode }) => {
     const [truckValue, setTruckValue] = useState(0);
     //добавление фото прямо из списка объявлений:
+
+    const [onReviewAdsAdd, setOnReviewAdsAdd] = useState(false);
+
     const [selectedPhoto, setSelectedPhoto] = useState(null);
 
     const handleFileChange = (e) => {
@@ -108,8 +111,20 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
         // Форматируем число с запятой
         return trimmed.toString().replace('.', ',');
     };
+
+    const handleMouseEnterReviewAdsAdd = () => {
+        setOnReviewAdsAdd(() => true);
+    };
+    const handleMouseLeaveReviewAdsAdd = () => {
+        setOnReviewAdsAdd(() => false);
+    };
+    
     return (
-        <div className={`ad-item ${isViewMode ? 'view-mode' : ''}`}>
+        <div
+            className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
+                onReviewAdsAdd ? '' : 'active'
+            }`}
+        >
             {/* <div className={`row ${rowColor}`}> */}
             <div className='row'>
                 <div className='upper-ad-row'>
@@ -263,7 +278,13 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                                 isViewMode ? 'view-mode' : ''
                             }`}
                         >
-                            <div className='icon-add'>Запомнить</div>
+                            <div
+                                className='icon-add'
+                                onMouseEnter={handleMouseEnterReviewAdsAdd}
+                                onMouseLeave={handleMouseLeaveReviewAdsAdd}
+                            >
+                                Запомнить
+                            </div>
                         </div>
                     </div>
                 </div>

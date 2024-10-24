@@ -15,7 +15,11 @@ const Header = () => {
                     <Link to='/'>
                         <div className={styles.logo}>
                             <img
-                                src='/logo/logo-oblacar.png'
+                                // src='/logo/logo-oblacar.png'
+                                // src='/logo/logo-oblacar2.png'
+                                // src='/logo/logo-oblacar3.png'
+                                // src='/logo/logo-oblacar4.png'
+                                src='/logo/logo-oblacar5.png'
                                 alt='Логотип'
                                 className={styles.logoImage}
                             />
