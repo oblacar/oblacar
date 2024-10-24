@@ -23,11 +23,13 @@ const Header = () => {
                     </Link>
                 </div>
             </div>
-            <div className={styles.middleLine}>
+            {/* <div className={styles.middleLine}>
                 <span className={styles.headerSlogan}>
                     Облачная легкость в поиске, надежность в перевозке.
                 </span>
-            </div>
+            </div> */}
+            <div className={styles.middleThinLine}></div>
+            <div className={styles.middleThinLine2}></div>
             <div className={styles.bottomLine}>
                 <IconDropdownMenuBar className={styles.iconsArea} />
             </div>

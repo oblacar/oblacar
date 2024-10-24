@@ -48,7 +48,25 @@
 
     /* opacity: 0.6;Прозрачность для черной линии */
 }
-
+/* 
+.middleThinLine {
+    height: 15px;
+    background-color: #1f1f1f; 
+    border-bottom: 3px dashed rgb(144, 143, 143);
+}
+.middleThinLine2 {
+    height: 13px;
+    background-color: #1f1f1f;
+} */
+.middleThinLine {
+    height: 15px;
+    background-color: #5bccfc;
+    /* border-bottom: 3px dashed rgb(144, 143, 143); */
+}
+.middleThinLine2 {
+    height: 15px;
+    background-color: #99dffb;
+}
 .headerSlogan {
     color: #ffffffcc; /* Белый цвет текста */
     display: flex; /* Используем flexbox для центрирования */

@@ -49,7 +49,7 @@ const zero = {
 };
 
 function IconDropdownMenuBar() {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, user } = useContext(AuthContext);
 
     const [iconNewAdCoordinates, setIconNewAdCoordinates] = useState(zero);
     const [iconUserCoordinates, setIconUserCoordinates] = useState(zero);
@@ -99,7 +99,7 @@ function IconDropdownMenuBar() {
                     windowWidth={windowWidth}
                 />
                 <IconHoverCard
-                    type='Профиль'
+                    type={isAuthenticated ? `${user.userName}` : 'Профиль'}
                     iconRef={iconUserRef}
                     IconComponent={FaUser}
                     HoverCardComponent={HoverUserCard}
