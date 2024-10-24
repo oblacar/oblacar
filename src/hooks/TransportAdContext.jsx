@@ -30,8 +30,6 @@ export const TransportAdProvider = ({ children }) => {
         fetchAds();
     }, []);
 
-
-    
     // выгрузка из тестового файла --->>>
     // useEffect(() => {
     //     const loadAds = async () => {
@@ -69,7 +67,14 @@ export const TransportAdProvider = ({ children }) => {
 
     return (
         <TransportAdContext.Provider
-            value={{ ads, loading, error, addAd, updateAd, deleteAd }}
+            value={{
+                ads,
+                loading,
+                error,
+                addAd,
+                updateAd,
+                deleteAd,
+            }}
         >
             {children}
         </TransportAdContext.Provider>

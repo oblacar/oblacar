@@ -18,6 +18,7 @@ import {
     push,
 } from 'firebase/database';
 
+import { uploadPhoto } from '../utils/helper';
 import testAds from '../constants/testData.json'; // Импортируйте тестовые данные
 
 const transportAdsRef = databaseRef(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
@@ -140,16 +141,24 @@ const TransportAdService = {
         return photoUrl; // возвращаем ссылку
     },
 
+    //Изменение структуры все базы объявлений. Добавили поле status. Назначили всем active
+    // Приходит в 4 этапа: все выгрузили, очистили, изменили и загрузили новую базу----->>>>
     uploadAdsToFirebase: async (ads) => {
         try {
+            const adsWithStatus = ads.map((ad) => ({
+                ...ad,
+                status: 'active', // Добавляем новое поле со статусом
+            }));
+
             const dbRef = databaseRef(db, 'transportAds'); // Создаем ссылку на узел "transportAds"
 
             // Очистка предыдущих данных (если нужно)
             await set(dbRef, null); // Очищаем узел перед загрузкой новых данных
 
-            const adsToUpload = ads.map(async (ad) => {
+            const adsToUpload = adsWithStatus.map(async (ad) => {
                 const newAdRef = push(dbRef); // Создаем уникальный ключ для нового объявления
 
+                // Сохраняем объявление с пустым полем для ссылки на фото
                 await set(newAdRef, {
                     adId: newAdRef.key,
                     ownerId: ad.ownerId,
@@ -162,22 +171,24 @@ const TransportAdService = {
                     paymentOptions: ad.paymentOptions,
                     truckId: ad.truckId,
                     truckName: ad.truckName,
-                    truckPhotoUrl: '', // Пустое поле для ссылки на фото
+                    truckPhotoUrl: ad.truckPhotoUrl,
                     transportType: ad.transportType,
                     loadingTypes: ad.loadingTypes,
                     truckWeight: ad.truckWeight,
                     truckHeight: ad.truckHeight,
                     truckWidth: ad.truckWidth,
                     truckDepth: ad.truckDepth,
+                    status: 'active', // Добавляем статус - мы сейчас всем сделаем активны, потом уже будем менять по ситуации
                 });
 
-                // Проверяем, есть ли файл в truckPhotoUrl
-                if (ad.truckPhotoUrl && ad.truckPhotoUrl instanceof File) {
-                    const photoUrl = await TransportAdService.uploadPhoto(
-                        ad.truckPhotoUrl
-                    ); // Загрузка фото и получение URL
-                    await update(newAdRef, { truckPhotoUrl: photoUrl }); // Обновляем ссылку на фото в объявлении
-                }
+                //!!! TODO Тужно быть аккуратней, кажется, что блок с фото удаляет ссылки. Проверяем, есть ли файл в truckPhotoUrl
+                // if (ad.truckPhotoUrl && ad.truckPhotoUrl instanceof File) {
+                //     const photoUrl = await uploadPhoto(
+                //         'truckPhotos',
+                //         ad.truckPhotoUrl
+                //     ); // Загрузка фото и получение URL
+                //     await update(newAdRef, { truckPhotoUrl: photoUrl }); // Обновляем ссылку на фото в объявлении
+                // }
 
                 return newAdRef.key; // Возвращаем id нового объявления, если нужно
             });
@@ -187,6 +198,7 @@ const TransportAdService = {
             console.error('Error uploading ads:', error);
         }
     },
+    //<<<----------------
 };
 
 export default TransportAdService;

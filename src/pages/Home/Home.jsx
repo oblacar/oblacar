@@ -25,6 +25,8 @@ function Home() {
 
     const handleUploadAds = async () => {
         await TransportAdService.uploadAdsToFirebase(ads); // Вызываем функцию загрузки из сервиса
+
+        // await TransportAdService.uploadAdsToFirebase(ads); // Вызываем функцию загрузки из сервиса
     };
 
     return (
@@ -51,6 +53,11 @@ function Home() {
                     водитель, проверенная ли машшина. 2. возле цены можно
                     заместить важную инфомрацию по оплате, кроме цены
                 </p> */}
+
+                {/* <button onClick={handleUploadAds}>
+                    Add ACTIVE for all ads
+                </button> */}
+
                 <TransportAdsList />
             </div>
         </>

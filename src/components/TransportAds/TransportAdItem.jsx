@@ -118,7 +118,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
     const handleMouseLeaveReviewAdsAdd = () => {
         setOnReviewAdsAdd(() => false);
     };
-    
+
     return (
         <div
             className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
