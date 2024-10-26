@@ -32,7 +32,7 @@ const TransportAdsList = () => {
                                 <TransportAdItem
                                     key={ad.adId || index}
                                     ad={ad}
-                                    rating={Math.floor(Math.random() * 50) / 10}
+                                    // rating={Math.floor(Math.random() * 50) / 10}
                                 />
                             )
                         );

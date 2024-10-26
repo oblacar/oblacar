@@ -287,9 +287,14 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
                         <div className='ad-user-name-rating'>
                             <div className='ad-user-name'>{ad.ownerName}</div>
-                            <div className='ad-user-rating'>
-                                ★ {ad.ownerRating}
-                            </div>
+
+                            {ad.ownerRating ? (
+                                <div className='ad-user-rating'>
+                                    ★ {ad.ownerRating}
+                                </div>
+                            ) : (
+                                ''
+                            )}
                         </div>
                     </div>
 
