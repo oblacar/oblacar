@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
+import TransportAdContext from '../../hooks/TransportAdContext';
 
 import IconHoverCard from './IconHoverCard';
 
@@ -50,6 +51,7 @@ const zero = {
 
 function IconDropdownMenuBar() {
     const { isAuthenticated, user } = useContext(AuthContext);
+    const { reviewAds } = useContext(TransportAdContext);
 
     const [iconNewAdCoordinates, setIconNewAdCoordinates] = useState(zero);
     const [iconUserCoordinates, setIconUserCoordinates] = useState(zero);
@@ -124,15 +126,25 @@ function IconDropdownMenuBar() {
                     iconCoordinates={iconCartCoordinates}
                     windowWidth={windowWidth}
                 />
-
-                <IconHoverCard
-                    type='Варианты'
-                    iconRef={iconOrdersRef}
-                    IconComponent={FaClipboardList}
-                    HoverCardComponent={HoverOrdersCard}
-                    iconCoordinates={iconOrdersCoordinates}
-                    windowWidth={windowWidth}
-                />
+                <div className={styles.iconContainerVariants}>
+                    <IconHoverCard
+                        type='Варианты'
+                        iconRef={iconOrdersRef}
+                        IconComponent={FaClipboardList}
+                        HoverCardComponent={HoverOrdersCard}
+                        iconCoordinates={iconOrdersCoordinates}
+                        windowWidth={windowWidth}
+                    />
+                    {reviewAds.length ? (
+                        <div className={styles.variantsCountContainer}>
+                            <div className={styles.variantsCount}>
+                                {reviewAds.length}
+                            </div>
+                        </div>
+                    ) : (
+                        ''
+                    )}
+                </div>
             </div>
         </>
     );

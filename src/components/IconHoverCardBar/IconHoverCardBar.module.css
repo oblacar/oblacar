@@ -18,9 +18,10 @@
     font-size: 22px;
 }
 
-.iconHover.iconHovered, .iconLabel.iconHovered {
+.iconHover.iconHovered,
+.iconLabel.iconHovered {
     /* color: #ff6600; */
-      color: #353093;
+    color: #353093;
 }
 .iconContainer {
     display: flex; /* Используем Flexbox для центрирования */
@@ -35,4 +36,29 @@
     color: gray; /* Серый цвет текста */
     margin-top: 5px; /* Отступ сверху от иконки */
     transition: color 0.2s ease; /* Плавный переход цвета */
+}
+
+.iconContainerVariants {
+    position: relative;
+    /* border: #293049 1px solid; */
+}
+.variantsCountContainer {
+    position: absolute;
+
+    left: 37px;
+    top: -8px;
+
+    min-width: 20px;
+    height: 20px;
+
+    background-color: #ff6600;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    /* padding: 0 3px; */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
