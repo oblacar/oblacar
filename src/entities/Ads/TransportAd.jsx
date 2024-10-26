@@ -2,6 +2,9 @@ export class TransportAd {
     constructor({
         adId,
         ownerId,
+        ownerName,
+        ownerPhotoUrl,
+        ownerRating,
         availabilityDate,
         departureCity,
         destinationCity,
@@ -21,6 +24,10 @@ export class TransportAd {
     }) {
         this.adId = adId; // уникальный идентификатор объявления
         this.ownerId = ownerId; // идентификатор владельца машины
+        this.ownerName = ownerName;
+        this.ownerPhotoUrl = ownerPhotoUrl;
+        this.ownerRating = ownerRating;
+
         // Детали маршрута
         this.availabilityDate = availabilityDate; // дата, когда машина доступна
         this.departureCity = departureCity; // город, где находится транспортное средство

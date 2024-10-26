@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+
+import AuthContext from '../../hooks/Authorization/AuthContext';
 
 import TransportAdItem from '../TransportAds/TransportAdItem';
 
@@ -15,23 +17,44 @@ import { TransportAd } from '../../entities/Ads/TransportAd';
 import './CreateTransportAd.css'; // Импортируйте файл стилей
 
 const CreateTransportAd = () => {
+    const { user } = useContext(AuthContext);
+
     const [formData, setFormData] = useState({
+        ownerId: '',
+        ownerName: '',
+        ownerPhotoUrl: '',
+        // ownerRating: user.userRating,
+        ownerRating: 0,
+
+        truckId: '',
         truckName: '',
-        truckPhoto: '',
-        height: '',
-        width: '',
-        depth: '',
-        weight: '',
+        truckPhotoUrl: '',
         transportType: '',
+        truckWeight: 0,
+        truckHeight: 0,
+        truckWidth: 0,
+        truckDepth: 0,
         loadingTypes: [], // массив возможных типов загрузки
         availabilityDate: '', // дата, когда машина доступна
         departureCity: '', // город, где находится транспортное средство
         destinationCity: '', // предполагаемое направление (если есть)
-        price: '', // стоимость перевозки
+        price: 0, // стоимость перевозки
         paymentUnit: '', // единица стоимости (тыс.руб, руб, руб/км и т.д.)
         readyToNegotiate: false, // готовность к торгу
         paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
     });
+
+    useEffect(() => {
+        if (user) {
+            setFormData((prev) => ({
+                ...prev,
+                ownerId: user.userId,
+                ownerName: user.userName,
+                ownerPhotoUrl: user.userPhoto,
+                ownerRating: user.userRating || 3.5, // Если у user нет рейтинга, по умолчанию 3.5
+            }));
+        }
+    }, [user]);
 
     const updateFormData = (newData) => {
         setFormData((prevState) => ({
@@ -46,23 +69,33 @@ const CreateTransportAd = () => {
         // Создание нового объекта транспортного объявления
         const newTransportAd = new TransportAd({
             adId: Date.now(), // TODO Пример генерации уникального ID
-            ownerId: 'user123', // TODO Замените на реальный ownerId
+
+            // ownerId: 'user123', // TODO Замените на реальный ownerId
+            ownerId: formData.ownerId,
+            ownerName: formData.ownerName,
+            ownerPhotoUrl: formData.ownerPhotoUrl,
+            // ownerRating: formData.userRating,
+            ownerRating: 3.5,
+
             availabilityDate: formData.availabilityDate,
             departureCity: formData.departureCity,
             destinationCity: formData.destinationCity,
+
             price: formData.price,
             paymentUnit: formData.paymentUnit,
             readyToNegotiate: formData.readyToNegotiate,
             paymentOptions: formData.paymentOptions,
+
             truckId: 'truck456', // TODO Замените на реальный truckId
             truckName: formData.truckName,
-            truckPhotoUrl: formData.truckPhoto,
+            truckPhotoUrl: formData.truckPhotoUrl,
             transportType: formData.transportType,
+
             loadingTypes: formData.loadingTypes,
-            truckWeight: formData.weight,
-            truckHeight: formData.height,
-            truckWidth: formData.width,
-            truckDepth: formData.depth,
+            truckWeight: formData.truckWeight,
+            truckHeight: formData.truckHeight,
+            truckWidth: formData.truckWidth,
+            truckDepth: formData.truckDepth,
         });
 
         console.log('Созданное объявление:', newTransportAd);

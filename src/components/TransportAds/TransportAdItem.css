@@ -215,14 +215,22 @@
     width: 50px;
     background-color: #ffffff;
     font-size: 20px;
-    
+
     display: flex;
     align-items: center;
-    justify-content: center; 
-    
+    justify-content: center;
+
     color: #d9d9d9;
     border-radius: 50%;
     margin-right: 5px;
+
+    overflow: hidden; /* Скрываем лишнее, если изображение больше круга */
+}
+
+.ad-photo-car-owner {
+    width: 100%; /* Задаем ширину и высоту изображения */
+    height: 100%;
+    object-fit: cover; /* Обеспечиваем обрезку изображения, чтобы оно заполнило круг */
 }
 
 .ad-user-name-rating {

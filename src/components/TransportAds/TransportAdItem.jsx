@@ -21,16 +21,15 @@ import { NumberSchema } from 'yup';
 //        * paymentUnit: '', // единица стоимости (тыс.руб, руб, руб/км и т.д.)
 //        * readyToNegotiate: false, // готовность к торгу
 //        * paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
-// Новые разделы:
-//      userName
+//        * userName
 //      userPhotoUrl
-//      userRating
+//        * userRating
 //}
 
 const TransportAdItem = ({ ad, rating, isViewMode }) => {
     const [truckValue, setTruckValue] = useState(0);
-    //добавление фото прямо из списка объявлений:
 
+    //добавление фото прямо из списка объявлений:
     const [onReviewAdsAdd, setOnReviewAdsAdd] = useState(false);
 
     const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -132,12 +131,11 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
             {/* <div className={`row ${rowColor}`}> */}
             <div className='row'>
                 <div className='upper-ad-row'>
-                    <div className='rating-star'>
-                        {/* TODO временная реализация отображения объявлений без рейтинга */}
+                    {/* <div className='rating-star'>
                         {rating < 2 ? null : (
                             <SingleRatingStar rating={rating} />
                         )}
-                    </div>
+                    </div> */}
                     <div className='departure-location-date'>
                         <div className='availability-date'>
                             {ad.availabilityDate}
@@ -217,7 +215,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                     <div className=' car-info'>
                         <span>
                             {ad.transportType ? `${ad.transportType}` : ''}
-                            {ad.weight ||
+                            {ad.truckWeight ||
                             ad.loadingTypes.length !== 0 ||
                             truckValue ? (
                                 <>{', '}</>
@@ -226,9 +224,9 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             )}
                         </span>
                         <span>
-                            {ad.weight ? (
+                            {ad.truckWeight ? (
                                 <>
-                                    <strong>{ad.weight}т</strong>,{' '}
+                                    <strong>{ad.truckWeight}т</strong>,{' '}
                                 </>
                             ) : (
                                 ''
@@ -273,10 +271,20 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             )}
                         </span>
                     </div>
+
                     <div className='ad-user-info'>
                         <div className='ad-user-photo'>
-                            <FaUser />
+                            {ad.ownerPhotoUrl ? ( // Проверяем, есть ли фото
+                                <img
+                                    src={ad.ownerPhotoUrl}
+                                    alt='Хозяин объявления'
+                                    className='ad-photo-car-owner'
+                                />
+                            ) : (
+                                <FaUser />
+                            )}
                         </div>
+
                         <div className='ad-user-name-rating'>
                             <div className='ad-user-name'>{ad.ownerName}</div>
                             <div className='ad-user-rating'>
@@ -284,10 +292,8 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             </div>
                         </div>
                     </div>
+
                     <div className='icon-item-ad-bar'>
-                        {/* <div className='icon-driver'>
-                            <FaUserCircle />
-                        </div> */}
                         <div
                             className={`container-icon-add ${
                                 isViewMode ? 'view-mode' : ''

@@ -15,8 +15,9 @@ const TransportSection = ({ updateFormData, formData }) => {
         if (files && files.length > 0) {
             const file = files[0];
             const reader = new FileReader();
+
             reader.onloadend = () => {
-                updateFormData({ truckPhoto: reader.result }); // Обновляем состояние с помощью updateFormData
+                updateFormData({ truckPhotoUrl: reader.result }); // Обновляем состояние с помощью updateFormData
             };
             reader.readAsDataURL(file);
         }
@@ -103,9 +104,9 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 }
                                 className='photo-circle'
                             >
-                                {formData.truckPhoto ? (
+                                {formData.truckPhotoUrl ? (
                                     <img
-                                        src={formData.truckPhoto}
+                                        src={formData.truckPhotoUrl}
                                         alt='Превью фото машины'
                                         className='photo-preview'
                                     />
@@ -175,8 +176,8 @@ const TransportSection = ({ updateFormData, formData }) => {
                             <input
                                 className='weight-input'
                                 type='number'
-                                name='weight'
-                                value={formData.weight}
+                                name='truckWeight'
+                                value={formData.truckWeight}
                                 onChange={handleInputChange}
                                 placeholder='Введите вес'
                                 min='0'
@@ -191,34 +192,34 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 <div className='dimension-item'>
                                     <input
                                         type='number'
-                                        name='height'
-                                        value={formData.height}
+                                        name='truckHeight'
+                                        value={formData.truckHeight}
                                         onChange={handleInputChange}
                                         placeholder='Высота'
                                         min='0'
-                                        step='0.01'
+                                        step='0.1'
                                     />
                                 </div>
                                 <div className='dimension-item'>
                                     <input
                                         type='number'
-                                        name='width'
-                                        value={formData.width}
+                                        name='truckWidth'
+                                        value={formData.truckWidth}
                                         onChange={handleInputChange}
                                         placeholder='Ширина'
                                         min='0'
-                                        step='0.01'
+                                        step='0.1'
                                     />
                                 </div>
                                 <div className='dimension-item'>
                                     <input
                                         type='number'
-                                        name='depth'
-                                        value={formData.depth}
+                                        name='truckDepth'
+                                        value={formData.truckDepth}
                                         onChange={handleInputChange}
                                         placeholder='Глубина'
                                         min='0'
-                                        step='0.01'
+                                        step='0.1'
                                     />
                                 </div>
                             </div>
