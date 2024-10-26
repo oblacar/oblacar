@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
 import { FaTruck, FaUser, FaUserCircle } from 'react-icons/fa';
 
+import TransportAdContext from '../../hooks/TransportAdContext';
+
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 import { NumberSchema } from 'yup';
 
@@ -26,7 +28,34 @@ import { NumberSchema } from 'yup';
 //        * userRating
 //}
 
-const TransportAdItem = ({ ad, rating, isViewMode }) => {
+const TransportAdItem = ({ ad, isViewMode }) => {
+    const { isInReviewAds } = ad;
+    const {
+        adId,
+        ownerId,
+        ownerName,
+        ownerPhotoUrl,
+        ownerRating,
+        availabilityDate,
+        departureCity,
+        destinationCity,
+        price,
+        paymentUnit,
+        readyToNegotiate,
+        paymentOptions,
+        truckId,
+        truckName,
+        truckPhotoUrl,
+        transportType,
+        loadingTypes,
+        truckWeight,
+        truckHeight,
+        truckWidth,
+        truckDepth,
+    } = ad.ad; // Деструктурируем из вложенного объекта ad.ad
+
+    const { removeReviewAd, addReviewAd } = useContext(TransportAdContext);
+
     const [truckValue, setTruckValue] = useState(0);
 
     //добавление фото прямо из списка объявлений:
@@ -53,15 +82,15 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
     };
 
     const handleClick = () => {
-        document.getElementById(`fileInput-${ad.adId}`).click(); // Программный клик по скрытому инпуту
+        document.getElementById(`fileInput-${adId}`).click(); // Программный клик по скрытому инпуту
     };
     //<----
 
     useEffect(() => {
-        if (ad.truckWidth && ad.truckHeight && ad.truckDepth) {
-            const tempWidth = Number(ad.truckWidth);
-            const tempHeight = Number(ad.truckHeight);
-            const tempDepth = Number(ad.truckDepth);
+        if (truckWidth && truckHeight && truckDepth) {
+            const tempWidth = Number(truckWidth);
+            const tempHeight = Number(truckHeight);
+            const tempDepth = Number(truckDepth);
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
@@ -72,20 +101,20 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
             setTruckValue(() => 0);
         }
     }, [
-        ad.transportType,
-        ad.truckWeight,
-        ad.truckWidth,
-        ad.truckHeight,
-        ad.truckDepth,
-        ad.loadingTypes,
+        transportType,
+        truckWeight,
+        truckWidth,
+        truckHeight,
+        truckDepth,
+        loadingTypes,
     ]);
 
     useEffect(() => {
         // console.log(ad);
-        if (ad.truckWidth && ad.truckHeight && ad.truckDepth) {
-            const tempWidth = Number(ad.truckWidth);
-            const tempHeight = Number(ad.truckHeight);
-            const tempDepth = Number(ad.truckDepth);
+        if (truckWidth && truckHeight && truckDepth) {
+            const tempWidth = Number(truckWidth);
+            const tempHeight = Number(truckHeight);
+            const tempDepth = Number(truckDepth);
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
@@ -138,35 +167,35 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                     </div> */}
                     <div className='departure-location-date'>
                         <div className='availability-date'>
-                            {ad.availabilityDate}
+                            {availabilityDate}
                         </div>
                         <div className='departure-location'>
                             <span className='departure location city'>
-                                {ad.departureCity}
+                                {departureCity}
                             </span>
                             <span className='destination city'>
-                                {ad.destinationCity || 'Россия'}
+                                {destinationCity || 'Россия'}
                             </span>
                         </div>
                     </div>
                     <div className='finance'>
                         <div className='price'>
-                            {formatNumber(ad.price)} {ad.paymentUnit}
+                            {formatNumber(price)} {paymentUnit}
                         </div>
                         <div className='finance-details'>
-                            {ad.paymentOptions && ad.paymentOptions.length > 0
-                                ? ad.paymentOptions.map((option, index) => (
+                            {paymentOptions && paymentOptions.length > 0
+                                ? paymentOptions.map((option, index) => (
                                       <span key={option}>
                                           {option}
-                                          {index < ad.paymentOptions.length - 1
+                                          {index < paymentOptions.length - 1
                                               ? ', '
                                               : ''}
                                       </span>
                                   ))
                                 : ''}
-                            {ad.readyToNegotiate && (
+                            {readyToNegotiate && (
                                 <span>
-                                    {ad.paymentOptions.length > 0 ? ', ' : ''}
+                                    {paymentOptions.length > 0 ? ', ' : ''}
                                     торг
                                 </span>
                             )}
@@ -175,9 +204,9 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                 </div>
                 <div className='down-ad-row'>
                     <div className='car-photo-icon'>
-                        {ad.truckPhotoUrl ? ( // Проверяем, есть ли фото
+                        {truckPhotoUrl ? ( // Проверяем, есть ли фото
                             <img
-                                src={ad.truckPhotoUrl}
+                                src={truckPhotoUrl}
                                 alt='Фото машины'
                                 className='photo-car' // Добавьте классы для стилизации
                             />
@@ -214,9 +243,9 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
                     <div className=' car-info'>
                         <span>
-                            {ad.transportType ? `${ad.transportType}` : ''}
-                            {ad.truckWeight ||
-                            ad.loadingTypes.length !== 0 ||
+                            {transportType ? `${transportType}` : ''}
+                            {truckWeight ||
+                            loadingTypes.length !== 0 ||
                             truckValue ? (
                                 <>{', '}</>
                             ) : (
@@ -224,9 +253,9 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             )}
                         </span>
                         <span>
-                            {ad.truckWeight ? (
+                            {truckWeight ? (
                                 <>
-                                    <strong>{ad.truckWeight}т</strong>,{' '}
+                                    <strong>{truckWeight}т</strong>,{' '}
                                 </>
                             ) : (
                                 ''
@@ -238,8 +267,8 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                                     <strong>
                                         {truckValue}м<sup>3</sup>
                                     </strong>
-                                    {` (${ad.truckWidth}м x ${ad.truckHeight}м x ${ad.truckDepth}м)`}
-                                    {ad.loadingTypes.length !== 0 ? (
+                                    {` (${truckWidth}м x ${truckHeight}м x ${truckDepth}м)`}
+                                    {loadingTypes.length !== 0 ? (
                                         <>{', '}</>
                                     ) : (
                                         ''
@@ -251,20 +280,17 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                         </span>
 
                         <span>
-                            {ad.loadingTypes.length !== 0 ? (
+                            {loadingTypes.length !== 0 ? (
                                 <>
                                     <strong>загрузка: </strong>
-                                    {ad.loadingTypes.map(
-                                        (loadingType, index) => (
-                                            <React.Fragment key={loadingType}>
-                                                {/* Используем React.Fragment для оборачивания */}
-                                                {loadingType}
-                                                {index <
-                                                    ad.loadingTypes.length -
-                                                        1 && ', '}
-                                            </React.Fragment>
-                                        )
-                                    )}
+                                    {loadingTypes.map((loadingType, index) => (
+                                        <React.Fragment key={loadingType}>
+                                            {/* Используем React.Fragment для оборачивания */}
+                                            {loadingType}
+                                            {index < loadingTypes.length - 1 &&
+                                                ', '}
+                                        </React.Fragment>
+                                    ))}
                                 </>
                             ) : (
                                 ''
@@ -274,9 +300,9 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
 
                     <div className='ad-user-info'>
                         <div className='ad-user-photo'>
-                            {ad.ownerPhotoUrl ? ( // Проверяем, есть ли фото
+                            {ownerPhotoUrl ? ( // Проверяем, есть ли фото
                                 <img
-                                    src={ad.ownerPhotoUrl}
+                                    src={ownerPhotoUrl}
                                     alt='Хозяин объявления'
                                     className='ad-photo-car-owner'
                                 />
@@ -286,11 +312,11 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                         </div>
 
                         <div className='ad-user-name-rating'>
-                            <div className='ad-user-name'>{ad.ownerName}</div>
+                            <div className='ad-user-name'>{ownerName}</div>
 
-                            {ad.ownerRating ? (
+                            {ownerRating ? (
                                 <div className='ad-user-rating'>
-                                    ★ {ad.ownerRating}
+                                    ★ {ownerRating}
                                 </div>
                             ) : (
                                 ''
@@ -305,11 +331,18 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             }`}
                         >
                             <div
-                                className='icon-add'
+                                className={`icon-add ${
+                                    isInReviewAds ? 'in-review-ads' : ''
+                                }`}
                                 onMouseEnter={handleMouseEnterReviewAdsAdd}
                                 onMouseLeave={handleMouseLeaveReviewAdsAdd}
+                                onClick={() => {
+                                    isInReviewAds
+                                        ? removeReviewAd(ad)
+                                        : addReviewAd(ad);
+                                }}
                             >
-                                Запомнить
+                                {isInReviewAds ? 'Убрать' : 'Запомнить'}
                             </div>
                         </div>
                     </div>

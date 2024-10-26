@@ -1,0 +1,5 @@
+.review-ad-item.inactive {
+    color: #999;
+    opacity: 0.6;
+    pointer-events: none; /* Чтобы пользователь не мог кликнуть */
+}

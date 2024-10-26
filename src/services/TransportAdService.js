@@ -24,19 +24,6 @@ import testAds from '../constants/testData.json'; // Импортируйте т
 const transportAdsRef = databaseRef(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
 
 const TransportAdService = {
-    // Метод для добавления нового объявления
-    // createAd: async (adData) => {
-    //     try {
-    //         const newAdRef = push(transportAdsRef); // Создает уникальный ключ для нового объявления
-    //         await set(newAdRef, adData); // Сохраняет данные в базе
-    //         return { id: newAdRef.key, ...adData }; // Возвращает объявление с ID
-    //     } catch (error) {
-    //         console.error('Ошибка при добавлении объявления: ', error);
-    //         throw new Error(
-    //             'Не удалось создать объявление. Попробуйте еще раз.'
-    //         );
-    //     }
-    // },
     //В режиме разработки не отправляем данные в базу
     // createAd: async (adData) => {
     //     // Здесь можно добавить логику для отправки данных в базу данных
@@ -63,7 +50,7 @@ const TransportAdService = {
             // Сохраняем объявление в базе данных по сгенерированному Firebase ID
             await set(newAdRef, adWithId);
 
-            console.log('Объявление успешно создано с ID:', adId);
+            // console.log('Объявление успешно создано с ID:', adId);
             return adWithId; // Возвращаем обновленное объявление с ID
         } catch (error) {
             console.error('Ошибка при создании объявления:', error);
@@ -232,6 +219,36 @@ const TransportAdService = {
         }
     },
     //<<<----------------
+
+    //ReviewAds methods--->>>
+    addReviewAd: async (userId, adId) => {
+        const userReviewAdsRef = db.ref(`userReviewAds/${userId}/ads`);
+        await userReviewAdsRef.transaction((currentAds) => {
+            if (currentAds) {
+                // Если объявления уже есть, добавляем новый adId
+                if (!currentAds.includes(adId)) {
+                    return [...currentAds, adId];
+                }
+            } else {
+                // Если нет, создаем новый массив
+                return [adId];
+            }
+            return currentAds;
+        });
+    },
+
+    removeReviewAd: async (userId, adId) => {
+        const userReviewAdsRef = db.ref(`userReviewAds/${userId}/ads`);
+        await userReviewAdsRef.transaction((currentAds) => {
+            if (currentAds) {
+                // Удаляем adId из массива
+                return currentAds.filter((id) => id !== adId);
+            }
+            return [];
+        });
+    },
+
+    //<<<---
 };
 
 export default TransportAdService;

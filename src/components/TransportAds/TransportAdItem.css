@@ -13,7 +13,7 @@
 }
 
 .ad-item:hover {
-    transform: scale(1.03); /* Увеличиваем карточку на 5% */
+    transform: scale(1.01); /* Увеличиваем карточку на 5% */
 }
 
 .ad-item.active:active {
@@ -283,9 +283,31 @@
     align-items: center; /* Вертикальное центрирование */
     transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
 }
-
 .icon-add:hover {
     background-color: #fc8135;
+    color: white;
+}
+
+.icon-add.in-review-ads {
+    /* background-color: #fe914d; */
+    /* background-color: #fdb181; */
+    background-color: #ffffff;
+
+    /* color: white; */
+    font-size: 14px;
+    height: 28px;
+    width: 90px;
+    border-radius: 16px;
+    border: 1px solid #293049;
+    /* float: right; */
+    color: #293049;
+    display: flex;
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
+}
+.icon-add.in-review-ads:hover {
+    background-color: #293049;
     color: white;
 }
 

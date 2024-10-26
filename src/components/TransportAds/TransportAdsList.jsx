@@ -30,7 +30,7 @@ const TransportAdsList = () => {
                         return (
                             ad && (
                                 <TransportAdItem
-                                    key={ad.adId || index}
+                                    key={ad.ad.adId || index}
                                     ad={ad}
                                     // rating={Math.floor(Math.random() * 50) / 10}
                                 />

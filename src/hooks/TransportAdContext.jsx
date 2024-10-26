@@ -19,7 +19,12 @@ export const TransportAdProvider = ({ children }) => {
             try {
                 const data = await TransportAdService.getAllAds();
 
-                setAds(data);
+                setAds(
+                    data.map((ad) => ({
+                        ad, // оригинальное объявление
+                        isInReviewAds: false, // по умолчанию не в "Вариантах". Позже пропишем проверку, когда сделаем коллекции
+                    }))
+                );
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -29,6 +34,25 @@ export const TransportAdProvider = ({ children }) => {
 
         fetchAds();
     }, []);
+
+    // Прямая выгрузка в объявление без расширения
+    // useEffect(() => {
+    //     const fetchAds = async () => {
+    //         setLoading(true);
+
+    //         try {
+    //             const data = await TransportAdService.getAllAds();
+
+    //             setAds(data);
+    //         } catch (err) {
+    //             setError(err.message);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchAds();
+    // }, []);
 
     // выгрузка из тестового файла --->>>
     // useEffect(() => {
@@ -65,6 +89,37 @@ export const TransportAdProvider = ({ children }) => {
         // Реализуйте логику удаления
     };
 
+    //ReviewAds methods --->>>
+    const addReviewAd = async (extAd) => {
+        try {
+            // Проверяем, есть ли уже объявление в списке
+            if (!reviewAds.some((ad) => ad.ad.adId === extAd.ad.adId)) {
+                extAd.isInReviewAds = true;
+
+                setReviewAds((prev) => [...prev, extAd]);
+
+                // Обновляем данные в Firebase для текущего пользователя
+                // await TransportAdService.addReviewAd(userId, adId);
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const removeReviewAd = async (extAd) => {
+        try {
+            extAd.isInReviewAds = false;
+
+            setReviewAds((prev) =>
+                prev.filter((ad) => ad.ad.adId !== extAd.ad.adId)
+            );
+            // await TransportAdService.removeReviewAd(userId, adId);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+    //<<<---
+
     return (
         <TransportAdContext.Provider
             value={{
@@ -74,6 +129,10 @@ export const TransportAdProvider = ({ children }) => {
                 addAd,
                 updateAd,
                 deleteAd,
+
+                reviewAds,
+                addReviewAd,
+                removeReviewAd,
             }}
         >
             {children}
