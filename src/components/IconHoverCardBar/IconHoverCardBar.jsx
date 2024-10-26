@@ -49,7 +49,7 @@ const zero = {
     right: 0,
 };
 
-function IconDropdownMenuBar() {
+function IconDropdownMenuBar({height}) {
     const { isAuthenticated, user } = useContext(AuthContext);
     const { reviewAds } = useContext(TransportAdContext);
 

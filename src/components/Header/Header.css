@@ -1,0 +1,91 @@
+/* src/components/Header/Header.module.css */
+.logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 1; /*Убедимся, что логотип выше других элементов */
+}
+
+.logo-image {
+    position: absolute; /* Абсолютное позиционирование */
+    top: 0; /* Верхняя часть логотипа касается верхней части header */
+    left: 30px;
+    height: 120px; /* Высота логотипа больше на 30% относительно header */
+    width: auto;
+    transform: translateY(-0%); /* Сдвигаем логотип вниз */
+    z-index: 11; /* Логотип выше остальных элементов */
+}
+
+.header {
+    width: 100%;
+    background-color: #f5f5f5; /* Цвет фона для header */
+    /* border: 1px blue solid; */
+    /* height: 900px; */
+    z-index: 5;
+}
+
+/* Верхняя полоса */
+.top-line {
+    padding: 10px 0;
+
+    /* display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10px; */
+    /*padding: 10px 20px; /* Отступы вокруг содержимого */
+    /* background-color: #76d2fd; /* Цвет фона верхней полосы */
+    background-color: #6abbf8;
+    z-index: 15;
+}
+
+.middle-thin-line {
+    height: 15px;
+    background-color: #5bccfc;
+    /* border-bottom: 3px dashed rgb(144, 143, 143); */
+}
+.middle-thin-line2 {
+    height: 15px;
+    background-color: #99dffb;
+}
+
+/* Нижняя полоса */
+/* Основной стиль для нижней полосы в header */
+.bottom-line {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 5px 3px 5px;
+
+    background-color: #d1f1ff;
+    /* transition: top 1.5s ease; */
+    /* transition: transform 0.3s ease-in-out; */
+    transition: transform 0.5s ease;
+}
+
+.fixed-bottom-line {
+    position: fixed;
+    top: -2px; /* Вверху экрана */
+    left: -10px;
+    width: 100%;
+    z-index: 10; /* На переднем плане */
+    background-color: #d1f1ff;
+    transform: translateY(0);
+}
+/* Полоса заполнителя */
+.header-padding {
+    height: 0;
+    /* transition: height 0.3s ease; */
+}
+
+/* Активная полоса заполнителя */
+.header-padding.visible {
+    height: 60px; /* Установите нужную высоту для заполнителя */
+}
+.icons-area {
+    display: flex;
+    gap: 20px;
+}
+
+.icons-area svg {
+    width: 20px;
+    height: 20px;
+}

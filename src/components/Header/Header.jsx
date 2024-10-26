@@ -1,19 +1,51 @@
 // src/components/Header/Header.js
 // Header - содержит три рабочих полосы и логотип
-
-import styles from './Header.module.css'; // Импортируем стили
+import React, { useEffect, useState, useRef } from 'react';
+import './Header.css'; // Импортируем стили
 
 import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';
 
 import { Link } from 'react-router-dom';
 
 const Header = () => {
+    const bottomLineRef = useRef(null);
+    const nextLineRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry.isIntersecting) {
+                    bottomLineRef.current.classList.add('fixed-bottom-line');
+                    document
+                        .querySelector('.header-padding')
+                        .classList.add('visible');
+                } else {
+                    bottomLineRef.current.classList.remove('fixed-bottom-line');
+                    document
+                        .querySelector('.header-padding')
+                        .classList.remove('visible');
+                }
+            },
+            { threshold: 0 }
+        );
+
+        if (nextLineRef.current) {
+            observer.observe(nextLineRef.current);
+        }
+
+        return () => {
+            if (nextLineRef.current) {
+                observer.unobserve(nextLineRef.current);
+            }
+        };
+    }, []);
+
     return (
-        <header className={styles.header}>
-            <div className={styles.topLine}>
-                <div className={styles.container}>
+        <header className='header'>
+            <div className='top-line'>
+                <div className='container'>
                     <Link to='/'>
-                        <div className={styles.logo}>
+                        <div className='logo'>
                             <img
                                 // src='/logo/logo-oblacar.png'
                                 // src='/logo/logo-oblacar2.png'
@@ -21,22 +53,24 @@ const Header = () => {
                                 // src='/logo/logo-oblacar4.png'
                                 src='/logo/logo-oblacar5.png'
                                 alt='Логотип'
-                                className={styles.logoImage}
+                                className='logo-image'
                             />
                         </div>
                     </Link>
                 </div>
             </div>
-            {/* <div className={styles.middleLine}>
-                <span className={styles.headerSlogan}>
-                    Облачная легкость в поиске, надежность в перевозке.
-                </span>
-            </div> */}
-            <div className={styles.middleThinLine}></div>
-            <div className={styles.middleThinLine2}></div>
-            <div className={styles.bottomLine}>
-                <IconDropdownMenuBar className={styles.iconsArea} />
+            <div className='middle-thin-line'></div>
+            <div
+                className='middle-thin-line2 next-line'
+                ref={nextLineRef}
+            ></div>
+            <div
+                className='bottom-line'
+                ref={bottomLineRef}
+            >
+                <IconDropdownMenuBar className='icons-area' />
             </div>
+            <div className='header-padding'></div>
         </header>
     );
 };
