@@ -145,22 +145,27 @@ const TransportAdService = {
     // Приходит в 4 этапа: все выгрузили, очистили, изменили и загрузили новую базу----->>>>
     uploadAdsToFirebase: async (ads) => {
         try {
-            const adsWithStatus = ads.map((ad) => ({
-                ...ad,
-                status: 'active', // Добавляем новое поле со статусом
-            }));
+            // const adsWithStatus = ads.map((ad) => ({
+            //     ...ad,
+            //     // Add new fields:
+            //     ownerName: '',
+            //     ownerPhotoUrl: '',
+            //     ownerRating: 0,
+            // }));
 
             const dbRef = databaseRef(db, 'transportAds'); // Создаем ссылку на узел "transportAds"
 
             // Очистка предыдущих данных (если нужно)
             await set(dbRef, null); // Очищаем узел перед загрузкой новых данных
 
-            const adsToUpload = adsWithStatus.map(async (ad) => {
-                const newAdRef = push(dbRef); // Создаем уникальный ключ для нового объявления
+            // const adsToUpload = adsWithStatus.map(async (ad) => {
+            const adsToUpload = ads.map(async (ad) => {
+                const newAdRef = push(dbRef); // Создаем уникальный ключ для нового объявления - если загружаем новое объявление, которого пока нет в базе
 
-                // Сохраняем объявление с пустым полем для ссылки на фото
+                // Сохраняем объявление с новыми полями
                 await set(newAdRef, {
-                    adId: newAdRef.key,
+                    // await set(ad.adId, {
+                    adId: ad.adId,
                     ownerId: ad.ownerId,
                     availabilityDate: ad.availabilityDate,
                     departureCity: ad.departureCity,
@@ -178,22 +183,28 @@ const TransportAdService = {
                     truckHeight: ad.truckHeight,
                     truckWidth: ad.truckWidth,
                     truckDepth: ad.truckDepth,
-                    status: 'active', // Добавляем статус - мы сейчас всем сделаем активны, потом уже будем менять по ситуации
+                    status: ad.status,
+                    // Новые поля:
+                    ownerName: ad.ownerName,
+                    ownerPhotoUrl: ad.ownerPhotoUrl,
+                    ownerRating: ad.ownerRating,
                 });
 
                 //!!! TODO Тужно быть аккуратней, кажется, что блок с фото удаляет ссылки. Проверяем, есть ли файл в truckPhotoUrl
-                // if (ad.truckPhotoUrl && ad.truckPhotoUrl instanceof File) {
-                //     const photoUrl = await uploadPhoto(
-                //         'truckPhotos',
-                //         ad.truckPhotoUrl
-                //     ); // Загрузка фото и получение URL
-                //     await update(newAdRef, { truckPhotoUrl: photoUrl }); // Обновляем ссылку на фото в объявлении
-                // }
+                if (ad.truckPhotoUrl && ad.truckPhotoUrl instanceof File) {
+                    const photoUrl = await uploadPhoto(
+                        'truckPhotos',
+                        ad.truckPhotoUrl
+                    ); // Загрузка фото и получение URL
+                    await update(newAdRef, { truckPhotoUrl: photoUrl }); // Обновляем ссылку на фото в объявлении
+                }
 
                 return newAdRef.key; // Возвращаем id нового объявления, если нужно
             });
 
             await Promise.all(adsToUpload); // Ждем завершения загрузки всех объявлений
+
+            console.log('База обновлена');
         } catch (error) {
             console.error('Error uploading ads:', error);
         }

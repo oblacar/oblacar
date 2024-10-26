@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
-import { FaTruck, FaUserCircle } from 'react-icons/fa';
+import { FaTruck, FaUser, FaUserCircle } from 'react-icons/fa';
 
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 import { NumberSchema } from 'yup';
@@ -21,6 +21,10 @@ import { NumberSchema } from 'yup';
 //        * paymentUnit: '', // единица стоимости (тыс.руб, руб, руб/км и т.д.)
 //        * readyToNegotiate: false, // готовность к торгу
 //        * paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
+// Новые разделы:
+//      userName
+//      userPhotoUrl
+//      userRating
 //}
 
 const TransportAdItem = ({ ad, rating, isViewMode }) => {
@@ -185,7 +189,7 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                             </div>
                         )}
                     </div>
-
+                    {/* В этом режиме можем добавить фото машины */}
                     {/* <div
                         className='car-photo-icon'
                         onClick={handleClick}
@@ -268,6 +272,17 @@ const TransportAdItem = ({ ad, rating, isViewMode }) => {
                                 ''
                             )}
                         </span>
+                    </div>
+                    <div className='ad-user-info'>
+                        <div className='ad-user-photo'>
+                            <FaUser />
+                        </div>
+                        <div className='ad-user-name-rating'>
+                            <div className='ad-user-name'>{ad.ownerName}</div>
+                            <div className='ad-user-rating'>
+                                ★ {ad.ownerRating}
+                            </div>
+                        </div>
                     </div>
                     <div className='icon-item-ad-bar'>
                         {/* <div className='icon-driver'>

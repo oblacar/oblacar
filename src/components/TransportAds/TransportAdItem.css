@@ -199,7 +199,60 @@
     padding-left: 5px;
     padding-top: 5px;
 }
+/*Инфомрация о пользователе--->>>*/
+.ad-user-info {
+    /* border: 1px solid black; */
 
+    display: flex;
+    align-items: center;
+
+    margin-left: 10px;
+}
+.ad-user-photo {
+    border: 1px solid rgb(238, 237, 237);
+
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff;
+    font-size: 20px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    
+    color: #d9d9d9;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.ad-user-name-rating {
+    /* border: 1px solid red; */
+    min-width: 100px;
+    /* height: 50px; */
+
+    /* display: flex;
+
+    align-items: center; */
+}
+.ad-user-rating {
+    /* border: 1px solid blue; */
+    /* height: 20px; */
+
+    font-size: 12px;
+    font-weight: 600;
+    color: rgb(114, 114, 114);
+    display: flex;
+}
+.ad-user-name {
+    /* border: 1px solid blueviolet; */
+    /* height: 30px; */
+
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    margin: 3px 0;
+}
+/*<<<---*/
 .icon-item-ad-bar {
     width: 100px;
 }

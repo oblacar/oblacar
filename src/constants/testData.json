@@ -17,7 +17,11 @@
         "truckWeight": 6.78,
         "truckHeight": 2.0,
         "truckWidth": 1.8,
-        "truckDepth": 1.5
+        "truckDepth": 1.5,
+        "ownerName": "Алексей",
+        "ownerPhotoUrl": "",
+        "ownerRating": 3.26,
+        "status": "active"
     },
     {
         "adId": "ad_2",
@@ -37,7 +41,11 @@
         "truckWeight": 8.5,
         "truckHeight": 2.5,
         "truckWidth": 1.9,
-        "truckDepth": 1.7
+        "truckDepth": 1.7,
+        "ownerName": "Иван",
+        "ownerPhotoUrl": "",
+        "ownerRating": 4.39,
+        "status": "active"
     },
     {
         "adId": "ad_3",
@@ -57,7 +65,11 @@
         "truckWeight": 5.25,
         "truckHeight": 2.2,
         "truckWidth": 1.85,
-        "truckDepth": 1.6
+        "truckDepth": 1.6,
+        "ownerName": "Махмуд",
+        "ownerPhotoUrl": "",
+        "ownerRating": 4.82,
+        "status": "active"
     },
     {
         "adId": "ad_4",
@@ -77,7 +89,11 @@
         "truckWeight": 7.4,
         "truckHeight": 2.0,
         "truckWidth": 1.75,
-        "truckDepth": 1.55
+        "truckDepth": 1.55,
+        "ownerName": "Фархот",
+        "ownerPhotoUrl": "",
+        "ownerRating": 3.15,
+        "status": "active"
     },
     {
         "adId": "ad_5",
@@ -97,7 +113,11 @@
         "truckWeight": 9.0,
         "truckHeight": 2.4,
         "truckWidth": 2.0,
-        "truckDepth": 1.8
+        "truckDepth": 1.8,
+        "ownerName": "Берендей",
+        "ownerPhotoUrl": "",
+        "ownerRating": 5.0,
+        "status": "active"
     },
     {
         "adId": "ad_6",
@@ -117,7 +137,11 @@
         "truckWeight": 4.5,
         "truckHeight": 2.1,
         "truckWidth": 1.95,
-        "truckDepth": 1.65
+        "truckDepth": 1.65,
+        "ownerName": "Андрей",
+        "ownerPhotoUrl": "",
+        "ownerRating": 1.25,
+        "status": "active"
     },
     {
         "adId": "ad_7",
@@ -137,7 +161,11 @@
         "truckWeight": 8.25,
         "truckHeight": 2.5,
         "truckWidth": 1.8,
-        "truckDepth": 1.7
+        "truckDepth": 1.7,
+        "ownerName": "Геннадий",
+        "ownerPhotoUrl": "",
+        "ownerRating": 4.2,
+        "status": "active"
     },
     {
         "adId": "ad_8",
@@ -157,7 +185,11 @@
         "truckWeight": 6.75,
         "truckHeight": 2.3,
         "truckWidth": 1.9,
-        "truckDepth": 1.6
+        "truckDepth": 1.6,
+        "ownerName": "Прокл",
+        "ownerPhotoUrl": "",
+        "ownerRating": 4.45,
+        "status": "active"
     },
     {
         "adId": "ad_9",
@@ -177,7 +209,11 @@
         "truckWeight": 7.1,
         "truckHeight": 2.2,
         "truckWidth": 1.85,
-        "truckDepth": 1.5
+        "truckDepth": 1.5,
+        "ownerName": "Зиновий",
+        "ownerPhotoUrl": "",
+        "ownerRating": 3.78,
+        "status": "active"
     },
     {
         "adId": "ad_10",
@@ -197,6 +233,10 @@
         "truckWeight": 5.9,
         "truckHeight": 2.15,
         "truckWidth": 1.95,
-        "truckDepth": 1.65
+        "truckDepth": 1.65,
+        "ownerName": "Борис",
+        "ownerPhotoUrl": "",
+        "ownerRating": 4.95,
+        "status": "active"
     }
 ]
