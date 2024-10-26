@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
+import TransportAdContext from '../../hooks/TransportAdContext';
 
 import TransportAdItem from '../TransportAds/TransportAdItem';
 
@@ -18,6 +19,7 @@ import './CreateTransportAd.css'; // Импортируйте файл стил�
 
 const CreateTransportAd = () => {
     const { user } = useContext(AuthContext);
+    const { addAd } = useContext(TransportAdContext);
 
     const [formData, setFormData] = useState({
         ownerId: '',
@@ -86,7 +88,7 @@ const CreateTransportAd = () => {
             readyToNegotiate: formData.readyToNegotiate,
             paymentOptions: formData.paymentOptions,
 
-            truckId: 'truck456', // TODO Замените на реальный truckId
+            truckId: Date.now(), // TODO Замените на реальный truckId
             truckName: formData.truckName,
             truckPhotoUrl: formData.truckPhotoUrl,
             transportType: formData.transportType,
@@ -100,7 +102,12 @@ const CreateTransportAd = () => {
 
         console.log('Созданное объявление:', newTransportAd);
         // Здесь вы можете отправить данные в базу данных позже
+
+        addAd(newTransportAd);
     };
+
+
+
 
     return (
         <form

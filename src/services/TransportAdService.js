@@ -38,17 +38,39 @@ const TransportAdService = {
     //     }
     // },
     //В режиме разработки не отправляем данные в базу
-    createAd: async (adData) => {
-        // Здесь можно добавить логику для отправки данных в базу данных
-        console.log('Создание нового объявления о транспорте:', adData);
+    // createAd: async (adData) => {
+    //     // Здесь можно добавить логику для отправки данных в базу данных
+    //     console.log('Создание нового объявления о транспорте:', adData);
 
-        // Пример имитации задержки
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve('Объявление успешно создано!');
-            }, 1000);
-        });
+    //     // Пример имитации задержки TODO нужно будет убрать
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             resolve('Объявление успешно создано!');
+    //         }, 1000);
+    //     });
+    // },
+
+    // Метод для создания объявления с использованием ID от Firebase
+    createAd: async (adData) => {
+        try {
+            // Создаем ссылку на новый узел в базе данных и добавляем данные с уникальным ключом
+            const newAdRef = push(databaseRef(db, 'transportAds'));
+            const adId = newAdRef.key; // Получаем уникальный ID
+
+            // Добавляем adId в объект объявления
+            const adWithId = { ...adData, adId };
+
+            // Сохраняем объявление в базе данных по сгенерированному Firebase ID
+            await set(newAdRef, adWithId);
+
+            console.log('Объявление успешно создано с ID:', adId);
+            return adWithId; // Возвращаем обновленное объявление с ID
+        } catch (error) {
+            console.error('Ошибка при создании объявления:', error);
+            throw error;
+        }
     },
+
     // В будущем можно добавить больше методов, таких как:
     // fetchTransports, updateTransportAd и т.д.
 
