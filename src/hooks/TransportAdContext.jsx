@@ -3,37 +3,99 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import TransportAdService from '../services/TransportAdService';
 import UserReviewAdService from '../services/UserReviewAdService';
 
+import AuthContext from './Authorization/AuthContext';
+
 const TransportAdContext = createContext();
 
 export const TransportAdProvider = ({ children }) => {
+    const { user } = useContext(AuthContext);
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [reviewAds, setReviewAds] = useState([]);
 
-    //закоментим подкрузку объявлений из базы. Временно, для отладки.
+    // загрузка объявлений после получения базы отмеченных объявлений:
+
     useEffect(() => {
-        const fetchAds = async () => {
-            setLoading(true);
+        if (user) {
+            const fetchInitialData = async () => {
+                setLoading(true);
 
-            try {
-                const data = await TransportAdService.getAllAds();
+                try {
+                    // Загружаем reviewAds и сохраняем
+                    const initialReviewAds =
+                        await TransportAdService.getReviewAds(user.userId);
 
-                setAds(
-                    data.map((ad) => ({
-                        ad, // оригинальное объявление
-                        isInReviewAds: false, // по умолчанию не в "Вариантах". Позже пропишем проверку, когда сделаем коллекции
-                    }))
-                );
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+                    // Преобразуем initialReviewAds в массив ключей
+                    const reviewAdsArray = initialReviewAds
+                        ? Object.keys(initialReviewAds)
+                        : [];
 
-        fetchAds();
+                    // Загружаем объявления
+                    let enhancedAds;
+
+                    if (ads.length === 0) {
+                        const adsData = await TransportAdService.getAllAds();
+
+                        // Назначаем каждому объявлению статус isInReviewAds на основе reviewAds
+                        enhancedAds = adsData.map((ad) => ({
+                            ad,
+                            isInReviewAds: reviewAdsArray.includes(ad.adId),
+                        }));
+                    } else {
+                        enhancedAds = ads.map((ad) => ({
+                            ad,
+                            isInReviewAds: reviewAdsArray.includes(ad.adId),
+                        }));
+                    }
+
+                    setAds(() => enhancedAds);
+
+                    const reviewAds = enhancedAds.filter(
+                        (extAd) => extAd.isInReviewAds === true
+                    );
+
+                    setReviewAds(() => reviewAds);
+                } catch (err) {
+                    console.error('Ошибка при загрузке данных:', err);
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchInitialData();
+        }
+    }, [user]);
+
+    //Выгружаем всю база и оборачиваем при начале сессии
+    useEffect(() => {
+        if (
+            !localStorage.getItem('authToken') &&
+            !localStorage.getItem('authEmail')
+        ) {
+            const fetchAds = async () => {
+                setLoading(true);
+
+                try {
+                    const data = await TransportAdService.getAllAds();
+
+                    setAds(
+                        data.map((ad) => ({
+                            ad, // оригинальное объявление
+                            isInReviewAds: false, // по умолчанию не в "Вариантах". Позже пропишем проверку, когда сделаем коллекции
+                        }))
+                    );
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchAds();
+        }
     }, []);
 
     // Прямая выгрузка в объявление без расширения
@@ -96,7 +158,7 @@ export const TransportAdProvider = ({ children }) => {
         setReviewAds(ads);
     };
 
-    const addReviewAd = async (userId,extAd) => {
+    const addReviewAd = async (userId, extAd) => {
         try {
             // Проверяем, есть ли уже объявление в списке
             if (!reviewAds.some((ad) => ad.ad.adId === extAd.ad.adId)) {

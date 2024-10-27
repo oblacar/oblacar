@@ -53,10 +53,6 @@ const Header = () => {
                     <Link to='/'>
                         <div className='logo'>
                             <img
-                                // src='/logo/logo-oblacar.png'
-                                // src='/logo/logo-oblacar2.png'
-                                // src='/logo/logo-oblacar3.png'
-                                // src='/logo/logo-oblacar4.png'
                                 src='/logo/logo-oblacar5.png'
                                 alt='Логотип'
                                 className='logo-image'
@@ -74,9 +70,9 @@ const Header = () => {
                 className='bottom-line'
                 ref={bottomLineRef}
             >
-                <div className='container-logo-mini'>
-                    {isNarrowHeader ? (
-                        <Link to='/'>
+                {isNarrowHeader ? (
+                    <Link to='/'>
+                        <div className='container-logo-mini'>
                             <div className='logo-mini'>
                                 <img
                                     src='/logo/logo-oblacar-mini.png'
@@ -84,11 +80,11 @@ const Header = () => {
                                     className='logo-image-mini'
                                 />
                             </div>
-                        </Link>
-                    ) : (
-                        ''
-                    )}
-                </div>
+                        </div>
+                    </Link>
+                ) : (
+                    ''
+                )}
 
                 <IconDropdownMenuBar className='icons-area' />
             </div>

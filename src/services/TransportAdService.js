@@ -222,7 +222,11 @@ const TransportAdService = {
 
     //ReviewAds methods--->>>
     addReviewAd: async (userId, adId) => {
-        const userReviewAdsRef = db.ref(`userReviewAds/${userId}/ads`);
+        const userReviewAdsRef = databaseRef(
+            db,
+            `userReviewAds/${userId}/reviewAds`
+        );
+
         await userReviewAdsRef.transaction((currentAds) => {
             if (currentAds) {
                 // Если объявления уже есть, добавляем новый adId
@@ -238,7 +242,11 @@ const TransportAdService = {
     },
 
     removeReviewAd: async (userId, adId) => {
-        const userReviewAdsRef = db.ref(`userReviewAds/${userId}/ads`);
+        const userReviewAdsRef = databaseRef(
+            db,
+            `userReviewAds/${userId}/reviewAds`
+        );
+
         await userReviewAdsRef.transaction((currentAds) => {
             if (currentAds) {
                 // Удаляем adId из массива
@@ -248,6 +256,24 @@ const TransportAdService = {
         });
     },
 
+    getReviewAds: async (userId) => {
+        try {
+            const reviewAdsRef = databaseRef(
+                db,
+                `userReviewAds/${userId}/reviewAds`
+            ); // Обращаемся к нужному пути
+
+            const snapshot = await get(reviewAdsRef);
+            if (snapshot.exists()) {
+                return snapshot.val(); // Вернет массив ID объявлений из базы
+            } else {
+                return []; // Если данных нет, возвращаем пустой массив
+            }
+        } catch (error) {
+            console.error('Ошибка при получении userReviewAds:', error);
+            throw error;
+        }
+    },
     //<<<---
 };
 

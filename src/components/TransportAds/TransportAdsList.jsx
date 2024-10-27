@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import TransportAdContext from '../../hooks/TransportAdContext';
 import TransportAdItem from './TransportAdItem';
 import styles from './TransportAdsList.module.css';
@@ -19,6 +19,7 @@ const TransportAdsList = () => {
     // const getRandomRating = () => {
     //     return Math.floor(Math.random() * 50) / 10;
     // };
+
 
     return (
         <div className={styles.adsListContainer}>
