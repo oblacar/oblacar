@@ -1,0 +1,54 @@
+.preview-review-ad-item {
+    display: flex;
+    /* border: 1px rgb(143, 162, 204) solid; */
+    margin-bottom: 5px;
+    padding: 10px 30px 10px 10px;
+
+    /* border-radius: 5px; */
+    border-top: 3px solid rgb(216, 222, 242);
+    /* border-top:1px solid rgb(242, 245, 254); */
+    /* background-color: rgb(255, 249, 239); */
+    cursor: pointer;
+}
+.preview-review-ad-item:last-child {
+    border-bottom: 3px solid rgb(216, 222, 242);
+    padding-bottom: 15px;
+}
+
+.preview-review-ad-item-route {
+    margin-right: auto;
+}
+
+.preview-review-ad-item-date {
+    font-weight: 600;
+    color: black;
+}
+
+.preview-review-ad-item-city {
+}
+
+.preview-review-ad-item-payment {
+    position: relative;
+}
+
+.preview-review-ad-item-price {
+    text-align: right;
+    font-weight: 600;
+    color: black;
+}
+
+.preview-review-ad-item-payment-unit {
+    text-align: right;
+    color: grey;
+}
+
+.preview-review-ad-item-delete-icon{
+    position: absolute;
+    right: -30px;
+    top: -5px;
+    color: rgb(255, 183, 183);
+}
+.preview-review-ad-item-delete-icon:hover{
+
+    color: rgb(255, 1, 1);
+}

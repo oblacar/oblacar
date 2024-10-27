@@ -18,3 +18,7 @@ export const uploadPhoto = async (path, file) => {
 };
 
 // Здесь можно добавлять другие полезные функции
+// Функция для добавления пробелов между тысячами
+export const formatNumber = (value) => {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};

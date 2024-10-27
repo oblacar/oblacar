@@ -158,7 +158,7 @@ export const TransportAdProvider = ({ children }) => {
         setReviewAds(ads);
     };
 
-    const addReviewAd = async (userId, extAd) => {
+    const addReviewAd = async (extAd) => {
         try {
             // Проверяем, есть ли уже объявление в списке
             if (!reviewAds.some((ad) => ad.ad.adId === extAd.ad.adId)) {
@@ -169,14 +169,14 @@ export const TransportAdProvider = ({ children }) => {
                 // Обновляем данные в Firebase для текущего пользователя
                 const adId = extAd.ad.adId;
 
-                await UserReviewAdService.addReviewAd(userId, adId);
+                await UserReviewAdService.addReviewAd(user.userId, adId);
             }
         } catch (err) {
             setError(err.message);
         }
     };
 
-    const removeReviewAd = async (userId, extAd) => {
+    const removeReviewAd = async (extAd) => {
         try {
             extAd.isInReviewAds = false;
 
@@ -186,7 +186,7 @@ export const TransportAdProvider = ({ children }) => {
 
             const adId = extAd.ad.adId;
 
-            await UserReviewAdService.removeReviewAd(userId, adId);
+            await UserReviewAdService.removeReviewAd(user.userId, adId);
         } catch (err) {
             setError(err.message);
         }

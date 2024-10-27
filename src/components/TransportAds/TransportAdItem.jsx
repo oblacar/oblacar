@@ -340,8 +340,8 @@ const TransportAdItem = ({ ad, isViewMode }) => {
                                 onMouseLeave={handleMouseLeaveReviewAdsAdd}
                                 onClick={() => {
                                     isInReviewAds
-                                        ? removeReviewAd(user.userId, ad)
-                                        : addReviewAd(user.userId, ad);
+                                        ? removeReviewAd(ad)
+                                        : addReviewAd(ad);
                                 }}
                             >
                                 {isInReviewAds ? 'Убрать' : 'Запомнить'}
