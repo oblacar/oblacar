@@ -3,6 +3,7 @@ import './TransportAdItem.css';
 import { FaTruck, FaUser, FaUserCircle } from 'react-icons/fa';
 
 import TransportAdContext from '../../hooks/TransportAdContext';
+import AuthContext from '../../hooks/Authorization/AuthContext';
 
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 import { NumberSchema } from 'yup';
@@ -55,6 +56,7 @@ const TransportAdItem = ({ ad, isViewMode }) => {
     } = ad.ad; // Деструктурируем из вложенного объекта ad.ad
 
     const { removeReviewAd, addReviewAd } = useContext(TransportAdContext);
+    const { user } = useContext(AuthContext);
 
     const [truckValue, setTruckValue] = useState(0);
 
@@ -338,8 +340,8 @@ const TransportAdItem = ({ ad, isViewMode }) => {
                                 onMouseLeave={handleMouseLeaveReviewAdsAdd}
                                 onClick={() => {
                                     isInReviewAds
-                                        ? removeReviewAd(ad)
-                                        : addReviewAd(ad);
+                                        ? removeReviewAd(user.userId, ad)
+                                        : addReviewAd(user.userId, ad);
                                 }}
                             >
                                 {isInReviewAds ? 'Убрать' : 'Запомнить'}

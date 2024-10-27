@@ -1,6 +1,7 @@
 // src/hooks/TransportAd/TransportAdContext.js
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import TransportAdService from '../services/TransportAdService';
+import UserReviewAdService from '../services/UserReviewAdService';
 
 const TransportAdContext = createContext();
 
@@ -90,7 +91,12 @@ export const TransportAdProvider = ({ children }) => {
     };
 
     //ReviewAds methods --->>>
-    const addReviewAd = async (extAd) => {
+    const loadReviewAds = async (userId) => {
+        const ads = await UserReviewAdService.getUserReviewAds(userId);
+        setReviewAds(ads);
+    };
+
+    const addReviewAd = async (userId,extAd) => {
         try {
             // Проверяем, есть ли уже объявление в списке
             if (!reviewAds.some((ad) => ad.ad.adId === extAd.ad.adId)) {
@@ -99,21 +105,26 @@ export const TransportAdProvider = ({ children }) => {
                 setReviewAds((prev) => [...prev, extAd]);
 
                 // Обновляем данные в Firebase для текущего пользователя
-                // await TransportAdService.addReviewAd(userId, adId);
+                const adId = extAd.ad.adId;
+
+                await UserReviewAdService.addReviewAd(userId, adId);
             }
         } catch (err) {
             setError(err.message);
         }
     };
 
-    const removeReviewAd = async (extAd) => {
+    const removeReviewAd = async (userId, extAd) => {
         try {
             extAd.isInReviewAds = false;
 
             setReviewAds((prev) =>
                 prev.filter((ad) => ad.ad.adId !== extAd.ad.adId)
             );
-            // await TransportAdService.removeReviewAd(userId, adId);
+
+            const adId = extAd.ad.adId;
+
+            await UserReviewAdService.removeReviewAd(userId, adId);
         } catch (err) {
             setError(err.message);
         }
@@ -131,6 +142,7 @@ export const TransportAdProvider = ({ children }) => {
                 deleteAd,
 
                 reviewAds,
+                loadReviewAds,
                 addReviewAd,
                 removeReviewAd,
             }}

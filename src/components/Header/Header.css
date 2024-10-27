@@ -16,6 +16,16 @@
     z-index: 11; /* Логотип выше остальных элементов */
 }
 
+.logo-image-mini{
+    position: absolute; /* Абсолютное позиционирование */
+    top: 3px; /* Верхняя часть логотипа касается верхней части header */
+    left: 30px;
+    height: 55px; /* Высота логотипа больше на 30% относительно header */
+    width: auto;
+    transform: translateY(-0%); /* Сдвигаем логотип вниз */
+    z-index: 11; /* Логотип выше остальных элементов */
+}
+
 .header {
     width: 100%;
     background-color: #f5f5f5; /* Цвет фона для header */

@@ -5,9 +5,11 @@ import './Header.css'; // Импортируем стили
 
 import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';
 
-import { Link } from 'react-router-dom';
+import { Link, useAsyncError } from 'react-router-dom';
 
 const Header = () => {
+    const [isNarrowHeader, setIsNarrowHeader] = useState(false);
+
     const bottomLineRef = useRef(null);
     const nextLineRef = useRef(null);
 
@@ -19,11 +21,15 @@ const Header = () => {
                     document
                         .querySelector('.header-padding')
                         .classList.add('visible');
+
+                    setIsNarrowHeader(() => true);
                 } else {
                     bottomLineRef.current.classList.remove('fixed-bottom-line');
                     document
                         .querySelector('.header-padding')
                         .classList.remove('visible');
+
+                    setIsNarrowHeader(() => false);
                 }
             },
             { threshold: 0 }
@@ -68,6 +74,22 @@ const Header = () => {
                 className='bottom-line'
                 ref={bottomLineRef}
             >
+                <div className='container-logo-mini'>
+                    {isNarrowHeader ? (
+                        <Link to='/'>
+                            <div className='logo-mini'>
+                                <img
+                                    src='/logo/logo-oblacar-mini.png'
+                                    alt='Логотип'
+                                    className='logo-image-mini'
+                                />
+                            </div>
+                        </Link>
+                    ) : (
+                        ''
+                    )}
+                </div>
+
                 <IconDropdownMenuBar className='icons-area' />
             </div>
             <div className='header-padding'></div>
