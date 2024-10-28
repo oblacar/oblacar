@@ -46,26 +46,41 @@ export const TransportAdProvider = ({ children }) => {
         let remainingReviewAds = new Set(reviewAds);
         const enhancedAds = []; // Массив для расширенных объявлений
         const foundAds = []; // Массив для найденных отмеченных объявлений
-        // const remainingAds = [...reviewAds]; // Копируем исходный массив для хранения оставшихся объявлений
+
+        const isAdsStructure = (ad) => {
+            const requiredKeys = ['isInReviewAds']; // Здесь перечислите нужные ключи
+
+            return requiredKeys.every((key) => ad.hasOwnProperty(key));
+        };
+        const isAdsExtended = isAdsStructure(ads[0]);
+
+        console.log('isAdsExtended: ', isAdsExtended);
 
         for (let ad of ads) {
-            // Если нашли все отмеченные объявления, завершаем цикл
+            let newExtAd;
 
-            let isInReviewAds = false;
+            if (isAdsExtended) {
+                newExtAd = ad;
 
-            let newExtAd = {
-                ad,
-                isInReviewAds: isInReviewAds,
-            };
+                newExtAd = {
+                    ...ad,
+                    isInReviewAds: false,
+                };
+            } else {
+                newExtAd = {
+                    ad,
+                    isInReviewAds: false,
+                };
+            }
 
             if (remainingReviewAds.size > 0) {
-                isInReviewAds = remainingReviewAds.has(ad.adId);
+                const isInReviewAds = remainingReviewAds.has(newExtAd.ad.adId);
 
                 if (isInReviewAds) {
                     newExtAd.isInReviewAds = true;
 
                     foundAds.push(newExtAd);
-                    remainingReviewAds.delete(ad.adId);
+                    remainingReviewAds.delete(newExtAd.ad.adId);
                 }
             }
 
@@ -80,6 +95,23 @@ export const TransportAdProvider = ({ children }) => {
     }
 
     useEffect(() => {
+        if (
+            !localStorage.getItem('authToken') &&
+            !localStorage.getItem('authEmail')
+        ) {
+            // Обновляем все объявления, чтобы сбросить isInReviewAds
+            setAds((ads) =>
+                ads.map((ad) => ({
+                    ...ad, // Копируем объявление
+                    isInReviewAds: false, // Сбрасываем статус
+                }))
+            );
+
+            // Очищаем список вариантов
+            setReviewAds([]);
+            return;
+        }
+
         if (!user) return;
 
         const fetchInitialData = async () => {
@@ -90,6 +122,8 @@ export const TransportAdProvider = ({ children }) => {
                 const initialReviewAds = await TransportAdService.getReviewAds(
                     user.userId
                 );
+
+                console.log(initialReviewAds);
 
                 // Преобразуем initialReviewAds в массив ключей
                 const reviewAdsArray = initialReviewAds
@@ -114,6 +148,8 @@ export const TransportAdProvider = ({ children }) => {
                         ads,
                         reviewAdsArray
                     );
+
+                    console.log('without exit');
 
                     setAds(enhancedAds);
                     setReviewAds(foundAds);
