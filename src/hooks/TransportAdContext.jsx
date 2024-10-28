@@ -16,57 +16,117 @@ export const TransportAdProvider = ({ children }) => {
     const [reviewAds, setReviewAds] = useState([]);
 
     // загрузка объявлений после получения базы отмеченных объявлений:
+    //Оптимизированный метод сверки объявлений с отмеченными
+    function markReviewAds(ads, reviewAds) {
+        let remainingReviewAds = new Set(reviewAds); // Преобразуем в Set для быстрого поиска
+        const enhancedAds = []; // Массив для расширенных объявлений
 
-    useEffect(() => {
-        if (user) {
-            const fetchInitialData = async () => {
-                setLoading(true);
+        for (let ad of ads) {
+            let isInReviewAds = false;
 
-                try {
-                    // Загружаем reviewAds и сохраняем
-                    const initialReviewAds =
-                        await TransportAdService.getReviewAds(user.userId);
+            if (remainingReviewAds.size > 0) {
+                isInReviewAds = remainingReviewAds.has(ad.adId);
+            }
 
-                    // Преобразуем initialReviewAds в массив ключей
-                    const reviewAdsArray = initialReviewAds
-                        ? Object.keys(initialReviewAds)
-                        : [];
+            // Добавляем расширенное объявление в массив
+            enhancedAds.push({
+                ad, // Само объявление
+                isInReviewAds: isInReviewAds, // Флаг наличия в списке отмеченных
+            });
 
-                    // Загружаем объявления
-                    let enhancedAds;
+            // Убираем найденное объявление из оставшихся
+            if (isInReviewAds) {
+                remainingReviewAds.delete(ad.adId);
+            }
+        }
+        return enhancedAds; // Возвращаем массив расширенных объявлений
+    }
 
-                    if (ads.length === 0) {
-                        const adsData = await TransportAdService.getAllAds();
+    function processAds(ads, reviewAds) {
+        let remainingReviewAds = new Set(reviewAds);
+        const enhancedAds = []; // Массив для расширенных объявлений
+        const foundAds = []; // Массив для найденных отмеченных объявлений
+        // const remainingAds = [...reviewAds]; // Копируем исходный массив для хранения оставшихся объявлений
 
-                        // Назначаем каждому объявлению статус isInReviewAds на основе reviewAds
-                        enhancedAds = adsData.map((ad) => ({
-                            ad,
-                            isInReviewAds: reviewAdsArray.includes(ad.adId),
-                        }));
-                    } else {
-                        enhancedAds = ads.map((ad) => ({
-                            ad,
-                            isInReviewAds: reviewAdsArray.includes(ad.adId),
-                        }));
-                    }
+        for (let ad of ads) {
+            // Если нашли все отмеченные объявления, завершаем цикл
 
-                    setAds(() => enhancedAds);
+            let isInReviewAds = false;
 
-                    const reviewAds = enhancedAds.filter(
-                        (extAd) => extAd.isInReviewAds === true
-                    );
-
-                    setReviewAds(() => reviewAds);
-                } catch (err) {
-                    console.error('Ошибка при загрузке данных:', err);
-                    setError(err.message);
-                } finally {
-                    setLoading(false);
-                }
+            let newExtAd = {
+                ad,
+                isInReviewAds: isInReviewAds,
             };
 
-            fetchInitialData();
+            if (remainingReviewAds.size > 0) {
+                isInReviewAds = remainingReviewAds.has(ad.adId);
+
+                if (isInReviewAds) {
+                    newExtAd.isInReviewAds = true;
+
+                    foundAds.push(newExtAd);
+                    remainingReviewAds.delete(ad.adId);
+                }
+            }
+
+            // Добавляем расширенное объявление
+            enhancedAds.push(newExtAd);
         }
+
+        return {
+            enhancedAds,
+            foundAds,
+        };
+    }
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchInitialData = async () => {
+            setLoading(true);
+
+            try {
+                // Загружаем reviewAds и сохраняем
+                const initialReviewAds = await TransportAdService.getReviewAds(
+                    user.userId
+                );
+
+                // Преобразуем initialReviewAds в массив ключей
+                const reviewAdsArray = initialReviewAds
+                    ? Object.keys(initialReviewAds)
+                    : [];
+
+                if (ads.length === 0) {
+                    const adsData = await TransportAdService.getAllAds();
+
+                    // Назначаем каждому объявлению статус isInReviewAds на основе reviewAds
+                    // enhancedAds = markReviewAds(adsData, reviewAdsArray);
+                    const { enhancedAds, foundAds } = processAds(
+                        adsData,
+                        reviewAdsArray
+                    );
+
+                    setAds(enhancedAds);
+                    setReviewAds(foundAds);
+                } else {
+                    // enhancedAds = markReviewAds(ads, reviewAdsArray);
+                    const { enhancedAds, foundAds } = processAds(
+                        ads,
+                        reviewAdsArray
+                    );
+
+                    setAds(enhancedAds);
+                    setReviewAds(foundAds);
+                }
+            } catch (err) {
+                console.error('Ошибка при загрузке данных:', err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
     }, [user]);
 
     //Выгружаем всю база и оборачиваем при начале сессии
