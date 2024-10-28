@@ -13,7 +13,8 @@
 }
 
 .ad-item:hover {
-    transform: scale(1.01); /* Увеличиваем карточку на 5% */
+    /* transform: scale(1.01); */
+    border: 1px solid rgb(148, 148, 234);
 }
 
 .ad-item.active:active {

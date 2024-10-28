@@ -5,6 +5,8 @@ import { FaTruck, FaUser, FaUserCircle } from 'react-icons/fa';
 import TransportAdContext from '../../hooks/TransportAdContext';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 
+import ToggleIconButtonPlus from '../common/ToggleIconButtonPlus/ToggleIconButtonPlus';
+
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 import { NumberSchema } from 'yup';
 
@@ -151,6 +153,14 @@ const TransportAdItem = ({ ad, isViewMode }) => {
     };
     const handleMouseLeaveReviewAdsAdd = () => {
         setOnReviewAdsAdd(() => false);
+    };
+
+    const handleToggle = (isAdded) => {
+        if (isAdded) {
+            addReviewAd(ad);
+        } else {
+            removeReviewAd(ad);
+        }
     };
 
     return (
@@ -332,7 +342,17 @@ const TransportAdItem = ({ ad, isViewMode }) => {
                                 isViewMode ? 'view-mode' : ''
                             }`}
                         >
+                           
                             <div
+                                onMouseLeave={handleMouseLeaveReviewAdsAdd}
+                                onMouseEnter={handleMouseEnterReviewAdsAdd}
+                            >
+                                <ToggleIconButtonPlus
+                                    onToggle={handleToggle}
+                                    initialAdded={false}
+                                />
+                            </div>
+                            {/* <div
                                 className={`icon-add ${
                                     isInReviewAds ? 'in-review-ads' : ''
                                 }`}
@@ -345,7 +365,7 @@ const TransportAdItem = ({ ad, isViewMode }) => {
                                 }}
                             >
                                 {isInReviewAds ? 'Убрать' : 'Запомнить'}
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

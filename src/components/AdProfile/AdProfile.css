@@ -1,0 +1,58 @@
+/* src/components/AdProfile/AdProfile.css */
+
+.ad-profile {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+}
+
+.ad-profile h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.ad-profile-details p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.ad-profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ad-profile-request-btn,
+.ad-profile-message-btn,
+.ad-profile-approve-btn,
+.ad-profile-decline-btn {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.ad-profile-request-btn {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.ad-profile-message-btn {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.ad-profile-approve-btn {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.ad-profile-decline-btn {
+    background-color: #d9534f;
+    color: #fff;
+}

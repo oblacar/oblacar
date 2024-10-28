@@ -20,6 +20,10 @@ import CreateTransportAd from '../../components/CreateTransportAd/CreateTranspor
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
+import AdProfile from '../../components/AdProfile/AdProfile';
+
+
+
 function Home() {
     const { ads } = useContext(TransportAdContext);
 
@@ -28,6 +32,14 @@ function Home() {
 
         // await TransportAdService.uploadAdsToFirebase(ads); // Вызываем функцию загрузки из сервиса
     };
+
+ const handleSendRequest = (adData, status) => {
+     console.log('Отправка запроса:', adData, status);
+ };
+
+ const handleMessage = () => {
+     console.log('Открытие чата с владельцем');
+ };
 
     return (
         <>
@@ -57,6 +69,12 @@ function Home() {
                 {/* <button onClick={handleUploadAds}>
                     Add ACTIVE for all ads
                 </button> */}
+
+                <AdProfile
+                    onSendRequest={handleSendRequest}
+                    onMessage={handleMessage}
+                    userType='cargoOwner' // или "transportOwner"
+                />
 
                 <TransportAdsList />
             </div>

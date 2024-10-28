@@ -1,0 +1,58 @@
+.toggle-icon-button {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 1s ease, transform 1s ease;
+}
+
+.toggle-icon-button.not-added .icon {
+    color: green;
+    transform: rotate(0deg);
+}
+
+.toggle-icon-button.added .icon {
+    color: red;
+    transform: rotate(45deg);
+}
+
+.toggle-label {
+    font-size: 14px;
+    margin-left: 8px;
+    transition: color 1s ease;
+}
+
+.toggle-icon-button.added .toggle-label {
+    color: red;
+}
+
+.toggle-icon-button.not-added .toggle-label {
+    color: green;
+}
+
+.toggle-icon-button {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 1s ease, transform 1s ease;
+}
+
+.toggle-icon-button:not(:disabled):hover,
+.toggle-icon-button:not(:disabled):focus {
+    /* background-color: transparent; Убираем фон при наведении */
+    outline: none; /* Убираем обводку */
+    box-shadow: none; /* Убираем возможную тень */
+}
+
+.toggle-icon-button:hover {
+    border-radius: 50%;
+    background-color: rgb(253, 212, 188);
+    /* border: 1px solid grey; */
+}

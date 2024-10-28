@@ -17,30 +17,6 @@ export const TransportAdProvider = ({ children }) => {
 
     // загрузка объявлений после получения базы отмеченных объявлений:
     //Оптимизированный метод сверки объявлений с отмеченными
-    function markReviewAds(ads, reviewAds) {
-        let remainingReviewAds = new Set(reviewAds); // Преобразуем в Set для быстрого поиска
-        const enhancedAds = []; // Массив для расширенных объявлений
-
-        for (let ad of ads) {
-            let isInReviewAds = false;
-
-            if (remainingReviewAds.size > 0) {
-                isInReviewAds = remainingReviewAds.has(ad.adId);
-            }
-
-            // Добавляем расширенное объявление в массив
-            enhancedAds.push({
-                ad, // Само объявление
-                isInReviewAds: isInReviewAds, // Флаг наличия в списке отмеченных
-            });
-
-            // Убираем найденное объявление из оставшихся
-            if (isInReviewAds) {
-                remainingReviewAds.delete(ad.adId);
-            }
-        }
-        return enhancedAds; // Возвращаем массив расширенных объявлений
-    }
 
     function processAds(ads, reviewAds) {
         let remainingReviewAds = new Set(reviewAds);
