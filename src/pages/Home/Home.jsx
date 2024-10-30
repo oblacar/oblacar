@@ -70,11 +70,11 @@ function Home() {
                     Add ACTIVE for all ads
                 </button> */}
 
-                <AdProfile
+                {/* <AdProfile
                     onSendRequest={handleSendRequest}
                     onMessage={handleMessage}
                     userType='cargoOwner' // или "transportOwner"
-                />
+                /> */}
 
                 <TransportAdsList />
             </div>

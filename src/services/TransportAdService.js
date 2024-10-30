@@ -87,8 +87,19 @@ const TransportAdService = {
 
             const ads = [];
 
+            const normalizeReceivedData = (data) => ({
+                ...data,
+                loadingTypes: data.loadingTypes === '' ? [] : data.loadingTypes,
+                paymentOptions:
+                    data.paymentOptions === '' ? [] : data.paymentOptions,
+                // обработка других полей...
+            });
+
             snapshot.forEach((childSnapshot) => {
-                ads.push({ id: childSnapshot.key, ...childSnapshot.val() }); // Добавляем каждое объявление в массив
+                ads.push({
+                    id: childSnapshot.key, //TODO нужно проверить, где мы используем id
+                    ...normalizeReceivedData(childSnapshot.val()),
+                }); // Добавляем каждое объявление в массив
             });
 
             return ads; // Возвращаем массив объявлений

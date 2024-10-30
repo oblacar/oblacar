@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
@@ -20,6 +21,8 @@ import './CreateTransportAd.css'; // Импортируйте файл стил�
 const CreateTransportAd = () => {
     const { user } = useContext(AuthContext);
     const { addAd } = useContext(TransportAdContext);
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         ownerId: '',
@@ -58,6 +61,18 @@ const CreateTransportAd = () => {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (user) {
+            setFormData((prev) => ({
+                ...prev,
+                ownerId: user.userId,
+                ownerName: user.userName,
+                ownerPhotoUrl: user.userPhoto,
+                ownerRating: user.userRating || 3.5, // Если у user нет рейтинга, по умолчанию 3.5
+            }));
+        }
+    }, []);
+
     const updateFormData = (newData) => {
         setFormData((prevState) => ({
             ...prevState,
@@ -80,34 +95,46 @@ const CreateTransportAd = () => {
             ownerRating: 3.5,
 
             availabilityDate: formData.availabilityDate,
+            //  ||
+            // new Date().toLocaleDateString('en-GB').replace(/\//g, '.'),
+
             departureCity: formData.departureCity,
             destinationCity: formData.destinationCity,
 
-            price: formData.price,
+            price: Number(formData.price),
             paymentUnit: formData.paymentUnit,
             readyToNegotiate: formData.readyToNegotiate,
-            paymentOptions: formData.paymentOptions,
+            paymentOptions:
+                formData.paymentOptions.length > 0
+                    ? formData.paymentOptions
+                    : '',
 
             truckId: Date.now(), // TODO Замените на реальный truckId
             truckName: formData.truckName,
             truckPhotoUrl: formData.truckPhotoUrl,
             transportType: formData.transportType,
 
-            loadingTypes: formData.loadingTypes,
-            truckWeight: formData.truckWeight,
-            truckHeight: formData.truckHeight,
-            truckWidth: formData.truckWidth,
-            truckDepth: formData.truckDepth,
+            loadingTypes:
+                formData.loadingTypes.length > 0 ? formData.loadingTypes : '',
+            truckWeight: Number(formData.truckWeight),
+            truckHeight: Number(formData.truckHeight),
+            truckWidth: Number(formData.truckWidth),
+            truckDepth: Number(formData.truckDepth),
         });
 
         console.log('Созданное объявление:', newTransportAd);
         // Здесь вы можете отправить данные в базу данных позже
 
-        addAd(newTransportAd);
+        try {
+            const result = addAd(newTransportAd);
+
+            if (result) {
+                navigate('/'); // Перенаправление на главную страницу
+            }
+        } catch (error) {
+            console.error('Ошибка при создании объявления:', error);
+        }
     };
-
-
-
 
     return (
         <form
@@ -118,8 +145,11 @@ const CreateTransportAd = () => {
             <div className='new-ad-show'>
                 <div className='ad-example'>
                     <TransportAdItem
-                        ad={formData}
-                        rating='4'
+                        ad={{
+                            ad: formData,
+                            isInReviewAds: false,
+                        }}
+                        // rating='4'
                         isViewMode={true}
                     />
                 </div>

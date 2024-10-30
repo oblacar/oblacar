@@ -2,6 +2,9 @@
     display: flex;
     flex-direction: column;
     margin: 20px 0;
+
+    max-width: 800px;
+
     /* border: 1px solid #ddd; Границы для объявления */
     border: 1px solid #d8d8d8;
     border-radius: 10px;

@@ -342,14 +342,13 @@ const TransportAdItem = ({ ad, isViewMode }) => {
                                 isViewMode ? 'view-mode' : ''
                             }`}
                         >
-                           
                             <div
                                 onMouseLeave={handleMouseLeaveReviewAdsAdd}
                                 onMouseEnter={handleMouseEnterReviewAdsAdd}
                             >
                                 <ToggleIconButtonPlus
                                     onToggle={handleToggle}
-                                    initialAdded={false}
+                                    initialAdded={isInReviewAds}
                                 />
                             </div>
                             {/* <div

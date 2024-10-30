@@ -1,0 +1,11 @@
+.ads-list-container {
+    display: flex;
+    justify-content: center;
+
+    /* font-family: Verdana, 'Dejavu Sans', Geneva, Tahoma, sans_serif; */
+}
+
+.preloader {
+    display: inline-block;
+    margin: 50px auto;
+}

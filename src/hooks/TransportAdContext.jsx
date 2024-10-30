@@ -30,8 +30,6 @@ export const TransportAdProvider = ({ children }) => {
         };
         const isAdsExtended = isAdsStructure(ads[0]);
 
-        console.log('isAdsExtended: ', isAdsExtended);
-
         for (let ad of ads) {
             let newExtAd;
 
@@ -206,13 +204,34 @@ export const TransportAdProvider = ({ children }) => {
     // }, []);
     //<<<---
 
-    // Функции для добавления, обновления и удаления объявлений
+    // Функции для добавления, обновления и удаления объявлений/ возвращаем положительно
     const addAd = async (adData) => {
         try {
-            const newAd = await TransportAdService.createAd(adData);
-            setAds((prevAds) => [...prevAds, newAd]);
+            console.log(adData);
+
+            const isAdsStructure = (adData) => {
+                const requiredKeys = ['isInReviewAds'];
+                return requiredKeys.every((key) => adData[key] !== undefined);
+            };
+
+            if (isAdsStructure(adData)) {
+                const newAd = await TransportAdService.createAd(adData.ad);
+
+                setAds((prevAds) => [...prevAds, newAd]);
+            } else {
+                const newAd = await TransportAdService.createAd(adData);
+
+                setAds((prevAds) => [
+                    ...prevAds,
+                    { ad: newAd, isInReviewAds: false },
+                ]);
+            }
+
+            return true;
         } catch (err) {
             setError(err.message);
+
+            return false;
         }
     };
 
