@@ -72,7 +72,7 @@
 .toggle-label-tip {
     position: absolute;
     top: -40px; /* Позиционируем под кнопкой */
-    left: -10px;
+    left: 0px;
     transform: translateX(-50%);
     background-color: rgb(255, 255, 255);
     color: #5c5c5c;
