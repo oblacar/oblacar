@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {  FaPlus } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
@@ -103,9 +103,11 @@ const CreateTransportAd = () => {
             departureCity: formData.departureCity,
             destinationCity: formData.destinationCity,
 
-            price: Number(formData.price),
             paymentUnit: formData.paymentUnit,
+            price: Number(formData.price),
             readyToNegotiate: formData.readyToNegotiate,
+            status: 'active',
+
             paymentOptions:
                 formData.paymentOptions.length > 0
                     ? formData.paymentOptions

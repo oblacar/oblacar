@@ -12,6 +12,7 @@ export class TransportAd {
         paymentUnit,
         readyToNegotiate,
         paymentOptions,
+        status,
         truckId,
         truckName,
         truckPhotoUrl,
@@ -27,7 +28,8 @@ export class TransportAd {
         this.ownerName = ownerName;
         this.ownerPhotoUrl = ownerPhotoUrl;
         this.ownerRating = ownerRating;
-
+        //Статус объявления
+        this.status = status;
         // Детали маршрута
         this.availabilityDate = availabilityDate; // дата, когда машина доступна
         this.departureCity = departureCity; // город, где находится транспортное средство
