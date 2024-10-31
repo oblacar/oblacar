@@ -15,6 +15,7 @@ const Button = ({
     size_width = '',
     size_height = 'medium',
     children,
+    icon = null, // Новый проп для иконки
     onClick,
 }) => {
     return (
@@ -23,6 +24,8 @@ const Button = ({
             className={`button ${type_btn} button-width-${size_width} button-height-${size_height}`}
             onClick={onClick}
         >
+            {icon && <span className='button-icon'>{icon}</span>}{' '}
+            {/* Отображение иконки */}
             {children}
         </button>
     );

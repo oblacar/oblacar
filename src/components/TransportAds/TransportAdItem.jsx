@@ -1,6 +1,8 @@
+//Очень важный компонет. Используется для превью, списка объявлений и т.п.
+
 import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
-import { FaTruck, FaUser, FaUserCircle } from 'react-icons/fa';
+import { FaTruck, FaUser,FaPlus, FaUserCircle } from 'react-icons/fa';
 
 import TransportAdContext from '../../hooks/TransportAdContext';
 import AuthContext from '../../hooks/Authorization/AuthContext';
@@ -31,7 +33,16 @@ import { NumberSchema } from 'yup';
 //        * userRating
 //}
 
-const TransportAdItem = ({ ad, isViewMode }) => {
+//
+
+const TransportAdItem = ({
+    ad,
+    isViewMode,
+    // hasAddToVariantsBtn = true,
+    // isHovered = true,
+    // isClickable = true,
+    isActive = true,
+}) => {
     const { isInReviewAds } = ad;
     const {
         adId,
@@ -166,8 +177,8 @@ const TransportAdItem = ({ ad, isViewMode }) => {
     return (
         <div
             className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
-                onReviewAdsAdd ? '' : 'active'
-            }`}
+                onReviewAdsAdd ? '' : 'ad-item-available-for-click'
+            }   ${isActive ? '' : 'ad-item-not-available'}`}
         >
             {/* <div className={`row ${rowColor}`}> */}
             <div className='row'>
@@ -338,9 +349,15 @@ const TransportAdItem = ({ ad, isViewMode }) => {
 
                     <div className='icon-item-ad-bar'>
                         <div
-                            className={`container-icon-add ${
-                                isViewMode ? 'view-mode' : ''
-                            }`}
+                            className={
+                                `container-icon-add ${
+                                    isViewMode ? 'view-mode' : ''
+                                }`
+
+                                // className={`container-icon-add ${
+                                //     hasAddToVariantsBtn ? '' : 'view-mode'
+                                // }`
+                            }
                         >
                             <div
                                 onMouseLeave={handleMouseLeaveReviewAdsAdd}

@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import {  FaPlus } from 'react-icons/fa';
+
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
 
@@ -159,9 +161,11 @@ const CreateTransportAd = () => {
                         type='submit'
                         type_btn='yes'
                         children='Разместить'
+                        icon={<FaPlus />} // Передача иконки
                     />
                 </div>
             </div>
+            <h3>Введите данные: </h3>
             <div className='new-transport-ad'>
                 <RouteSection
                     updateFormData={updateFormData}

@@ -76,3 +76,9 @@
 .button-height-high {
     height: 40px; /* Ширина 200px */
 }
+
+.button-icon {
+    margin-right: 8px; /* Отступ от текста */
+    display: inline-flex;
+    align-items: center;
+}
