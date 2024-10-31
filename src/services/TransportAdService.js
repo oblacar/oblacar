@@ -95,11 +95,23 @@ const TransportAdService = {
                 // обработка других полей...
             });
 
+            // snapshot.forEach((childSnapshot) => {
+            //     ads.push({
+            //         id: childSnapshot.key, //TODO нужно проверить, где мы используем id
+            //         ...normalizeReceivedData(childSnapshot.val()),
+            //     }); // Добавляем каждое объявление в массив
+            // });
+
+            // не скачиваем Удаленные объявления
             snapshot.forEach((childSnapshot) => {
-                ads.push({
-                    id: childSnapshot.key, //TODO нужно проверить, где мы используем id
-                    ...normalizeReceivedData(childSnapshot.val()),
-                }); // Добавляем каждое объявление в массив
+                const adData = normalizeReceivedData(childSnapshot.val());
+                // Пропускаем объявления со статусом 'deleted'
+                if (adData.status !== 'deleted') {
+                    ads.push({
+                        id: childSnapshot.key,
+                        ...adData,
+                    });
+                }
             });
 
             return ads; // Возвращаем массив объявлений

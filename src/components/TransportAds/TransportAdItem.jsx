@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
-import { FaTruck, FaUser,FaPlus, FaUserCircle } from 'react-icons/fa';
+import { FaTruck, FaUser, FaPlus, FaUserCircle } from 'react-icons/fa';
 
 import TransportAdContext from '../../hooks/TransportAdContext';
 import AuthContext from '../../hooks/Authorization/AuthContext';
@@ -37,7 +37,7 @@ import { NumberSchema } from 'yup';
 
 const TransportAdItem = ({
     ad,
-    isViewMode,
+    isViewMode = false,
     // hasAddToVariantsBtn = true,
     // isHovered = true,
     // isClickable = true,
@@ -57,6 +57,7 @@ const TransportAdItem = ({
         paymentUnit,
         readyToNegotiate,
         paymentOptions,
+        status,
         truckId,
         truckName,
         truckPhotoUrl,
@@ -175,79 +176,86 @@ const TransportAdItem = ({
     };
 
     return (
-        <div
-            className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
-                onReviewAdsAdd ? '' : 'ad-item-available-for-click'
-            }   ${isActive ? '' : 'ad-item-not-available'}`}
-        >
-            {/* <div className={`row ${rowColor}`}> */}
-            <div className='row'>
-                <div className='upper-ad-row'>
-                    {/* <div className='rating-star'>
+        <div className={'ad-item-container'}>
+            <div
+                className={`ad-item-show-status ${isActive ? '' : 'no-active'}`}
+            >
+                {status === 'work' ? 'В работе' : null}
+                {status === 'completed' ? 'Завершено' : null}
+            </div>
+            <div
+                className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
+                    onReviewAdsAdd ? '' : 'ad-item-available-for-click'
+                }   ${isActive ? '' : 'ad-item-not-available'}`}
+            >
+                {/* <div className={`row ${rowColor}`}> */}
+                <div className='row'>
+                    <div className='upper-ad-row'>
+                        {/* <div className='rating-star'>
                         {rating < 2 ? null : (
                             <SingleRatingStar rating={rating} />
                         )}
                     </div> */}
-                    <div className='departure-location-date'>
-                        <div className='availability-date'>
-                            {availabilityDate}
+                        <div className='departure-location-date'>
+                            <div className='availability-date'>
+                                {availabilityDate}
+                            </div>
+                            <div className='departure-location'>
+                                <span className='departure location city'>
+                                    {departureCity}
+                                </span>
+                                <span className='destination city'>
+                                    {destinationCity || 'Россия'}
+                                </span>
+                            </div>
                         </div>
-                        <div className='departure-location'>
-                            <span className='departure location city'>
-                                {departureCity}
-                            </span>
-                            <span className='destination city'>
-                                {destinationCity || 'Россия'}
-                            </span>
+                        <div className='finance'>
+                            <div className='price'>
+                                {formatNumber(price)} {paymentUnit}
+                            </div>
+                            <div className='finance-details'>
+                                {paymentOptions && paymentOptions.length > 0
+                                    ? paymentOptions.map((option, index) => (
+                                          <span key={option}>
+                                              {option}
+                                              {index < paymentOptions.length - 1
+                                                  ? ', '
+                                                  : ''}
+                                          </span>
+                                      ))
+                                    : ''}
+                                {readyToNegotiate && (
+                                    <span>
+                                        {paymentOptions.length > 0 ? ', ' : ''}
+                                        торг
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <div className='finance'>
-                        <div className='price'>
-                            {formatNumber(price)} {paymentUnit}
-                        </div>
-                        <div className='finance-details'>
-                            {paymentOptions && paymentOptions.length > 0
-                                ? paymentOptions.map((option, index) => (
-                                      <span key={option}>
-                                          {option}
-                                          {index < paymentOptions.length - 1
-                                              ? ', '
-                                              : ''}
-                                      </span>
-                                  ))
-                                : ''}
-                            {readyToNegotiate && (
-                                <span>
-                                    {paymentOptions.length > 0 ? ', ' : ''}
-                                    торг
-                                </span>
+                    <div className='down-ad-row'>
+                        <div className='car-photo-icon'>
+                            {truckPhotoUrl ? ( // Проверяем, есть ли фото
+                                <img
+                                    src={truckPhotoUrl}
+                                    alt='Фото машины'
+                                    className='photo-car' // Добавьте классы для стилизации
+                                />
+                            ) : (
+                                <div className='icon-car'>
+                                    <FaTruck />
+                                </div>
                             )}
                         </div>
-                    </div>
-                </div>
-                <div className='down-ad-row'>
-                    <div className='car-photo-icon'>
-                        {truckPhotoUrl ? ( // Проверяем, есть ли фото
-                            <img
-                                src={truckPhotoUrl}
-                                alt='Фото машины'
-                                className='photo-car' // Добавьте классы для стилизации
-                            />
-                        ) : (
-                            <div className='icon-car'>
-                                <FaTruck />
-                            </div>
-                        )}
-                    </div>
-                    {/* В этом режиме можем добавить фото машины */}
-                    {/* <div
+                        {/* В этом режиме можем добавить фото машины */}
+                        {/* <div
                         className='car-photo-icon'
                         onClick={handleClick}
-                    >
+                        >
                         {selectedPhoto || ad.truckPhoto ? ( // Проверяем, есть ли фото
                             <img
-                                src={selectedPhoto || ad.truckPhoto}
-                                alt='Фото машины'
+                            src={selectedPhoto || ad.truckPhoto}
+                            alt='Фото машины'
                                 className='photo-car' // Добавьте классы для стилизации
                             />
                         ) : (
@@ -261,114 +269,119 @@ const TransportAdItem = ({
                             style={{ display: 'none' }} // Скрываем стандартное поле ввода
                             onChange={handleFileChange}
                             accept='image/*' // Указываем, что это изображение
-                        />
-                    </div> */}
+                            />
+                            </div> */}
 
-                    <div className=' car-info'>
-                        <span>
-                            {transportType ? `${transportType}` : ''}
-                            {truckWeight ||
-                            loadingTypes.length !== 0 ||
-                            truckValue ? (
-                                <>{', '}</>
-                            ) : (
-                                ''
-                            )}
-                        </span>
-                        <span>
-                            {truckWeight ? (
-                                <>
-                                    <strong>{truckWeight}т</strong>,{' '}
-                                </>
-                            ) : (
-                                ''
-                            )}
-                        </span>
-                        <span>
-                            {truckValue ? (
-                                <>
-                                    <strong>
-                                        {truckValue}м<sup>3</sup>
-                                    </strong>
-                                    {` (${truckWidth}м x ${truckHeight}м x ${truckDepth}м)`}
-                                    {loadingTypes.length !== 0 ? (
-                                        <>{', '}</>
-                                    ) : (
-                                        ''
-                                    )}
-                                </>
-                            ) : (
-                                ''
-                            )}
-                        </span>
+                        <div className=' car-info'>
+                            <span>
+                                {transportType ? `${transportType}` : ''}
+                                {truckWeight ||
+                                loadingTypes.length !== 0 ||
+                                truckValue ? (
+                                    <>{', '}</>
+                                ) : (
+                                    ''
+                                )}
+                            </span>
+                            <span>
+                                {truckWeight ? (
+                                    <>
+                                        <strong>{truckWeight}т</strong>,{' '}
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                            </span>
+                            <span>
+                                {truckValue ? (
+                                    <>
+                                        <strong>
+                                            {truckValue}м<sup>3</sup>
+                                        </strong>
+                                        {` (${truckWidth}м x ${truckHeight}м x ${truckDepth}м)`}
+                                        {loadingTypes.length !== 0 ? (
+                                            <>{', '}</>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                            </span>
 
-                        <span>
-                            {loadingTypes.length !== 0 ? (
-                                <>
-                                    <strong>загрузка: </strong>
-                                    {loadingTypes.map((loadingType, index) => (
-                                        <React.Fragment key={loadingType}>
-                                            {/* Используем React.Fragment для оборачивания */}
-                                            {loadingType}
-                                            {index < loadingTypes.length - 1 &&
-                                                ', '}
-                                        </React.Fragment>
-                                    ))}
-                                </>
-                            ) : (
-                                ''
-                            )}
-                        </span>
-                    </div>
-
-                    <div className='ad-user-info'>
-                        <div className='ad-user-photo'>
-                            {ownerPhotoUrl ? ( // Проверяем, есть ли фото
-                                <img
-                                    src={ownerPhotoUrl}
-                                    alt='Хозяин объявления'
-                                    className='ad-photo-car-owner'
-                                />
-                            ) : (
-                                <FaUser />
-                            )}
+                            <span>
+                                {loadingTypes.length !== 0 ? (
+                                    <>
+                                        <strong>загрузка: </strong>
+                                        {loadingTypes.map(
+                                            (loadingType, index) => (
+                                                <React.Fragment
+                                                    key={loadingType}
+                                                >
+                                                    {/* Используем React.Fragment для оборачивания */}
+                                                    {loadingType}
+                                                    {index <
+                                                        loadingTypes.length -
+                                                            1 && ', '}
+                                                </React.Fragment>
+                                            )
+                                        )}
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                            </span>
                         </div>
 
-                        <div className='ad-user-name-rating'>
-                            <div className='ad-user-name'>{ownerName}</div>
-
-                            {ownerRating ? (
-                                <div className='ad-user-rating'>
-                                    ★ {ownerRating}
-                                </div>
-                            ) : (
-                                ''
-                            )}
-                        </div>
-                    </div>
-
-                    <div className='icon-item-ad-bar'>
-                        <div
-                            className={
-                                `container-icon-add ${
-                                    isViewMode ? 'view-mode' : ''
-                                }`
-
-                                // className={`container-icon-add ${
-                                //     hasAddToVariantsBtn ? '' : 'view-mode'
-                                // }`
-                            }
-                        >
-                            <div
-                                onMouseLeave={handleMouseLeaveReviewAdsAdd}
-                                onMouseEnter={handleMouseEnterReviewAdsAdd}
-                            >
-                                <ToggleIconButtonPlus
-                                    onToggle={handleToggle}
-                                    initialAdded={isInReviewAds}
-                                />
+                        <div className='ad-user-info'>
+                            <div className='ad-user-photo'>
+                                {ownerPhotoUrl ? ( // Проверяем, есть ли фото
+                                    <img
+                                        src={ownerPhotoUrl}
+                                        alt='Хозяин объявления'
+                                        className='ad-photo-car-owner'
+                                    />
+                                ) : (
+                                    <FaUser />
+                                )}
                             </div>
-                            {/* <div
+
+                            <div className='ad-user-name-rating'>
+                                <div className='ad-user-name'>{ownerName}</div>
+
+                                {ownerRating ? (
+                                    <div className='ad-user-rating'>
+                                        ★ {ownerRating}
+                                    </div>
+                                ) : (
+                                    ''
+                                )}
+                            </div>
+                        </div>
+
+                        <div className='icon-item-ad-bar'>
+                            <div
+                                className={
+                                    `container-icon-add ${
+                                        isViewMode ? 'view-mode' : ''
+                                    }`
+
+                                    // className={`container-icon-add ${
+                                    //     hasAddToVariantsBtn ? '' : 'view-mode'
+                                    // }`
+                                }
+                            >
+                                <div
+                                    onMouseLeave={handleMouseLeaveReviewAdsAdd}
+                                    onMouseEnter={handleMouseEnterReviewAdsAdd}
+                                >
+                                    <ToggleIconButtonPlus
+                                        onToggle={handleToggle}
+                                        initialAdded={isInReviewAds}
+                                    />
+                                </div>
+                                {/* <div
                                 className={`icon-add ${
                                     isInReviewAds ? 'in-review-ads' : ''
                                 }`}
@@ -378,10 +391,11 @@ const TransportAdItem = ({
                                     isInReviewAds
                                         ? removeReviewAd(ad)
                                         : addReviewAd(ad);
-                                }}
-                            >
-                                {isInReviewAds ? 'Убрать' : 'Запомнить'}
+                                        }}
+                                        >
+                                        {isInReviewAds ? 'Убрать' : 'Запомнить'}
                             </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>

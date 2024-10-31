@@ -1,3 +1,7 @@
+.ad-item-container {
+    position: relative;
+}
+
 .ad-item {
     display: flex;
     flex-direction: column;
@@ -37,7 +41,7 @@
 /* недоступность в визуальное отличие недоступных объявлений*/
 .ad-item.ad-item-not-available {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.3;
 }
 
 /*Режим просмотра --->*/
@@ -71,6 +75,27 @@
     align-items: flex-end;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     position: relative;
+}
+
+.ad-item-show-status {
+    position: absolute;
+    display: none;
+    right: 20px;
+    top: 40px;
+    border: 4px double rgb(154, 142, 246);
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    background-color: #ffffff; /* полностью белый фон */
+    border-radius: 16px;
+
+    z-index: 1;
+    transform: rotate(20deg);
+}
+
+.ad-item-show-status.no-active {
+    display: block;
 }
 
 .rating-star {
