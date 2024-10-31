@@ -1,5 +1,82 @@
-.review-ad-item.inactive {
-    color: #999;
-    opacity: 0.6;
-    pointer-events: none; /* Чтобы пользователь не мог кликнуть */
+.preview-review-ad-item-container {
+    position: relative;
+}
+
+.preview-review-ad-item {
+    display: flex;
+    /* border: 1px rgb(143, 162, 204) solid; */
+    margin-bottom: 5px;
+    padding: 10px 30px 10px 10px;
+
+    border-radius: 5px;
+
+    /* border-top: 3px solid rgb(216, 222, 242); */
+    
+    background-color: beige;
+
+    /* border-top:1px solid rgb(242, 245, 254); */
+    /* background-color: rgb(255, 249, 239); */
+    cursor: pointer;
+}
+
+.preview-review-ad-item-route {
+    margin-right: auto;
+}
+
+.preview-review-ad-item-date {
+    font-weight: 600;
+    color: black;
+}
+
+.preview-review-ad-item-payment {
+    position: relative;
+}
+
+.preview-review-ad-item-price {
+    text-align: right;
+    font-weight: 600;
+    color: black;
+}
+
+.preview-review-ad-item-payment-unit {
+    text-align: right;
+    color: grey;
+}
+
+.preview-review-ad-item-delete-icon {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    color: rgb(255, 183, 183);
+}
+.preview-review-ad-item-delete-icon:hover {
+    color: rgb(255, 1, 1);
+    cursor: pointer;
+}
+/*Режим не активности - работает только удалить*/
+.preview-review-ad-item.review-ad-item-not-active {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.preview-review-ad-item-negative-status {
+    position: absolute;
+
+    left: 30%;
+    top: 30%;
+
+    color: rgb(154, 142, 246);
+    border: 4px double rgb(154, 142, 246);
+    padding: 3px 10px;
+    border-radius: 5px;
+    background-color: white;
+
+    z-index: 3;
+    transform: rotate(-20deg);
+
+    display: none;
+}
+
+.preview-review-ad-item-negative-status.review-ad-item-not-active {
+    display: block;
 }

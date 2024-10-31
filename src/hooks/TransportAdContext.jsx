@@ -15,10 +15,41 @@ export const TransportAdProvider = ({ children }) => {
 
     const [reviewAds, setReviewAds] = useState([]);
 
+    // Догрузка удаленных объявлений в список Вариантов:
+    const fetchRemainingReviewAds = async (remainingReviewAds, foundAds) => {
+        for (const adId of remainingReviewAds) {
+            try {
+                const adData = await TransportAdService.getAdById(adId);
+
+                if (adData) {
+                    const newExtAd = {
+                        ad: adData, // Сохраняем объявление
+                        isInReviewAds: true,
+                    };
+
+                    foundAds.push(newExtAd); // Добавляем объявление в переданный массив
+
+                    // Удаляем adId из Set
+                    remainingReviewAds.delete(adId);
+                } else {
+                    console.log(
+                        'Объявление не найдено или было удалено. id:',
+                        adId
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    `Ошибка при получении объявления с id ${adId}:`,
+                    error
+                );
+            }
+        }
+    };
+
     // загрузка объявлений после получения базы отмеченных объявлений:
     //Оптимизированный метод сверки объявлений с отмеченными
 
-    function processAds(ads, reviewAds) {
+    async function processAds(ads, reviewAds) {
         let remainingReviewAds = new Set(reviewAds);
         const enhancedAds = []; // Массив для расширенных объявлений
         const foundAds = []; // Массив для найденных отмеченных объявлений
@@ -61,6 +92,11 @@ export const TransportAdProvider = ({ children }) => {
             // Добавляем расширенное объявление
             enhancedAds.push(newExtAd);
         }
+
+        await fetchRemainingReviewAds(remainingReviewAds, foundAds);
+
+        console.log(remainingReviewAds);
+        console.log(foundAds);
 
         return {
             enhancedAds,
@@ -109,7 +145,7 @@ export const TransportAdProvider = ({ children }) => {
 
                     // Назначаем каждому объявлению статус isInReviewAds на основе reviewAds
                     // enhancedAds = markReviewAds(adsData, reviewAdsArray);
-                    const { enhancedAds, foundAds } = processAds(
+                    const { enhancedAds, foundAds } = await processAds(
                         adsData,
                         reviewAdsArray
                     );
@@ -118,7 +154,7 @@ export const TransportAdProvider = ({ children }) => {
                     setReviewAds(foundAds);
                 } else {
                     // enhancedAds = markReviewAds(ads, reviewAdsArray);
-                    const { enhancedAds, foundAds } = processAds(
+                    const { enhancedAds, foundAds } = await processAds(
                         ads,
                         reviewAdsArray
                     );

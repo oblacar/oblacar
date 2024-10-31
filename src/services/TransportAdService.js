@@ -108,7 +108,7 @@ const TransportAdService = {
                 // Пропускаем объявления со статусом 'deleted'
                 if (adData.status !== 'deleted') {
                     ads.push({
-                        id: childSnapshot.key,
+                        // id: childSnapshot.key,
                         ...adData,
                     });
                 }
@@ -125,20 +125,23 @@ const TransportAdService = {
 
     // Метод для получения одного объявления по ID
     getAdById: async (adId) => {
-        const adRef = databaseRef(db, `transportAds/${adId}`); // Ссылка на конкретное объявление
-
         try {
+            const adRef = databaseRef(db, `transportAds/${adId}`);
             const snapshot = await get(adRef);
-            if (!snapshot.exists()) {
-                console.log('Нет данных для данного объявления');
-                return null; // Или возвращаем что-то другое, если данных нет
+
+            if (snapshot.exists()) {
+                return snapshot.val(); // Возвращаем данные объявления, если оно существует
+            } else {
+                console.log(`Объявление с id ${adId} не найдено.`);
+                return null; // Возвращаем null, если объявление не найдено
             }
-            const adData = { id: snapshot.key, ...snapshot.val() };
-            return adData; // Возвращаем данные объявления
         } catch (error) {
-            console.error('Ошибка при получении объявления: ', error);
+            console.error(
+                `Ошибка при получении объявления с id ${adId}:`,
+                error
+            );
             throw new Error(
-                'Не удалось загрузить объявление. Попробуйте еще раз.'
+                `Не удалось загрузить объявление. Попробуйте еще раз.`
             );
         }
     },
@@ -173,18 +176,10 @@ const TransportAdService = {
         return photoUrl; // возвращаем ссылку
     },
 
-    //Изменение структуры все базы объявлений. Добавили поле status. Назначили всем active
+    //Изменение структуры всей базы объявлений. Добавили поле status. Назначили всем active
     // Приходит в 4 этапа: все выгрузили, очистили, изменили и загрузили новую базу----->>>>
     uploadAdsToFirebase: async (ads) => {
         try {
-            // const adsWithStatus = ads.map((ad) => ({
-            //     ...ad,
-            //     // Add new fields:
-            //     ownerName: '',
-            //     ownerPhotoUrl: '',
-            //     ownerRating: 0,
-            // }));
-
             const dbRef = databaseRef(db, 'transportAds'); // Создаем ссылку на узел "transportAds"
 
             // Очистка предыдущих данных (если нужно)
