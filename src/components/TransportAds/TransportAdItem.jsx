@@ -180,8 +180,8 @@ const TransportAdItem = ({
             <div
                 className={`ad-item-show-status ${isActive ? '' : 'no-active'}`}
             >
-                {status === 'work' ? 'В работе' : null}
-                {status === 'completed' ? 'Завершено' : null}
+                {status === 'work' ? 'Занят' : null}
+                {status === 'completed' ? 'Доставлено' : null}
             </div>
             <div
                 className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
@@ -361,27 +361,32 @@ const TransportAdItem = ({
                         </div>
 
                         <div className='icon-item-ad-bar'>
-                            <div
-                                className={
-                                    `container-icon-add ${
-                                        isViewMode ? 'view-mode' : ''
-                                    }`
-
-                                    // className={`container-icon-add ${
-                                    //     hasAddToVariantsBtn ? '' : 'view-mode'
-                                    // }`
-                                }
-                            >
+                            {isActive ? (
                                 <div
-                                    onMouseLeave={handleMouseLeaveReviewAdsAdd}
-                                    onMouseEnter={handleMouseEnterReviewAdsAdd}
+                                    className={
+                                        `container-icon-add ${
+                                            isViewMode ? 'view-mode' : ''
+                                        }`
+
+                                        // className={`container-icon-add ${
+                                        //     hasAddToVariantsBtn ? '' : 'view-mode'
+                                        // }`
+                                    }
                                 >
-                                    <ToggleIconButtonPlus
-                                        onToggle={handleToggle}
-                                        initialAdded={isInReviewAds}
-                                    />
-                                </div>
-                                {/* <div
+                                    <div
+                                        onMouseLeave={
+                                            handleMouseLeaveReviewAdsAdd
+                                        }
+                                        onMouseEnter={
+                                            handleMouseEnterReviewAdsAdd
+                                        }
+                                    >
+                                        <ToggleIconButtonPlus
+                                            onToggle={handleToggle}
+                                            initialAdded={isInReviewAds}
+                                        />
+                                    </div>
+                                    {/* <div
                                 className={`icon-add ${
                                     isInReviewAds ? 'in-review-ads' : ''
                                 }`}
@@ -395,7 +400,10 @@ const TransportAdItem = ({
                                         >
                                         {isInReviewAds ? 'Убрать' : 'Запомнить'}
                             </div> */}
-                            </div>
+                                </div>
+                            ) : (
+                                ''
+                            )}
                         </div>
                     </div>
                 </div>

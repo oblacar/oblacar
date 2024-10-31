@@ -40,7 +40,7 @@ export const PrevieReviewAdsList = () => {
                             </div>
                             <div
                                 className='preview-review-ad-item-delete-icon'
-                                onClick={() => removeReviewAd(ad)}
+                                onClick={()=>removeReviewAd(ad)}
                             >
                                 <FaTimesCircle />
                             </div>
