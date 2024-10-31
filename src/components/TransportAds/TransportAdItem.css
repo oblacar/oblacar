@@ -10,7 +10,7 @@
     max-width: 800px;
 
     /* border: 1px solid #ddd; Границы для объявления */
-    border: 1px solid #d8d8d8;
+    border: 2px solid #d8d8d8;
     border-radius: 10px;
     /* background-color: #fff; */
     padding: 0px;
@@ -21,7 +21,7 @@
 
 .ad-item:hover {
     /* transform: scale(1.01); */
-    border: 1px solid rgb(148, 148, 234);
+    border: 2px solid rgb(148, 148, 234);
 }
 
 .ad-item.ad-item-available-for-click:active {
@@ -351,4 +351,12 @@
     /* display: inline-block; */
     float: right;
     margin-right: 3px;
+}
+
+.ad-item-show-in-review {
+    position: absolute;
+    right: -5px;
+    top: 10px;
+    color: rgb(86, 233, 86);
+    z-index: 1;
 }

@@ -15,7 +15,7 @@
 }
 
 .toggle-icon-button.added .icon {
-    color: red;
+    color: rgb(255, 77, 77);
     transform: rotate(45deg);
 }
 
@@ -26,11 +26,11 @@
 }
 
 .toggle-icon-button.added .toggle-label {
-    color: red;
+    /* color: red; */
 }
 
 .toggle-icon-button.not-added .toggle-label {
-    color: green;
+    /* color: green; */
 }
 
 .toggle-icon-button {
@@ -55,8 +55,8 @@
 
 .toggle-icon-button:hover {
     border-radius: 50%;
-    /* background-color: rgb(253, 212, 188); */
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(229, 229, 229);
+    /* background-color: rgb(255, 255, 255); */
     /* border: 1px solid grey; */
 }
 

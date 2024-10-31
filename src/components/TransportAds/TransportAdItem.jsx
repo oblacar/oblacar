@@ -2,7 +2,14 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import './TransportAdItem.css';
-import { FaTruck, FaUser, FaPlus, FaUserCircle } from 'react-icons/fa';
+import {
+    FaTruck,
+    FaUser,
+    FaCheckCircle,
+    FaCheck,
+    FaPlus,
+    FaUserCircle,
+} from 'react-icons/fa';
 
 import TransportAdContext from '../../hooks/TransportAdContext';
 import AuthContext from '../../hooks/Authorization/AuthContext';
@@ -188,6 +195,14 @@ const TransportAdItem = ({
                     onReviewAdsAdd ? '' : 'ad-item-available-for-click'
                 }   ${isActive ? '' : 'ad-item-not-available'}`}
             >
+                {isInReviewAds ? (
+                    <div className={`ad-item-show-in-review`}>
+                        <FaCheck />
+                    </div>
+                ) : (
+                    ''
+                )}
+
                 {/* <div className={`row ${rowColor}`}> */}
                 <div className='row'>
                     <div className='upper-ad-row'>
