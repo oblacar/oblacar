@@ -19,6 +19,10 @@
     transform: rotate(45deg);
 }
 
+.toggle-icon-button.not-colored-btn .icon  {
+    color: rgb(211, 211, 211);
+}
+
 .toggle-label {
     font-size: 14px;
     margin-left: 8px;

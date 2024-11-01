@@ -77,36 +77,38 @@ const TransportAdItem = ({
     } = ad.ad; // Деструктурируем из вложенного объекта ad.ad
 
     const { removeReviewAd, addReviewAd } = useContext(TransportAdContext);
-    const { user } = useContext(AuthContext);
+    const [isSelectedAdItem, setIsSelectedAdItem] = useState(false);
 
     const [truckValue, setTruckValue] = useState(0);
 
     //добавление фото прямо из списка объявлений:
     const [onReviewAdsAdd, setOnReviewAdsAdd] = useState(false);
 
-    const [selectedPhoto, setSelectedPhoto] = useState(null);
+    //блок для редактирования фото объявления из списка представления-->>
+    // const { user } = useContext(AuthContext);
+    // const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedPhoto(reader.result);
-                // Здесь можно также обновить состояние контекста или родительского компонента
-                // updateFormData({ truckPhotoUrl: reader.result });
-            };
+    // const handleFileChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             setSelectedPhoto(reader.result);
+    //             // Здесь можно также обновить состояние контекста или родительского компонента
+    //             // updateFormData({ truckPhotoUrl: reader.result });
+    //         };
 
-            reader.readAsDataURL(file);
+    //         reader.readAsDataURL(file);
 
-            ad.truckPhotoUrl = file; // Прямое изменение объекта, вы можете использовать метод, если он у вас есть
+    //         ad.truckPhotoUrl = file; // Прямое изменение объекта, вы можете использовать метод, если он у вас есть
 
-            console.log(ad);
-        }
-    };
+    //         console.log(ad);
+    //     }
+    // };
 
-    const handleClick = () => {
-        document.getElementById(`fileInput-${adId}`).click(); // Программный клик по скрытому инпуту
-    };
+    // const handleClick = () => {
+    //     document.getElementById(`fileInput-${adId}`).click(); // Программный клик по скрытому инпуту
+    // };
     //<----
 
     useEffect(() => {
@@ -183,7 +185,11 @@ const TransportAdItem = ({
     };
 
     return (
-        <div className={'ad-item-container'}>
+        <div
+            className={'ad-item-container'}
+            onMouseEnter={() => setIsSelectedAdItem(() => true)}
+            onMouseLeave={() => setIsSelectedAdItem(() => false)}
+        >
             <div
                 className={`ad-item-show-status ${isActive ? '' : 'no-active'}`}
             >
@@ -399,6 +405,7 @@ const TransportAdItem = ({
                                         <ToggleIconButtonPlus
                                             onToggle={handleToggle}
                                             initialAdded={isInReviewAds}
+                                            isColored={isSelectedAdItem}
                                         />
                                     </div>
                                     {/* <div

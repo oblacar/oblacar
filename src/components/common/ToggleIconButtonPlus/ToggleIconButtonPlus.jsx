@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import './ToggleIconButtonPlus.css';
 
-const ToggleIconButtonPlus = ({ onToggle, initialAdded = false }) => {
+const ToggleIconButtonPlus = ({
+    onToggle,
+    initialAdded = false,
+    isColored = true,
+}) => {
     const [isAdded, setIsAdded] = useState(initialAdded);
 
     const [showTooltip, setShowTooltip] = useState(false);
@@ -32,7 +36,9 @@ const ToggleIconButtonPlus = ({ onToggle, initialAdded = false }) => {
             onClick={handleClick}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className={`toggle-icon-button ${isAdded ? 'added' : 'not-added'}`}
+            className={`toggle-icon-button ${isAdded ? 'added' : 'not-added'} ${
+                isColored ? '' : 'not-colored-btn'
+            }`}
         >
             <div className='toggle-label-container-tip'>
                 <FaPlus className='icon' />
