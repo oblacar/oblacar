@@ -1,24 +1,3 @@
-/* src/components/AdProfile/AdProfile.css */
-
-.ad-profile {
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 600px;
-    margin: 0 auto;
-    background-color: #f9f9f9;
-}
-
-.ad-profile h2 {
-    font-size: 24px;
-    margin-bottom: 15px;
-}
-
-.ad-profile-details p {
-    margin: 5px 0;
-    font-size: 16px;
-}
-
 .ad-profile-actions {
     display: flex;
     gap: 10px;
@@ -38,21 +17,116 @@
 }
 
 .ad-profile-request-btn {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: #fff;
 }
 
 .ad-profile-message-btn {
-    background-color: #007BFF;
+    background-color: #007bff;
     color: #fff;
 }
 
 .ad-profile-approve-btn {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: #fff;
 }
 
 .ad-profile-decline-btn {
     background-color: #d9534f;
     color: #fff;
+}
+
+/*Профиль транспортного объявления*/
+.transport-ad-profile {
+    border: 1px solid rgb(231, 231, 231);
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fcfcfc;
+}
+
+.transport-ad-profile-main-data {
+    /* border: 1px solid rgb(238, 46, 46); */
+    display: flex;
+}
+.transport-ad-profile-rout-date-price {
+    /* border: 1px solid rgb(243, 243, 243); */
+    min-width: 200px;
+    text-align: start;
+    font-size: 18px;
+    /* color: #383839; */
+    /* background-color: white; */
+    border-radius: 5px;
+}
+.transport-ad-profile-date {
+    /* border: 1px solid rgb(13, 132, 7); */
+}
+
+.transport-ad-profile-departure-city {
+    /* border: 1px solid rgb(165, 54, 93); */
+}
+.transport-ad-profile-destination-city {
+    /* border: 1px solid rgb(165, 54, 93); */
+}
+
+.transport-ad-profile-price {
+    /* border: 1px solid rgb(4, 93, 111); */
+}
+
+.transport-ad-profile-rout-date-price-row strong,
+.transport-ad-profile-truck-row strong {
+    width: 80px;
+    display: inline-block;
+    color: rgb(241, 134, 68);
+    font-size: 16px;
+    /* font-weight: 500; */
+}
+.transport-ad-profile-rout-date-price-row {
+    margin: 5px 10px;
+    /* font-weight: 600; */
+}
+
+/*Данные об автомобиле*/
+.transport-ad-profile-truck {
+    margin-top: 50px;
+}
+
+.transport-ad-profile-truck-row {
+    margin: 5px 10px;
+}
+/* .transport-ad-profile-truck-row strong {
+    width: 80px;
+    display: inline-block;
+    color: rgb(106, 106, 106);
+    font-size: 16px;
+} */
+.transport-ad-profile-truck-name {
+    /* border: 1px solid rgb(8, 196, 42); */
+    font-weight: 600;
+    font-size: 24px;
+}
+.transport-ad-profile-truck-type {
+    /* border: 1px solid rgb(8, 196, 42); */
+}
+.transport-ad-profile-truck-weight-value {
+    /* border: 1px solid rgb(8, 196, 42); */
+}
+.transport-ad-profile-truck-loadings {
+    /* border: 1px solid rgb(8, 196, 42); */
+}
+
+/*Фото зона*/
+.transport-ad-profile-truck-photo-area {
+    border: 1px solid rgb(8, 196, 42);
+    margin-left: auto; /* Прижимает второй блок к правому краю */
+    text-align: start;
+    min-width: 400px;
+}
+.transport-ad-profile-truck-photo {
+    height: 300px;
+    border: 1px solid red;
+}
+
+.transport-ad-profile-truck-photo-preview-area {
+    height: 80px;
+    border: 1px solid red;
 }

@@ -22,3 +22,15 @@ export const uploadPhoto = async (path, file) => {
 export const formatNumber = (value) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 };
+
+// Обрезаем по третий знак после запятой:
+export const cutNumber = (num) => {
+    // Умножение трех чисел
+    const result = num; // Замените на ваше умножение
+
+    // Обрезаем число до трех знаков после запятой
+    const trimmed = Math.abs(result) < 1e-10 ? 0 : Number(result.toFixed(3));
+
+    // Форматируем число с запятой
+    return trimmed.toString().replace('.', ',');
+};
