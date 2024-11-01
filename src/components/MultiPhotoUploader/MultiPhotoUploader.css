@@ -1,0 +1,27 @@
+.multi-photo-uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+button {
+    margin: 5px;
+}
+
+.multi-photo-preview {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-top: 10px;
+    overflow-x: auto; /* Горизонтальная прокрутка для большого числа фото */
+    padding: 5px;
+    max-width: 100%; /* Ограничиваем ширину */
+}
+
+.multi-photo-preview-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+}

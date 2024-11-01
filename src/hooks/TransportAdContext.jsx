@@ -320,6 +320,22 @@ export const TransportAdProvider = ({ children }) => {
     };
     //<<<---
 
+    //Метод работы с загрузкой фото группой--->>>
+    const [photos, setPhotos] = useState([]);
+
+    const uploadPhotos = async (selectedPhotos) => {
+        try {
+            const uploadedPhotoUrls = await TransportAdService.uploadPhotoSet(
+                selectedPhotos
+            );
+            setPhotos((prevPhotos) => [...prevPhotos, ...uploadedPhotoUrls]);
+        } catch (error) {
+            console.error('Ошибка при загрузке фото:', error);
+        }
+    };
+
+    //<<<---
+
     return (
         <TransportAdContext.Provider
             value={{
@@ -334,6 +350,9 @@ export const TransportAdProvider = ({ children }) => {
                 loadReviewAds,
                 addReviewAd,
                 removeReviewAd,
+
+                photos,
+                uploadPhotos,
             }}
         >
             {children}

@@ -293,6 +293,19 @@ const TransportAdService = {
         }
     },
     //<<<---
+
+    //Метод для загрузки фото группой, возвращает массив ссылок, которые будет передавать объекту--->>>
+    uploadPhotoSet: async (selectedPhotos) => {
+        const photoUrls = [];
+        for (let photo of selectedPhotos) {
+            const photoRef = storageRef(storage, `truckPhotos/${photo.name}`);
+            await uploadBytes(photoRef, photo);
+            const url = await getDownloadURL(photoRef);
+            photoUrls.push(url);
+        }
+        return photoUrls;
+    },
+    //<<<---
 };
 
 export default TransportAdService;

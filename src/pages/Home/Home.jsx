@@ -21,7 +21,7 @@ import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
 import AdProfile from '../../components/AdProfile/AdProfile';
-
+import MultiPhotoUploader from '../../components/MultiPhotoUploader/MultiPhotoUploader';
 
 
 function Home() {
@@ -69,6 +69,8 @@ function Home() {
                 {/* <button onClick={handleUploadAds}>
                     Add ACTIVE for all ads
                 </button> */}
+
+                <MultiPhotoUploader />
 
                 <AdProfile
                     onSendRequest={handleSendRequest}

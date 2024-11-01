@@ -82,8 +82,8 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
         const valuePart = value ? (
             <div>
                 <strong>Габариты: </strong>
-                {value}м<sup>3</sup> ({truckHeight}м x {truckWidth}м x{' '}
-                {truckDepth}
+                {value}м<sup>3</sup> ({Number(truckHeight)}м x{' '}
+                {Number(truckWidth)}м x {Number(truckDepth)}
                 м)
             </div>
         ) : null;
@@ -91,7 +91,7 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
         const weightPart = truckWeight ? (
             <div>
                 <strong>Тоннаж: </strong>
-                {truckWeight}т
+                {Number(truckWeight)}т
             </div>
         ) : null;
 
