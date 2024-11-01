@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { FaUpload } from 'react-icons/fa';
 import { truckTypesWithLoading } from '../../constants/transportAdData'; // Импортируйте ваш массив типов грузовиков
 
+import MultiTruckPhotoUploader from '../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
+
 const TransportSection = ({ updateFormData, formData }) => {
     const [loadingTypes, setLoadingTypes] = useState([]);
 
@@ -10,18 +12,19 @@ const TransportSection = ({ updateFormData, formData }) => {
         updateFormData({ [name]: value }); // Передаем данные в родительский компонент
     };
 
-    const handleFileChange = (e) => {
-        const { files } = e.target;
-        if (files && files.length > 0) {
-            const file = files[0];
-            const reader = new FileReader();
+    //TODO нужно понять, что именно мы хотим при  нажатии на кружок. Может он и не нужен, а будем вставлять первое фото и все
+    // const handleFileChange = (e) => {
+    //     const { files } = e.target;
+    //     if (files && files.length > 0) {
+    //         const file = files[0];
+    //         const reader = new FileReader();
 
-            reader.onloadend = () => {
-                updateFormData({ truckPhotoUrl: reader.result }); // Обновляем состояние с помощью updateFormData
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    //         reader.onloadend = () => {
+    //             updateFormData({ truckPhotoUrl: reader.result }); // Обновляем состояние с помощью updateFormData
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // };
 
     const handleTransportTypeChange = (e) => {
         const transportTypeName = e.target.value;
@@ -76,7 +79,7 @@ const TransportSection = ({ updateFormData, formData }) => {
                     <div className='truck-name-photo'>
                         <div className='truck-name'>
                             <p className='new-ad-title without-bottom-margine'>
-                                Название:
+                                Марка машины:
                             </p>
                             <input
                                 type='text'
@@ -93,7 +96,7 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 id='truckPhoto'
                                 name='truckPhoto'
                                 accept='image/*'
-                                onChange={handleFileChange}
+                                // onChange={handleFileChange}
                                 style={{ display: 'none' }} // Скрываем стандартное поле ввода
                             />
                             <div
@@ -104,9 +107,9 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 }
                                 className='photo-circle'
                             >
-                                {formData.truckPhotoUrl ? (
+                                {formData.truckPhotoUrls ? (
                                     <img
-                                        src={formData.truckPhotoUrl}
+                                        src={formData.truckPhotoUrls[0]}
                                         alt='Превью фото машины'
                                         className='photo-preview'
                                     />
@@ -114,6 +117,12 @@ const TransportSection = ({ updateFormData, formData }) => {
                                     <span>Фото</span>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                    <div>
+                        {/* Загрузить фото */}
+                        <div>
+                            <MultiTruckPhotoUploader />
                         </div>
                     </div>
 

@@ -35,7 +35,7 @@ const CreateTransportAd = () => {
 
         truckId: '',
         truckName: '',
-        truckPhotoUrl: '',
+        truckPhotoUrls: [],
         transportType: '',
         truckWeight: 0,
         truckHeight: 0,
@@ -115,7 +115,10 @@ const CreateTransportAd = () => {
 
             truckId: Date.now(), // TODO Замените на реальный truckId
             truckName: formData.truckName,
-            truckPhotoUrl: formData.truckPhotoUrl,
+            truckPhotoUrls:
+                formData.truckPhotoUrls.length > 0
+                    ? formData.truckPhotoUrls
+                    : '',
             transportType: formData.transportType,
 
             loadingTypes:

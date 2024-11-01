@@ -89,6 +89,8 @@ const TransportAdService = {
 
             const normalizeReceivedData = (data) => ({
                 ...data,
+                truckPhotoUrls:
+                    data.truckPhotoUrls === '' ? [] : data.truckPhotoUrls,
                 loadingTypes: data.loadingTypes === '' ? [] : data.loadingTypes,
                 paymentOptions:
                     data.paymentOptions === '' ? [] : data.paymentOptions,
@@ -203,7 +205,7 @@ const TransportAdService = {
                     paymentOptions: ad.paymentOptions,
                     truckId: ad.truckId,
                     truckName: ad.truckName,
-                    truckPhotoUrl: ad.truckPhotoUrl,
+                    truckPhotoUrls: ad.truckPhotoUrls,
                     transportType: ad.transportType,
                     loadingTypes: ad.loadingTypes,
                     truckWeight: ad.truckWeight,
@@ -218,12 +220,16 @@ const TransportAdService = {
                 });
 
                 //!!! TODO Тужно быть аккуратней, кажется, что блок с фото удаляет ссылки. Проверяем, есть ли файл в truckPhotoUrl
-                if (ad.truckPhotoUrl && ad.truckPhotoUrl instanceof File) {
+                if (
+                    ad.truckPhotoUrls &&
+                    ad.truckPhotoUrls[0] &&
+                    ad.truckPhotoUrls[0] instanceof File
+                ) {
                     const photoUrl = await uploadPhoto(
                         'truckPhotos',
-                        ad.truckPhotoUrl
+                        ad.truckPhotoUrls[0]
                     ); // Загрузка фото и получение URL
-                    await update(newAdRef, { truckPhotoUrl: photoUrl }); // Обновляем ссылку на фото в объявлении
+                    await update(newAdRef, { truckPhotoUrls: photoUrl }); // TODO неправильное обновление. Нужно отладитьОбновляем ссылку на фото в объявлении
                 }
 
                 return newAdRef.key; // Возвращаем id нового объявления, если нужно

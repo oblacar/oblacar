@@ -67,7 +67,7 @@ const TransportAdItem = ({
         status,
         truckId,
         truckName,
-        truckPhotoUrl,
+        truckPhotoUrls,
         transportType,
         loadingTypes,
         truckWeight,
@@ -256,9 +256,9 @@ const TransportAdItem = ({
                     </div>
                     <div className='down-ad-row'>
                         <div className='car-photo-icon'>
-                            {truckPhotoUrl ? ( // Проверяем, есть ли фото
+                            {truckPhotoUrls && truckPhotoUrls[0] ? ( // Проверяем, есть ли фото
                                 <img
-                                    src={truckPhotoUrl}
+                                    src={truckPhotoUrls[0]}
                                     alt='Фото машины'
                                     className='photo-car' // Добавьте классы для стилизации
                                 />

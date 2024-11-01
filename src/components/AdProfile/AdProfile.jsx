@@ -22,7 +22,7 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
             paymentOptions: ['б/нал с НДС', 'б/нал без НДС'],
             truckId: 'truck_1',
             truckName: 'Mercedes-Benz Actros',
-            truckPhotoUrl: '',
+            truckPhotoUrls: '',
             transportType: 'Автовоз',
             loadingTypes: ['верхняя'],
             truckWeight: 5.9,

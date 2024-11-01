@@ -1,0 +1,100 @@
+.multi-photo-preview {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.multi-photo-preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgb(255, 255, 255);
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.multi-photo-preview-item:hover {
+    border: 2px solid rgb(18, 225, 18);
+    border-radius: 8px;
+}
+
+.multi-photo-preview-item:first-child {
+    border: 2px solid rgb(18, 225, 18);
+    border-radius: 8px;
+}
+
+.multi-photo-preview-item .multi-photo-preview-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.multi-photo-preview-image:active {
+    -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+}
+.delete-photo-icon {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+
+    color: rgb(137, 137, 137);
+
+    /* border: 1px solid rgb(240, 106, 106); */
+    background-color: white;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+}
+
+.delete-photo-icon:hover {
+    color: red;
+}
+
+.delete-photo-icon:active {
+    background-color: rgb(255, 99, 99);
+    color: white;
+}
+
+.multi-photo-btn-add-photos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: auto;
+
+    max-width: 36px;
+    max-height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+
+    transition: color 0.2s ease;
+    /* border: 1px solid rgb(71, 96, 177); */
+    border: 4px double rgb(71, 96, 177);
+    color: rgb(71, 96, 177);
+
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+
+.multi-photo-btn-add-photos:hover {
+    color: rgb(255, 255, 255);
+    background-color: rgb(71, 96, 177);
+    border: 4px double rgb(255, 255, 255);
+}
+.multi-photo-btn-add-photos:active {
+    -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+}
