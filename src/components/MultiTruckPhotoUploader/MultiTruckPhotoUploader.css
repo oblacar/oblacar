@@ -66,7 +66,7 @@
     color: white;
 }
 
-.multi-photo-btn-add-photos {
+/* .multi-photo-btn-add-photos {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,7 +79,6 @@
     min-height: 36px;
 
     transition: color 0.2s ease;
-    /* border: 1px solid rgb(71, 96, 177); */
     border: 4px double rgb(71, 96, 177);
     color: rgb(71, 96, 177);
 
@@ -97,4 +96,4 @@
     -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
     -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
     box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-}
+} */

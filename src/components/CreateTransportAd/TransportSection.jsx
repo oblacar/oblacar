@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FaUpload } from 'react-icons/fa';
+import { FaUpload, FaCamera } from 'react-icons/fa';
 import { truckTypesWithLoading } from '../../constants/transportAdData'; // Импортируйте ваш массив типов грузовиков
 
 import MultiTruckPhotoUploader from '../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
+import AddPhotoButton from '../common/AddPhotoButton/AddPhotoButton';
 
 const TransportSection = ({ updateFormData, formData }) => {
     const [loadingTypes, setLoadingTypes] = useState([]);
@@ -10,6 +11,10 @@ const TransportSection = ({ updateFormData, formData }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         updateFormData({ [name]: value }); // Передаем данные в родительский компонент
+    };
+
+    const openFileDialog = () => {
+        document.getElementById('file-upload').click();
     };
 
     //TODO нужно понять, что именно мы хотим при  нажатии на кружок. Может он и не нужен, а будем вставлять первое фото и все
@@ -78,19 +83,19 @@ const TransportSection = ({ updateFormData, formData }) => {
                 <div className='truck-corrector '>
                     <div className='truck-name-photo'>
                         <div className='truck-name'>
-                            <p className='new-ad-title without-bottom-margine'>
+                            {/* <p className='new-ad-title without-bottom-margine'>
                                 Марка машины:
-                            </p>
+                            </p> */}
                             <input
                                 type='text'
                                 id='truckName'
                                 name='truckName'
                                 value={formData.truckName}
                                 onChange={handleInputChange}
-                                placeholder='Название'
+                                placeholder='Марка машины'
                             />
                         </div>
-                        <div className='truck-photo'>
+                        {/* <div className='truck-photo'>
                             <input
                                 type='file'
                                 id='truckPhoto'
@@ -117,13 +122,13 @@ const TransportSection = ({ updateFormData, formData }) => {
                                     <span>Фото</span>
                                 )}
                             </div>
-                        </div>
+                        </div> */}
+                        <AddPhotoButton openFileDialog={openFileDialog} />
                     </div>
                     <div>
-                        {/* Загрузить фото */}
-                        <div>
-                            <MultiTruckPhotoUploader />
-                        </div>
+                        <MultiTruckPhotoUploader
+                            openFileDialog={openFileDialog}
+                        />
                     </div>
 
                     <p className='new-ad-title without-bottom-margine'>Тип:</p>

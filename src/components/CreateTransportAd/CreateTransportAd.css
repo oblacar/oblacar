@@ -20,7 +20,6 @@
 
 .button-submit-ad-div {
     margin-right: 5px;
-
 }
 
 button {
@@ -239,7 +238,15 @@ input.weight-input {
 
 .truck-name {
     flex: 1; /* Занимает всё доступное пространство */
-    margin-right: 20px; /* Отступ между элементами */
+    margin-right: 10px; /* Отступ между элементами */
+    display: flex;
+    align-items: center;
+}
+
+.truck-name input {
+    height: 44px;
+    margin: 0px;
+    font-size: 16px;
 }
 
 label.label-dimension {

@@ -10,7 +10,7 @@ import {
     FaTimes,
 } from 'react-icons/fa';
 
-const MultiTruckPhotoUploader = () => {
+const MultiTruckPhotoUploader = ({ openFileDialog }) => {
     const [selectedPhotos, setSelectedPhotos] = useState([]);
     const { uploadPhotos } = useContext(TransportAdContext); // Метод загрузки фото из контекста
 
@@ -52,13 +52,13 @@ const MultiTruckPhotoUploader = () => {
                 style={{ display: 'none' }}
                 id='file-upload'
             />
-            <div className='multi-photo-btn-add-photos'>
+            {/* <div className='multi-photo-btn-add-photos'>
                 <FaCamera
                     onClick={() =>
                         document.getElementById('file-upload').click()
                     }
                 />
-            </div>
+            </div> */}
             <div className='multi-photo-preview'>
                 {selectedPhotos.map((file, index) => (
                     <div
