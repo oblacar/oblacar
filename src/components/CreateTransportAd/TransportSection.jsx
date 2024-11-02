@@ -128,6 +128,7 @@ const TransportSection = ({ updateFormData, formData }) => {
                     <div>
                         <MultiTruckPhotoUploader
                             openFileDialog={openFileDialog}
+                            updateFormData={updateFormData}
                         />
                     </div>
 

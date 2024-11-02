@@ -1,45 +1,59 @@
 import React, { useState, useContext } from 'react';
-import TransportAdContext from '../../hooks/TransportAdContext'; // Импортируем контекс
+import TransportAdContext from '../../hooks/TransportAdContext';
 import './MultiTruckPhotoUploader.css';
-import {
-    FaCheckCircle,
-    FaTrash,
-    FaCamera,
-    FaTrashAlt,
-    FaImages,
-    FaTimes,
-} from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 
-const MultiTruckPhotoUploader = ({ openFileDialog }) => {
+const MultiTruckPhotoUploader = ({ openFileDialog, updateFormData }) => {
     const [selectedPhotos, setSelectedPhotos] = useState([]);
-    const { uploadPhotos } = useContext(TransportAdContext); // Метод загрузки фото из контекста
-
-    //Меню удаления фото из выбранных / установка фото в качестве главного--->>>
+    const { uploadPhotos } = useContext(TransportAdContext);
     const [menuVisible, setMenuVisible] = useState(null);
+
+    const handleFileChange = (event) => {
+        const { files } = event.target;
+        if (files && files.length > 0) {
+            const newTruckPhotoUrls = [];
+            const fileReaders = [];
+
+            Array.from(files).forEach((file) => {
+                const reader = new FileReader();
+                fileReaders.push(reader);
+
+                reader.onloadend = () => {
+                    newTruckPhotoUrls.push(reader.result);
+                    if (newTruckPhotoUrls.length === files.length) {
+                        setSelectedPhotos(newTruckPhotoUrls);
+                        updateFormData({ truckPhotoUrls: newTruckPhotoUrls });
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    };
 
     const makePrimary = (index) => {
         if (index !== 0) {
             const newPhotos = [...selectedPhotos];
+            // Перемещаем выбранное фото на первое место
             [newPhotos[0], newPhotos[index]] = [newPhotos[index], newPhotos[0]];
+
+            // Обновляем состояние выбранных фото
             setSelectedPhotos(newPhotos);
+
+            // Обновляем данные в родительской компоненте
+            updateFormData({ truckPhotoUrls: newPhotos });
         }
-        setMenuVisible(null);
     };
 
     const removePhoto = (index) => {
         const newPhotos = selectedPhotos.filter((_, i) => i !== index);
         setSelectedPhotos(newPhotos);
         setMenuVisible(null);
-    };
-
-    //<<<---
-    const handleFileChange = (event) => {
-        setSelectedPhotos([...event.target.files]); // Обновляем список выбранных файлов
+        updateFormData({ truckPhotoUrls: newPhotos });
     };
 
     const handleUpload = async () => {
         await uploadPhotos(selectedPhotos);
-        setSelectedPhotos([]); // Очистка после загрузки
+        setSelectedPhotos([]);
     };
 
     return (
@@ -52,15 +66,8 @@ const MultiTruckPhotoUploader = ({ openFileDialog }) => {
                 style={{ display: 'none' }}
                 id='file-upload'
             />
-            {/* <div className='multi-photo-btn-add-photos'>
-                <FaCamera
-                    onClick={() =>
-                        document.getElementById('file-upload').click()
-                    }
-                />
-            </div> */}
             <div className='multi-photo-preview'>
-                {selectedPhotos.map((file, index) => (
+                {selectedPhotos.map((url, index) => (
                     <div
                         key={index}
                         className='multi-photo-preview-item'
@@ -68,7 +75,7 @@ const MultiTruckPhotoUploader = ({ openFileDialog }) => {
                         onMouseLeave={() => setMenuVisible(null)}
                     >
                         <img
-                            src={URL.createObjectURL(file)}
+                            src={url}
                             alt='preview'
                             className='multi-photo-preview-image'
                             onClick={() => makePrimary(index)}
