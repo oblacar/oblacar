@@ -1,0 +1,61 @@
+.photo-carousel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* width: 100%; */
+    width: 300px;
+
+    border-radius: 10px;
+
+    -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+}
+
+.photo-carousel-active {
+    width: 100%;
+    height: 250px; /* Высота для большого фото */
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+
+    border-radius: 10px 10px 0px 0px;
+}
+
+.photo-carousel-active-image {
+    /* max-width: 100%;
+    max-height: 100%; */
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+.photo-carousel-previews {
+    display: flex;
+    gap: 5px;
+    overflow: hidden; /* Отключаем скроллинг */
+    width: 100%;
+    height: 100px; /* Высота полосы для миниатюр */
+    position: relative;
+}
+
+.photo-carousel-thumbnail {
+    width: 80px;
+    height: 80px;
+
+    border: 5px solid rgb(255, 255, 255);
+    border-radius: 10px;
+
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.photo-carousel-thumbnail:hover {
+    /* transform: scale(1.1); */
+    border: 5px solid rgb(235, 199, 166);
+    /* border-radius: 10px; */
+}

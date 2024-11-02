@@ -71,11 +71,12 @@ function Home() {
 
                 {/* <MultiPhotoUploader /> */}
 
-                {/* <AdProfile
+                <AdProfile
                     onSendRequest={handleSendRequest}
                     onMessage={handleMessage}
                     userType='cargoOwner' // или "transportOwner"
-                /> */}
+                    ad={ads.length > 0 ? ads[0].ad : null}
+                />
 
                 <TransportAdsList />
             </div>

@@ -1,41 +1,37 @@
 // src/components/AdProfile/AdProfile.js
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AdProfile.css';
 import { FaEnvelope, FaCheck, FaTimes } from 'react-icons/fa';
+import { cutNumber, formatNumber } from '../../utils/helper';
 
-import { cutNumber } from '../../utils/helper';
+import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
 
 const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
-    // Тестовые данные объявления
+    const [isLoading, setIsLoading] = useState(true);
+    //Фото блок--->>>
+    // Состояние для активного фото
+    const [activePhoto, setActivePhoto] = useState('');
+    const previewContainerRef = useRef(null);
 
-    const testAd2 = {
-        ad: {
-            adId: 'ad_10',
-            ownerId: 'owner_6',
-            availabilityDate: '30.10.2024',
-            departureCity: 'Томск',
-            destinationCity: 'Уфа',
-            price: 650,
-            paymentUnit: 'тыс. руб',
-            readyToNegotiate: false,
-            paymentOptions: ['б/нал с НДС', 'б/нал без НДС'],
-            truckId: 'truck_1',
-            truckName: 'Mercedes-Benz Actros',
-            truckPhotoUrls: '',
-            transportType: 'Автовоз',
-            loadingTypes: ['верхняя'],
-            truckWeight: 5.9,
-            truckHeight: 2.15,
-            truckWidth: 1.95,
-            truckDepth: 1.65,
-            ownerName: 'Борис',
-            ownerPhotoUrl: '',
-            ownerRating: 4.95,
-            status: 'active',
-        },
-        isInReviewAds: false,
+    useEffect(() => {
+        if (ad) {
+            setIsLoading(false);
+            setActivePhoto(() => ad.truckPhotoUrls?.[0]);
+        }
+    }, [ad]);
+
+    // Функция для смены активного фото
+    const handlePhotoClick = (photoUrl) => {
+        setActivePhoto(photoUrl);
     };
+    ///<<<---
+
+    if (isLoading) {
+        return <div className='loading'>Загрузка объявления...</div>;
+    }
+
+    console.log('прошли за проверку: ', ad);
 
     const {
         availabilityDate,
@@ -51,22 +47,19 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
         truckHeight,
         truckWidth,
         truckDepth,
-    } = testAd2.ad;
+    } = ad;
 
     const loadingTypesItem = () => {
-        const loadingTypesString = loadingTypes.join(', ');
-
+        const loadingTypesString = loadingTypes?.join(', ');
         return loadingTypesString ? (
             <>
-                <strong>Загрузка:</strong>
-                {loadingTypesString}
+                <strong>Загрузка:</strong> {loadingTypesString}
             </>
         ) : null;
     };
 
     const paymentOptionsItem = () => {
-        const paymentOptionsString = paymentOptions.join(', ');
-
+        const paymentOptionsString = paymentOptions?.join(', ');
         return paymentOptionsString ? (
             <>
                 <strong>Условия:</strong> {paymentOptionsString}
@@ -83,8 +76,7 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
             <div>
                 <strong>Габариты: </strong>
                 {value}м<sup>3</sup> ({Number(truckHeight)}м x{' '}
-                {Number(truckWidth)}м x {Number(truckDepth)}
-                м)
+                {Number(truckWidth)}м x {Number(truckDepth)}м)
             </div>
         ) : null;
 
@@ -103,25 +95,13 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
         );
     };
 
-    const testAd = {
-        truckName: 'Mercedes-Benz Actros',
-        loadingTypes: 'боковая',
-        truckWeight: '20 000 кг',
-        truckDimensions: '2.5 x 3 x 8 м',
-        departureCity: 'Москва',
-        destinationCity: 'Санкт-Петербург',
-        availabilityDate: '2024-11-01',
-        price: '5000 ₽',
-        paymentUnit: 'за поездку',
-        ownerName: 'Алексей Иванов',
-    };
-
-    const adData = ad || testAd;
-
     return (
         <>
             <div className='transport-ad-profile'>
                 <div className='transport-ad-profile-main-data'>
+                    <div className='transport-ad-profile-truck-photo-area'>
+                        <PhotoCarousel photos={ad.truckPhotoUrls || []} />
+                    </div>
                     <div className='transport-ad-profile-rout-date-price'>
                         <div className='transport-ad-profile-date transport-ad-profile-rout-date-price-row'>
                             <strong>Доступен:</strong> {availabilityDate}
@@ -133,7 +113,8 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
                             <strong>Куда:</strong> {destinationCity}
                         </div>
                         <div className='transport-ad-profile-price transport-ad-profile-rout-date-price-row'>
-                            <strong>Цена:</strong> {price} {paymentUnit}
+                            <strong>Цена:</strong> {formatNumber(String(price))}{' '}
+                            {paymentUnit}
                         </div>
                         <div className='transport-ad-profile-price transport-ad-profile-rout-date-price-row'>
                             {paymentOptionsItem()}
@@ -155,12 +136,6 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
                                 {loadingTypesItem()}
                             </div>
                         </div>
-                    </div>
-                    <div className='transport-ad-profile-truck-photo-area'>
-                        <div className='transport-ad-profile-truck-photo'>
-                            PHOTO
-                        </div>
-                        <div className='transport-ad-profile-truck-photo-preview-area'></div>
                     </div>
                 </div>
                 {userType === 'cargoOwner' ? (
