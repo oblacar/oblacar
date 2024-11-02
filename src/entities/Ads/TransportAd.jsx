@@ -11,13 +11,13 @@ export class TransportAd {
         price,
         paymentUnit,
         readyToNegotiate,
-        paymentOptions,
+        paymentOptions = [],
         status,
         truckId,
         truckName,
-        truckPhotoUrls = [], //делаем массив ссылок
+        truckPhotoUrls = [],
         transportType,
-        loadingTypes,
+        loadingTypes = [],
         truckWeight,
         truckHeight,
         truckWidth,
@@ -44,26 +44,10 @@ export class TransportAd {
         this.truckName = truckName; // имя карточки машины
 
         // this.truckPhotoUrls = truckPhotoUrls; // ссылка на фото машины
-        // this.truckPhotoUrls = Array.isArray(truckPhotoUrls)
-        //     ? truckPhotoUrls.filter((url) => url) // Убираем null значения
-        //     : [];
-
-        // this.truckPhotoUrls = Array.isArray(truckPhotoUrls)
-        //     ? truckPhotoUrls.map((url) => url || 'Empty URL')
-        //     : 'Not an array';
-
         // Создаем глубокую копию массива `truckPhotoUrls` для безопасности
         this.truckPhotoUrls = Array.isArray(truckPhotoUrls)
             ? [...truckPhotoUrls]
             : '';
-
-        // this.truckPhotoUrls = Object.freeze(['12', '23', '45']);
-
-        // console.log(
-        //     'Внутри сущности: truckPhotoUrls: ',
-        //     this.truckPhotoUrls,
-        //     this
-        // );
 
         this.transportType = transportType; // тип транспортного средства (например, грузовик, фура)
         this.loadingTypes = loadingTypes; // тип загрузки
@@ -71,7 +55,5 @@ export class TransportAd {
         this.truckHeight = truckHeight; // высота
         this.truckWidth = truckWidth; // ширина
         this.truckDepth = truckDepth; // глубина
-
-        // console.log('Сущность изнути при создании: ', this);
     }
 }

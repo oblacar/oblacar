@@ -130,16 +130,16 @@ const TransportAdService = {
 
             const normalizeReceivedData = (data) => ({
                 ...data,
-                truckPhotoUrls: Array.isArray(data.truckPhotoUrls)
-                    ? data.truckPhotoUrls
-                    : data.truckPhotoUrls
-                    ? [data.truckPhotoUrls]
-                    : [],
-
-                // truckPhotoUrls:
-                //     data.truckPhotoUrls === '' ? [] : data.truckPhotoUrls,
+                // truckPhotoUrls: Array.isArray(data.truckPhotoUrls)
+                //     ? data.truckPhotoUrls
+                //     : data.truckPhotoUrls
+                //     ? [data.truckPhotoUrls]
+                //     : [],
+                truckPhotoUrls:
+                    data.truckPhotoUrls === '' ? [] : data.truckPhotoUrls,
 
                 loadingTypes: data.loadingTypes === '' ? [] : data.loadingTypes,
+
                 paymentOptions:
                     data.paymentOptions === '' ? [] : data.paymentOptions,
                 // обработка других полей...
@@ -223,8 +223,7 @@ const TransportAdService = {
         try {
             // Проверяем, является ли file строкой base64 и конвертируем в File, если это так
             if (typeof file === 'string' && file.startsWith('data:image')) {
-                console.log('Конвертация base64 в File');
-                file = base64ToFile(file, `image_${Date.now()}.jpg`);
+                file = base64ToFile(file, `truck_${Date.now()}.jpg`);
             } else if (!(file instanceof File)) {
                 console.error('Неверный тип файла:', file);
                 return null;
@@ -239,7 +238,6 @@ const TransportAdService = {
             // получаем ссылку на загруженное фото
             const photoUrl = await getDownloadURL(photoRef);
 
-            console.log('Фото загружено:', photoUrl);
             return photoUrl; // возвращаем ссылку
         } catch (error) {
             console.error('Ошибка при загрузке фото:', error);

@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { FaPlus } from 'react-icons/fa';
+import { TransportAd } from '../../entities/Ads/TransportAd';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
@@ -12,18 +12,15 @@ import RouteSection from './RouteSection';
 import PaymentSection from './PaymentSection';
 import TransportSection from './TransportSection';
 
-import Button from '../common/Button/Button';
-
-// import TransportAdContext from '../../hooks/TransportAdContext'; // Импортируйте ваш TransportAdContext
-// import TransportContext from '../../hooks/TransportContext'; // Импортируйте ваш TransportContext
-import { TransportAd } from '../../entities/Ads/TransportAd';
-
 import './CreateTransportAd.css'; // Импортируйте файл стилей
+import Button from '../common/Button/Button';
+import { FaPlus } from 'react-icons/fa';
 
 const CreateTransportAd = () => {
     const { user } = useContext(AuthContext);
     const { addAd } = useContext(TransportAdContext);
 
+    //TODO Пока не используем переброску на главную страницу
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -51,10 +48,6 @@ const CreateTransportAd = () => {
         paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
     });
 
-    // useEffect(() => {
-    //     console.log(formData);
-    // }, [formData]);
-
     useEffect(() => {
         if (user) {
             setFormData((prev) => ({
@@ -62,7 +55,7 @@ const CreateTransportAd = () => {
                 ownerId: user.userId,
                 ownerName: user.userName,
                 ownerPhotoUrl: user.userPhoto,
-                ownerRating: user.userRating || 3.5, // Если у user нет рейтинга, по умолчанию 3.5
+                ownerRating: user.userRating || 3.5, // TODO. Если у user нет рейтинга, по умолчанию 3.5
             }));
         }
     }, [user]);
@@ -74,7 +67,7 @@ const CreateTransportAd = () => {
                 ownerId: user.userId,
                 ownerName: user.userName,
                 ownerPhotoUrl: user.userPhoto,
-                ownerRating: user.userRating || 3.5, // Если у user нет рейтинга, по умолчанию 3.5
+                ownerRating: user.userRating || 3.5, // TODO. Если у user нет рейтинга, по умолчанию 3.5
             }));
         }
     }, []);
@@ -91,17 +84,10 @@ const CreateTransportAd = () => {
     const handleSubmit = (e) => {
         e.preventDefault(); // Предотвращаем стандартное поведение формы
 
-        console.log('Перед созданием: ', formData);
-
         // Создание нового объекта транспортного объявления
-
         const newTransportAd = new TransportAd({
-            ...formData,
-        });
-        const newTransportAd2 = new TransportAd({
             adId: Date.now(), // TODO Пример генерации уникального ID
 
-            // ownerId: 'user123', // TODO Замените на реальный ownerId
             ownerId: formData.ownerId,
             ownerName: formData.ownerName,
             ownerPhotoUrl: formData.ownerPhotoUrl,
@@ -127,42 +113,30 @@ const CreateTransportAd = () => {
 
             truckId: Date.now(), // TODO Замените на реальный truckId
             truckName: formData.truckName,
-            // truckPhotoUrls:
-            //     formData.truckPhotoUrls.length > 0
-            //         ? formData.truckPhotoUrls
-            //         : '',
-            // truckPhotoUrls:
-            //     formData.truckPhotoUrls.length > 0
-            //         ? [...formData.truckPhotoUrls]
-            //         : '',
-            truckPhotoUrls: [...formData.truckPhotoUrls], // используем копию массива
+            truckPhotoUrls:
+                formData.truckPhotoUrls.length > 0
+                    ? formData.truckPhotoUrls
+                    : '',
 
             transportType: formData.transportType,
 
             loadingTypes:
                 formData.loadingTypes.length > 0 ? formData.loadingTypes : '',
+
             truckWeight: Number(formData.truckWeight),
             truckHeight: Number(formData.truckHeight),
             truckWidth: Number(formData.truckWidth),
             truckDepth: Number(formData.truckDepth),
         });
 
-        console.log('Костыль: ', newTransportAd);
-        // newTransportAd.truckPhotoUrls = formData.truckPhotoUrls;
-
-        console.log(
-            'объект и массив',
-            newTransportAd2,
-            formData.truckPhotoUrls
-        );
-        // console.log('Короткое создание - newTransportAd:', newTransportAd);
         // Здесь вы можете отправить данные в базу данных позже
+        // console.log('Создано новое объявление:', newTransportAd);
 
         try {
-            const result = addAd(newTransportAd2);
+            const result = addAd(newTransportAd);
 
             // if (result) {
-            //     navigate('/'); // Перенаправление на главную страницу
+            //     navigate('/'); // TODO. Нужно подумать, а правильно ли перекидывать на главную страниуц.
             // }
         } catch (error) {
             console.error('Ошибка при создании объявления:', error);
@@ -182,17 +156,15 @@ const CreateTransportAd = () => {
                             ad: formData,
                             isInReviewAds: false,
                         }}
-                        // rating='4'
                         isViewMode={true}
                     />
                 </div>
                 <div className='button-submit-ad-div'>
-                    {/* <button type='submit'>Создать объявление</button> */}
                     <Button
                         type='submit'
                         type_btn='yes'
                         children='Разместить'
-                        icon={<FaPlus />} // Передача иконки
+                        icon={<FaPlus />}
                     />
                 </div>
             </div>

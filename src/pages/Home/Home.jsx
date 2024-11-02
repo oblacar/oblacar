@@ -23,7 +23,6 @@ import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 import AdProfile from '../../components/AdProfile/AdProfile';
 import MultiPhotoUploader from '../../components/MultiPhotoUploader/MultiPhotoUploader';
 
-
 function Home() {
     const { ads } = useContext(TransportAdContext);
 
@@ -33,13 +32,13 @@ function Home() {
         // await TransportAdService.uploadAdsToFirebase(ads); // Вызываем функцию загрузки из сервиса
     };
 
- const handleSendRequest = (adData, status) => {
-     console.log('Отправка запроса:', adData, status);
- };
+    const handleSendRequest = (adData, status) => {
+        console.log('Отправка запроса:', adData, status);
+    };
 
- const handleMessage = () => {
-     console.log('Открытие чата с владельцем');
- };
+    const handleMessage = () => {
+        console.log('Открытие чата с владельцем');
+    };
 
     return (
         <>
@@ -70,15 +69,15 @@ function Home() {
                     Add ACTIVE for all ads
                 </button> */}
 
-                <MultiPhotoUploader />
+                {/* <MultiPhotoUploader /> */}
 
-                <AdProfile
+                {/* <AdProfile
                     onSendRequest={handleSendRequest}
                     onMessage={handleMessage}
                     userType='cargoOwner' // или "transportOwner"
-                />
+                /> */}
 
-                {/* <TransportAdsList /> */}
+                <TransportAdsList />
             </div>
         </>
     );

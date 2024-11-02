@@ -95,9 +95,6 @@ export const TransportAdProvider = ({ children }) => {
 
         await fetchRemainingReviewAds(remainingReviewAds, foundAds);
 
-        console.log(remainingReviewAds);
-        console.log(foundAds);
-
         return {
             enhancedAds,
             foundAds,
@@ -132,8 +129,6 @@ export const TransportAdProvider = ({ children }) => {
                 const initialReviewAds = await TransportAdService.getReviewAds(
                     user.userId
                 );
-
-                console.log(initialReviewAds);
 
                 // Преобразуем initialReviewAds в массив ключей
                 const reviewAdsArray = initialReviewAds
@@ -243,8 +238,6 @@ export const TransportAdProvider = ({ children }) => {
     // Функции для добавления, обновления и удаления объявлений/ возвращаем положительно
     const addAd = async (adData) => {
         try {
-            console.log('До вызова createAd:', adData);
-
             const isAdsStructure = (adData) => {
                 const requiredKeys = ['isInReviewAds'];
                 return requiredKeys.every((key) => adData[key] !== undefined);
@@ -253,13 +246,9 @@ export const TransportAdProvider = ({ children }) => {
             if (isAdsStructure(adData)) {
                 const newAd = await TransportAdService.createAd(adData.ad);
 
-                console.log('После вызова createAd с isAdsStructure:', newAd);
-
                 setAds((prevAds) => [...prevAds, newAd]);
             } else {
                 const newAd = await TransportAdService.createAd(adData);
-
-                console.log('После вызова createAd без isAdsStructure:', newAd);
 
                 setAds((prevAds) => [
                     ...prevAds,
