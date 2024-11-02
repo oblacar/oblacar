@@ -51,6 +51,10 @@ const CreateTransportAd = () => {
         paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
     });
 
+    // useEffect(() => {
+    //     console.log(formData);
+    // }, [formData]);
+
     useEffect(() => {
         if (user) {
             setFormData((prev) => ({
@@ -80,13 +84,21 @@ const CreateTransportAd = () => {
             ...prevState,
             ...newData,
         }));
+
+        // console.log(newData);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Предотвращаем стандартное поведение формы
 
+        console.log('Перед созданием: ', formData);
+
         // Создание нового объекта транспортного объявления
+
         const newTransportAd = new TransportAd({
+            ...formData,
+        });
+        const newTransportAd2 = new TransportAd({
             adId: Date.now(), // TODO Пример генерации уникального ID
 
             // ownerId: 'user123', // TODO Замените на реальный ownerId
@@ -115,10 +127,16 @@ const CreateTransportAd = () => {
 
             truckId: Date.now(), // TODO Замените на реальный truckId
             truckName: formData.truckName,
-            truckPhotoUrls:
-                formData.truckPhotoUrls.length > 0
-                    ? formData.truckPhotoUrls
-                    : '',
+            // truckPhotoUrls:
+            //     formData.truckPhotoUrls.length > 0
+            //         ? formData.truckPhotoUrls
+            //         : '',
+            // truckPhotoUrls:
+            //     formData.truckPhotoUrls.length > 0
+            //         ? [...formData.truckPhotoUrls]
+            //         : '',
+            truckPhotoUrls: [...formData.truckPhotoUrls], // используем копию массива
+
             transportType: formData.transportType,
 
             loadingTypes:
@@ -129,15 +147,23 @@ const CreateTransportAd = () => {
             truckDepth: Number(formData.truckDepth),
         });
 
-        console.log('Созданное объявление:', newTransportAd);
+        console.log('Костыль: ', newTransportAd);
+        // newTransportAd.truckPhotoUrls = formData.truckPhotoUrls;
+
+        console.log(
+            'объект и массив',
+            newTransportAd2,
+            formData.truckPhotoUrls
+        );
+        // console.log('Короткое создание - newTransportAd:', newTransportAd);
         // Здесь вы можете отправить данные в базу данных позже
 
         try {
-            const result = addAd(newTransportAd);
+            const result = addAd(newTransportAd2);
 
-            if (result) {
-                navigate('/'); // Перенаправление на главную страницу
-            }
+            // if (result) {
+            //     navigate('/'); // Перенаправление на главную страницу
+            // }
         } catch (error) {
             console.error('Ошибка при создании объявления:', error);
         }

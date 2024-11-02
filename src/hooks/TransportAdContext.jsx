@@ -243,7 +243,7 @@ export const TransportAdProvider = ({ children }) => {
     // Функции для добавления, обновления и удаления объявлений/ возвращаем положительно
     const addAd = async (adData) => {
         try {
-            console.log(adData);
+            console.log('До вызова createAd:', adData);
 
             const isAdsStructure = (adData) => {
                 const requiredKeys = ['isInReviewAds'];
@@ -253,9 +253,13 @@ export const TransportAdProvider = ({ children }) => {
             if (isAdsStructure(adData)) {
                 const newAd = await TransportAdService.createAd(adData.ad);
 
+                console.log('После вызова createAd с isAdsStructure:', newAd);
+
                 setAds((prevAds) => [...prevAds, newAd]);
             } else {
                 const newAd = await TransportAdService.createAd(adData);
+
+                console.log('После вызова createAd без isAdsStructure:', newAd);
 
                 setAds((prevAds) => [
                     ...prevAds,

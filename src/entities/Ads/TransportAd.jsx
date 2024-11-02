@@ -15,7 +15,7 @@ export class TransportAd {
         status,
         truckId,
         truckName,
-        truckPhotoUrls, //делаем массив ссылок
+        truckPhotoUrls = [], //делаем массив ссылок
         transportType,
         loadingTypes,
         truckWeight,
@@ -42,12 +42,36 @@ export class TransportAd {
         // Детали транспорта
         this.truckId = truckId; // id карточки машины в базе машин
         this.truckName = truckName; // имя карточки машины
-        this.truckPhotoUrls = truckPhotoUrls; // ссылка на фото машины
+
+        // this.truckPhotoUrls = truckPhotoUrls; // ссылка на фото машины
+        // this.truckPhotoUrls = Array.isArray(truckPhotoUrls)
+        //     ? truckPhotoUrls.filter((url) => url) // Убираем null значения
+        //     : [];
+
+        // this.truckPhotoUrls = Array.isArray(truckPhotoUrls)
+        //     ? truckPhotoUrls.map((url) => url || 'Empty URL')
+        //     : 'Not an array';
+
+        // Создаем глубокую копию массива `truckPhotoUrls` для безопасности
+        this.truckPhotoUrls = Array.isArray(truckPhotoUrls)
+            ? [...truckPhotoUrls]
+            : '';
+
+        // this.truckPhotoUrls = Object.freeze(['12', '23', '45']);
+
+        // console.log(
+        //     'Внутри сущности: truckPhotoUrls: ',
+        //     this.truckPhotoUrls,
+        //     this
+        // );
+
         this.transportType = transportType; // тип транспортного средства (например, грузовик, фура)
         this.loadingTypes = loadingTypes; // тип загрузки
         this.truckWeight = truckWeight; // вес загрузки
         this.truckHeight = truckHeight; // высота
         this.truckWidth = truckWidth; // ширина
         this.truckDepth = truckDepth; // глубина
+
+        // console.log('Сущность изнути при создании: ', this);
     }
 }

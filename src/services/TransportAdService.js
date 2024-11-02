@@ -18,7 +18,10 @@ import {
     push,
 } from 'firebase/database';
 
-import { uploadPhoto } from '../utils/helper';
+import {
+    base64ToFile,
+    uploadPhoto as uploadPhotoFromHelper,
+} from '../utils/helper';
 import testAds from '../constants/testData.json'; // Импортируйте тестовые данные
 
 const transportAdsRef = databaseRef(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
@@ -38,8 +41,46 @@ const TransportAdService = {
     // },
 
     // Метод для создания объявления с использованием ID от Firebase
+    // createAd: async (adData) => {
+    //     try {
+    //         // Создаем ссылку на новый узел в базе данных и добавляем данные с уникальным ключом
+    //         const newAdRef = push(databaseRef(db, 'transportAds'));
+    //         const adId = newAdRef.key; // Получаем уникальный ID
+
+    //         // Добавляем adId в объект объявления
+    //         const adWithId = { ...adData, adId };
+
+    //         // Сохраняем объявление в базе данных по сгенерированному Firebase ID
+    //         await set(newAdRef, adWithId);
+
+    //         // console.log('Объявление успешно создано с ID:', adId);
+    //         return adWithId; // Возвращаем обновленное объявление с ID
+    //     } catch (error) {
+    //         console.error('Ошибка при создании объявления:', error);
+    //         throw error;
+    //     }
+    // },
+
     createAd: async (adData) => {
         try {
+            // Проверяем, есть ли массив фото и загружаем каждое
+            if (adData.truckPhotoUrls && adData.truckPhotoUrls.length > 0) {
+                const photoUrls = await Promise.all(
+                    adData.truckPhotoUrls.map((file) =>
+                        TransportAdService.uploadPhoto(file)
+                    ) // TODO зачем-то берет файл из helper?
+                );
+                // Обновляем массив `truckPhotoUrls` ссылками на загруженные фото
+                adData.truckPhotoUrls = photoUrls;
+
+                if (adData.truckPhotoUrls.length === 0) {
+                    console.error('Не удалось загрузить ни одного фото.');
+                    throw new Error('Загрузка фото не удалась.');
+                }
+            }
+
+            console.log('Из сериса: ', adData);
+
             // Создаем ссылку на новый узел в базе данных и добавляем данные с уникальным ключом
             const newAdRef = push(databaseRef(db, 'transportAds'));
             const adId = newAdRef.key; // Получаем уникальный ID
@@ -89,8 +130,15 @@ const TransportAdService = {
 
             const normalizeReceivedData = (data) => ({
                 ...data,
-                truckPhotoUrls:
-                    data.truckPhotoUrls === '' ? [] : data.truckPhotoUrls,
+                truckPhotoUrls: Array.isArray(data.truckPhotoUrls)
+                    ? data.truckPhotoUrls
+                    : data.truckPhotoUrls
+                    ? [data.truckPhotoUrls]
+                    : [],
+
+                // truckPhotoUrls:
+                //     data.truckPhotoUrls === '' ? [] : data.truckPhotoUrls,
+
                 loadingTypes: data.loadingTypes === '' ? [] : data.loadingTypes,
                 paymentOptions:
                     data.paymentOptions === '' ? [] : data.paymentOptions,
@@ -169,13 +217,34 @@ const TransportAdService = {
         }
     },
 
+    //Метод загрузки одного фото в storage на firebase. Возвращает ссылку
+    // Обновленный метод uploadPhoto для обработки base64
     uploadPhoto: async (file) => {
-        if (!file) return;
+        try {
+            // Проверяем, является ли file строкой base64 и конвертируем в File, если это так
+            if (typeof file === 'string' && file.startsWith('data:image')) {
+                console.log('Конвертация base64 в File');
+                file = base64ToFile(file, `image_${Date.now()}.jpg`);
+            } else if (!(file instanceof File)) {
+                console.error('Неверный тип файла:', file);
+                return null;
+            }
 
-        const photoRef = storageRef(storage, `truckPhotos/${file.name}`); // создаем уникальную ссылку для фото
-        await uploadBytes(photoRef, file); // загружаем фото
-        const photoUrl = await getDownloadURL(photoRef); // получаем ссылку на загруженное фото
-        return photoUrl; // возвращаем ссылку
+            // создаем уникальную ссылку для фото
+            const photoRef = storageRef(storage, `truckPhotos/${file.name}`);
+
+            // загружаем фото
+            await uploadBytes(photoRef, file);
+
+            // получаем ссылку на загруженное фото
+            const photoUrl = await getDownloadURL(photoRef);
+
+            console.log('Фото загружено:', photoUrl);
+            return photoUrl; // возвращаем ссылку
+        } catch (error) {
+            console.error('Ошибка при загрузке фото:', error);
+            return null; // Вернем null, чтобы обработать ошибку
+        }
     },
 
     //Изменение структуры всей базы объявлений. Добавили поле status. Назначили всем active
@@ -225,7 +294,7 @@ const TransportAdService = {
                     ad.truckPhotoUrls[0] &&
                     ad.truckPhotoUrls[0] instanceof File
                 ) {
-                    const photoUrl = await uploadPhoto(
+                    const photoUrl = await uploadPhotoFromHelper(
                         'truckPhotos',
                         ad.truckPhotoUrls[0]
                     ); // Загрузка фото и получение URL

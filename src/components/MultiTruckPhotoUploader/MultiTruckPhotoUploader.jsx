@@ -10,25 +10,78 @@ const MultiTruckPhotoUploader = ({ openFileDialog, updateFormData }) => {
 
     const handleFileChange = (event) => {
         const { files } = event.target;
-        if (files && files.length > 0) {
-            const newTruckPhotoUrls = [];
-            const fileReaders = [];
 
-            Array.from(files).forEach((file) => {
+        if (files && files.length > 0) {
+            const newTruckPhotoUrls = []; // Для хранения результатов FileReader
+            const fileReaders = []; // Для отслеживания FileReader
+
+            Array.from(files).forEach((file, index) => {
                 const reader = new FileReader();
                 fileReaders.push(reader);
 
                 reader.onloadend = () => {
-                    newTruckPhotoUrls.push(reader.result);
-                    if (newTruckPhotoUrls.length === files.length) {
-                        setSelectedPhotos(newTruckPhotoUrls);
-                        updateFormData({ truckPhotoUrls: newTruckPhotoUrls });
+                    newTruckPhotoUrls[index] = reader.result; // Сохраняем в порядке загрузки
+                    if (
+                        newTruckPhotoUrls.filter(Boolean).length ===
+                        files.length
+                    ) {
+                        // Устанавливаем состояние, только когда все файлы загружены
+                        setSelectedPhotos(newTruckPhotoUrls); // Для локального отображения
+                        updateFormData({ truckPhotoUrls: newTruckPhotoUrls }); // Для отправки данных в formData
+                        
+                        // console.log(newTruckPhotoUrls);
                     }
                 };
                 reader.readAsDataURL(file);
             });
         }
     };
+
+    // const handleFileChange = (event) => {
+    //     const { files } = event.target;
+
+    //     if (files && files.length > 0) {
+    //         const newTruckPhotoUrls = [];
+    //         const fileReaders = [];
+
+    //         Array.from(files).forEach((file) => {
+    //             const reader = new FileReader();
+    //             fileReaders.push(reader);
+
+    //             reader.onloadend = () => {
+    //                 newTruckPhotoUrls.push(reader.result);
+    //                 if (newTruckPhotoUrls.length === files.length) {
+    //                     setSelectedPhotos(newTruckPhotoUrls);
+    //                     updateFormData({ truckPhotoUrls: newTruckPhotoUrls });
+    //                 }
+    //             };
+    //             reader.readAsDataURL(file);
+    //         });
+    //     }
+    // };
+
+    // const handleFileChange = (event) => {
+    //     const { files } = event.target;
+
+    //     if (files && files.length > 0) {
+    //         const fileArray = Array.from(files); // Преобразуем FileList в массив
+    //         console.log('Выбранные файлы:', fileArray);
+
+    //         // Проверка каждого файла
+    //         fileArray.forEach((file, index) => {
+    //             if (!file) {
+    //                 console.error(
+    //                     `Файл на позиции ${index} имеет значение null`
+    //                 );
+    //             } else {
+    //                 console.log(`Файл на позиции ${index}:`, file);
+    //             }
+    //         });
+
+    //         setSelectedPhotos(fileArray); // Обновляем список выбранных файлов
+    //         updateFormData({ truckPhotoUrls: fileArray }); // Передаем массив файлов в formData
+    //     }
+    // };
 
     const makePrimary = (index) => {
         if (index !== 0) {
