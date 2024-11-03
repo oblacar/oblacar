@@ -7,8 +7,10 @@ import {
     FaEnvelope,
     FaCheck,
     FaTimes,
+    FaEdit,
     FaCommentDots,
 } from 'react-icons/fa';
+import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
 import { cutNumber, formatNumber } from '../../utils/helper';
 
@@ -147,9 +149,30 @@ const PersonalTransportAdProfile = ({
                         </div>
                     </div>
                 </div>
-                <div className='transport-ad-profile-requests'>
-                    <strong>Запросы на перевозку</strong>
-                    {/* TODO реализация блока запросов */}
+                <div className='transport-ad-profile-btns'>
+                    <Button
+                        type='button'
+                        children='Редактировать'
+                        icon={<PencilSquareIcon />}
+                        className='transport-ad-profile-correction-btn'
+                    />
+                    <Button
+                        type='button'
+                        children='Удалить'
+                        type_btn='no'
+                        icon={<TrashIcon />}
+                        className='transport-ad-profile-delete-btn'
+                    />
+                </div>
+            </div>
+            <div className='transport-ad-profile-requests'>
+                <strong>Запросы на перевозку</strong>
+                {/* TODO реализация блока запросов */}
+                <div>
+                    <p>
+                        Запросов на перевозку по данному объявлению еще не
+                        поступало
+                    </p>
                 </div>
             </div>
         </>

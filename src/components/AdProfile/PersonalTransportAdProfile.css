@@ -3,6 +3,7 @@
     border: 1px solid rgb(231, 231, 231);
     padding: 10px;
     border-radius: 5px;
+    margin-bottom: 30px;
     /* background-color: #fcfcfc; */
 }
 
@@ -85,12 +86,28 @@
 }
 
 /*Информация о пользователе*/
-.transport-ad-profile-requests {
-    padding-top: 10px;
-    margin-top: 30px;
+.transport-ad-profile-requests strong{
+    /* padding-top: 20px;
+    margin-top: 30px; */
     /* border: 1px solid black; */
-    border-top: 4px solid rgb(224, 234, 255);
-    height: 100px;
+    /* border-top: 4px solid rgb(224, 234, 255); */
+
+    /* height: 100px; */
+    font-size: 24px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 /*<<<---*/
+
+.transport-ad-profile-btns {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin-top: 20px;
+}
+.transport-ad-profile-correction-btn {
+    display: inline-block;
+}
+.transport-ad-profile-delete-btn {
+    display: inline-block;
+}

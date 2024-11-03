@@ -112,4 +112,7 @@
     margin-right: 8px; /* Отступ от текста */
     display: inline-flex;
     align-items: center;
+
+    width: 18px; /* Установите нужные размеры */
+    height: 18px;
 }
