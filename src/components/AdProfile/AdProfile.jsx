@@ -2,29 +2,37 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import './AdProfile.css';
-import { FaEnvelope, FaCheck, FaTimes } from 'react-icons/fa';
+import {
+    FaUser,
+    FaEnvelope,
+    FaCheck,
+    FaTimes,
+    FaCommentDots,
+} from 'react-icons/fa';
+
 import { cutNumber, formatNumber } from '../../utils/helper';
 
 import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
+import Button from '../common/Button/Button';
 
 const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
     const [isLoading, setIsLoading] = useState(true);
     //Фото блок--->>>
     // Состояние для активного фото
-    const [activePhoto, setActivePhoto] = useState('');
-    const previewContainerRef = useRef(null);
+    // const [activePhoto, setActivePhoto] = useState('');
+    // const previewContainerRef = useRef(null);
 
     useEffect(() => {
         if (ad) {
             setIsLoading(false);
-            setActivePhoto(() => ad.truckPhotoUrls?.[0]);
+            // setActivePhoto(() => ad.truckPhotoUrls?.[0]);
         }
     }, [ad]);
 
     // Функция для смены активного фото
-    const handlePhotoClick = (photoUrl) => {
-        setActivePhoto(photoUrl);
-    };
+    // const handlePhotoClick = (photoUrl) => {
+    //     setActivePhoto(photoUrl);
+    // };
     ///<<<---
 
     if (isLoading) {
@@ -34,6 +42,8 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
     console.log('прошли за проверку: ', ad);
 
     const {
+        ownerPhotoUrl,
+        ownerName,
         availabilityDate,
         departureCity,
         destinationCity,
@@ -47,6 +57,7 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
         truckHeight,
         truckWidth,
         truckDepth,
+        ownerRating,
     } = ad;
 
     const loadingTypesItem = () => {
@@ -138,7 +149,56 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
                         </div>
                     </div>
                 </div>
-                {userType === 'cargoOwner' ? (
+                <div className='transport-ad-profile-owner-data'>
+                    <div className='transport-ad-profile-user-data'>
+                        <div className='transport-ad-profile-user-photo-rating'>
+                            <div className='transport-ad-profile-user-photo'>
+                                {ownerPhotoUrl ? ( // Проверяем, есть ли фото
+                                    <img
+                                        src={ownerPhotoUrl}
+                                        alt='Хозяин объявления'
+                                        className='transport-ad-profile-photo-car-owner'
+                                    />
+                                ) : (
+                                    <FaUser />
+                                )}
+                                {ownerRating ? (
+                                    <div className='transport-ad-profile-user-rating'>
+                                        ★ {ownerRating}
+                                    </div>
+                                ) : (
+                                    ''
+                                )}
+                            </div>
+                        </div>
+                        <div className='transport-ad-profile-user-name'>
+                            {ownerName}
+                        </div>
+
+                        <div className='transport-ad-profile-user-btn-message'>
+                            <Button
+                                type='button'
+                                children='Написать'
+                                icon={<FaCommentDots />}
+                            />
+                        </div>
+                    </div>
+                    <div className='transport-ad-profile-owner-send-request'>
+                        <strong>
+                            Опишите груз и отправьте Перевозчику запрос на
+                            подтверждение доставки.
+                        </strong>
+                        <textarea placeholder='Описание вашего груза и детали перевозки.'></textarea>
+                        <Button
+                            type='button'
+                            children='Отправить запрос'
+                            icon={<FaEnvelope />}
+                            type_btn='reverse'
+                        />
+                    </div>
+                </div>
+
+                {/* {userType === 'cargoOwner' ? (
                     <div className='ad-profile-actions'>
                         <button
                             className='ad-profile-request-btn'
@@ -168,7 +228,7 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
                             <FaTimes /> Отклонить запрос
                         </button>
                     </div>
-                ) : null}
+                ) : null} */}
             </div>
         </>
     );

@@ -1,17 +1,55 @@
+.ad-profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ad-profile-request-btn,
+.ad-profile-message-btn,
+.ad-profile-approve-btn,
+.ad-profile-decline-btn {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.ad-profile-request-btn {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.ad-profile-message-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.ad-profile-approve-btn {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.ad-profile-decline-btn {
+    background-color: #d9534f;
+    color: #fff;
+}
 
 /*Профиль транспортного объявления*/
 .transport-ad-profile {
-    border: 1px solid rgb(231, 231, 231);
+    /* border: 1px solid rgb(231, 231, 231); */
     padding: 10px;
     border-radius: 5px;
     /* background-color: #fcfcfc; */
 }
 
 .transport-ad-profile-main-data {
+    /* border: 1px solid rgb(238, 46, 46); */
     display: flex;
 }
 .transport-ad-profile-rout-date-price {
-    /* border: 1px solid rgb(175, 175, 175); */
+    border: 1px solid rgb(175, 175, 175);
     min-width: 300px;
     width: 100%;
     text-align: start;
@@ -22,9 +60,9 @@
     margin-left: 20px;
     padding: 10px;
 
-    /* -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
     -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2); */
+    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
 }
 .transport-ad-profile-date {
     /* border: 1px solid rgb(13, 132, 7); */
@@ -92,29 +130,30 @@
 
 /*Информация о пользователе*/
 .transport-ad-profile-owner-data {
-    display: flex;
-    /* width: 100%; */
-    border: 1px solid rgb(202, 202, 202);
+    width: 100%;
+    border: 1px solid red;
+
     margin-top: 20px;
-    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    /* gap: 15px;  */
     padding: 10px;
-    gap: 20px; /* Расстояние между фото и блоком запроса */
-    align-items: stretch; /* Растягиваем элементы по высоте */
-
-    -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-    -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-
 }
 
-/* Блок с фото и именем пользователя */
 .transport-ad-profile-user-data {
+    border: 1px solid brown;
+
+    color: rgb(53, 53, 53);
+
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    min-width: 120px;
+
+    min-width: 100px;
     text-align: center;
-    color: rgb(53, 53, 53);
 }
 
 /*Пользователь*/
@@ -175,41 +214,11 @@
     align-items: center; */
     flex-shrink: 0; /* Запрещаем кнопке сжиматься */
 }
-/* Блок отправки запроса */
+/*Отправка запроса за подверждение перевозки*/
 .transport-ad-profile-owner-send-request {
-    flex-grow: 1; /* Занимаем оставшееся пространство */
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    /* border: 1px solid green; */
-    background-color: #6abbf8;
-    color: #fff;
-    border-radius: 10px;
-}
+    border: 1px solid green;
 
-/* Текст запроса */
-.transport-ad-profile-owner-send-request strong {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-}
-
-/* Многострочное поле */
-.transport-ad-profile-owner-send-request textarea {
-    resize: none; /* Запрещаем изменение размера */
-    flex-grow: 1; /* Растягиваем на всю высоту */
-    /* width: 100%; */
-    min-height: 100px;
-    margin-bottom: 10px;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-/* Кнопка отправки */
-.transport-ad-profile-owner-send-request button {
-    align-self: flex-end; /* Прижимаем кнопку к правому краю */
+    background-color: #d9534f;
 }
 
 /*<<<---*/
