@@ -13,6 +13,9 @@ import {
     FaUserCircle,
 } from 'react-icons/fa';
 
+import { BookmarkIcon as BookmarkIconSolid } from '@heroicons/react/24/solid';
+import { BookmarkIcon as BookmarkIconOutline } from '@heroicons/react/24/outline';
+
 import TransportAdContext from '../../hooks/TransportAdContext';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 
@@ -204,22 +207,20 @@ const TransportAdItem = ({
                 }   ${isActive ? '' : 'ad-item-not-available'}`}
             >
                 {isInReviewAds ? (
-                    <div className={`ad-item-show-in-review`}>
-                        <FaCheck />
-                    </div>
+                    <>
+                        <div className={`ad-item-show-in-review`}>
+                            <FaCheck />
+                        </div>
+                        {/* <BookmarkIconSolid className='bookmark-icon-solid' /> */}
+                    </>
                 ) : (
+                    // <BookmarkIconOutline className='bookmark-icon-outline ' />
                     ''
                 )}
 
-                {/* <div className={`row ${rowColor}`}> */}
                 <div className='row'>
                     <Link to={`/ads/${adId}`}>
                         <div className='upper-ad-row'>
-                            {/* <div className='rating-star'>
-                        {rating < 2 ? null : (
-                            <SingleRatingStar rating={rating} />
-                            )}
-                            </div> */}
                             <div className='departure-location-date'>
                                 <div className='availability-date'>
                                     {availabilityDate}

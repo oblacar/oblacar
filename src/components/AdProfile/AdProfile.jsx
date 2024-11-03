@@ -8,10 +8,10 @@ import AuthContext from '../../hooks/Authorization/AuthContext';
 import PersonalTransportAdProfile from './PersonalTransportAdProfile';
 import OtherTransportAdProfile from './OtherTransportAdProfile';
 
-const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
-    const { user } = useContext(AuthContext);
+const AdProfile = ({ ad }) => {
+    const { user, isAuthenticated } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
-  
+
     useEffect(() => {
         if (ad) {
             setIsLoading(false);
@@ -27,7 +27,7 @@ const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
     return (
         <>
             <div>
-                {ownerId === user.userId ? (
+                {isAuthenticated && ownerId === user.userId ? (
                     <PersonalTransportAdProfile ad={ad} />
                 ) : (
                     <OtherTransportAdProfile ad={ad} />

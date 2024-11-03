@@ -367,3 +367,23 @@
     color: rgb(86, 233, 86);
     z-index: 1;
 }
+
+/*Иконки закладок*/
+
+.bookmark-icon-outline {
+    height: 24px;
+    color: rgb(195, 195, 195);
+    position: absolute;
+    top: -3px;
+    left: 10px;
+    z-index: 2;
+}
+
+.bookmark-icon-solid {
+    height: 24px;
+    color: red;
+    position: absolute;
+    top: -3px;
+    left: 10px;
+    z-index: 2;
+}

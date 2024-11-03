@@ -171,16 +171,19 @@
     flex-direction: column;
     padding: 10px;
 
-    background-color: #6abbf8;
-    color: #fff;
+    /* background-color: #6abbf8; */
+    background-color: rgb(209, 241, 255);
     border-radius: 10px;
 }
 
 /* Текст запроса */
 .transport-ad-profile-owner-send-request strong {
     font-weight: bold;
+    color: #293049;
     display: block;
     margin-bottom: 8px;
+
+    text-align: center;
 }
 
 /* Многострочное поле */
