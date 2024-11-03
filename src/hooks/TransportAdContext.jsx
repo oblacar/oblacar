@@ -264,6 +264,11 @@ export const TransportAdProvider = ({ children }) => {
         }
     };
 
+    // Метод для поиска объявления по ID
+    const getAdById = (adId) => {
+        return ads.find((ad) => ad.ad.adId === adId);
+    };
+
     const updateAd = async (adId, updatedData) => {
         // Реализуйте логику обновления
     };
@@ -336,6 +341,8 @@ export const TransportAdProvider = ({ children }) => {
                 loading,
                 error,
                 addAd,
+                getAdById,
+
                 updateAd,
                 deleteAd,
 

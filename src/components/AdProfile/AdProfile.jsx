@@ -11,7 +11,7 @@ import OtherTransportAdProfile from './OtherTransportAdProfile';
 const AdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
     const { user } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
-
+  
     useEffect(() => {
         if (ad) {
             setIsLoading(false);

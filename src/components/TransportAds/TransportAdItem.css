@@ -293,6 +293,19 @@
 /*<<<---*/
 .icon-item-ad-bar {
     width: 100px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.icon-item-ad-bar-filler {
+    flex-grow: 1;
+    height: 44px;
+}
+
+.container-icon-add {
+    margin-right: 3px;
 }
 
 .icon-add {
@@ -345,12 +358,6 @@
     -webkit-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
     -moz-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
     box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
-}
-
-.container-icon-add {
-    /* display: inline-block; */
-    float: right;
-    margin-right: 3px;
 }
 
 .ad-item-show-in-review {

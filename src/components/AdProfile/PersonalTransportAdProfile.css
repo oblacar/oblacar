@@ -86,13 +86,18 @@
 }
 
 /*Информация о пользователе*/
-.transport-ad-profile-requests strong{
-    /* padding-top: 20px;
-    margin-top: 30px; */
-    /* border: 1px solid black; */
-    /* border-top: 4px solid rgb(224, 234, 255); */
+.transport-ad-profile-requests {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Если нужно также вертикальное выравнивание */
+    text-align: center; /* Центрирует текст внутри блока */
+}
 
-    /* height: 100px; */
+.transport-ad-profile-requests div {
+    text-align: center;
+}
+
+.transport-ad-profile-requests strong {
     font-size: 24px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }

@@ -9,6 +9,7 @@ import Home from './pages/Home/Home';
 import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
 import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страницы аутентификации
 import NewTransportAd from './pages/Ads/NewTransportAd/NewTransportAd';
+import AdPage from './pages/Ads/AdPage';
 
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
@@ -52,6 +53,14 @@ const App = () => {
                                         <Route
                                             path='/new-tansport-ad'
                                             element={<NewTransportAd />}
+                                        />
+                                        {/* <Route
+                                            path='/ads'
+                                            element={<AdList />}
+                                        /> */}
+                                        <Route
+                                            path='/ads/:adId'
+                                            element={<AdPage />}
                                         />
                                     </Route>
                                 </Routes>

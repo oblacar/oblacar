@@ -159,20 +159,22 @@ const PersonalTransportAdProfile = ({
                     <Button
                         type='button'
                         children='Удалить'
-                        type_btn='no'
+                        type_btn='reverse-no'
                         icon={<TrashIcon />}
                         className='transport-ad-profile-delete-btn'
                     />
                 </div>
             </div>
             <div className='transport-ad-profile-requests'>
-                <strong>Запросы на перевозку</strong>
-                {/* TODO реализация блока запросов */}
                 <div>
-                    <p>
-                        Запросов на перевозку по данному объявлению еще не
-                        поступало
-                    </p>
+                    <strong>Запросы на перевозку</strong>
+                    {/* TODO реализация блока запросов */}
+                    <div>
+                        <p>
+                            Запросов на перевозку по данному объявлению еще не
+                            поступало
+                        </p>
+                    </div>
                 </div>
             </div>
         </>

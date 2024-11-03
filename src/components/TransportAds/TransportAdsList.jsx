@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import TransportAdContext from '../../hooks/TransportAdContext';
 import TransportAdItem from './TransportAdItem';
 import './TransportAdsList.css';
@@ -25,11 +26,14 @@ const TransportAdsList = () => {
                     ads.map((ad, index) => {
                         return (
                             ad && (
-                                <TransportAdItem
-                                    key={ad.ad.adId || index}
-                                    ad={ad}
-                                    isActive={ad.ad.status === 'active'}
-                                />
+                                <div key={ad.ad.adId || index}>
+                                    {/* <Link to={`/ads/${ad.ad.adId}`}> */}
+                                    <TransportAdItem
+                                        ad={ad}
+                                        isActive={ad.ad.status === 'active'}
+                                    />
+                                    {/* </Link> */}
+                                </div>
                             )
                         );
                     })
