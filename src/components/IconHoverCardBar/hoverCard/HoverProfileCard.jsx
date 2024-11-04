@@ -6,6 +6,8 @@ import { setTopLeftHover } from './hoverCardFunctions';
 import './hoverCard.css';
 import './hoverProfileStyle.css';
 
+//TODO Проверить этот компонент, кажется, что это неиспользуемый компонент
+
 export const HoverProfileCard = ({
     isHoveredIcon,
     setIsProfileHovered,
@@ -13,7 +15,7 @@ export const HoverProfileCard = ({
     windowWidth,
 }) => {
     const [isHoveredCard, setIsHoveredCard] = useState(false);
-    const { selectUserProfileSection, logOut } = useContext(AuthContext);
+    const { logOut } = useContext(AuthContext);
 
     const handleMouseEnter = () => {
         setIsHoveredCard(true);
@@ -31,7 +33,7 @@ export const HoverProfileCard = ({
     };
 
     const handleSectionClick = (userSection) => {
-        selectUserProfileSection(userSection);
+        // selectUserProfileSection(userSection);
         setIsHoveredCard(false);
         setIsProfileHovered(false);
     };

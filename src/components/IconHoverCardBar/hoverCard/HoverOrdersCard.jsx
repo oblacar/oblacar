@@ -2,7 +2,8 @@ import { useState, useContext } from 'react';
 import { setTopLeftHover } from './hoverCardFunctions';
 import './hoverCard.css'; // Создайте файл стилей HoverCard.css
 
-import AuthContext from '../../../hooks/Authorization/AuthContext';
+// import AuthContext from '../../../hooks/Authorization/AuthContext';
+import UserContext from '../../../hooks/UserContext';
 
 import { PrevieReviewAdsList } from '../../ReviewAds/PreviewReviewAdsList';
 
@@ -11,7 +12,9 @@ export const HoverOrdersCard = ({
     iconCoordinates,
     windowWidth,
 }) => {
-    const { isAuthenticated } = useContext(AuthContext);
+    // const { isAuthenticated } = useContext(AuthContext);//TODO Try relocated on UserContext
+    const { isUserLoaded } = useContext(UserContext);
+
     const [isHoveredCard, setIsHoveredCard] = useState(false);
 
     const handleMouseEnter = () => {
@@ -32,7 +35,7 @@ export const HoverOrdersCard = ({
         >
             <div className='hover-card-content '>
                 <p className='hover-card-title'>Варианты</p>
-                {isAuthenticated ? (
+                {isUserLoaded ? (
                     <PrevieReviewAdsList />
                 ) : (
                     <p>

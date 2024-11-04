@@ -186,7 +186,7 @@ const OtherTransportAdProfile = ({
                             Опишите груз и отправьте Перевозчику запрос на
                             подтверждение доставки.
                         </strong>
-                        <textarea placeholder='Описание вашего груза и детали перевозки.'></textarea>
+                        <textarea placeholder='Описание вашего груза и деталей перевозки.'></textarea>
                         <Button
                             type='button'
                             children='Отправить запрос'

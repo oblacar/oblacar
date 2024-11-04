@@ -1,23 +1,22 @@
-import React, {
-    createContext,
-    useReducer,
-    useEffect,
-    useContext,
-    useState,
-} from 'react';
+import React, { createContext, useReducer, useEffect } from 'react';
 import authReducer from './authReducer';
 import { userService } from '../../services/UserService'; // Импорт UserService для взаимодействия с Firebase
 // import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Импорт аутентификации Firebase
 
-import UserContext from '../UserContext'; // Импортируем UserContext
+// import UserContext from '../UserContext'; //TODO закоментил при переходе на ЮзерКонтекст
 
 // Создание контекста
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(authReducer, { user: null });
+    // const [state, dispatch] = useReducer(authReducer, { user: null });//TODO перевозим пользователя в ЮзерКонтекст
+    const [state, dispatch] = useReducer(authReducer, {
+        userId: null,
+        isAuthenticated: false,
+    });
+
     // const auth = getAuth();
-    const { dispatch: userDispatch } = useContext(UserContext); // Получаем dispatch из UserContext напрямую
+    // const { dispatch: userDispatch } = useContext(UserContext); //TODO закоментил при переходе на ЮзерКонтекст
     // const [erMessage, setErMessage] = useState(''); // Состояние для ошибок
 
     // Эффект для проверки состояния пользователя при загрузке
@@ -29,45 +28,50 @@ export const AuthProvider = ({ children }) => {
             // auth.signOut();
             userService.logoutUser();
             dispatch({ type: 'LOGOUT' });
-            userDispatch({ type: 'CLEAR_USER' });
+            // userDispatch({ type: 'CLEAR_USER' });//TODO закоментил при переходе на ЮзерКонтекст
             return; // Останавливаем выполнение, если токен отсутствует
         }
 
+        // Отслеживаем изменения аутентификации
         const unsubscribe = userService.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
+                    //TODO вставили корткий вариант вместо закоменченого
+                    dispatch({ type: 'LOGIN', payload: { userId: user.uid } });
+
                     console.log(
                         'Пользователь аутентифицирован, UID:',
                         user.uid
                     );
 
-                    // Если пользователь авторизован, подтягиваем его профиль из базы данных
-                    const userProfile = await userService.getUserProfile(
-                        user.uid
-                    );
+                    //TODO закоменчиваем блок для переноса логики в ЮрезКонтекст
+                    // // Если пользователь авторизован, подтягиваем его профиль из базы данных
+                    // const userProfile = await userService.getUserProfile(
+                    //     user.uid
+                    // );
 
-                    if (userProfile) {
-                        console.log(
-                            'Загружен профиль пользователя:',
-                            userProfile
-                        );
+                    // if (userProfile) {
+                    //     console.log(
+                    //         'Загружен профиль пользователя:',
+                    //         userProfile
+                    //     );
 
-                        dispatch({
-                            type: 'LOGIN',
-                            payload: { ...user, ...userProfile },
-                        });
+                    //     dispatch({
+                    //         type: 'LOGIN',
+                    //         payload: { ...user, ...userProfile },
+                    //     });
 
-                        userDispatch({
-                            type: 'SET_USER',
-                            payload: { ...user, ...userProfile },
-                        });
-                    } else {
-                        console.error(
-                            'Профиль пользователя не найден. Ожидаем его создание.'
-                        );
-                        // Здесь можно добавить логику ожидания, например, через setInterval, чтобы
-                        // повторить попытку загрузки через несколько секунд.
-                    }
+                    //     // userDispatch({
+                    //     //     type: 'SET_USER',
+                    //     //     payload: { ...user, ...userProfile },
+                    //     // });//TODO закоментил при переходе на ЮзерКонтекст
+                    // } else {
+                    //     console.error(
+                    //         'Профиль пользователя не найден. Ожидаем его создание.'
+                    //     );
+                    //     // Здесь можно добавить логику ожидания, например, через setInterval, чтобы
+                    //     // повторить попытку загрузки через несколько секунд.
+                    // }
                 } catch (error) {
                     console.error(
                         'Ошибка загрузки профиля пользователя:',
@@ -78,18 +82,14 @@ export const AuthProvider = ({ children }) => {
                 dispatch({ type: 'LOGOUT' });
 
                 // Очищаем состояние пользователя в UserContext
-                userDispatch({ type: 'CLEAR_USER' });
+                // userDispatch({ type: 'CLEAR_USER' });//TODO закоментил при переходе на ЮзерКонтекст
             }
         });
 
         // Очистка подписки при размонтировании компонента
         return () => unsubscribe();
-    }, [userDispatch]);
-
-    //Обнулим текст ошибки
-    // const resetError = () => {
-    //     // setErMessage(() => '');
-    // };
+        // }, [userDispatch]);//TODO for relocating in UserContext
+    }, []);
 
     // Функция для регистрации
     const register = async (data) => {
@@ -98,16 +98,17 @@ export const AuthProvider = ({ children }) => {
             const user = await userService.registerUser(data);
 
             // Загружаем профиль пользователя из базы данных
-            const userProfile = await userService.getUserProfile(user.uid);
+            // const userProfile = await userService.getUserProfile(user.uid);//TODO переводим Юзера в ЮзерКонтекст
 
             // Обновляем состояние аутентификации
-            dispatch({ type: 'LOGIN', payload: { ...user, ...userProfile } });
+            // dispatch({ type: 'LOGIN', payload: { ...user, ...userProfile } });
+            dispatch({ type: 'LOGIN', payload: { userId: user.uid } });
 
             // Обновляем состояние в UserContext через dispatch
-            userDispatch({
-                type: 'SET_USER',
-                payload: { ...user, ...userProfile },
-            });
+            // userDispatch({
+            //     type: 'SET_USER',
+            //     payload: { ...user, ...userProfile },
+            // });//TODO закоментил при переходе на ЮзерКонтекст
 
             // Сохраняем токен в localStorage
             localStorage.setItem('authToken', user.uid);
@@ -116,6 +117,8 @@ export const AuthProvider = ({ children }) => {
             console.log(
                 'Пользователь успешно вошёл в систему после регистрации'
             );
+
+            return user; //TODO пока нигде не используется вроде бы. Нужно проверять.
         } catch (error) {
             // console.error('Ошибка регистрации и входа:', error.message);
 
@@ -132,16 +135,17 @@ export const AuthProvider = ({ children }) => {
             const user = await userService.loginUser({ email, password });
 
             // Загружаем профиль пользователя и обновляем состояние
-            const userProfile = await userService.getUserProfile(user.uid);
+            // const userProfile = await userService.getUserProfile(user.uid);//TODO переводим Юзера в ЮзерКонтекст
 
             // Обновление состояния аутентификации
-            dispatch({ type: 'LOGIN', payload: { ...user, ...userProfile } });
+            // dispatch({ type: 'LOGIN', payload: { ...user, ...userProfile } });//TODO переводим Юзера в ЮзерКонтекст
+            dispatch({ type: 'LOGIN', payload: { userId: user.uid } });
 
             // Обновляем состояние в UserContext через dispatch
-            userDispatch({
-                type: 'SET_USER',
-                payload: { ...user, ...userProfile },
-            });
+            // userDispatch({
+            //     type: 'SET_USER',
+            //     payload: { ...user, ...userProfile },
+            // });//TODO закоментил при переходе на ЮзерКонтекст
 
             // setErMessage(''); // Сбрасываем ошибку при успешной аутентификации
 
@@ -155,24 +159,6 @@ export const AuthProvider = ({ children }) => {
                 localStorage.removeItem('authEmail');
             }
         } catch (error) {
-            // console.error('Ошибка входа:', error.message);
-
-            // switch (error.code) {
-            //     case 'auth/wrong-password':
-            //         setErMessage('Неверный email или пароль');
-            //         break;
-            //     case 'auth/user-not-found':
-            //         setErMessage('Пользователь с таким email не найден');
-            //         break;
-            //     case 'auth/invalid-email':
-            //         setErMessage('Неверный email');
-            //         break;
-            //     default:
-            //         setErMessage('Ошибка входа.');
-            //         break;
-            // }
-
-            // Выбросываем ошибку
             throw new Error(error.message); // Пробрасываем ошибку дальше
         }
     };
@@ -186,7 +172,7 @@ export const AuthProvider = ({ children }) => {
             dispatch({ type: 'LOGOUT' });
 
             // Очищаем UserContext через dispatch
-            userDispatch({ type: 'CLEAR_USER' });
+            // userDispatch({ type: 'CLEAR_USER' });//TODO закоментил при переходе на ЮзерКонтекст
 
             // Очищаем localStorage при выходе
             localStorage.removeItem('authToken');
@@ -196,17 +182,29 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Передаем функцию обновления пользователя, которая вызовет dispatch в authReducer
+    const updateAuthUser = (updatedUser) => {
+        dispatch({ type: 'SET_USER', payload: updatedUser });
+    };
+
     // Возвращаем контекст с необходимыми параметрами
     return (
         <AuthContext.Provider
             value={{
-                user: state.user, // Данные пользователя
-                isAuthenticated: !!state.user, // true, если пользователь авторизован
-                register, // Функция регистрации
-                login, // Функция входа
-                logout, // Функция выхода
-                // erMessage, // Информация об ошибке при login
-                // resetError, // Обнуляем ошибку
+                // user: state.user, // Данные пользователя
+                // isAuthenticated: !!state.user, // true, если пользователь авторизован
+                // register, // Функция регистрации
+                // login, // Функция входа
+                // logout, // Функция выхода
+                // // erMessage, // Информация об ошибке при login
+                // // resetError, // Обнуляем ошибку
+                // updateAuthUser, // метод для обновления user из UserContext
+
+                userId: state.userId,
+                isAuthenticated: state.isAuthenticated,
+                register,
+                login,
+                logout,
             }}
         >
             {children}

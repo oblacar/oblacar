@@ -20,8 +20,8 @@ const App = () => {
     return (
         <>
             <Router>
-                <UserProvider>
-                    <AuthProvider>
+                <AuthProvider>
+                    <UserProvider>
                         <TransportProvider>
                             <TransportAdProvider>
                                 <Routes>
@@ -66,8 +66,8 @@ const App = () => {
                                 </Routes>
                             </TransportAdProvider>
                         </TransportProvider>
-                    </AuthProvider>
-                </UserProvider>
+                    </UserProvider>
+                </AuthProvider>
             </Router>
         </>
     );

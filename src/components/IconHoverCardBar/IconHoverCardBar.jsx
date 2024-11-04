@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
+import UserContext from '../../hooks/UserContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
 
 import IconHoverCard from './IconHoverCard';
@@ -49,8 +50,9 @@ const zero = {
     right: 0,
 };
 
-function IconDropdownMenuBar({height}) {
-    const { isAuthenticated, user } = useContext(AuthContext);
+function IconDropdownMenuBar({ height }) {
+    const { isAuthenticated } = useContext(AuthContext);
+    const { user, isUserLoaded } = useContext(UserContext);
     const { reviewAds } = useContext(TransportAdContext);
 
     const [iconNewAdCoordinates, setIconNewAdCoordinates] = useState(zero);
@@ -89,6 +91,21 @@ function IconDropdownMenuBar({height}) {
         };
     }, []);
 
+    // const [isLoading, setIsLoading] = useState(true);
+
+    // useEffect(() => {
+    //     // Если пользователь аутентифицирован и данные пользователя загрузились
+    //     if (isAuthenticated && user) {
+    //         setIsLoading(false);
+
+    //         console.log(user);
+    //     }
+    // }, [isAuthenticated, user]);
+
+    // if (isLoading) {
+    //     return <div>Loading...</div>;
+    // }
+
     return (
         <>
             <div className={styles.iconsArea}>
@@ -101,13 +118,21 @@ function IconDropdownMenuBar({height}) {
                     windowWidth={windowWidth}
                 />
                 <IconHoverCard
-                    type={isAuthenticated ? `${user.userName}` : 'Профиль'}
+                    type={
+                        isAuthenticated && isUserLoaded
+                            ? `${user.userName}`
+                            : 'Профиль'
+                    }
                     iconRef={iconUserRef}
                     IconComponent={FaUser}
                     HoverCardComponent={HoverUserCard}
                     iconCoordinates={iconUserCoordinates}
                     windowWidth={windowWidth}
-                    LinkTo={isAuthenticated ? '/user-profile' : '/login'}
+                    LinkTo={
+                        isAuthenticated && isUserLoaded
+                            ? '/user-profile'
+                            : '/login'
+                    }
                 />
                 <IconHoverCard
                     type='Сообщения'

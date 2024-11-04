@@ -1,5 +1,3 @@
-import User from '../entities/User/User'; //TODO выяснить, почему как мы сущности обходимся
-
 import { auth, db, storage } from '../firebase'; // Импорт аутентификации, базы данных и хранилища
 import {
     createUserWithEmailAndPassword,
@@ -59,22 +57,10 @@ class UserService {
                 userData
             );
 
-            // Возвращаем созданного пользователя
             return user;
-            // return new User(
-            //     user.uid,
-            //     profilePictureURL,
-            //     `${data.firstName} ${data.lastName}`,
-            //     data.email,
-            //     data.phone || '',
-            //     data.additionalInfo || '',
-            //     data.password, // Пароль лучше хранить зашифрованным
-            //     new Date().toISOString(),
-            //     user.stsTokenManager.accessToken
-            // );
         } catch (error) {
             // console.error('Ошибка регистрации:', error);
-            
+
             switch (error.code) {
                 case 'auth/email-already-in-use':
                     throw new Error(
@@ -136,17 +122,16 @@ class UserService {
 
             switch (error.code) {
                 case 'auth/wrong-password':
-                     throw new Error('Неверный email или пароль');
-      
+                    throw new Error('Неверный email или пароль');
+
                 case 'auth/user-not-found':
                     throw new Error('Пользователь с таким email не найден');
-       
-                case 'auth/invalid-email':
-                     throw new Error('Неверный email');
-   
-                default:
-              throw new Error('Ошибка входа.');
 
+                case 'auth/invalid-email':
+                    throw new Error('Неверный email');
+
+                default:
+                    throw new Error('Ошибка входа.');
             }
         }
     }

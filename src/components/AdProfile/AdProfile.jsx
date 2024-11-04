@@ -4,12 +4,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import './AdProfile.css';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
+import UserContext from '../../hooks/UserContext';
 
 import PersonalTransportAdProfile from './PersonalTransportAdProfile';
 import OtherTransportAdProfile from './OtherTransportAdProfile';
 
 const AdProfile = ({ ad }) => {
-    const { user, isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated } = useContext(AuthContext);
+    const { user, isUserLoaded } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -27,7 +29,7 @@ const AdProfile = ({ ad }) => {
     return (
         <>
             <div>
-                {isAuthenticated && ownerId === user.userId ? (
+                {isAuthenticated && isUserLoaded && ownerId === user.userId ? (
                     <PersonalTransportAdProfile ad={ad} />
                 ) : (
                     <OtherTransportAdProfile ad={ad} />

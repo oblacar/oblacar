@@ -10,8 +10,7 @@ import UserContext from '../../../hooks/UserContext';
 import { userService } from '../../../services/UserService';
 
 const PersonalInfo = () => {
-    const { state, dispatch } = useContext(UserContext); // Получаем данные пользователя из контекста
-    const { user } = state; // Извлекаем пользователя из состояния
+    const { user, updateUser } = useContext(UserContext); // Получаем данные пользователя из контекста
 
     const [userData, setUserData] = useState(user || {}); // Используем одно состояние для всех данных пользователя
 
@@ -62,17 +61,15 @@ const PersonalInfo = () => {
         console.log('Обновляемый профиль:', updatedUser);
 
         // Сохраняем обновленные данные в контексте
-        dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+        // dispatch({ type: 'UPDATE_USER', payload: updatedUser });
 
         // Сохраняем обновленные данные в Firebase
         try {
-            await userService.updateUserProfile(user.userId, updatedUser); // Обновляем данные в Firebase
-            console.log('Данные профиля успешно обновлены в Firebase');
+            // Вызываем updateUserProfile из UserContext
+            await updateUser(updatedUser);
+            console.log('Данные профиля успешно обновлены');
         } catch (error) {
-            console.error(
-                'Ошибка обновления данных в Firebase:',
-                error.message
-            );
+            console.error('Ошибка обновления профиля:', error.message);
         }
 
         setIsEditing(false); // Выходим из режима редактирования

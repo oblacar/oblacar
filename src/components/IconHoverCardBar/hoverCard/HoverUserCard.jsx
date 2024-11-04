@@ -26,8 +26,7 @@ export const HoverUserCard = ({
     windowWidth,
 }) => {
     const { isAuthenticated, logout } = useContext(AuthContext);
-    const { state } = useContext(UserContext); // Получаем состояние пользователя из контекста
-    const { user } = state;
+    const { user } = useContext(UserContext); // Получаем состояние пользователя из контекста
 
     const [isHoveredCard, setIsHoveredCard] = useState(false);
 

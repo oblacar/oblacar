@@ -4,6 +4,7 @@ import { setTopLeftHover } from './hoverCardFunctions';
 import './hoverCard.css'; // Создайте файл стилей HoverCard.css
 
 import AuthContext from '../../../hooks/Authorization/AuthContext';
+import UserContext from '../../../hooks/UserContext';
 
 import Button from '../../common/Button/Button';
 
@@ -12,7 +13,8 @@ export const HoverNewAdCard = ({
     iconCoordinates,
     windowWidth,
 }) => {
-    const { isAuthenticated } = useContext(AuthContext);
+    // const { isAuthenticated } = useContext(AuthContext);//TODO Try relocated on UserContext
+    const { isUserLoaded } = useContext(UserContext);
 
     const [isHoveredCard, setIsHoveredCard] = useState(false);
 
@@ -36,7 +38,8 @@ export const HoverNewAdCard = ({
             >
                 <div className='hover-card-content '>
                     <p className='hover-card-title'>Новое объявление</p>
-                    {!isAuthenticated ? (
+                    {/* {!isAuthenticated || */}
+                    { !isUserLoaded ? (
                         <div>
                             <p>
                                 Для размещения нового объявления, необходимо

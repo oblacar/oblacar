@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { TransportAd } from '../../entities/Ads/TransportAd';
 
-import AuthContext from '../../hooks/Authorization/AuthContext';
+// import AuthContext from '../../hooks/Authorization/AuthContext';
+import UserContext from '../../hooks/UserContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
 
 import TransportAdItem from '../TransportAds/TransportAdItem';
@@ -17,7 +18,7 @@ import Button from '../common/Button/Button';
 import { FaPlus } from 'react-icons/fa';
 
 const CreateTransportAd = () => {
-    const { user } = useContext(AuthContext);
+    const { user } = useContext(UserContext);
     const { addAd } = useContext(TransportAdContext);
 
     //TODO Пока не используем переброску на главную страницу

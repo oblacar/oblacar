@@ -4,11 +4,14 @@ import TransportAdService from '../services/TransportAdService';
 import UserReviewAdService from '../services/UserReviewAdService';
 
 import AuthContext from './Authorization/AuthContext';
+import UserContext from './UserContext';
 
 const TransportAdContext = createContext();
 
 export const TransportAdProvider = ({ children }) => {
-    const { user } = useContext(AuthContext);
+    // const { user } = useContext(AuthContext);//TODO for relocated on UserContext
+    const { userId } = useContext(AuthContext);
+    const { user, isUserLoaded } = useContext(UserContext);
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -119,7 +122,7 @@ export const TransportAdProvider = ({ children }) => {
             return;
         }
 
-        if (!user) return;
+        if (!isUserLoaded) return;
 
         const fetchInitialData = async () => {
             setLoading(true);
@@ -127,7 +130,7 @@ export const TransportAdProvider = ({ children }) => {
             try {
                 // Загружаем reviewAds и сохраняем
                 const initialReviewAds = await TransportAdService.getReviewAds(
-                    user.userId
+                    userId
                 );
 
                 // Преобразуем initialReviewAds в массив ключей
@@ -168,7 +171,7 @@ export const TransportAdProvider = ({ children }) => {
         };
 
         fetchInitialData();
-    }, [user]);
+    }, [user, isUserLoaded]);
 
     //Выгружаем всю база и оборачиваем при начале сессии
     useEffect(() => {
@@ -294,7 +297,7 @@ export const TransportAdProvider = ({ children }) => {
                 // Обновляем данные в Firebase для текущего пользователя
                 const adId = extAd.ad.adId;
 
-                await UserReviewAdService.addReviewAd(user.userId, adId);
+                await UserReviewAdService.addReviewAd(userId, adId);
             }
         } catch (err) {
             setError(err.message);
@@ -311,7 +314,7 @@ export const TransportAdProvider = ({ children }) => {
 
             const adId = extAd.ad.adId;
 
-            await UserReviewAdService.removeReviewAd(user.userId, adId);
+            await UserReviewAdService.removeReviewAd(userId, adId);
         } catch (err) {
             setError(err.message);
         }
