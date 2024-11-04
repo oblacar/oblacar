@@ -1,5 +1,5 @@
 // src/pages/Home/Home.js
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styles from './Home.module.css'; // Подключаем стили
 
 import TransportAdContext from '../../hooks/TransportAdContext';
@@ -23,6 +23,8 @@ import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 import AdProfile from '../../components/AdProfile/AdProfile';
 import MultiPhotoUploader from '../../components/MultiPhotoUploader/MultiPhotoUploader';
 
+import ChatBox from '../../components/common/ChatBox/ChatBox';
+
 function Home() {
     const { ads } = useContext(TransportAdContext);
 
@@ -38,6 +40,25 @@ function Home() {
 
     const handleMessage = () => {
         console.log('Открытие чата с владельцем');
+    };
+
+    const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
+    const testConversation = {
+        conversationId: 'test_convo_1',
+        messages: [
+            {
+                messageId: 'msg1',
+                senderId: 'user1',
+                text: 'Привет! Как дела?',
+                timestamp: Date.now() - 60000,
+            },
+            {
+                messageId: 'msg2',
+                senderId: 'self',
+                text: 'Привет! Все хорошо, а у тебя?',
+                timestamp: Date.now() - 30000,
+            },
+        ],
     };
 
     return (
@@ -78,7 +99,17 @@ function Home() {
                     ad={ads.length > 0 ? ads[0].ad : null}
                 /> */}
 
-                <TransportAdsList />
+                {/* <TransportAdsList /> */}
+
+                <button onClick={() => setIsChatBoxOpen(true)}>
+                    Открыть Чат
+                </button>
+                {isChatBoxOpen && (
+                    <ChatBox
+                        conversation={testConversation}
+                        onClose={() => setIsChatBoxOpen(false)}
+                    />
+                )}
             </div>
         </>
     );
