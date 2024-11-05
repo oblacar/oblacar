@@ -1,9 +1,12 @@
 /* src/components/MessageInput.css */
 .message-input {
     display: flex;
+
     padding: 10px;
     border-top: 1px solid #ddd;
     background: #f9f9f9;
+
+
 }
 
 .message-input input {

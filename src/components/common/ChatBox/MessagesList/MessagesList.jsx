@@ -1,7 +1,9 @@
 // src/components/MessagesList.js
 import React, { useContext, useEffect, useRef } from 'react';
-import './MessagesList.css';
 import UserContext from '../../../../hooks/UserContext';
+import './MessagesList.css';
+
+import { formatTimestamp } from '../../../../utils/formatTimestamp';
 
 const MessagesList = ({ conversation }) => {
     const { user } = useContext(UserContext);
@@ -22,9 +24,9 @@ const MessagesList = ({ conversation }) => {
                         msg.senderId === userId ? 'own' : 'other'
                     }`} // Условный класс
                 >
-                    <p>{msg.text}</p>
+                    <span className='message-text'>{msg.text}</span>
                     <span className='timestamp'>
-                        {new Date(msg.timestamp).toLocaleTimeString()}
+                        {formatTimestamp(msg.timestamp)}
                     </span>
                 </div>
             ))}
