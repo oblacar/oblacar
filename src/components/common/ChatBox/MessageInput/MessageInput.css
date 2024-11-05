@@ -1,33 +1,24 @@
-/* src/components/MessageInput.css */
 .message-input {
     display: flex;
-    align-items: center;
+    align-items: center; /* Центрирование по вертикали */
+    padding: 0px;
 
-    padding: 10px;
+    background-color: white;
     border-top: 1px solid #ddd;
-    background: #f9f9f9;
 }
 
-.message-input input {
-    flex: 1;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    margin-bottom: 0px;
-}
-
-.message-input button {
-    margin-left: 8px;
-    padding: 8px 12px;
+.message-input textarea {
+    flex: 1; /* Занимает всё доступное пространство */
+    padding: 10px;
     border: none;
-    border-radius: 4px;
-    background: #0073e6;
-    color: #fff;
-    cursor: pointer;
-}
+    outline: none;
 
-.message-input button:hover {
-    background: #005bb5;
+    border-radius: 0px 0px 0px 10px;
+
+    resize: none;
+    overflow: hidden;
+    font-size: 16px; /* Настраиваем размер текста */
+    font-family: Calibri, Arial, sans-serif; /* Calibri, затем Arial */
 }
 
 .chat-send-icon-btn {
@@ -36,7 +27,7 @@
     color: #8e8e8e;
     cursor: pointer;
     display: block;
-    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .chat-send-icon-btn.chat-text-exist {

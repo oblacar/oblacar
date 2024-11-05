@@ -1,6 +1,6 @@
 // src/components/AdProfile/AdProfile.js
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import './OtherTransportAdProfile.css';
 import {
     FaUser,
@@ -10,10 +10,14 @@ import {
     FaCommentDots,
 } from 'react-icons/fa';
 
+import ConversationContext from '../../hooks/ConversationContext';
+import UserContext from '../../hooks/UserContext';
+
 import { cutNumber, formatNumber } from '../../utils/helper';
 
 import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
 import Button from '../common/Button/Button';
+import ChatBox from '../common/ChatBox/ChatBox';
 
 const OtherTransportAdProfile = ({
     ad,
@@ -21,6 +25,11 @@ const OtherTransportAdProfile = ({
     onMessage,
     userType,
 }) => {
+    const { startConversation, selectedConversation } =
+        useContext(ConversationContext);
+    const { user } = useContext(UserContext);
+
+    const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -36,6 +45,7 @@ const OtherTransportAdProfile = ({
     const {
         ownerPhotoUrl,
         ownerName,
+        ownerId,
         availabilityDate,
         departureCity,
         destinationCity,
@@ -103,6 +113,19 @@ const OtherTransportAdProfile = ({
             </>
         );
     };
+
+    //chat-->>
+
+    const handleStartConversation = () => {
+        // startConversation([
+        //     '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2',
+        //     'f5uTdFZacmRrWZAVkkyskfmYpFn1',
+        // ]); // Замените "user1" и "user2" на реальные userId
+
+        startConversation([user.userId, ownerId]); // Замените "user1" и "user2" на реальные userId
+        setIsChatBoxOpen(true); // Открываем ChatBox после создания
+    };
+    //<<--
 
     return (
         <>
@@ -178,6 +201,7 @@ const OtherTransportAdProfile = ({
                                 type='button'
                                 children='Написать'
                                 icon={<FaCommentDots />}
+                                onClick={handleStartConversation}
                             />
                         </div>
                     </div>
@@ -196,6 +220,10 @@ const OtherTransportAdProfile = ({
                     </div>
                 </div>
             </div>
+
+            {isChatBoxOpen && selectedConversation && (
+                <ChatBox onClose={() => setIsChatBoxOpen(false)} />
+            )}
         </>
     );
 };

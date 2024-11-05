@@ -22,9 +22,14 @@ const MessagesList = ({ conversation }) => {
                     key={idx}
                     className={`message ${
                         msg.senderId === userId ? 'own' : 'other'
-                    }`} // Условный класс
+                    }`} 
                 >
-                    <span className='message-text'>{msg.text}</span>
+                    <div
+                        className='message-text'
+                        dangerouslySetInnerHTML={{
+                            __html: msg.text.replace(/\n/g, '<br />'), // Преобразуем \n в <br />
+                        }}
+                    />
                     <span className='timestamp'>
                         {formatTimestamp(msg.timestamp)}
                     </span>

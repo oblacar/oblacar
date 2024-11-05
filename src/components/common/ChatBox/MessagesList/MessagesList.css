@@ -13,6 +13,8 @@
     max-width: 80%;
     font-size: 14px;
     position: relative;
+    white-space: pre-wrap;
+    line-height: 1.2;
 }
 
 .message.own {

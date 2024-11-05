@@ -36,14 +36,6 @@ function Home() {
         // await TransportAdService.uploadAdsToFirebase(ads); // Вызываем функцию загрузки из сервиса
     };
 
-    const handleSendRequest = (adData, status) => {
-        console.log('Отправка запроса:', adData, status);
-    };
-
-    const handleMessage = () => {
-        console.log('Открытие чата с владельцем');
-    };
-
     const { startConversation, selectedConversation } =
         useContext(ConversationContext);
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
@@ -54,24 +46,6 @@ function Home() {
             'f5uTdFZacmRrWZAVkkyskfmYpFn1',
         ]); // Замените "user1" и "user2" на реальные userId
         setIsChatBoxOpen(true); // Открываем ChatBox после создания
-    };
-
-    const testConversation = {
-        conversationId: 'test_convo_1',
-        messages: [
-            {
-                messageId: 'msg1',
-                senderId: 'user1',
-                text: 'Привет! Как дела?',
-                timestamp: Date.now() - 60000,
-            },
-            {
-                messageId: 'msg2',
-                senderId: 'self',
-                text: 'Привет! Все хорошо, а у тебя?',
-                timestamp: Date.now() - 30000,
-            },
-        ],
     };
 
     return (
@@ -112,27 +86,14 @@ function Home() {
                     ad={ads.length > 0 ? ads[0].ad : null}
                 /> */}
 
-                {/* <TransportAdsList /> */}
+                <TransportAdsList />
 
-                {/* <button onClick={() => setIsChatBoxOpen(true)}>
-                    Открыть Чат
-                </button>
-                {isChatBoxOpen && (
-                    <>
-                        <p>true chat</p>
-
-                        <ChatBox
-                            conversation={testConversation}
-                            onClose={() => setIsChatBoxOpen(false)}
-                        />
-                    </>
-                )} */}
-                <button onClick={handleStartConversation}>
+                {/* <button onClick={handleStartConversation}>
                     Начать переписку
                 </button>
                 {isChatBoxOpen && selectedConversation && (
                     <ChatBox onClose={() => setIsChatBoxOpen(false)} />
-                )}
+                )} */}
             </div>
         </>
     );
