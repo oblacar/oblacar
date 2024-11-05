@@ -1,12 +1,11 @@
 /* src/components/MessageInput.css */
 .message-input {
     display: flex;
+    align-items: center;
 
     padding: 10px;
     border-top: 1px solid #ddd;
     background: #f9f9f9;
-
-
 }
 
 .message-input input {
@@ -14,6 +13,7 @@
     padding: 8px;
     border-radius: 4px;
     border: 1px solid #ccc;
+    margin-bottom: 0px;
 }
 
 .message-input button {
@@ -28,4 +28,17 @@
 
 .message-input button:hover {
     background: #005bb5;
+}
+
+.chat-send-icon-btn {
+    height: 28px;
+    width: 28px;
+    color: #8e8e8e;
+    cursor: pointer;
+    display: block;
+    margin-left: 10px;
+}
+
+.chat-send-icon-btn.chat-text-exist {
+    color: #1a5884;
 }

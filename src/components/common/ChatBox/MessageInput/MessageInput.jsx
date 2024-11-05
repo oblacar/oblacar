@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import './MessageInput.css';
 
+import { ArrowUpCircleIcon } from '@heroicons/react/24/solid';
+
 const MessageInput = ({ onSend }) => {
     const [text, setText] = useState('');
 
@@ -20,7 +22,13 @@ const MessageInput = ({ onSend }) => {
                 onChange={(e) => setText(e.target.value)}
                 placeholder='Напишите сообщение...'
             />
-            <button onClick={handleSend}>Отправить</button>
+            <ArrowUpCircleIcon
+                className={`
+                    chat-send-icon-btn ${text===''?'':'chat-text-exist'}
+                    
+                    `}
+                onClick={handleSend}
+            />
         </div>
     );
 };

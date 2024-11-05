@@ -2,6 +2,8 @@
 import React, { useEffect, useContext, useRef, useState } from 'react';
 import ConversationContext from '../../../hooks/ConversationContext';
 
+import { XMarkIcon } from '@heroicons/react/24/outline';
+
 import MessagesList from './MessagesList/MessagesList';
 import MessageInput from './MessageInput/MessageInput';
 import './ChatBox.css';
@@ -63,12 +65,11 @@ const ChatBox = ({ onClose }) => {
                 />
                 <div className='chatbox-header'>
                     <span>Переписка</span>
-                    <button
-                        className='chatbox-close'
+
+                    <XMarkIcon
+                        className='close-chat-icon-btn'
                         onClick={onClose}
-                    >
-                        ×
-                    </button>
+                    />
                 </div>
                 <MessagesList
                     conversation={{ ...selectedConversation, messages }}

@@ -24,29 +24,6 @@ import ToggleIconButtonPlus from '../common/ToggleIconButtonPlus/ToggleIconButto
 import SingleRatingStar from '../common/SingleRatingStar/SingleRatingStar';
 import { NumberSchema } from 'yup';
 
-//ad:{
-//         truckName: '',
-//         truckPhoto: '',
-//        * truckHeight: '',
-//        * truckWidth: '',
-//        * truckDepth: '',
-//        * truckWeight: '',
-//        * transportType: '',
-//        * loadingTypes: [], // массив возможных типов загрузки
-//        * availabilityDate: '', // дата, когда машина доступна
-//        * departureCity: '', // город, где находится транспортное средство
-//        * destinationCity: '', // предполагаемое направление (если есть)
-//        * price: '', // стоимость перевозки
-//        * paymentUnit: '', // единица стоимости (тыс.руб, руб, руб/км и т.д.)
-//        * readyToNegotiate: false, // готовность к торгу
-//        * paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
-//        * userName
-//      userPhotoUrl
-//        * userRating
-//}
-
-//
-
 const TransportAdItem = ({
     ad,
     isViewMode = false,

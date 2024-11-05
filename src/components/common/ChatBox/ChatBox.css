@@ -29,3 +29,10 @@
     cursor: row-resize;
     width: 100%;
 }
+
+.close-chat-icon-btn {
+    height: 25px;
+    width: 25px;
+    color: white;
+    cursor: pointer;
+}
