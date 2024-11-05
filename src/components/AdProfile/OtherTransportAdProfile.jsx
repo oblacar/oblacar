@@ -10,6 +10,9 @@ import {
     FaCommentDots,
 } from 'react-icons/fa';
 
+// chat - bubble - left - right;
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
+
 import ConversationContext from '../../hooks/ConversationContext';
 import UserContext from '../../hooks/UserContext';
 
@@ -200,8 +203,11 @@ const OtherTransportAdProfile = ({
                             <Button
                                 type='button'
                                 children='Написать'
-                                icon={<FaCommentDots />}
+                                // icon={<FaCommentDots />}
+                                icon={<ChatBubbleLeftRightIcon />}
+                                // ChatBubbleLeftRightIcon
                                 onClick={handleStartConversation}
+                                type_btn='reverse'
                             />
                         </div>
                     </div>
@@ -215,7 +221,7 @@ const OtherTransportAdProfile = ({
                             type='button'
                             children='Отправить запрос'
                             icon={<FaEnvelope />}
-                            type_btn='reverse'
+                            // type_btn='reverse'
                         />
                     </div>
                 </div>

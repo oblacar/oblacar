@@ -1,42 +1,43 @@
 /* src/components/MessagesList.css */
 .messages-list {
-    flex: 1;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column; /* Сообщения идут столбцом */
+    align-items: flex-start; /* Сообщения других пользователей прижаты к левому краю */
     padding: 10px;
+    overflow-y: auto;
 }
 
 .message {
+    display: inline-block;
     padding: 8px;
     border-radius: 20px;
     margin-bottom: 8px;
     background: #e6f3ff;
     max-width: 80%;
     font-size: 14px;
-    position: relative;
     white-space: pre-wrap;
     line-height: 1.2;
+    width: fit-content; /* Сообщение адаптируется по ширине текста */
 }
 
 .message.own {
-    margin-left: auto;
-    text-align: right;
+    align-self: flex-end; /* Прижимает сообщения owner к правому краю */
+    text-align: left;
     border-bottom-right-radius: 0px;
     background: #1a5884;
     color: white;
 }
 
-.message.own .message-text {
-    margin-right: 10px;
-}
-
 .message.other {
+    align-self: flex-start; /* Прижимает сообщения других пользователей к левому краю */
     background: #eaeaea;
     text-align: left;
     border-bottom-left-radius: 0px;
 }
 
+.message.own .message-text,
 .message.other .message-text {
-    margin-left: 10px;
+    margin: 0 10px;
 }
 
 .timestamp {
@@ -49,6 +50,7 @@
     text-align: right;
     color: #d5d5d5;
 }
+
 .message.other .timestamp {
     text-align: left;
     color: #848484;
