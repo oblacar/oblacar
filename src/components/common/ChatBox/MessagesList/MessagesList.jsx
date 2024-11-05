@@ -1,8 +1,12 @@
 // src/components/MessagesList.js
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import './MessagesList.css';
+import UserContext from '../../../../hooks/UserContext';
 
 const MessagesList = ({ conversation }) => {
+    const { user } = useContext(UserContext);
+    const { userId } = user;
+
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -15,8 +19,8 @@ const MessagesList = ({ conversation }) => {
                 <div
                     key={idx}
                     className={`message ${
-                        msg.senderId === 'self' ? 'own' : ''
-                    }`}
+                        msg.senderId === userId ? 'own' : 'other'
+                    }`} // Условный класс
                 >
                     <p>{msg.text}</p>
                     <span className='timestamp'>

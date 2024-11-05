@@ -9,7 +9,9 @@ export class Conversation {
     }) {
         this.conversationId = conversationId; // Уникальный ID переписки
         this.participants = participants; // Массив ID участников
-        this.messages = messages.map((msg) => new Message(msg)); // Список сообщений как объекты Message
+        this.messages = Array.isArray(messages)
+            ? messages
+            : Object.values(messages || {}); // Преобразуем в массив, если это объект
         this.lastMessage = lastMessage ? new Message(lastMessage) : null; // Последнее сообщение
     }
 

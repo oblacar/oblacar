@@ -13,6 +13,8 @@ import {
     getDownloadURL,
 } from 'firebase/storage'; // Импортируйте необходимые функции
 
+import ConversationContext from '../../hooks/ConversationContext';
+
 import { addTransportAds } from '../../scripts/addTransportAds';
 
 import CreateTransportAd from '../../components/CreateTransportAd/CreateTransportAd';
@@ -42,7 +44,18 @@ function Home() {
         console.log('Открытие чата с владельцем');
     };
 
+    const { startConversation, selectedConversation } =
+        useContext(ConversationContext);
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
+
+    const handleStartConversation = () => {
+        startConversation([
+            '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2',
+            'f5uTdFZacmRrWZAVkkyskfmYpFn1',
+        ]); // Замените "user1" и "user2" на реальные userId
+        setIsChatBoxOpen(true); // Открываем ChatBox после создания
+    };
+
     const testConversation = {
         conversationId: 'test_convo_1',
         messages: [
@@ -101,14 +114,24 @@ function Home() {
 
                 {/* <TransportAdsList /> */}
 
-                <button onClick={() => setIsChatBoxOpen(true)}>
+                {/* <button onClick={() => setIsChatBoxOpen(true)}>
                     Открыть Чат
                 </button>
                 {isChatBoxOpen && (
-                    <ChatBox
-                        conversation={testConversation}
-                        onClose={() => setIsChatBoxOpen(false)}
-                    />
+                    <>
+                        <p>true chat</p>
+
+                        <ChatBox
+                            conversation={testConversation}
+                            onClose={() => setIsChatBoxOpen(false)}
+                        />
+                    </>
+                )} */}
+                <button onClick={handleStartConversation}>
+                    Начать переписку
+                </button>
+                {isChatBoxOpen && selectedConversation && (
+                    <ChatBox onClose={() => setIsChatBoxOpen(false)} />
                 )}
             </div>
         </>

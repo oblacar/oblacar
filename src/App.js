@@ -15,6 +15,7 @@ import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импор�
 import { UserProvider } from './hooks/UserContext';
 import { TransportAdProvider } from './hooks/TransportAdContext';
 import { TransportProvider } from './hooks/TransportContext';
+import { ConversationProvider } from './hooks/ConversationContext';
 
 const App = () => {
     return (
@@ -22,50 +23,52 @@ const App = () => {
             <Router>
                 <AuthProvider>
                     <UserProvider>
-                        <TransportProvider>
-                            <TransportAdProvider>
-                                <Routes>
-                                    <Route element={<Layout />}>
-                                        <Route
-                                            path='/'
-                                            element={<Home />}
-                                        />
-                                        <Route
-                                            path='/register'
-                                            element={
-                                                <AuthPage isLogin={false} />
-                                            }
-                                        />
-                                        <Route
-                                            path='/login'
-                                            element={
-                                                <AuthPage isLogin={true} />
-                                            }
-                                        />
-                                        <Route
-                                            path='/user-profile'
-                                            element={<ProfileUserPage />}
-                                        />
-                                        <Route
-                                            path='/auth'
-                                            element={<AuthPage />}
-                                        />
-                                        <Route
-                                            path='/new-tansport-ad'
-                                            element={<NewTransportAd />}
-                                        />
-                                        {/* <Route
+                        <ConversationProvider>
+                            <TransportProvider>
+                                <TransportAdProvider>
+                                    <Routes>
+                                        <Route element={<Layout />}>
+                                            <Route
+                                                path='/'
+                                                element={<Home />}
+                                            />
+                                            <Route
+                                                path='/register'
+                                                element={
+                                                    <AuthPage isLogin={false} />
+                                                }
+                                            />
+                                            <Route
+                                                path='/login'
+                                                element={
+                                                    <AuthPage isLogin={true} />
+                                                }
+                                            />
+                                            <Route
+                                                path='/user-profile'
+                                                element={<ProfileUserPage />}
+                                            />
+                                            <Route
+                                                path='/auth'
+                                                element={<AuthPage />}
+                                            />
+                                            <Route
+                                                path='/new-tansport-ad'
+                                                element={<NewTransportAd />}
+                                            />
+                                            {/* <Route
                                             path='/ads'
                                             element={<AdList />}
                                         /> */}
-                                        <Route
-                                            path='/ads/:adId'
-                                            element={<AdPage />}
-                                        />
-                                    </Route>
-                                </Routes>
-                            </TransportAdProvider>
-                        </TransportProvider>
+                                            <Route
+                                                path='/ads/:adId'
+                                                element={<AdPage />}
+                                            />
+                                        </Route>
+                                    </Routes>
+                                </TransportAdProvider>
+                            </TransportProvider>
+                        </ConversationProvider>
                     </UserProvider>
                 </AuthProvider>
             </Router>

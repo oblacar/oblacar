@@ -15,9 +15,20 @@
   position: relative;
 }
 
+/* .message.own {
+  background: #d1ffd6;
+  margin-left: auto;
+} */
+/* src/components/MessagesList.css */
 .message.own {
   background: #d1ffd6;
   margin-left: auto;
+  text-align: right;
+}
+
+.message.other {
+  background: #e6f3ff;
+  text-align: left;
 }
 
 .timestamp {
