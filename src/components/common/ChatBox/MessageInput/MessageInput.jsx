@@ -1,61 +1,57 @@
 // src/components/MessageInput.js
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './MessageInput.css';
-
 import { ArrowUpCircleIcon } from '@heroicons/react/24/solid';
 
 const MessageInput = ({ onSend }) => {
     const [text, setText] = useState('');
+    const inputRef = useRef(null);
+
+    const handleInput = () => {
+        setText(inputRef.current.innerText);
+    };
 
     const handleSend = () => {
         if (text.trim()) {
             onSend(text);
             setText('');
-
-            // Сбрасываем высоту после отправки
-            const textarea = document.querySelector('.message-input textarea');
-            textarea.style.height = 'auto';
+            inputRef.current.innerText = '';
+            inputRef.current.style.height = 'auto';
         }
     };
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
-                // Добавляем перевод строки, если нажато Shift + Enter
-                e.preventDefault(); // Предотвращаем добавление новой строки
-                setText((prevText) => prevText + '\n');
+                e.preventDefault();
+                document.execCommand('insertLineBreak'); // Вставляем перенос строки
             } else {
-                // Отправляем сообщение, если нажато только Enter
-                e.preventDefault(); // Предотвращаем добавление новой строки
+                e.preventDefault();
                 handleSend();
             }
         }
     };
 
-    const handleInputChange = (e) => {
-        setText(e.target.value); // Обновляем текст сначала
-        e.target.style.height = 'auto'; // Сбрасываем высоту перед расчетом
-
-        requestAnimationFrame(() => {
-            e.target.style.height = `${e.target.scrollHeight}px`; // Устанавливаем высоту после обновления текста
-        });
-    };
-
     return (
         <div className='message-input'>
-            <textarea
-                value={text}
-                onChange={handleInputChange} // Автоматическое изменение высоты
+            <div
+                ref={inputRef}
+                contentEditable='true'
+                onInput={handleInput}
                 onKeyDown={handleKeyDown}
-                placeholder='Напишите сообщение...'
-                rows='1' // Начальная высота
-                style={{ resize: 'none', overflow: 'hidden' }} // Отключаем ручное изменение размера
+                data-placeholder='Напишите сообщение...'
+                className='input-field'
+                style={{
+                    resize: 'none',
+                    overflowY: 'auto',
+                    maxHeight: '150px',
+                    minHeight: '24px',
+                }}
             />
             <ArrowUpCircleIcon
-                className={`
-                    chat-send-icon-btn ${text === '' ? '' : 'chat-text-exist'}
-                    
-                    `}
+                className={`chat-send-icon-btn ${
+                    text === '' ? '' : 'chat-text-exist'
+                }`}
                 onClick={handleSend}
             />
         </div>

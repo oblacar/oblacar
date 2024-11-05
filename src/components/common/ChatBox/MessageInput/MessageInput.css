@@ -1,24 +1,31 @@
+/* src/components/MessageInput.css */
 .message-input {
     display: flex;
-    align-items: center; /* Центрирование по вертикали */
+    align-items: center;
     padding: 0px;
-
     background-color: white;
     border-top: 1px solid #ddd;
 }
 
-.message-input textarea {
-    flex: 1; /* Занимает всё доступное пространство */
+.input-field {
+    flex: 1;
     padding: 10px;
     border: none;
     outline: none;
-
     border-radius: 0px 0px 0px 10px;
+    font-size: 16px;
+    line-height: 1.4;
+    font-family: Calibri, Arial, sans-serif;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    min-width: 50px;
+    min-height: 24px;
+}
 
-    resize: none;
-    overflow: hidden;
-    font-size: 16px; /* Настраиваем размер текста */
-    font-family: Calibri, Arial, sans-serif; /* Calibri, затем Arial */
+.input-field:empty::before {
+    content: attr(data-placeholder);
+    color: #888;
+    pointer-events: none;
 }
 
 .chat-send-icon-btn {
