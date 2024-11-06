@@ -45,12 +45,9 @@
 }
 
 .close-chat-icon-btn:hover {
-    color: rgb(113, 113, 113);
+    color: #1a5884;
 }
 
-.close-chat-icon-btn {
-    color: rgb(151, 151, 151);
-}
 /*Фото и ияя собеседника-->>*/
 .chatbox-chat-partner-photo-name {
     display: flex;

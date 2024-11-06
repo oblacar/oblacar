@@ -3,8 +3,11 @@
     flex-grow: 1; /* Занимает оставшееся пространство */
 
     display: flex;
-    flex-direction: column; /* Сообщения идут столбцом */
+    flex-direction: column; /*Сообщения идут столбцом*/
+    /* flex-direction: column-reverse; Начинаем выравнивание с нижней части */
     align-items: flex-start; /* Сообщения других пользователей прижаты к левому краю */
+    justify-content: end;
+
     padding: 10px;
     overflow-y: auto;
 }
