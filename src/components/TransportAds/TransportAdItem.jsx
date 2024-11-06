@@ -196,67 +196,65 @@ const TransportAdItem = ({
                 )}
 
                 {/* <div className='row'> */}
-                    <Link to={`/ads/${adId}`}>
-                        <div className='upper-ad-row'>
-                            <div className='departure-location-date'>
-                                <div className='availability-date'>
-                                    {availabilityDate}
-                                </div>
-                                <div className='departure-location'>
-                                    <span className='departure location city'>
-                                        {departureCity}
-                                    </span>
-                                    <span className='destination city'>
-                                        {destinationCity || 'Россия'}
-                                    </span>
-                                </div>
+                <Link to={`/ads/${adId}`}>
+                    <div className='upper-ad-row'>
+                        <div className='departure-location-date'>
+                            <div className='availability-date'>
+                                {availabilityDate}
                             </div>
-                            <div className='finance'>
-                                <div className='price'>
-                                    {formatNumber(price)} {paymentUnit}
-                                </div>
-                                <div className='finance-details'>
-                                    {paymentOptions && paymentOptions.length > 0
-                                        ? paymentOptions.map(
-                                              (option, index) => (
-                                                  <span key={option}>
-                                                      {option}
-                                                      {index <
-                                                      paymentOptions.length - 1
-                                                          ? ', '
-                                                          : ''}
-                                                  </span>
-                                              )
-                                          )
-                                        : ''}
-                                    {readyToNegotiate && (
-                                        <span>
-                                            {paymentOptions.length > 0
-                                                ? ', '
-                                                : ''}
-                                            торг
-                                        </span>
-                                    )}
-                                </div>
+                            <div className='departure-location'>
+                                <span className='departure location city'>
+                                    {departureCity}
+                                </span>
+                                <span className='destination city'>
+                                    {destinationCity || 'Россия'}
+                                </span>
                             </div>
                         </div>
+                        <div className='finance'>
+                            <div className='price'>
+                                {formatNumber(price)} {paymentUnit}
+                            </div>
+                            <div className='finance-details'>
+                                {paymentOptions && paymentOptions.length > 0
+                                    ? paymentOptions.map((option, index) => (
+                                          <span key={option}>
+                                              {option}
+                                              {index < paymentOptions.length - 1
+                                                  ? ', '
+                                                  : ''}
+                                          </span>
+                                      ))
+                                    : ''}
+                                {readyToNegotiate && (
+                                    <span>
+                                        {paymentOptions.length > 0 ? ', ' : ''}
+                                        торг
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
 
-                        <div className='down-ad-row'>
-                            <div className='car-info'>
-                                <div className='car-photo-icon'>
-                                    {truckPhotoUrls && truckPhotoUrls[0] ? ( // Проверяем, есть ли фото
-                                        <img
-                                            src={truckPhotoUrls[0]}
-                                            alt='Фото машины'
-                                            className='photo-car' // Добавьте классы для стилизации
-                                        />
-                                    ) : (
-                                        <div className='icon-car'>
-                                            <FaTruck />
-                                        </div>
-                                    )}
-                                </div>
-                                <span>
+                    <div className='down-ad-row'>
+                        <div className='car-info'>
+                            <div className='car-photo-icon'>
+                                {truckPhotoUrls && truckPhotoUrls[0] ? ( // Проверяем, есть ли фото
+                                    <img
+                                        src={truckPhotoUrls[0]}
+                                        alt='Фото машины'
+                                        className='photo-car' // Добавьте классы для стилизации
+                                    />
+                                ) : (
+                                    <div className='icon-car'>
+                                        <FaTruck />
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <div>
+                                    {truckName ? `${truckName}, ` : ''}
+
                                     {transportType ? `${transportType}` : ''}
                                     {truckWeight ||
                                     loadingTypes.length !== 0 ||
@@ -289,7 +287,8 @@ const TransportAdItem = ({
                                     ) : (
                                         ''
                                     )}
-
+                                </div>
+                                <div>
                                     {loadingTypes.length !== 0 ? (
                                         <>
                                             <strong>загрузка: </strong>
@@ -310,38 +309,37 @@ const TransportAdItem = ({
                                     ) : (
                                         ''
                                     )}
-                                </span>
-                            </div>
-
-                            <div className='ad-user-info'>
-                                <div className='ad-user-photo'>
-                                    {ownerPhotoUrl ? ( // Проверяем, есть ли фото
-                                        <img
-                                            src={ownerPhotoUrl}
-                                            alt='Хозяин объявления'
-                                            className='ad-photo-car-owner'
-                                        />
-                                    ) : (
-                                        <FaUser />
-                                    )}
-                                </div>
-
-                                <div className='ad-user-name-rating'>
-                                    <div className='ad-user-name'>
-                                        {ownerName}
-                                    </div>
-
-                                    {ownerRating ? (
-                                        <div className='ad-user-rating'>
-                                            ★ {ownerRating}
-                                        </div>
-                                    ) : (
-                                        ''
-                                    )}
                                 </div>
                             </div>
                         </div>
-                    </Link>
+
+                        <div className='ad-user-info'>
+                            <div className='ad-user-photo'>
+                                {ownerPhotoUrl ? ( // Проверяем, есть ли фото
+                                    <img
+                                        src={ownerPhotoUrl}
+                                        alt='Хозяин объявления'
+                                        className='ad-photo-car-owner'
+                                    />
+                                ) : (
+                                    <FaUser />
+                                )}
+                            </div>
+
+                            <div className='ad-user-name-rating'>
+                                <div className='ad-user-name'>{ownerName}</div>
+
+                                {ownerRating ? (
+                                    <div className='ad-user-rating'>
+                                        ★ {ownerRating}
+                                    </div>
+                                ) : (
+                                    ''
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </Link>
                 {/* </div> */}
             </div>
             {/* <div className='icon-item-ad-bar'> */}
