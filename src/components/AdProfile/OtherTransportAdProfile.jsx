@@ -228,7 +228,11 @@ const OtherTransportAdProfile = ({
             </div>
 
             {isChatBoxOpen && selectedConversation && (
-                <ChatBox onClose={() => setIsChatBoxOpen(false)} />
+                <ChatBox
+                    onClose={() => setIsChatBoxOpen(false)}
+                    chatPartnerName={ownerName}
+                    chatPartnerPhoto={ownerPhotoUrl}
+                />
             )}
         </>
     );

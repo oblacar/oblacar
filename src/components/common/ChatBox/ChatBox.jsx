@@ -2,7 +2,7 @@
 import React, { useEffect, useContext, useRef, useState } from 'react';
 import ConversationContext from '../../../hooks/ConversationContext';
 
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
 
 import MessagesList from './MessagesList/MessagesList';
 import MessageInput from './MessageInput/MessageInput';
@@ -10,7 +10,7 @@ import './ChatBox.css';
 
 import AuthContext from '../../../hooks/Authorization/AuthContext';
 
-const ChatBox = ({ onClose }) => {
+const ChatBox = ({ onClose, chatPartnerName = '', chatPartnerPhoto = '' }) => {
     const { userId } = useContext(AuthContext);
     const { selectedConversation, messages, sendMessage } =
         useContext(ConversationContext);
@@ -59,12 +59,27 @@ const ChatBox = ({ onClose }) => {
                 ref={chatBoxRef}
                 style={{ height: `${height}px` }}
             >
-                <div
-                    className='resize-handle'
-                    onMouseDown={handleMouseDown}
-                />
                 <div className='chatbox-header'>
-                    <span>Переписка</span>
+                    <div
+                        className='resize-handle'
+                        onMouseDown={handleMouseDown}
+                    />
+                    <div className='chatbox-chat-partner-photo-name'>
+                        <div className='chatbox-chat-partner-photo'>
+                            {chatPartnerPhoto ? ( // Проверяем, есть ли фото
+                                <img
+                                    src={chatPartnerPhoto}
+                                    alt='Собеседник'
+                                    className='chatbox-chat-partner-photo-img'
+                                />
+                            ) : (
+                                <UserIcon className='chatbox-chat-partner-photo-icon' />
+                            )}
+                        </div>
+                        <div className='chatbox-chat-partner-name'>
+                            {chatPartnerName}
+                        </div>
+                    </div>
 
                     <XMarkIcon
                         className='close-chat-icon-btn'
