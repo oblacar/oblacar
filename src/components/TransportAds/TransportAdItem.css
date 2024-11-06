@@ -19,7 +19,7 @@
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-.ad-item:hover {
+.ad-item-mouse-enter {
     /* transform: scale(1.01); */
     border: 2px solid rgb(148, 148, 234);
 }
@@ -54,15 +54,6 @@
     visibility: hidden;
 }
 /*<---*/
-
-.row {
-    width: 100%;
-    box-sizing: border-box;
-
-    min-height: 100px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-}
 
 .upper-ad-row {
     border-radius: 10px 10px 0 0;
@@ -150,6 +141,10 @@
 }
 
 .price {
+    display: flex;
+    align-items: center; /* Центрирует текст по вертикали */
+    text-align: right; /* Выравнивание текста по правому краю */
+
     font-size: 16px;
     font-weight: 600;
     color: #2c2c48;
@@ -160,37 +155,41 @@
 .finance-details {
     color: #949494;
     font-size: 12px;
+
+    text-align: right; /* Выравнивание текста по правому краю */
+    width: 100%; /* Убедитесь, что элемент занимает всю доступную ширину */
 }
 
-.cell.price {
-    justify-content: center; /* Горизонтальное центрирование */
+/*Нижняя полоса*/
+/*стилизуем информацию о транспорте*/
+.down-ad-row {
+    min-height: 40px; /*TODO сделать выравнивание по центру, но что бы все входило*/
+    color: #414141;
+
+    background-color: #f9f9f9;
+    border-radius: 10px;
+
+    display: flex;
+    justify-content: space-between; /* Выравнивание боковых блоков */
+    /* width: 100%; Контейнер занимает всю ширину */
+    /* box-sizing: border-box; */
+    /* justify-content: space-between; Размещает элементы по краям */
     align-items: center; /* Вертикальное центрирование */
 }
-/*стилизуем информацию о транспорте*/
+
 .car-info {
     text-align: left;
 
     font-size: 14px;
 
-    flex-grow: 1; /* Центр занимает оставшееся пространство */
-    box-sizing: border-box; /* Учитываем отступы внутри блока */
-}
-
-.volume {
-    font-weight: 600;
-}
-
-.down-ad-row {
-    min-height: 40px; /*TODO сделать выравнивание по центру, но что бы все входило*/
-    color: #414141;
+    /* flex-grow: 1; Центр занимает оставшееся пространство */
+    /* box-sizing: border-box; Учитываем отступы внутри блока */
 
     display: flex;
-    justify-content: space-between; /* Выравнивание боковых блоков */
-    width: 100%; /* Контейнер занимает всю ширину */
-    box-sizing: border-box;
-
+    justify-content: start; /* Выравнивание боковых блоков */
     align-items: center; /* Вертикальное центрирование */
 }
+
 /*Область фото на объявлении, которая иконка, если нет фото*/
 .car-photo-icon {
     width: 50px;
@@ -218,11 +217,8 @@
 .icon-car {
     font-size: 20px;
     color: rgb(190, 190, 193);
-    /* 
-    margin: 0px 10px 0px 20px;
-    margin-top: 5px; */
     display: block;
-    /* border: 1px solid black; */
+
     text-align: center;
     width: 100%;
     font-size: 22px;
@@ -231,18 +227,23 @@
 }
 /*Инфомрация о пользователе--->>>*/
 .ad-user-info {
-    /* border: 1px solid black; */
+    margin-right: 50px;
 
     display: flex;
     align-items: center;
+
+    width: 200px;
 
     margin-left: 10px;
 }
 .ad-user-photo {
     border: 1px solid rgb(238, 237, 237);
 
-    height: 50px;
-    width: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+
     background-color: #ffffff;
     font-size: 20px;
 
@@ -264,48 +265,28 @@
 }
 
 .ad-user-name-rating {
-    /* border: 1px solid red; */
     min-width: 100px;
-    /* height: 50px; */
-
-    /* display: flex;
-
-    align-items: center; */
 }
-.ad-user-rating {
-    /* border: 1px solid blue; */
-    /* height: 20px; */
 
+.ad-user-rating {
     font-size: 12px;
     font-weight: 600;
     color: rgb(114, 114, 114);
     display: flex;
 }
 .ad-user-name {
-    /* border: 1px solid blueviolet; */
-    /* height: 30px; */
-
     font-size: 14px;
     display: flex;
+    text-align: start;
     align-items: center;
     margin: 3px 0;
 }
 /*<<<---*/
-.icon-item-ad-bar {
-    width: 100px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.icon-item-ad-bar-filler {
-    flex-grow: 1;
-    height: 44px;
-}
 
 .container-icon-add {
-    margin-right: 3px;
+    position: absolute;
+    right: 5px;
+    bottom: 10px;
 }
 
 .icon-add {

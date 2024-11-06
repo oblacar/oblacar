@@ -243,6 +243,58 @@ class UserService {
             throw error;
         }
     }
+
+    //метод updateUserProfilePhoto,
+    //который обновляет ссылку на фото пользователя в коллекции users в Firestore.
+    async updateUserProfilePhoto(userId, newPhotoFile) {
+        try {
+            // Создаем ссылку на место хранения фото в Storage
+            const storageReference = storageRef(
+                storage,
+                `profilePhotos/${userId}`
+            );
+            await uploadBytes(storageReference, newPhotoFile);
+            // const newPhotoUrl = await getDownloadURL(storageReference);
+
+            // // Создаем ссылку на документ пользователя в Realtime Database и обновляем данные
+            // const userDbRef = databaseRef(db, `users/${userId}`);
+            // await update(userDbRef, {
+            //     userPhoto: newPhotoUrl,
+            // });
+
+            // Повторно получаем URL, если он пустой
+            let newPhotoUrl = await getDownloadURL(storageReference);
+            console.log('Полученный URL фото:', newPhotoUrl);
+
+            if (!newPhotoUrl) {
+                console.error(
+                    'Не удалось получить ссылку на фото, повторный запрос...'
+                );
+                newPhotoUrl = await getDownloadURL(storageReference);
+                console.log('URL после повторного запроса:', newPhotoUrl);
+            }
+
+            // Логирование перед обновлением
+            if (newPhotoUrl) {
+                const userDbRef = databaseRef(db, `users/${userId}`);
+                await update(userDbRef, { userPhoto: newPhotoUrl });
+                console.log(
+                    'User profile photo URL updated in Realtime Database:',
+                    newPhotoUrl
+                );
+            } else {
+                console.error(
+                    'URL фото все еще пустой после повторного запроса.'
+                );
+            }
+
+            console.log('User profile photo URL updated in Realtime Database');
+            return newPhotoUrl;
+        } catch (error) {
+            console.error('Ошибка при обновлении фото пользователя:', error);
+            throw error;
+        }
+    }
 }
 
 // Экспортируем экземпляр UserService

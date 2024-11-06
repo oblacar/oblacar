@@ -101,8 +101,6 @@ const TransportAdItem = ({
 
             const truckValue = tempWidth * tempHeight * tempDepth;
 
-            // console.log('tempDepth = ', truckValue);
-
             setTruckValue(() => cutNumber(truckValue)); // Обновляем состояние
         } else {
             setTruckValue(() => 0);
@@ -181,7 +179,9 @@ const TransportAdItem = ({
             <div
                 className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
                     onReviewAdsAdd ? '' : 'ad-item-available-for-click'
-                }   ${isActive ? '' : 'ad-item-not-available'}`}
+                }   ${isActive ? '' : 'ad-item-not-available'} ${
+                    isSelectedAdItem ? 'ad-item-mouse-enter' : ''
+                }`}
             >
                 {isInReviewAds ? (
                     <>
@@ -195,7 +195,7 @@ const TransportAdItem = ({
                     ''
                 )}
 
-                <div className='row'>
+                {/* <div className='row'> */}
                     <Link to={`/ads/${adId}`}>
                         <div className='upper-ad-row'>
                             <div className='departure-location-date'>
@@ -240,49 +240,22 @@ const TransportAdItem = ({
                                 </div>
                             </div>
                         </div>
-                    </Link>
-                    <div className='down-ad-row'>
-                        <Link to={`/ads/${adId}`}>
-                            <div className='car-photo-icon'>
-                                {truckPhotoUrls && truckPhotoUrls[0] ? ( // Проверяем, есть ли фото
-                                    <img
-                                        src={truckPhotoUrls[0]}
-                                        alt='Фото машины'
-                                        className='photo-car' // Добавьте классы для стилизации
-                                    />
-                                ) : (
-                                    <div className='icon-car'>
-                                        <FaTruck />
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
-                        {/* В этом режиме можем добавить фото машины */}
-                        {/* <div
-                        className='car-photo-icon'
-                        onClick={handleClick}
-                        >
-                        {selectedPhoto || ad.truckPhoto ? ( // Проверяем, есть ли фото
-                            <img
-                            src={selectedPhoto || ad.truckPhoto}
-                            alt='Фото машины'
-                                className='photo-car' // Добавьте классы для стилизации
-                            />
-                        ) : (
-                            <div className='icon-car'>
-                                <FaTruck />
-                            </div>
-                        )}
-                        <input
-                            type='file'
-                            id={`fileInput-${ad.adId}`} // Уникальный ID для каждого инпута
-                            style={{ display: 'none' }} // Скрываем стандартное поле ввода
-                            onChange={handleFileChange}
-                            accept='image/*' // Указываем, что это изображение
-                            />
-                            </div> */}
-                        <Link to={`/ads/${adId}`}>
-                            <div className=' car-info'>
+
+                        <div className='down-ad-row'>
+                            <div className='car-info'>
+                                <div className='car-photo-icon'>
+                                    {truckPhotoUrls && truckPhotoUrls[0] ? ( // Проверяем, есть ли фото
+                                        <img
+                                            src={truckPhotoUrls[0]}
+                                            alt='Фото машины'
+                                            className='photo-car' // Добавьте классы для стилизации
+                                        />
+                                    ) : (
+                                        <div className='icon-car'>
+                                            <FaTruck />
+                                        </div>
+                                    )}
+                                </div>
                                 <span>
                                     {transportType ? `${transportType}` : ''}
                                     {truckWeight ||
@@ -292,8 +265,7 @@ const TransportAdItem = ({
                                     ) : (
                                         ''
                                     )}
-                                </span>
-                                <span>
+
                                     {truckWeight ? (
                                         <>
                                             <strong>{truckWeight}т</strong>,{' '}
@@ -301,8 +273,7 @@ const TransportAdItem = ({
                                     ) : (
                                         ''
                                     )}
-                                </span>
-                                <span>
+
                                     {truckValue ? (
                                         <>
                                             <strong>
@@ -318,9 +289,7 @@ const TransportAdItem = ({
                                     ) : (
                                         ''
                                     )}
-                                </span>
 
-                                <span>
                                     {loadingTypes.length !== 0 ? (
                                         <>
                                             <strong>загрузка: </strong>
@@ -343,8 +312,7 @@ const TransportAdItem = ({
                                     )}
                                 </span>
                             </div>
-                        </Link>
-                        <Link to={`/ads/${adId}`}>
+
                             <div className='ad-user-info'>
                                 <div className='ad-user-photo'>
                                     {ownerPhotoUrl ? ( // Проверяем, есть ли фото
@@ -372,41 +340,33 @@ const TransportAdItem = ({
                                     )}
                                 </div>
                             </div>
-                        </Link>
-
-                        <div className='icon-item-ad-bar'>
-                            <Link
-                                to={`/ads/${adId}`}
-                                className='icon-item-ad-bar-filler'
-                            ></Link>
-                            {isActive ? (
-                                <div
-                                    className={`container-icon-add ${
-                                        isViewMode ? 'view-mode' : ''
-                                    }`}
-                                >
-                                    <div
-                                        onMouseLeave={
-                                            handleMouseLeaveReviewAdsAdd
-                                        }
-                                        onMouseEnter={
-                                            handleMouseEnterReviewAdsAdd
-                                        }
-                                    >
-                                        <ToggleIconButtonPlus
-                                            onToggle={handleToggle}
-                                            initialAdded={isInReviewAds}
-                                            isColored={isSelectedAdItem}
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
-                                ''
-                            )}
                         </div>
+                    </Link>
+                {/* </div> */}
+            </div>
+            {/* <div className='icon-item-ad-bar'> */}
+
+            {isActive ? (
+                <div
+                    className={`container-icon-add ${
+                        isViewMode ? 'view-mode' : ''
+                    }`}
+                >
+                    <div
+                        onMouseLeave={handleMouseLeaveReviewAdsAdd}
+                        onMouseEnter={handleMouseEnterReviewAdsAdd}
+                    >
+                        <ToggleIconButtonPlus
+                            onToggle={handleToggle}
+                            initialAdded={isInReviewAds}
+                            isColored={isSelectedAdItem}
+                        />
                     </div>
                 </div>
-            </div>
+            ) : (
+                ''
+            )}
+            {/* </div> */}
         </div>
     );
 };

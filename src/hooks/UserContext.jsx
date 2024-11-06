@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import { userService } from '../services/UserService';
+import TransportAdService from '../services/TransportAdService';
 
 import AuthContext from './Authorization/AuthContext';
 
@@ -26,8 +27,28 @@ const userReducer = (state, action) => {
     switch (action.type) {
         case 'SET_USER':
             return { ...state, user: action.payload }; // Заменяем пользователя реальными данными
+        // case 'UPDATE_USER':
+        //     return {
+        //         ...state,
+        //         user: {
+        //             ...state.user,
+        //             ...action.payload, // Обновляем только переданные поля
+        //         },
+        //     };
+
         case 'UPDATE_USER':
-            return { ...state, user: { ...state.user, ...action.payload } }; // Обновляем поля пользователя
+            console.log('Старое состояние:', state);
+            console.log('Payload:', action.payload);
+            const newState = {
+                ...state,
+                user: {
+                    ...state.user,
+                    ...action.payload,
+                },
+            };
+            console.log('Новое состояние:', newState);
+            return newState;
+
         case 'CLEAR_USER':
             return { ...state, user: initialState.user }; // Возвращаемся к начальным пустым значениям
         default:
@@ -89,6 +110,43 @@ export const UserProvider = ({ children }) => {
         }
     };
 
+    //-->>
+    const updateUserProfilePhoto = async (userId, newPhotoFile) => {
+        try {
+            // Обновляем фото профиля через UserService и получаем новую ссылку
+            const newPhotoUrl = await userService.updateUserProfilePhoto(
+                userId,
+                newPhotoFile
+            );
+
+            console.log(
+                'ссылка после userService.updateUserProfilePhoto',
+                newPhotoUrl
+            );
+
+            // Обновляем фото в объявлениях через TransportAdService
+            await TransportAdService.updateUserPhotoInAds(userId, newPhotoUrl);
+
+            console.log(
+                'ссылка после TransportAdService.updateUserPhotoInAds',
+                newPhotoUrl
+            );
+
+            // Используем UPDATE_USER для обновления photoUrl в состоянии
+            dispatch({
+                type: 'UPDATE_USER',
+                payload: { userPhoto: newPhotoUrl },
+            });
+
+            console.log('Пользователь после обновления: ', state.user);
+        } catch (error) {
+            console.error('Ошибка при обновлении фото профиля:', error);
+            throw error;
+        }
+    };
+
+    //<<--
+
     //TODO Shoulde check maybe we can use only isUserLoader without isAuthentithaed in components
     const isUserLoaded = Boolean(
         state.user && state.user.userId && state.user.userId === userId
@@ -96,7 +154,12 @@ export const UserProvider = ({ children }) => {
 
     return (
         <UserContext.Provider
-            value={{ user: state.user, updateUser, isUserLoaded }}
+            value={{
+                user: state.user,
+                updateUser,
+                isUserLoaded,
+                updateUserProfilePhoto,
+            }}
         >
             {children}
         </UserContext.Provider>

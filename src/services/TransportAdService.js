@@ -379,6 +379,40 @@ const TransportAdService = {
         return photoUrls;
     },
     //<<<---
+
+    //Method for updating photo of user in user's ads -->>
+    async updateUserPhotoInAds(userId, newPhotoUrl) {
+        try {
+            // Создаем ссылку на путь, где находятся объявления с `ownerId`, равным `userId`
+            const adsRef = databaseRef(db, 'transportAds');
+
+            // Загружаем все объявления
+            const snapshot = await get(adsRef);
+
+            if (snapshot.exists()) {
+                const updates = {};
+
+                // Перебираем все объявления и ищем те, у которых `ownerId` совпадает с `userId`
+                snapshot.forEach((childSnapshot) => {
+                    const adData = childSnapshot.val();
+
+                    if (adData.ownerId === userId) {
+                        // Обновляем photoUrl для объявлений, где `ownerId` совпадает с `userId`
+                        updates[
+                            `transportAds/${childSnapshot.key}/ownerPhotoUrl`
+                        ] = newPhotoUrl;
+                    }
+                });
+
+                // Выполняем обновление всех подходящих объявлений
+                await update(databaseRef(db), updates);
+            }
+        } catch (error) {
+            console.error('Ошибка при обновлении фото в объявлениях:', error);
+            throw error;
+        }
+    },
+    //<<--
 };
 
 export default TransportAdService;

@@ -10,7 +10,8 @@ import UserContext from '../../../hooks/UserContext';
 import { userService } from '../../../services/UserService';
 
 const PersonalInfo = () => {
-    const { user, updateUser } = useContext(UserContext); // Получаем данные пользователя из контекста
+    const { user, updateUser, updateUserProfilePhoto } =
+        useContext(UserContext); // Получаем данные пользователя из контекста
 
     const [userData, setUserData] = useState(user || {}); // Используем одно состояние для всех данных пользователя
 
@@ -37,39 +38,14 @@ const PersonalInfo = () => {
         // Если выбрано новое фото, загружаем его в Firebase
         if (selectedPhoto) {
             try {
-                downloadURL = await userService.uploadUserPhoto(
+                downloadURL = await updateUserProfilePhoto(
                     user.userId,
                     selectedPhoto
-                ); // Загружаем оригинальный файл
+                );
             } catch (error) {
                 console.error('Ошибка загрузки фото:', error.message);
-                return; // Прерываем сохранение, если произошла ошибка при загрузке фото
+                return;
             }
-        }
-
-        console.log(downloadURL);
-
-        const updatedUser = {
-            userPhoto: downloadURL || '',
-            userName: userData.userName || '',
-            // userEmail: userData.userEmail,
-            userPhone: userData.userPhone || '',
-            userAbout: userData.userAbout || '',
-            // Добавь сюда только те поля, которые должны быть сохранены
-        };
-
-        console.log('Обновляемый профиль:', updatedUser);
-
-        // Сохраняем обновленные данные в контексте
-        // dispatch({ type: 'UPDATE_USER', payload: updatedUser });
-
-        // Сохраняем обновленные данные в Firebase
-        try {
-            // Вызываем updateUserProfile из UserContext
-            await updateUser(updatedUser);
-            console.log('Данные профиля успешно обновлены');
-        } catch (error) {
-            console.error('Ошибка обновления профиля:', error.message);
         }
 
         setIsEditing(false); // Выходим из режима редактирования
