@@ -1,5 +1,7 @@
 /* src/components/MessagesList.css */
 .messages-list {
+    flex-grow: 1; /* Занимает оставшееся пространство */
+
     display: flex;
     flex-direction: column; /* Сообщения идут столбцом */
     align-items: flex-start; /* Сообщения других пользователей прижаты к левому краю */
