@@ -10,10 +10,18 @@ import './ChatBox.css';
 
 import AuthContext from '../../../hooks/Authorization/AuthContext';
 
-const ChatBox = ({ onClose, chatPartnerName = '', chatPartnerPhoto = '' }) => {
+const ChatBox = ({
+    onClose,
+
+    chatPartnerId = '',
+    chatPartnerName = '',
+    chatPartnerPhoto = '',
+}) => {
     const { userId } = useContext(AuthContext);
-    const { selectedConversation, messages, sendMessage } =
+    const { currentConversation: selectedConversation, sendMessage } =
         useContext(ConversationContext);
+
+    const { messages } = selectedConversation;
 
     const [height, setHeight] = useState(400); // Начальная высота чата
     const chatBoxRef = useRef(null);
@@ -42,7 +50,13 @@ const ChatBox = ({ onClose, chatPartnerName = '', chatPartnerPhoto = '' }) => {
     //Отправка сообщений
     const handleSendMessage = (text) => {
         if (selectedConversation) {
-            sendMessage(selectedConversation.conversationId, userId, text);
+            sendMessage(
+                selectedConversation.conversationId,
+                userId,
+                chatPartnerId,
+                selectedConversation.adId,
+                text
+            );
         }
     };
 

@@ -167,7 +167,8 @@ const ConversationService = {
 
             let messageIds = [];
             if (conversationSnapshot.exists()) {
-                messageIds = conversationSnapshot.val(); // Предполагаем, что это массив
+                const messagesData = conversationSnapshot.val();
+                messageIds = Array.isArray(messagesData) ? messagesData : []; // Проверяем, что messages — это массив
             }
 
             // Добавляем новый messageId как строку в массив

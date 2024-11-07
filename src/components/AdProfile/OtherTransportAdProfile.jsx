@@ -28,12 +28,16 @@ const OtherTransportAdProfile = ({
     onMessage,
     userType,
 }) => {
-    const { startConversation, selectedConversation } =
+    const { startConversation, currentConversation } =
         useContext(ConversationContext);
     const { user } = useContext(UserContext);
 
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    // useEffect(() => {
+    //     console.log('on: ', isChatBoxOpen, currentConversation);
+    // }, [currentConversation, isChatBoxOpen]);
 
     useEffect(() => {
         if (ad) {
@@ -120,27 +124,41 @@ const OtherTransportAdProfile = ({
 
     //chat-->>
 
-    const handleStartConversation = () => {
-        // startConversation([
-        //     '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2',
-        //     'f5uTdFZacmRrWZAVkkyskfmYpFn1',
-        // ]); // Замените "user1" и "user2" на реальные userId
+    // const handleStartConversation = () => {
+    //     // startConversation([
+    //     //     '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2',
+    //     //     'f5uTdFZacmRrWZAVkkyskfmYpFn1',
+    //     // ]); // Замените "user1" и "user2" на реальные userId
 
-        startConversation([user.userId, ownerId]); // Замените "user1" и "user2" на реальные userId
-        setIsChatBoxOpen(true); // Открываем ChatBox после создания
-    };
+    //     startConversation([user.userId, ownerId]); // Замените "user1" и "user2" на реальные userId
+    //     setIsChatBoxOpen(true); // Открываем ChatBox после создания
+    // };
     //<<--
 
     // Пример использования в компоненте Chat
-    // const { startConversation } = useConversation();
 
     const handleStartChat = async () => {
         // adId,
         // participants = [user.userId, ownerId]
-        const participants = [user.userId, ownerId];
+
+        const participants = [
+            {
+                userId: user.userId,
+                userName: user.userName,
+                userPhotoUrl: user.userPhoto,
+            },
+            {
+                userId: ownerId,
+                userName: ownerName,
+                userPhotoUrl: ownerPhotoUrl,
+            },
+        ];
+        console.log('пользователи: ', participants);
 
         const conversation = await startConversation(adId, participants);
         console.log('Запущен разговор:', conversation);
+
+        setIsChatBoxOpen(true);
     };
 
     return (
@@ -241,11 +259,12 @@ const OtherTransportAdProfile = ({
                 </div>
             </div>
 
-            {isChatBoxOpen && selectedConversation && (
+            {isChatBoxOpen && currentConversation && (
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
                     chatPartnerName={ownerName}
                     chatPartnerPhoto={ownerPhotoUrl}
+                    chatPartnerId={ownerId}
                 />
             )}
         </>
