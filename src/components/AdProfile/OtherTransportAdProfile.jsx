@@ -21,6 +21,7 @@ import { cutNumber, formatNumber } from '../../utils/helper';
 import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
 import Button from '../common/Button/Button';
 import ChatBox from '../common/ChatBox/ChatBox';
+import Preloader from '../common/Preloader/Preloader';
 
 const OtherTransportAdProfile = ({
     ad,
@@ -35,15 +36,19 @@ const OtherTransportAdProfile = ({
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // useEffect(() => {
-    //     console.log('on: ', isChatBoxOpen, currentConversation);
-    // }, [currentConversation, isChatBoxOpen]);
+    const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
     useEffect(() => {
         if (ad) {
             setIsLoading(false);
         }
     }, [ad]);
+
+    useEffect(() => {
+        if (isChatBoxOpen && currentConversation) {
+            setIsLoadingConversation(false);
+        }
+    }, [isChatBoxOpen, currentConversation]);
 
     if (isLoading) {
         return <div className='loading'>Загрузка объявления...</div>;
@@ -124,22 +129,8 @@ const OtherTransportAdProfile = ({
 
     //chat-->>
 
-    // const handleStartConversation = () => {
-    //     // startConversation([
-    //     //     '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2',
-    //     //     'f5uTdFZacmRrWZAVkkyskfmYpFn1',
-    //     // ]); // Замените "user1" и "user2" на реальные userId
-
-    //     startConversation([user.userId, ownerId]); // Замените "user1" и "user2" на реальные userId
-    //     setIsChatBoxOpen(true); // Открываем ChatBox после создания
-    // };
-    //<<--
-
-    // Пример использования в компоненте Chat
-
     const handleStartChat = async () => {
-        // adId,
-        // participants = [user.userId, ownerId]
+        setIsLoadingConversation(true);
 
         const participants = [
             {
@@ -153,10 +144,10 @@ const OtherTransportAdProfile = ({
                 userPhotoUrl: ownerPhotoUrl,
             },
         ];
-        console.log('пользователи: ', participants);
+        // console.log('пользователи: ', participants);
 
         const conversation = await startConversation(adId, participants);
-        console.log('Запущен разговор:', conversation);
+        // console.log('Запущен разговор:', conversation);
 
         setIsChatBoxOpen(true);
     };
@@ -242,6 +233,7 @@ const OtherTransportAdProfile = ({
                                 type_btn='reverse'
                             />
                         </div>
+                        {isLoadingConversation ? <Preloader /> : ''}
                     </div>
                     <div className='transport-ad-profile-owner-send-request'>
                         <strong>

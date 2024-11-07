@@ -6,17 +6,17 @@ import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 const ConversationContext = createContext();
 
 export const ConversationProvider = ({ children }) => {
-    const [conversations, setConversations] = useState([]);
-    const [selectedConversation, setSelectedConversation] = useState(null);
+    // const [conversations, setConversations] = useState([]);
+    // const [selectedConversation, setSelectedConversation] = useState(null);
 
-    const getConversation = async (adId, userId) => {
-        const conversation = await ConversationService.findConversationByAdId(
-            adId,
-            userId
-        );
-        setSelectedConversation(conversation);
-        return conversation;
-    };
+    // const getConversation = async (adId, userId) => {
+    //     const conversation = await ConversationService.findConversationByAdId(
+    //         adId,
+    //         userId
+    //     );
+    //     setSelectedConversation(conversation);
+    //     return conversation;
+    // };
 
     // const startConversation = async (adId, participants) => {
     //     let conversation = await getConversation(adId, participants[0]);
@@ -132,10 +132,10 @@ export const ConversationProvider = ({ children }) => {
     return (
         <ConversationContext.Provider
             value={{
-                conversations,
-                selectedConversation,
-                getConversation,
-                setSelectedConversation,
+                // conversations,
+                // selectedConversation,
+                // getConversation,
+                // setSelectedConversation,
 
                 startConversation,
                 currentConversation,
