@@ -1,24 +1,25 @@
-import { Message } from './Message';
-
-export class Conversation {
-    constructor({
-        conversationId,
-        participants,
-        messages = [],
-        lastMessage = null,
-    }) {
-        this.conversationId = conversationId; // Уникальный ID переписки
-        this.participants = participants; // Массив ID участников
-        this.messages = Array.isArray(messages)
-            ? messages
-            : Object.values(messages || {}); // Преобразуем в массив, если это объект
-        this.lastMessage = lastMessage ? new Message(lastMessage) : null; // Последнее сообщение
+// src/entities/Messages/Conversation.js
+// participants - массив из двух объектов типа: { userId: '', userName: '', userPhotoUrl: '' }
+// если массивы пустой, передаем пустую строку. При чтении нужно будет преобразовать в пустой массив.
+class Conversation {
+    constructor(id, adId, participants = [], messages = [], lastMessage = '') {
+        this.conversationId = id;
+        this.id = id;
+        this.adId = adId;
+        this.participants = participants.length > 0 ? participants : '';
+        this.messages = messages.length > 0 ? messages : '';
+        this.lastMessage = lastMessage || '';
     }
 
-    // Метод для добавления нового сообщения
-    addMessage(messageData) {
-        const newMessage = new Message(messageData);
-        this.messages.push(newMessage);
-        this.lastMessage = newMessage;
+    toFirebaseObject() {
+        return {
+            conversationId: this.conversationId,
+            adId: this.adId,
+            participants: this.participants,
+            messages: this.messages,
+            lastMessage: this.lastMessage,
+        };
     }
 }
+
+export default Conversation;

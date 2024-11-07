@@ -56,7 +56,7 @@
 /*<---*/
 
 .upper-ad-row {
-    border-radius: 10px 10px 0 0;
+    border-radius: 30px 30px 0 0;
     display: flex;
 
     width: 100%;
@@ -166,14 +166,11 @@
     min-height: 40px; /*TODO сделать выравнивание по центру, но что бы все входило*/
     color: #414141;
 
-    background-color: #f9f9f9;
-    border-radius: 10px;
+    background-color: #f3f3f3;
+    border-radius: 0px 0px 10px 10px;
 
     display: flex;
     justify-content: space-between; /* Выравнивание боковых блоков */
-    /* width: 100%; Контейнер занимает всю ширину */
-    /* box-sizing: border-box; */
-    /* justify-content: space-between; Размещает элементы по краям */
     align-items: center; /* Вертикальное центрирование */
 }
 
@@ -181,9 +178,6 @@
     text-align: left;
 
     font-size: 14px;
-
-    /* flex-grow: 1; Центр занимает оставшееся пространство */
-    /* box-sizing: border-box; Учитываем отступы внутри блока */
 
     display: flex;
     justify-content: start; /* Выравнивание боковых блоков */
@@ -197,7 +191,10 @@
     height: 50px;
 
     border: 1px rgb(241, 241, 241) solid;
-    border-radius: 50%;
+    /* border-radius: 50%; */
+    /* border-radius: 10px 10px 10px 10px; */
+    border-radius: 5px;
+    
     margin: 5px;
 
     background-color: #ffffff;

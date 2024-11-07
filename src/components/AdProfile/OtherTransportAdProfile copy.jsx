@@ -46,7 +46,6 @@ const OtherTransportAdProfile = ({
     }
 
     const {
-        adId,
         ownerPhotoUrl,
         ownerName,
         ownerId,
@@ -134,11 +133,7 @@ const OtherTransportAdProfile = ({
     // Пример использования в компоненте Chat
     // const { startConversation } = useConversation();
 
-    const handleStartChat = async () => {
-        // adId,
-        // participants = [user.userId, ownerId]
-        const participants = [user.userId, ownerId];
-
+    const handleStartChat = async (adId, participants) => {
         const conversation = await startConversation(adId, participants);
         console.log('Запущен разговор:', conversation);
     };

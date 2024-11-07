@@ -14,6 +14,7 @@ import {
 } from 'firebase/storage'; // Импортируйте необходимые функции
 
 import ConversationContext from '../../hooks/ConversationContext';
+import ConversationService from '../../services/ConversationService';
 
 import { addTransportAds } from '../../scripts/addTransportAds';
 
@@ -48,8 +49,178 @@ function Home() {
         setIsChatBoxOpen(true); // Открываем ChatBox после создания
     };
 
+    //методы для наастройки сообщений. после отладаки удалить
+    const handleCreateConversation = async () => {
+        const adId = '-OAgoNAJhgOAvR-JtzlK'; // Задаем тестовый adId
+        const participants = [
+            {
+                userId: '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2',
+                userName: '',
+                userPhotoUrl: '',
+            },
+            {
+                userId: 'A9lTs7ZeBsOHADGE1MGlFCKx08u1',
+                userName: '',
+                userPhotoUrl: '',
+            },
+        ]; // Тестовые ID пользователей
+
+        try {
+            const conversation = await ConversationService.createConversation(
+                adId,
+                participants
+            );
+            console.log('Создан разговор:', conversation);
+        } catch (error) {
+            console.error('Ошибка при создании разговора:', error);
+        }
+    };
+
+    const handleSendMessage = async () => {
+        const conversationId = '-OB3_3p3rApdweRHB07u'; // Укажите ID тестового разговора
+        const senderId = '4yFCj7s6pBTNsZnRs0Ek3pNUsYb2';
+        const recipientId = 'A9lTs7ZeBsOHADGE1MGlFCKx08u1';
+        const adId = '-OAgoNAJhgOAvR-JtzlK'; // ID объявления
+        const text = 'Тестовое сообщение-2'; // Текст сообщения
+        const isDeliveryRequest = false; // Можно переключить на true для теста запроса поставки
+
+        try {
+            const message = await ConversationService.addMessage(
+                conversationId,
+                senderId,
+                recipientId,
+                adId,
+                text,
+                isDeliveryRequest
+            );
+            console.log('Сообщение успешно отправлено:', message);
+        } catch (error) {
+            console.error('Ошибка при отправке сообщения:', error);
+        }
+    };
+
+    const handleTestClick = async () => {
+        try {
+            const conversation =
+                await ConversationService.getConversationByAdId(
+                    '-OAgoNAJhgOAvR-JtzlK'
+                );
+            console.log('Полученный разговор:', conversation);
+        } catch (error) {
+            console.error('Ошибка при получении разговора:', error);
+        }
+    };
+    const handleTestClick2 = async () => {
+        try {
+            const messages =
+                await ConversationService.getMessagesByConversationId(
+                    '-OB3_3p3rApdweRHB07u' // conversationIid
+                );
+            console.log('Полученные сообщений по id Разговора:', messages);
+        } catch (error) {
+            console.error('Ошибка при получении сообщений:', error);
+        }
+    };
+
+    const handleTestClick3 = async () => {
+        try {
+            const unreadMessageIds =
+                await ConversationService.getUnreadMessageIds(
+                    'A9lTs7ZeBsOHADGE1MGlFCKx08u1'
+                );
+            console.log('Непрочитанные сообщения:', unreadMessageIds);
+
+            setMessageIds(unreadMessageIds);
+        } catch (error) {
+            console.error(
+                'Ошибка при получении непрочитанных сообщений:',
+                error
+            );
+        }
+    };
+
+    const [messageIds, setMessageIds] = useState([]);
+
+    const handleTestClick4 = async () => {
+        try {
+            const messages = await ConversationService.getMessagesByIds(
+                messageIds
+            );
+            console.log('Непрочитанные сообщения по messageIds:', messages);
+        } catch (error) {
+            console.error(
+                'Ошибка при получении сообщений по messageIds:',
+                error
+            );
+        }
+    };
+
+    const handleMarkAsUnread = async () => {
+        try {
+            await ConversationService.markMessageAsUnread(
+                '-OB5--mv6iVw8vsTQwDJ'
+            );
+            console.log(
+                `Сообщение '-OB5--mv6iVw8vsTQwDJ' добавлено в непрочитанные `
+            );
+        } catch (error) {
+            console.error(
+                'Ошибка при добавлении сообщения в непрочитанные:',
+                error
+            );
+        }
+    };
+
+    const handleMarkAsRead = async () => {
+        try {
+            await ConversationService.markMessageAsRead('-OB5--mv6iVw8vsTQwDJ');
+            console.log(
+                `Сообщение '-OB5--mv6iVw8vsTQwDJ' отмечено как прочитанное `
+            );
+        } catch (error) {
+            console.error(
+                'Ошибка при отметке сообщения как прочитанного:',
+                error
+            );
+        }
+    };
+
+    const handleDeleteMessage = async () => {
+        try {
+            await ConversationService.deleteMessage('-OB5MfSdiQJu5uzy4aqY');
+            console.log(`Сообщение '-OB5MfSdiQJu5uzy4aqY' удалено`);
+        } catch (error) {
+            console.error('Ошибка при удалении сообщения:', error);
+        }
+    };
+
+    //
+
     return (
         <>
+            <button onClick={handleCreateConversation}>Создать разговор</button>
+            <button onClick={handleSendMessage}>
+                + Отправить тестовое сообщение
+            </button>
+            <button onClick={handleTestClick}>
+                + Тестировать getConversationByAdId
+            </button>
+            <button onClick={handleTestClick2}>
+                + Тестировать получение сообщений по id метода
+            </button>
+            <button onClick={handleTestClick3}>
+                + Тестировать получение непрочитанных сообщений
+            </button>
+            <button onClick={handleTestClick4}>
+                + Тестировать получение сообщений по messageIds
+            </button>
+            <button onClick={handleMarkAsUnread}>
+                + Отметить сообщение как непрочитанное
+            </button>
+            <button onClick={handleMarkAsRead}>
+                + Отметить сообщение как прочитанное
+            </button>
+            <button onClick={handleDeleteMessage}>+ Удалить сообщение</button>
             <div className={styles.container}>
                 {/* <div> */}
                 {/* Другие элементы вашего компонента */}
