@@ -25,34 +25,19 @@ import Preloader from '../common/Preloader/Preloader';
 
 const OtherTransportAdProfile = ({
     ad,
-    onSendRequest,
-    onMessage,
-    userType,
+    // onSendRequest,
+    // onMessage,
+    // userType,
 }) => {
-    const { startConversation, currentConversation } =
-        useContext(ConversationContext);
+    const {
+        currentConversation,
+        findConversation,
+        // sendMessage,
+        clearConversation,
+        setBasicConversationData,
+        clearBasicConversationData,
+    } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
-
-    const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const [isLoadingConversation, setIsLoadingConversation] = useState(false);
-
-    useEffect(() => {
-        if (ad) {
-            setIsLoading(false);
-        }
-    }, [ad]);
-
-    useEffect(() => {
-        if (isChatBoxOpen && currentConversation) {
-            setIsLoadingConversation(false);
-        }
-    }, [isChatBoxOpen, currentConversation]);
-
-    if (isLoading) {
-        return <div className='loading'>Загрузка объявления...</div>;
-    }
 
     const {
         adId,
@@ -75,6 +60,67 @@ const OtherTransportAdProfile = ({
         truckDepth,
         ownerRating,
     } = ad;
+
+    const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const [isLoadingConversation, setIsLoadingConversation] = useState(false);
+
+    useEffect(() => {
+        if (ad) {
+            setIsLoading(false);
+        }
+    }, [ad]);
+
+    useEffect(
+        () => {
+            const basicConversationData = {
+                adId: ad.adId,
+                participants: [
+                    {
+                        userId: ownerId,
+                        userName: ownerName,
+                        userPhotoUrl: ownerPhotoUrl,
+                    },
+                    {
+                        userId: user.userId,
+                        userName: user.userName,
+                        userPhotoUrl: user.userPhoto,
+                    },
+                ],
+            };
+
+            setBasicConversationData(basicConversationData);
+
+            findConversation(adId, [ownerId, user.userId]);
+
+            // Очистка состояния при размонтировании компонента
+            return () => {
+                clearConversation();
+                clearBasicConversationData();
+            };
+        },
+        // eslint-disable-next-line
+        [
+            // adId,
+            // ownerId,
+            // ownerName,
+            // ownerPhotoUrl,
+            // user.userId,
+            // user.userName,
+            // user.userPhoto,
+        ]
+    );
+
+    useEffect(() => {
+        // if (isChatBoxOpen && currentConversation) {
+        setIsLoadingConversation(false);
+        // }
+    }, [isChatBoxOpen, currentConversation]);
+
+    if (isLoading) {
+        return <div className='loading'>Загрузка объявления...</div>;
+    }
 
     const loadingTypesItem = () => {
         const loadingTypesString = loadingTypes?.join(', ');
@@ -132,21 +178,21 @@ const OtherTransportAdProfile = ({
     const handleStartChat = async () => {
         setIsLoadingConversation(true);
 
-        const participants = [
-            {
-                userId: user.userId,
-                userName: user.userName,
-                userPhotoUrl: user.userPhoto,
-            },
-            {
-                userId: ownerId,
-                userName: ownerName,
-                userPhotoUrl: ownerPhotoUrl,
-            },
-        ];
+        // const participants = [
+        //     {
+        //         userId: user.userId,
+        //         userName: user.userName,
+        //         userPhotoUrl: user.userPhoto,
+        //     },
+        //     {
+        //         userId: ownerId,
+        //         userName: ownerName,
+        //         userPhotoUrl: ownerPhotoUrl,
+        //     },
+        // ];
         // console.log('пользователи: ', participants);
 
-        const conversation = await startConversation(adId, participants);
+        // const conversation = await startConversation(adId, participants);
         // console.log('Запущен разговор:', conversation);
 
         setIsChatBoxOpen(true);
@@ -251,9 +297,11 @@ const OtherTransportAdProfile = ({
                 </div>
             </div>
 
-            {isChatBoxOpen && currentConversation && (
+            {isChatBoxOpen && (
+                // && currentConversation
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
+                    adId={ad.adId}
                     chatPartnerName={ownerName}
                     chatPartnerPhoto={ownerPhotoUrl}
                     chatPartnerId={ownerId}

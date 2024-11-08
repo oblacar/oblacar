@@ -12,16 +12,16 @@ import AuthContext from '../../../hooks/Authorization/AuthContext';
 
 const ChatBox = ({
     onClose,
-
+    adId,
     chatPartnerId = '',
     chatPartnerName = '',
     chatPartnerPhoto = '',
 }) => {
     const { userId } = useContext(AuthContext);
-    const { currentConversation: selectedConversation, sendMessage } =
+    const { currentConversation, sendMessage } =
         useContext(ConversationContext);
 
-    const { messages } = selectedConversation;
+    // const { messages } = currentConversation;
 
     const [height, setHeight] = useState(400); // Начальная высота чата
     const chatBoxRef = useRef(null);
@@ -49,63 +49,56 @@ const ChatBox = ({
 
     //Отправка сообщений
     const handleSendMessage = (text) => {
-        if (selectedConversation) {
-            sendMessage(
-                selectedConversation.conversationId,
-                userId,
-                chatPartnerId,
-                selectedConversation.adId,
-                text
-            );
-        }
+        sendMessage(adId, userId, chatPartnerId, text);
     };
 
-    useEffect(() => {
-        if (!selectedConversation) {
-            onClose(); // Закрываем ChatBox, если нет выбранной переписки
-        }
-    }, [selectedConversation, onClose]);
+    // useEffect(() => {
+    //     if (!currentConversation) {
+    //         onClose(); // Закрываем ChatBox, если нет выбранной переписки
+    //     }
+    // }, [currentConversation, onClose]);
+
+    // useEffect(() => {
+    //     onClose();
+    // }, [onClose]);
 
     return (
-        selectedConversation && (
-            <div
-                className='chatbox'
-                ref={chatBoxRef}
-                style={{ height: `${height}px` }}
-            >
-                <div className='chatbox-header'>
-                    <div
-                        className='resize-handle'
-                        onMouseDown={handleMouseDown}
-                    />
-                    <div className='chatbox-chat-partner-photo-name'>
-                        <div className='chatbox-chat-partner-photo'>
-                            {chatPartnerPhoto ? ( // Проверяем, есть ли фото
-                                <img
-                                    src={chatPartnerPhoto}
-                                    alt='Собеседник'
-                                    className='chatbox-chat-partner-photo-img'
-                                />
-                            ) : (
-                                <UserIcon className='chatbox-chat-partner-photo-icon' />
-                            )}
-                        </div>
-                        <div className='chatbox-chat-partner-name'>
-                            {chatPartnerName}
-                        </div>
-                    </div>
-
-                    <XMarkIcon
-                        className='close-chat-icon-btn'
-                        onClick={onClose}
-                    />
-                </div>
-                <MessagesList
-                    conversation={{ ...selectedConversation, messages }}
+        // currentConversation &&
+        <div
+            className='chatbox'
+            ref={chatBoxRef}
+            style={{ height: `${height}px` }}
+        >
+            <div className='chatbox-header'>
+                <div
+                    className='resize-handle'
+                    onMouseDown={handleMouseDown}
                 />
-                <MessageInput onSend={handleSendMessage} />
+                <div className='chatbox-chat-partner-photo-name'>
+                    <div className='chatbox-chat-partner-photo'>
+                        {chatPartnerPhoto ? ( // Проверяем, есть ли фото
+                            <img
+                                src={chatPartnerPhoto}
+                                alt='Собеседник'
+                                className='chatbox-chat-partner-photo-img'
+                            />
+                        ) : (
+                            <UserIcon className='chatbox-chat-partner-photo-icon' />
+                        )}
+                    </div>
+                    <div className='chatbox-chat-partner-name'>
+                        {chatPartnerName}
+                    </div>
+                </div>
+
+                <XMarkIcon
+                    className='close-chat-icon-btn'
+                    onClick={onClose}
+                />
             </div>
-        )
+            <MessagesList messages={currentConversation?.messages || []} />
+            <MessageInput onSend={handleSendMessage} />
+        </div>
     );
 };
 

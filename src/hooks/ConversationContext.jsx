@@ -1,65 +1,62 @@
 // ConversationContext.js
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import ConversationService from '../services/ConversationService';
 import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 
 const ConversationContext = createContext();
 
 export const ConversationProvider = ({ children }) => {
-    // const [conversations, setConversations] = useState([]);
-    // const [selectedConversation, setSelectedConversation] = useState(null);
-
-    // const getConversation = async (adId, userId) => {
-    //     const conversation = await ConversationService.findConversationByAdId(
-    //         adId,
-    //         userId
-    //     );
-    //     setSelectedConversation(conversation);
-    //     return conversation;
-    // };
-
-    // const startConversation = async (adId, participants) => {
-    //     let conversation = await getConversation(adId, participants[0]);
-
-    //     if (!conversation) {
-    //         conversation = await ConversationService.createConversation(
-    //             adId,
-    //             participants
-    //         );
-    //         setConversations((prev) => [...prev, conversation]);
-    //     }
-
-    //     setSelectedConversation(conversation);
-    //     return conversation;
-    // };
-
-    //Методы, который начали делать с нуля со второй попытки
-
-    // Метод начать разговор
+    // currentConversation - Расширенный conversation, где messages - это массив сообщений, а не только их id
     const [currentConversation, setCurrentConversation] = useState(null);
 
-    const startConversation = async (adId, participants) => {
+    // Основные данные разговора. Важно передавать данные в заданном формате
+    const initialBasicConversationData = {
+        adId: '',
+        participants: [
+            {
+                userId: '',
+                userName: '',
+                userPhotoUrl: '',
+            },
+            {
+                userId: '',
+                userName: '',
+                userPhotoUrl: '',
+            },
+        ],
+    };
+    const [currentConversationBasicData, setCurrentConversationBasicData] =
+        useState(initialBasicConversationData);
+
+    const setBasicConversationData = (basicConversationData) => {
+        setCurrentConversationBasicData(basicConversationData);
+    };
+
+    const clearBasicConversationData = () => {
+        setCurrentConversationBasicData(initialBasicConversationData);
+    };
+
+    // Метод пытается получить "разговор" и записать его в "текщий разговор", если нет, то null
+    const findConversation = async (adId, idParticipants) => {
         try {
-            // Ищем разговор по adId
-            let conversation = await ConversationService.getConversationByAdId(
-                adId
-            );
+            // Проверка на наличие разговора по `adId`
+            const conversation =
+                await ConversationService.getConversationByAdIdAndParticipantsId(
+                    adId,
+                    idParticipants
+                );
 
             if (!conversation) {
-                // Если разговор не найден, создаем новый
-                conversation = await ConversationService.createConversation(
-                    adId,
-                    participants
-                );
+                setCurrentConversation(null);
+                return;
             }
 
-            // Получаем все сообщения для данного разговора
+            //Получаем массив сообщений для существующего conversation
             const messages =
                 await ConversationService.getMessagesByConversationId(
                     conversation.conversationId
                 );
 
-            // Создаем расширенный разговор (ExtendedConversation) с полным массивом объектов сообщений
             const extendedConversation = new ExtendedConversation(
                 conversation.conversationId,
                 conversation.adId,
@@ -67,79 +64,111 @@ export const ConversationProvider = ({ children }) => {
                 messages
             );
 
-            // Сохраняем текущий расширенный разговор в состоянии
             setCurrentConversation(extendedConversation);
-
-            return extendedConversation;
         } catch (error) {
-            console.error('Ошибка при запуске разговора:', error);
-            throw error;
+            console.error('Ошибка при поиске разговора:', error);
+            setCurrentConversation(null); // Обрабатываем ошибку, сбрасывая состояние
         }
     };
 
-    // const [conversations, setConversations] = useState({});
-    const sendMessage = (
-        conversationId,
+    useEffect(() => {
+        console.log(currentConversation);
+    }, [currentConversation]);
+
+    // Метод отправки сообщений.
+    // Очень важный метод, так как при первом отправлении создается conversation в коллекции
+    const sendMessage = async (
+        adId,
         senderId,
         recipientId,
-        adId,
         text,
         isDeliveryRequest = false
     ) => {
-        // Создаем временное сообщение, чтобы сразу обновить интерфейс
-        const tempMessage = {
-            messageId: `temp-${Date.now()}`, // Временный ID
-            conversationId,
-            senderId,
-            recipientId,
-            adId,
-            text,
-            timestamp: Date.now(),
-            isRead: false,
-            isDeliveryRequest,
-        };
+        try {
+            // Локально добавляем сообщение для мгновенного отображения
+            const newMessage = {
+                messageId: `temp-${Date.now()}`, // Временный ID для локального отображения
+                conversationId: currentConversation?.conversationId || null,
+                senderId,
+                recipientId,
+                adId,
+                text,
+                timestamp: Date.now(),
+                isRead: false,
+                isDeliveryRequest,
+            };
 
-        // Обновляем интерфейс сразу
-        setCurrentConversation((prevConversation) => ({
-            ...prevConversation,
-            messages: [...prevConversation.messages, tempMessage],
-        }));
+            if (!currentConversation) {
+                // Создаем расширенный разговор (ExtendedConversation) с полным массивом объектов сообщений
+                const extendedConversation = new ExtendedConversation(
+                    null,
+                    currentConversationBasicData.adId,
+                    currentConversationBasicData.participants,
+                    []
+                );
 
-        // Асинхронно отправляем сообщение на сервер
-        ConversationService.addMessage(
-            conversationId,
-            senderId,
-            recipientId,
-            adId,
-            text,
-            isDeliveryRequest
-        )
-            .then((message) => {
-                // Заменяем временное сообщение на сообщение из базы, если оно успешно записано
+                setCurrentConversation(extendedConversation);
+            }
+
+            // Обновляем локальный интерфейс чата
+            setCurrentConversation((prevConversation) => ({
+                ...prevConversation,
+                messages: [...(prevConversation?.messages || []), newMessage],
+            }));
+
+            // Проверяем существование разговора
+            let conversationId = currentConversation?.conversationId;
+
+            if (!conversationId) {
+                // Разговор не существует, создаем новый в фоне
+                const newConversation =
+                    await ConversationService.createConversation(
+                        currentConversationBasicData.adId,
+                        currentConversationBasicData.participants
+                    );
+
+                conversationId = newConversation.conversationId;
+
+                // Сохраняем текущий расширенный разговор в состоянии
                 setCurrentConversation((prevConversation) => ({
                     ...prevConversation,
-                    messages: prevConversation.messages.map((msg) =>
-                        msg.messageId === tempMessage.messageId ? message : msg
-                    ),
+                    conversationId: conversationId,
                 }));
-            })
-            .catch((error) => {
-                console.error('Ошибка при отправке сообщения:', error);
-                // Обрабатываем ошибку, если нужно удалить временное сообщение или показать уведомление
-            });
+                // setCurrentConversation(extendedConversation);
+            }
+
+            // Сохраняем сообщение на сервере после создания разговора
+            await ConversationService.addMessage(
+                conversationId,
+                senderId,
+                recipientId,
+                adId,
+                text,
+                isDeliveryRequest
+            );
+
+            console.log('Сообщение отправлено и сохранено в базе');
+        } catch (error) {
+            console.error('Ошибка при отправке сообщения:', error);
+            // Дополнительно: можно добавить обработку ошибки для уведомления пользователя
+        }
+    };
+
+    const clearConversation = () => {
+        setCurrentConversation(null);
     };
 
     return (
         <ConversationContext.Provider
             value={{
-                // conversations,
-                // selectedConversation,
-                // getConversation,
-                // setSelectedConversation,
-
-                startConversation,
+                findConversation,
                 currentConversation,
                 sendMessage,
+                clearConversation,
+
+                // методы задающие базовые данные для разговора
+                setBasicConversationData,
+                clearBasicConversationData,
             }}
         >
             {children}

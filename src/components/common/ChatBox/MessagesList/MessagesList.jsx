@@ -5,7 +5,7 @@ import './MessagesList.css';
 
 import { formatTimestamp } from '../../../../utils/formatTimestamp';
 
-const MessagesList = ({ conversation }) => {
+const MessagesList = ({ messages }) => {
     const { user } = useContext(UserContext);
     const { userId } = user;
 
@@ -13,16 +13,16 @@ const MessagesList = ({ conversation }) => {
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [conversation.messages]);
+    }, [messages]);
 
     return (
         <div className='messages-list'>
-            {conversation.messages.map((msg, idx) => (
+            {messages.map((msg, idx) => (
                 <div
                     key={idx}
                     className={`message ${
                         msg.senderId === userId ? 'own' : 'other'
-                    }`} 
+                    }`}
                 >
                     <div
                         className='message-text'
@@ -39,5 +39,6 @@ const MessagesList = ({ conversation }) => {
         </div>
     );
 };
+
 
 export default MessagesList;

@@ -18,6 +18,11 @@ import Message from '../entities/Messages/Message';
 const ConversationService = {
     //Метод createConversation будет создавать новый разговор в базе данных
     async createConversation(adId, participants) {
+        console.log('Проверка данных перед созданием разговора:', {
+            adId,
+            participants,
+        });
+
         try {
             const conversationsRef = dbRef(db, 'conversations');
             const newConversationRef = push(conversationsRef);
@@ -43,91 +48,6 @@ const ConversationService = {
             throw error;
         }
     },
-
-    // Пока не тестировали и не использовали данный метод.. .вроде бы.. закоментил, что бы проверить это
-    // async findConversationByAdIdAndUserId(adId, userId) {
-    //     try {
-    //         const conversationsRef = dbRef(db, 'conversations');
-    //         const conversationQuery = query(
-    //             conversationsRef,
-    //             orderByChild('adId'),
-    //             equalTo(adId)
-    //         );
-
-    //         const snapshot = await get(conversationQuery);
-    //         let conversation = null;
-
-    //         if (snapshot.exists()) {
-    //             snapshot.forEach((childSnapshot) => {
-    //                 const data = childSnapshot.val();
-    //                 if (data.participants && data.participants[userId]) {
-    //                     conversation = Conversation.fromFirebaseData(
-    //                         childSnapshot.key,
-    //                         data
-    //                     );
-    //                 }
-    //             });
-    //         }
-    //         return conversation;
-    //     } catch (error) {
-    //         console.error('Ошибка при поиске разговора:', error);
-    //         throw error;
-    //     }
-    // },
-
-    //Работа с сообщениями
-    // async addMessageToConversation(
-    //     conversationId,
-    //     senderId,
-    //     recipientId,
-    //     adId,
-    //     text,
-    //     isDeliveryRequest = false
-    // ) {
-    //     try {
-    //         const messagesRef = dbRef(
-    //             db,
-    //             `conversations/${conversationId}/messages`
-    //         );
-    //         const newMessageRef = push(messagesRef);
-    //         const messageData = new Message(
-    //             newMessageRef.key,
-    //             conversationId,
-    //             senderId,
-    //             recipientId,
-    //             adId,
-    //             text,
-    //             Date.now(),
-    //             false,
-    //             isDeliveryRequest
-    //         );
-
-    //         // Сохраняем сообщение в базе данных
-    //         await set(newMessageRef, messageData.toFirebaseObject());
-    //         console.log('Сообщение успешно отправлено:', messageData);
-
-    //         // Добавляем в непрочитанные сообщения, если оно не прочитано
-    //         if (!messageData.isRead) {
-    //             const unreadMessagesRef = dbRef(
-    //                 db,
-    //                 `unreadMessages/${recipientId}/${newMessageRef.key}`
-    //             );
-    //             await set(unreadMessagesRef, {
-    //                 conversationId: messageData.conversationId,
-    //                 adId: messageData.adId,
-    //                 senderId: messageData.senderId,
-    //                 text: messageData.text,
-    //                 timestamp: messageData.timestamp,
-    //                 isDeliveryRequest: messageData.isDeliveryRequest,
-    //             });
-    //         }
-
-    //         return messageData;
-    //     } catch (error) {
-    //         console.error('Ошибка при отправке сообщения:', error);
-    //         throw error;
-    //     }
-    // },
 
     //метод добавляет сообщение в коллекцию сообщений, а также добавляет messageId в коллекцию unreadMessages
     // + перевели на строковую систему хранения ключей
@@ -248,30 +168,50 @@ const ConversationService = {
         }
     },
 
-    // Удаляет messageId из непрочитанных сообщений для пользователя - частично дублирует markMessageAsRead
-    // async readMessage(recipientId, messageId) {
-    //     try {
-    //         const messageRef = dbRef(
-    //             db,
-    //             `unreadMessages/${recipientId}/${messageId}`
-    //         );
-    //         await remove(messageRef);
-    //         console.log(
-    //             `Message ID ${messageId} удален из непрочитанных для пользователя ${recipientId}`
-    //         );
-    //     } catch (error) {
-    //         console.error(
-    //             'Ошибка при удалении сообщения из непрочитанных:',
-    //             error
-    //         );
-    //         throw error;
-    //     }
-    // },
-
+    
     // Метод возвращает данные о разговоре и массив messageId (без подгрузки самих сообщений):
     // Этот метод вернет conversationId, adId, participants и массив messageId из поля messages.
-    //++ метод отлажен для строковых Id сообщений
-    async getConversationByAdId(adId) {
+    //-+ метод не проверен
+    async getConversationsByAdId(adId) {
+        try {
+            const conversationsRef = dbRef(db, 'conversations');
+            const conversationQuery = query(
+                conversationsRef,
+                orderByChild('adId'),
+                equalTo(adId)
+            );
+
+            // Запрос данных
+            const snapshot = await get(conversationQuery);
+            const conversations = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    conversations.push({
+                        conversationId: childSnapshot.key,
+                        adId: data.adId,
+                        participants: data.participants,
+                        messageIds: Array.isArray(data.messages)
+                            ? data.messages.map(String)
+                            : Object.keys(data.messages || {}),
+                    });
+                });
+                console.log(`Разговоры для adId ${adId}:`, conversations);
+                return conversations;
+            } else {
+                console.log(`Разговоры для adId ${adId} не найдены.`);
+                return [];
+            }
+        } catch (error) {
+            console.error('Ошибка при выполнении запроса:', error);
+            throw error;
+        }
+    },
+
+    // Метод ищет конкретный разговор, основанный на adId и массиве participantsId из двух userId собеседников:
+    // -- не проверен
+    async getConversationByAdIdAndParticipantsId(adId, participantsId) {
         try {
             const conversationsRef = dbRef(db, 'conversations');
             const conversationQuery = query(
@@ -284,22 +224,46 @@ const ConversationService = {
             const snapshot = await get(conversationQuery);
 
             if (snapshot.exists()) {
-                let conversation = null;
+                let foundConversation = null;
                 snapshot.forEach((childSnapshot) => {
                     const data = childSnapshot.val();
-                    conversation = {
-                        conversationId: childSnapshot.key,
-                        adId: data.adId,
-                        participants: data.participants,
-                        messageIds: Array.isArray(data.messages)
-                            ? data.messages.map(String)
-                            : Object.keys(data.messages || {}),
-                    };
+                    const conversationParticipants = data.participants
+                        .map((p) => p.userId)
+                        .sort();
+
+                    // Сравниваем участников
+                    if (
+                        conversationParticipants.length ===
+                            participantsId.length &&
+                        conversationParticipants.every(
+                            (id, index) => id === participantsId.sort()[index]
+                        )
+                    ) {
+                        foundConversation = {
+                            conversationId: childSnapshot.key,
+                            adId: data.adId,
+                            participants: data.participants,
+                            messageIds: Array.isArray(data.messages)
+                                ? data.messages.map(String)
+                                : Object.keys(data.messages || {}),
+                        };
+                    }
                 });
-                console.log(`Разговор для adId ${adId}:`, conversation);
-                return conversation;
+
+                if (foundConversation) {
+                    console.log(
+                        `Найден разговор для adId ${adId} и участников ${participantsId}:`,
+                        foundConversation
+                    );
+                    return foundConversation;
+                } else {
+                    console.log(
+                        `Разговор для adId ${adId} и участников ${participantsId} не найден.`
+                    );
+                    return null;
+                }
             } else {
-                console.log(`Разговор для adId ${adId} не найден.`);
+                console.log(`Разговоры для adId ${adId} не найдены.`);
                 return null;
             }
         } catch (error) {
