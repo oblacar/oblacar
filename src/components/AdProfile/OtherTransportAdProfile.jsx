@@ -2,15 +2,8 @@
 
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import './OtherTransportAdProfile.css';
-import {
-    FaUser,
-    FaEnvelope,
-    FaCheck,
-    FaTimes,
-    FaCommentDots,
-} from 'react-icons/fa';
+import { FaUser, FaEnvelope } from 'react-icons/fa';
 
-// chat - bubble - left - right;
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 
 import ConversationContext from '../../hooks/ConversationContext';
@@ -32,7 +25,7 @@ const OtherTransportAdProfile = ({
     const {
         currentConversation,
         findConversation,
-        // sendMessage,
+
         clearConversation,
         setBasicConversationData,
         clearBasicConversationData,
@@ -113,9 +106,7 @@ const OtherTransportAdProfile = ({
     );
 
     useEffect(() => {
-        // if (isChatBoxOpen && currentConversation) {
         setIsLoadingConversation(false);
-        // }
     }, [isChatBoxOpen, currentConversation]);
 
     if (isLoading) {
@@ -173,27 +164,8 @@ const OtherTransportAdProfile = ({
         );
     };
 
-    //chat-->>
-
     const handleStartChat = async () => {
         setIsLoadingConversation(true);
-
-        // const participants = [
-        //     {
-        //         userId: user.userId,
-        //         userName: user.userName,
-        //         userPhotoUrl: user.userPhoto,
-        //     },
-        //     {
-        //         userId: ownerId,
-        //         userName: ownerName,
-        //         userPhotoUrl: ownerPhotoUrl,
-        //     },
-        // ];
-        // console.log('пользователи: ', participants);
-
-        // const conversation = await startConversation(adId, participants);
-        // console.log('Запущен разговор:', conversation);
 
         setIsChatBoxOpen(true);
     };
@@ -271,10 +243,7 @@ const OtherTransportAdProfile = ({
                             <Button
                                 type='button'
                                 children='Написать'
-                                // icon={<FaCommentDots />}
                                 icon={<ChatBubbleLeftRightIcon />}
-                                // ChatBubbleLeftRightIcon
-                                // onClick={handleStartConversation}
                                 onClick={handleStartChat}
                                 type_btn='reverse'
                             />
@@ -291,14 +260,12 @@ const OtherTransportAdProfile = ({
                             type='button'
                             children='Отправить запрос'
                             icon={<FaEnvelope />}
-                            // type_btn='reverse'
                         />
                     </div>
                 </div>
             </div>
 
             {isChatBoxOpen && (
-                // && currentConversation
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
                     adId={ad.adId}

@@ -21,8 +21,6 @@ const ChatBox = ({
     const { currentConversation, sendMessage } =
         useContext(ConversationContext);
 
-    // const { messages } = currentConversation;
-
     const [height, setHeight] = useState(400); // Начальная высота чата
     const chatBoxRef = useRef(null);
     const startYRef = useRef(0); // Используем useRef для стартовой позиции
@@ -52,18 +50,7 @@ const ChatBox = ({
         sendMessage(adId, userId, chatPartnerId, text);
     };
 
-    // useEffect(() => {
-    //     if (!currentConversation) {
-    //         onClose(); // Закрываем ChatBox, если нет выбранной переписки
-    //     }
-    // }, [currentConversation, onClose]);
-
-    // useEffect(() => {
-    //     onClose();
-    // }, [onClose]);
-
     return (
-        // currentConversation &&
         <div
             className='chatbox'
             ref={chatBoxRef}
