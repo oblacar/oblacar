@@ -1,11 +1,79 @@
 // ConversationContext.js
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import ConversationService from '../services/ConversationService';
+import TransportAdService from '../services/TransportAdService';
 import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 
 const ConversationContext = createContext();
 
 export const ConversationProvider = ({ children }) => {
+    //conversations - диалоги для пользователя
+    const [conversations, setConversations] = useState([]);
+
+    const getUserConversations = async (userId) => {
+        try {
+            // Получаем массив стандартных разговоров
+            const conversations =
+                await ConversationService.getUserConversations(userId);
+
+            console.log('Нашли conversations: ', conversations);
+
+            // Создаем массив для хранения расширенных разговоров
+            const extendedConversations = [];
+
+            for (const conversation of conversations) {
+                const {
+                    conversationId,
+                    adId,
+                    participants,
+                    messages,
+                    lastMessage,
+                } = conversation;
+
+                // Получаем логистическую информацию по adId
+                const adData = await TransportAdService.getAdById(adId);
+
+                console.log(`getAdById(${adId}): `, adData);
+
+                const {
+                    availabilityDate,
+                    departureCity,
+                    destinationCity,
+                    price,
+                    paymentUnit,
+                } = adData || {}; // Если данных нет, значения будут undefined
+
+                //Получаем массив сообщений для массива Id messages
+                const conversationMessages =
+                    await ConversationService.getMessagesByIds(messages);
+
+                // Создаем расширенный разговор
+                const extendedConversation = new ExtendedConversation({
+                    conversationId: conversationId,
+                    adId: adId,
+                    availabilityDate: availabilityDate || '',
+                    departureCity: departureCity || '',
+                    destinationCity: destinationCity || '',
+                    priceAndPaymentUnit: price + ' ' + paymentUnit || '',
+                    participants: participants,
+                    messages: conversationMessages,
+                    lastMessage: lastMessage || null,
+                });
+
+                // Добавляем расширенный разговор в массив
+                extendedConversations.push(extendedConversation);
+            }
+
+            console.log('extendedConversations: ', extendedConversations);
+
+            // Устанавливаем массив расширенных разговоров в состояние
+            setConversations(extendedConversations);
+        } catch (error) {
+            console.error('Ошибка при поиске разговоров:', error);
+            setConversations([]);
+        }
+    };
+
     // currentConversation - Расширенный conversation, где messages - это массив сообщений, а не только их id
     const [currentConversation, setCurrentConversation] = useState(null);
 
@@ -57,12 +125,12 @@ export const ConversationProvider = ({ children }) => {
                     conversation.conversationId
                 );
 
-            const extendedConversation = new ExtendedConversation(
-                conversation.conversationId,
-                conversation.adId,
-                conversation.participants,
-                messages
-            );
+            const extendedConversation = new ExtendedConversation({
+                conversationId: conversation.conversationId,
+                adId: conversation.adId,
+                participants: conversation.participants,
+                messages: messages,
+            });
 
             setCurrentConversation(extendedConversation);
         } catch (error) {
@@ -100,12 +168,10 @@ export const ConversationProvider = ({ children }) => {
 
             if (!currentConversation) {
                 // Создаем расширенный разговор (ExtendedConversation) с полным массивом объектов сообщений
-                const extendedConversation = new ExtendedConversation(
-                    null,
-                    currentConversationBasicData.adId,
-                    currentConversationBasicData.participants,
-                    []
-                );
+                const extendedConversation = new ExtendedConversation({
+                    adId: currentConversationBasicData.adId,
+                    participants: currentConversationBasicData.participants,
+                });
 
                 setCurrentConversation(extendedConversation);
             }
@@ -169,6 +235,9 @@ export const ConversationProvider = ({ children }) => {
                 // методы задающие базовые данные для разговора
                 setBasicConversationData,
                 clearBasicConversationData,
+                //Методы для чат-листа
+                conversations,
+                getUserConversations,
             }}
         >
             {children}

@@ -168,7 +168,6 @@ const ConversationService = {
         }
     },
 
-    
     // Метод возвращает данные о разговоре и массив messageId (без подгрузки самих сообщений):
     // Этот метод вернет conversationId, adId, participants и массив messageId из поля messages.
     //-+ метод не проверен
@@ -431,24 +430,32 @@ const ConversationService = {
         }
     },
 
-    //Метод возвращает все разговоры, в которых участвует пользователь.
+    // Метод возвращает все разговоры, в которых участвует пользователь.
+    // Этот метод сначала загружает все разговоры, а затем фильтрует их,
+    // чтобы выбрать только те, где userId присутствует в списке участников.
+    // Поле participants рассматривается как массив объектов { userId, userName, userPhotoUrl },
+    // и проверка на участие происходит через метод some, который ищет совпадение по userId
     async getUserConversations(userId) {
         try {
             const conversationsRef = dbRef(db, 'conversations');
-            const userConversationsQuery = query(
-                conversationsRef,
-                orderByChild(`participants/${userId}`),
-                equalTo(true)
-            );
-            const snapshot = await get(userConversationsQuery);
+            const snapshot = await get(conversationsRef);
 
             const conversations = [];
             snapshot.forEach((childSnapshot) => {
-                const conversation = {
-                    conversationId: childSnapshot.key,
-                    ...childSnapshot.val(),
-                };
-                conversations.push(conversation);
+                const data = childSnapshot.val();
+
+                // Проверяем, является ли userId одним из участников
+                const isParticipant = data.participants.some(
+                    (participant) => participant.userId === userId
+                );
+
+                if (isParticipant) {
+                    const conversation = {
+                        conversationId: childSnapshot.key,
+                        ...data,
+                    };
+                    conversations.push(conversation);
+                }
             });
 
             console.log('Разговоры пользователя:', conversations);
