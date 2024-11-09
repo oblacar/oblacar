@@ -1,9 +1,7 @@
-// ChatInterface.js
+// ChatInterface.js работающий компонет, сохраняем, что бы перенести области чата, который уже настроен
 import React, { useState, useContext, useEffect } from 'react';
 import ConversationList from './ConversationList';
 import ActiveConversation from './ActiveConversation';
-import MessagesList from '../common/ChatBox/MessagesList/MessagesList';
-import MessageInput from '../common/ChatBox/MessageInput/MessageInput';
 
 import ConversationContext from '../../hooks/ConversationContext';
 import UserContext from '../../hooks/UserContext';
@@ -13,7 +11,6 @@ import './ChatInterface.css';
 const ChatInterface = () => {
     const { user } = useContext(UserContext);
     const [selectedConversation, setSelectedConversation] = useState(null);
-
     const { conversations, getUserConversations } =
         useContext(ConversationContext);
 
@@ -27,9 +24,6 @@ const ChatInterface = () => {
         console.log('список разговоров в интефейсе: ', conversations);
     }, [conversations]);
 
-    const handleSendMessage = (text) => {
-        console.log(text); //imitation of sendMessage
-    };
     return (
         <div className='chat-interface'>
             <ConversationList
@@ -37,8 +31,6 @@ const ChatInterface = () => {
                 onSelectConversation={setSelectedConversation}
             />
             <ActiveConversation conversation={selectedConversation} />
-            {/* <MessagesList messages={selectedConversation?.messages || []} />
-            <MessageInput onSend={handleSendMessage} /> */}
         </div>
     );
 };

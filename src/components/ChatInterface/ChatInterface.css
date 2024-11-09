@@ -1,6 +1,7 @@
 .chat-interface {
     display: flex;
-    height: 100vh;
+    max-height: calc(100vh - 300px);
+    height: calc(100vh - 300px);
     border: 1px solid #ccc;
     border-radius: 4px;
     overflow: hidden;

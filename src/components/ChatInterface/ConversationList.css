@@ -17,6 +17,10 @@
     background-color: #f0f0f0;
 }
 
+.conversation-item.selected {
+    background-color: #f0f0f0; /* Светло-серый фон для выделения */
+}
+
 .conversation-photo {
     width: 40px;
     height: 40px;

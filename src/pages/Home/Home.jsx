@@ -73,7 +73,7 @@ function Home() {
                     ad={ads.length > 0 ? ads[0].ad : null}
                 /> */}
 
-                <TransportAdsList />
+                {/* <TransportAdsList /> */}
             </div>
         </>
     );
