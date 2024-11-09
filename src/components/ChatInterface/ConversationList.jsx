@@ -46,14 +46,20 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
                                 className='conversation-photo'
                             />
                             <div className='conversation-details'>
+                                <h4>{conversation.availabilityDate}</h4>
                                 <h4>
+                                    {conversation.departureCity} -{' '}
+                                    {conversation.destinationCity}
+                                </h4>
+                                <p>{conversation.priceAndPaymentUnit}</p>
+
+                                <p>
                                     {
                                         conversation.participants[
                                             chatPartnerIindex
                                         ].userName
                                     }
-                                </h4>
-                                <p>{conversation.lastMessage}</p>
+                                </p>
                             </div>
                         </div>
                     );

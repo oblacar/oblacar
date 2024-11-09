@@ -1,16 +1,26 @@
 // ActiveConversation.js
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './ActiveConversation.css';
 import MessagesList from '../common/ChatBox/MessagesList/MessagesList';
 import MessageInput from '../common/ChatBox/MessageInput/MessageInput';
+import ConversationContext from '../../hooks/ConversationContext';
+import UserContext from '../../hooks/UserContext';
 
 const ActiveConversation = ({ conversation }) => {
-    const [messageText, setMessageText] = useState('');
+    const { sendChatInterfaceMessage } = useContext(ConversationContext);
+    const { user } = useContext(UserContext);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = (messageText) => {
         if (messageText.trim()) {
-            // Логика отправки сообщения
-            setMessageText('');
+            const chatPartnerIindex =
+                user.userId === conversation.participants[0].userId ? 1 : 0;
+
+            sendChatInterfaceMessage(
+                conversation.adId,
+                user.userId,
+                conversation.participants[chatPartnerIindex].userId,
+                messageText.trim()
+            );
         }
     };
 
@@ -18,12 +28,8 @@ const ActiveConversation = ({ conversation }) => {
         <div className='active-conversation'>
             {conversation ? (
                 <>
-                    {/* <div className='message-list'> */}
                     <MessagesList messages={conversation?.messages || []} />
-                    {/* </div> */}
-                    {/* <div className='message-input'> */}
                     <MessageInput onSend={handleSendMessage} />
-                    {/* </div> */}
                 </>
             ) : (
                 <div className='no-conversation'>

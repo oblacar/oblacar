@@ -76,7 +76,6 @@ const ConversationService = {
 
             // Сохраняем сообщение в Firebase
             await set(newMessageRef, messageData.toFirebaseObject());
-            console.log('Сообщение успешно отправлено:', messageData);
 
             // Обновляем массив messageIds в разговоре
             const conversationMessagesRef = dbRef(
@@ -97,18 +96,12 @@ const ConversationService = {
             await update(dbRef(db, `conversations/${conversationId}`), {
                 messages: messageIds,
             });
-            console.log(
-                `Message ID ${messageData.messageId} добавлен в разговор ${conversationId}`
-            );
 
             // Добавляем messageId в непрочитанные для получателя
             await this.markMessageAsUnread(messageData.messageId);
 
             // Обновляем последнее сообщение в разговоре
             await this.updateLastMessageInConversation(conversationId, text);
-            console.log(
-                `Последнее сообщение обновлено в разговоре ${conversationId}`
-            );
 
             return messageData;
         } catch (error) {
@@ -156,9 +149,6 @@ const ConversationService = {
 
             // Обновляем список непрочитанных сообщений
             await set(unreadMessagesRef, unreadMessageIds);
-            console.log(
-                `Сообщение ${messageId} добавлено в непрочитанные для пользователя ${recipientId}`
-            );
         } catch (error) {
             console.error(
                 'Ошибка при добавлении сообщения в непрочитанные:',
@@ -368,7 +358,6 @@ const ConversationService = {
                 }
             }
 
-            console.log('Полученные сообщения по messageIds:', messages);
             return messages;
         } catch (error) {
             console.error(
@@ -458,7 +447,6 @@ const ConversationService = {
                 }
             });
 
-            console.log('Разговоры пользователя:', conversations);
             return conversations;
         } catch (error) {
             console.error(
@@ -536,10 +524,6 @@ const ConversationService = {
                 `conversations/${conversationId}`
             );
             await update(conversationRef, { lastMessage });
-
-            console.log(
-                `Последнее сообщение обновлено в разговоре ${conversationId}`
-            );
         } catch (error) {
             console.error(
                 'Ошибка при обновлении последнего сообщения в разговоре:',

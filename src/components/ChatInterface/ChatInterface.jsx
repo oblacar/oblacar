@@ -2,8 +2,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import ConversationList from './ConversationList';
 import ActiveConversation from './ActiveConversation';
-import MessagesList from '../common/ChatBox/MessagesList/MessagesList';
-import MessageInput from '../common/ChatBox/MessageInput/MessageInput';
 
 import ConversationContext from '../../hooks/ConversationContext';
 import UserContext from '../../hooks/UserContext';
@@ -24,12 +22,18 @@ const ChatInterface = () => {
     }, [user.userId]);
 
     useEffect(() => {
-        console.log('список разговоров в интефейсе: ', conversations);
+        if (!selectedConversation) {
+            return;
+        }
+
+        const conversationId = selectedConversation.conversationId;
+        const conversation = conversations.find(
+            (con) => con.conversationId === conversationId
+        );
+
+        setSelectedConversation(conversation);
     }, [conversations]);
 
-    const handleSendMessage = (text) => {
-        console.log(text); //imitation of sendMessage
-    };
     return (
         <div className='chat-interface'>
             <ConversationList
@@ -37,8 +41,6 @@ const ChatInterface = () => {
                 onSelectConversation={setSelectedConversation}
             />
             <ActiveConversation conversation={selectedConversation} />
-            {/* <MessagesList messages={selectedConversation?.messages || []} />
-            <MessageInput onSend={handleSendMessage} /> */}
         </div>
     );
 };

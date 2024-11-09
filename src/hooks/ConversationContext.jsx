@@ -16,8 +16,6 @@ export const ConversationProvider = ({ children }) => {
             const conversations =
                 await ConversationService.getUserConversations(userId);
 
-            console.log('Нашли conversations: ', conversations);
-
             // Создаем массив для хранения расширенных разговоров
             const extendedConversations = [];
 
@@ -32,8 +30,6 @@ export const ConversationProvider = ({ children }) => {
 
                 // Получаем логистическую информацию по adId
                 const adData = await TransportAdService.getAdById(adId);
-
-                console.log(`getAdById(${adId}): `, adData);
 
                 const {
                     availabilityDate,
@@ -63,8 +59,6 @@ export const ConversationProvider = ({ children }) => {
                 // Добавляем расширенный разговор в массив
                 extendedConversations.push(extendedConversation);
             }
-
-            console.log('extendedConversations: ', extendedConversations);
 
             // Устанавливаем массив расширенных разговоров в состояние
             setConversations(extendedConversations);
@@ -139,9 +133,65 @@ export const ConversationProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        console.log(currentConversation);
-    }, [currentConversation]);
+    // Метод отправки сообщений из списка Диалогов.
+    // Основное отличие от sendMessage в том, что conversation уже существует.
+    const sendChatInterfaceMessage = async (
+        adId,
+        senderId,
+        recipientId,
+        text,
+        isDeliveryRequest = false
+    ) => {
+        try {
+            const conversation = conversations.find(
+                (conv) => conv.adId === adId
+            );
+
+            if (!conversation) {
+                return;
+            }
+
+            // Локально добавляем сообщение для мгновенного отображения
+            const newMessage = {
+                messageId: `temp-${Date.now()}`, // Временный ID для локального отображения
+                conversationId: conversation.conversationId,
+                senderId,
+                recipientId,
+                adId,
+                text,
+                timestamp: Date.now(),
+                isRead: false,
+                isDeliveryRequest,
+            };
+
+            // Обновляем локальный интерфейс чата
+            setConversations((prevConversations) =>
+                prevConversations.map((conv) =>
+                    conv.conversationId === conversation.conversationId
+                        ? {
+                              ...conv,
+                              messages: [...conv.messages, newMessage],
+                          }
+                        : conv
+                )
+            );
+
+            // Сохраняем сообщение на сервере после создания разговора
+            await ConversationService.addMessage(
+                conversation.conversationId,
+                senderId,
+                recipientId,
+                adId,
+                text,
+                isDeliveryRequest
+            );
+
+            console.log('Сообщение отправлено и сохранено в базе');
+        } catch (error) {
+            console.error('Ошибка при отправке сообщения:', error);
+            // Дополнительно: можно добавить обработку ошибки для уведомления пользователя
+        }
+    };
 
     // Метод отправки сообщений.
     // Очень важный метод, так как при первом отправлении создается conversation в коллекции
@@ -156,7 +206,7 @@ export const ConversationProvider = ({ children }) => {
             // Локально добавляем сообщение для мгновенного отображения
             const newMessage = {
                 messageId: `temp-${Date.now()}`, // Временный ID для локального отображения
-                conversationId: currentConversation?.conversationId || null,
+                conversationId: currentConversation?.conversationId || null, //TODO нужно сделать такой же метод для отправки из чата
                 senderId,
                 recipientId,
                 adId,
@@ -238,6 +288,7 @@ export const ConversationProvider = ({ children }) => {
                 //Методы для чат-листа
                 conversations,
                 getUserConversations,
+                sendChatInterfaceMessage,
             }}
         >
             {children}
