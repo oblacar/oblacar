@@ -2,24 +2,17 @@
 import React, { useState, useContext, useEffect } from 'react';
 import ConversationList from './ConversationList';
 import ActiveConversation from './ActiveConversation';
+import Preloader from '../common/Preloader/Preloader';
 
 import ConversationContext from '../../hooks/ConversationContext';
-import UserContext from '../../hooks/UserContext';
 
 import './ChatInterface.css';
 
 const ChatInterface = () => {
-    const { user } = useContext(UserContext);
     const [selectedConversation, setSelectedConversation] = useState(null);
 
-    const { conversations, getUserConversations } =
+    const { conversations, isConversationsLoaded } =
         useContext(ConversationContext);
-
-    useEffect(() => {
-        if (user.userId) {
-            getUserConversations(user.userId);
-        }
-    }, [user.userId]);
 
     useEffect(() => {
         if (!selectedConversation) {
@@ -35,13 +28,22 @@ const ChatInterface = () => {
     }, [conversations]);
 
     return (
-        <div className='chat-interface'>
-            <ConversationList
-                conversations={conversations ? conversations : []}
-                onSelectConversation={setSelectedConversation}
-            />
-            <ActiveConversation conversation={selectedConversation} />
-        </div>
+        <>
+            {isConversationsLoaded ? (
+                <div className='chat-interface'>
+                    <ConversationList
+                        conversations={conversations ? conversations : []}
+                        onSelectConversation={setSelectedConversation}
+                    />
+                    <ActiveConversation conversation={selectedConversation} />
+                </div>
+            ) : (
+                <div className='chat-interface-preloader'>
+                    <p>Ваши Диалоги загружаются.</p>
+                    <Preloader />
+                </div>
+            )}
+        </>
     );
 };
 

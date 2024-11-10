@@ -16,6 +16,7 @@ import { UserProvider } from './hooks/UserContext';
 import { TransportAdProvider } from './hooks/TransportAdContext';
 import { TransportProvider } from './hooks/TransportContext';
 import { ConversationProvider } from './hooks/ConversationContext';
+import ConversationsPage from './pages/ConversationsPage/ConversationsPage';
 
 const App = () => {
     return (
@@ -63,6 +64,10 @@ const App = () => {
                                             <Route
                                                 path='/ads/:adId'
                                                 element={<AdPage />}
+                                            />
+                                            <Route
+                                                path='/dialogs'
+                                                element={<ConversationsPage />}
                                             />
                                         </Route>
                                     </Routes>

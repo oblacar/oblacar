@@ -532,6 +532,54 @@ const ConversationService = {
             throw error;
         }
     },
+
+    //Получаем список непрочитанных сообщений: Берем messageId непрочитанных сообщений из unreadMessages/${userId}.
+    //Извлекаем сообщения: Используем Promise.all, чтобы загрузить все сообщения по идентификаторам.
+    //Фильтрация: Если какое-то сообщение отсутствует, оно будет исключено из результирующего массива.
+    //Возвращаем массив сообщений: Результат — массив объектов сообщений с их содержимым, готовых к отображению.
+    async getUnreadMessagesByUserId(userId) {
+        try {
+            // Получаем ссылку на непрочитанные сообщения пользователя
+            const unreadMessagesRef = dbRef(db, `unreadMessages/${userId}`);
+            const unreadSnapshot = await get(unreadMessagesRef);
+
+            if (unreadSnapshot.exists()) {
+                // Извлекаем id непрочитанных сообщений
+                const unreadMessageIds = Object.keys(unreadSnapshot.val());
+
+                // Загружаем сами сообщения по id
+                const unreadMessages = await Promise.all(
+                    unreadMessageIds.map(async (messageId) => {
+                        const messageRef = dbRef(db, `messages/${messageId}`);
+                        const messageSnapshot = await get(messageRef);
+
+                        if (messageSnapshot.exists()) {
+                            return { messageId, ...messageSnapshot.val() };
+                        } else {
+                            console.warn(
+                                `Сообщение с ID ${messageId} не найдено.`
+                            );
+                            return null;
+                        }
+                    })
+                );
+
+                // Фильтруем возможные null-значения, если какие-то сообщения не найдены
+                return unreadMessages.filter((message) => message !== null);
+            } else {
+                console.log(
+                    `Нет непрочитанных сообщений для пользователя с ID ${userId}`
+                );
+                return [];
+            }
+        } catch (error) {
+            console.error(
+                'Ошибка при получении непрочитанных сообщений:',
+                error
+            );
+            throw error;
+        }
+    },
 };
 
 export default ConversationService;

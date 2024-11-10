@@ -141,6 +141,9 @@ function IconDropdownMenuBar({ height }) {
                     HoverCardComponent={HoverMessageCard}
                     iconCoordinates={iconMessageCoordinates}
                     windowWidth={windowWidth}
+                    LinkTo={
+                        isAuthenticated && isUserLoaded ? '/dialogs' : '/login'
+                    }
                 />
 
                 <IconHoverCard

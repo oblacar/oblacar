@@ -4,11 +4,38 @@ import ConversationService from '../services/ConversationService';
 import TransportAdService from '../services/TransportAdService';
 import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 
+import AuthContext from './Authorization/AuthContext';
+
 const ConversationContext = createContext();
 
 export const ConversationProvider = ({ children }) => {
     //conversations - диалоги для пользователя
     const [conversations, setConversations] = useState([]);
+    const [isConversationsLoaded, setIsConversationsLoaded] = useState(false);
+    const { isAuthenticated, userId } = useContext(AuthContext);
+    const [unreadMessages, setUnreadMessages] = useState([]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            setIsConversationsLoaded(false);
+            
+            getUserConversations(userId);
+
+            getUnreadMessagesByUserId(userId);
+        }
+    }, [isAuthenticated, userId]);
+
+    const getUnreadMessagesByUserId = async (userId) => {
+        try {
+            const unreadMessages =
+                await ConversationService.getUnreadMessagesByUserId(userId);
+
+            setUnreadMessages(unreadMessages);
+        } catch (error) {
+            console.error('Ошибка при поиске разговоров:', error);
+            setUnreadMessages([]);
+        }
+    };
 
     const getUserConversations = async (userId) => {
         try {
@@ -62,6 +89,7 @@ export const ConversationProvider = ({ children }) => {
 
             // Устанавливаем массив расширенных разговоров в состояние
             setConversations(extendedConversations);
+            setIsConversationsLoaded(true);
         } catch (error) {
             console.error('Ошибка при поиске разговоров:', error);
             setConversations([]);
@@ -289,6 +317,8 @@ export const ConversationProvider = ({ children }) => {
                 conversations,
                 getUserConversations,
                 sendChatInterfaceMessage,
+                isConversationsLoaded,
+                unreadMessages,
             }}
         >
             {children}

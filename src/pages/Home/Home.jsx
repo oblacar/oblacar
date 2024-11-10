@@ -36,7 +36,7 @@ function Home() {
 
     return (
         <>
-            <ChatInterface />
+            {/* <ChatInterface /> */}
             <div className={styles.container}>
                 {/* <div> */}
                 {/* Другие элементы вашего компонента */}
@@ -73,7 +73,7 @@ function Home() {
                     ad={ads.length > 0 ? ads[0].ad : null}
                 /> */}
 
-                {/* <TransportAdsList /> */}
+                <TransportAdsList />
             </div>
         </>
     );
