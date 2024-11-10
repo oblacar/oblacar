@@ -1,4 +1,6 @@
 // ConversationService.js
+// Данный Сервис работает с массивами, исппользовался до перехода полностью
+// на объектную база
 import { db } from '../firebase';
 import {
     ref as dbRef,
@@ -16,42 +18,28 @@ import Conversation from '../entities/Messages/Conversation';
 import Message from '../entities/Messages/Message';
 
 const ConversationService = {
-    // Метод createConversation создает новый разговор в базе данных
-    // Создаем новый разговор в концепции объектов.
-    // метод createConversation, который преобразует participants в объект с userId в качестве ключа:
-    // -+ проходит тестирование
-    async createConversation(adId, participantsArray) {
+    //Метод createConversation будет создавать новый разговор в базе данных
+    async createConversation(adId, participants) {
         console.log('Проверка данных перед созданием разговора:', {
             adId,
-            participantsArray,
+            participants,
         });
 
         try {
             const conversationsRef = dbRef(db, 'conversations');
             const newConversationRef = push(conversationsRef);
-            const conversationId = newConversationRef.key;
+            const conversationId = newConversationRef.key; // Получаем ID разговора
 
-            // Преобразуем массив участников в объект
-            const participants = participantsArray.reduce((acc, user) => {
-                acc[user.userId] = {
-                    userName: user.userName,
-                    userPhotoUrl: user.userPhotoUrl,
-                };
-                return acc;
-            }, {});
-
-            // Создаем данные для разговора
-            const conversationData = {
+            // Создаем новый разговор с conversationId
+            const conversationData = new Conversation(
                 conversationId,
                 adId,
-                participants, // Теперь это объект, а не массив
-                messages: {}, // Пустой объект для хранения сообщений по ключу
-                lastMessage: null,
-            };
+                participants,
+                []
+            );
 
             // Сохраняем разговор в Firebase
-            await set(newConversationRef, conversationData);
-
+            await set(newConversationRef, conversationData.toFirebaseObject());
             console.log(
                 'Разговор успешно создан с ID:',
                 conversationData.conversationId
@@ -63,105 +51,8 @@ const ConversationService = {
         }
     },
 
-    // const ConversationService = {
-    //     //Метод createConversation будет создавать новый разговор в базе данных
-    //     async createConversation(adId, participants) {
-    //         console.log('Проверка данных перед созданием разговора:', {
-    //             adId,
-    //             participants,
-    //         });
-
-    //         try {
-    //             const conversationsRef = dbRef(db, 'conversations');
-    //             const newConversationRef = push(conversationsRef);
-    //             const conversationId = newConversationRef.key; // Получаем ID разговора
-
-    //             // Создаем новый разговор с conversationId
-    //             const conversationData = new Conversation(
-    //                 conversationId,
-    //                 adId,
-    //                 participants,
-    //                 []
-    //             );
-
-    //             // Сохраняем разговор в Firebase
-    //             await set(newConversationRef, conversationData.toFirebaseObject());
-    //             console.log(
-    //                 'Разговор успешно создан с ID:',
-    //                 conversationData.conversationId
-    //             );
-    //             return conversationData;
-    //         } catch (error) {
-    //             console.error('Ошибка при создании разговора:', error);
-    //             throw error;
-    //         }
-    //     },
-
     //метод добавляет сообщение в коллекцию сообщений, а также добавляет messageId в коллекцию unreadMessages
     // + перевели на строковую систему хранения ключей
-    // async addMessage(
-    //     conversationId,
-    //     senderId,
-    //     recipientId,
-    //     adId,
-    //     text,
-    //     isDeliveryRequest = false
-    // ) {
-    //     try {
-    //         const messagesRef = dbRef(db, 'messages');
-    //         const newMessageRef = push(messagesRef);
-    //         const messageData = new Message(
-    //             newMessageRef.key, // messageId, генерируемый Firebase
-    //             conversationId,
-    //             senderId,
-    //             recipientId,
-    //             adId,
-    //             text,
-    //             Date.now(),
-    //             false, // По умолчанию сообщение считается непрочитанным
-    //             isDeliveryRequest
-    //         );
-
-    //         // Сохраняем сообщение в Firebase
-    //         await set(newMessageRef, messageData.toFirebaseObject());
-
-    //         // Обновляем массив messageIds в разговоре
-    //         const conversationMessagesRef = dbRef(
-    //             db,
-    //             `conversations/${conversationId}/messages`
-    //         );
-    //         const conversationSnapshot = await get(conversationMessagesRef);
-
-    //         let messageIds = [];
-    //         if (conversationSnapshot.exists()) {
-    //             const messagesData = conversationSnapshot.val();
-    //             messageIds = Array.isArray(messagesData) ? messagesData : []; // Проверяем, что messages — это массив
-    //         }
-
-    //         // Добавляем новый messageId как строку в массив
-    //         messageIds.push(messageData.messageId);
-
-    //         await update(dbRef(db, `conversations/${conversationId}`), {
-    //             messages: messageIds,
-    //         });
-
-    //         // Добавляем messageId в непрочитанные для получателя
-    //         await this.markMessageAsUnread(messageData.messageId);
-
-    //         // Обновляем последнее сообщение в разговоре
-    //         await this.updateLastMessageInConversation(conversationId, text);
-
-    //         return messageData;
-    //     } catch (error) {
-    //         console.error('Ошибка при отправке сообщения:', error);
-    //         throw error;
-    //     }
-    // },
-
-    // Метод метод addMessage, который работает с объектом сообщений вместо массива.
-    // В этом методе мы добавляем новый messageId в объект, где ключом является messageId,
-    // а значением true (для отметки присутствия сообщения в разговоре).
-    // -+ проходит тестирование
     async addMessage(
         conversationId,
         senderId,
@@ -171,7 +62,6 @@ const ConversationService = {
         isDeliveryRequest = false
     ) {
         try {
-            // Создаем новое сообщение
             const messagesRef = dbRef(db, 'messages');
             const newMessageRef = push(messagesRef);
             const messageData = new Message(
@@ -189,15 +79,27 @@ const ConversationService = {
             // Сохраняем сообщение в Firebase
             await set(newMessageRef, messageData.toFirebaseObject());
 
-            // Добавляем messageId в объект messages в разговоре
+            // Обновляем массив messageIds в разговоре
             const conversationMessagesRef = dbRef(
                 db,
-                `conversations/${conversationId}/messages/${messageData.messageId}`
+                `conversations/${conversationId}/messages`
             );
+            const conversationSnapshot = await get(conversationMessagesRef);
 
-            await set(conversationMessagesRef, true);
+            let messageIds = [];
+            if (conversationSnapshot.exists()) {
+                const messagesData = conversationSnapshot.val();
+                messageIds = Array.isArray(messagesData) ? messagesData : []; // Проверяем, что messages — это массив
+            }
 
-            // Отмечаем messageId как непрочитанный для получателя
+            // Добавляем новый messageId как строку в массив
+            messageIds.push(messageData.messageId);
+
+            await update(dbRef(db, `conversations/${conversationId}`), {
+                messages: messageIds,
+            });
+
+            // Добавляем messageId в непрочитанные для получателя
             await this.markMessageAsUnread(messageData.messageId);
 
             // Обновляем последнее сообщение в разговоре
@@ -214,9 +116,6 @@ const ConversationService = {
     // Проверка существования сообщения - предотвратит случайные добавления несуществующих messageId.
     // Обновление статуса isRead: false для сообщения.
     // + перевели на строковую систему хранения ключей
-
-    // Метод markMessageAsUnread, который сохраняет непрочитанные сообщения как объекты
-    // -+ вроде бы работает
     async markMessageAsUnread(messageId) {
         try {
             // Получаем данные сообщения для определения recipientId
@@ -233,28 +132,25 @@ const ConversationService = {
             // Обновление статуса isRead в самом сообщении
             await update(messageRef, { isRead: false });
 
-            // Получаем текущий объект непрочитанных сообщений для пользователя
+            // Получаем текущий список непрочитанных сообщений для пользователя
             const unreadMessagesRef = dbRef(
                 db,
                 `unreadMessages/${recipientId}`
             );
             const unreadSnapshot = await get(unreadMessagesRef);
+            let unreadMessageIds = [];
 
-            // Если данные уже существуют, преобразуем в объект или создаем новый объект
-            const unreadMessageIds = unreadSnapshot.exists()
-                ? unreadSnapshot.val()
-                : {};
+            // Проверяем существование массива и добавляем новое сообщение, если оно отсутствует
+            if (unreadSnapshot.exists()) {
+                unreadMessageIds = unreadSnapshot.val();
+            }
 
-            // Проверяем, если messageId еще нет в непрочитанных, добавляем его
-            if (!unreadMessageIds[messageId]) {
-                unreadMessageIds[messageId] = true;
+            if (!unreadMessageIds.includes(messageId)) {
+                unreadMessageIds.push(messageId);
             }
 
             // Обновляем список непрочитанных сообщений
             await set(unreadMessagesRef, unreadMessageIds);
-            console.log(
-                `Сообщение ${messageId} добавлено в непрочитанные для пользователя ${recipientId}`
-            );
         } catch (error) {
             console.error(
                 'Ошибка при добавлении сообщения в непрочитанные:',
@@ -263,50 +159,6 @@ const ConversationService = {
             throw error;
         }
     },
-
-    // async markMessageAsUnread(messageId) {
-    //     try {
-    //         // Получаем данные сообщения для определения recipientId
-    //         const messageRef = dbRef(db, `messages/${messageId}`);
-    //         const snapshot = await get(messageRef);
-
-    //         if (!snapshot.exists()) {
-    //             console.error(`Сообщение с ID ${messageId} не найдено.`);
-    //             return;
-    //         }
-
-    //         const { recipientId } = snapshot.val();
-
-    //         // Обновление статуса isRead в самом сообщении
-    //         await update(messageRef, { isRead: false });
-
-    //         // Получаем текущий список непрочитанных сообщений для пользователя
-    //         const unreadMessagesRef = dbRef(
-    //             db,
-    //             `unreadMessages/${recipientId}`
-    //         );
-    //         const unreadSnapshot = await get(unreadMessagesRef);
-    //         let unreadMessageIds = [];
-
-    //         // Проверяем существование массива и добавляем новое сообщение, если оно отсутствует
-    //         if (unreadSnapshot.exists()) {
-    //             unreadMessageIds = unreadSnapshot.val();
-    //         }
-
-    //         if (!unreadMessageIds.includes(messageId)) {
-    //             unreadMessageIds.push(messageId);
-    //         }
-
-    //         // Обновляем список непрочитанных сообщений
-    //         await set(unreadMessagesRef, unreadMessageIds);
-    //     } catch (error) {
-    //         console.error(
-    //             'Ошибка при добавлении сообщения в непрочитанные:',
-    //             error
-    //         );
-    //         throw error;
-    //     }
-    // },
 
     // Метод возвращает данные о разговоре и массив messageId (без подгрузки самих сообщений):
     // Этот метод вернет conversationId, adId, participants и массив messageId из поля messages.
