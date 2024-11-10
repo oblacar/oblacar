@@ -25,6 +25,9 @@ export const ConversationProvider = ({ children }) => {
 
             getUnreadMessagesByUserId(userId);
         }
+        else{
+            setUnreadMessages([]);
+        }
     }, [isAuthenticated, userId]);
 
     const getUnreadMessagesByUserId = async (userId) => {
@@ -50,6 +53,8 @@ export const ConversationProvider = ({ children }) => {
             // Создаем массив для хранения расширенных разговоров
             const extendedConversations = [];
 
+
+
             for (const conversation of conversations) {
                 const {
                     conversationId,
@@ -69,6 +74,8 @@ export const ConversationProvider = ({ children }) => {
                     price,
                     paymentUnit,
                 } = adData || {}; // Если данных нет, значения будут undefined
+
+                console.log('messages для расширенного объекта:', messages);
 
                 //Получаем массив сообщений для массива Id messages
                 const conversationMessages =
