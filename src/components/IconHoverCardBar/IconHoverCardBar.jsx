@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
+import ConversationContext from '../../hooks/ConversationContext';
 
 import IconHoverCard from './IconHoverCard';
 
@@ -54,6 +55,7 @@ function IconDropdownMenuBar({ height }) {
     const { isAuthenticated } = useContext(AuthContext);
     const { user, isUserLoaded } = useContext(UserContext);
     const { reviewAds } = useContext(TransportAdContext);
+    const { unreadMessages } = useContext(ConversationContext);
 
     const [iconNewAdCoordinates, setIconNewAdCoordinates] = useState(zero);
     const [iconUserCoordinates, setIconUserCoordinates] = useState(zero);
@@ -134,17 +136,32 @@ function IconDropdownMenuBar({ height }) {
                             : '/login'
                     }
                 />
-                <IconHoverCard
-                    type='Сообщения'
-                    iconRef={iconMessageRef}
-                    IconComponent={FaEnvelope}
-                    HoverCardComponent={HoverMessageCard}
-                    iconCoordinates={iconMessageCoordinates}
-                    windowWidth={windowWidth}
-                    LinkTo={
-                        isAuthenticated && isUserLoaded ? '/dialogs' : '/login'
-                    }
-                />
+                <div className={styles.iconContainerVariants}>
+                    <IconHoverCard
+                        type='Сообщения'
+                        iconRef={iconMessageRef}
+                        IconComponent={FaEnvelope}
+                        HoverCardComponent={HoverMessageCard}
+                        iconCoordinates={iconMessageCoordinates}
+                        windowWidth={windowWidth}
+                        LinkTo={
+                            isAuthenticated && isUserLoaded
+                                ? '/dialogs'
+                                : '/login'
+                        }
+                    />
+                    {unreadMessages.length ? (
+                        <div
+                            className={`${styles.variantsCountContainer} ${styles.unreadMessagesPosition}`}
+                        >
+                            <div className={styles.variantsCount}>
+                                {unreadMessages.length}
+                            </div>
+                        </div>
+                    ) : (
+                        ''
+                    )}
+                </div>
 
                 <IconHoverCard
                     type='Доставки'

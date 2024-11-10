@@ -5,6 +5,7 @@ import TransportAdService from '../services/TransportAdService';
 import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 
 import AuthContext from './Authorization/AuthContext';
+import UserContext from './UserContext';
 
 const ConversationContext = createContext();
 
@@ -13,12 +14,13 @@ export const ConversationProvider = ({ children }) => {
     const [conversations, setConversations] = useState([]);
     const [isConversationsLoaded, setIsConversationsLoaded] = useState(false);
     const { isAuthenticated, userId } = useContext(AuthContext);
+    // const { user } = useContext(UserContext);
     const [unreadMessages, setUnreadMessages] = useState([]);
 
     useEffect(() => {
         if (isAuthenticated) {
             setIsConversationsLoaded(false);
-            
+
             getUserConversations(userId);
 
             getUnreadMessagesByUserId(userId);
@@ -29,6 +31,8 @@ export const ConversationProvider = ({ children }) => {
         try {
             const unreadMessages =
                 await ConversationService.getUnreadMessagesByUserId(userId);
+
+            console.log('unreadMessages: ', unreadMessages);
 
             setUnreadMessages(unreadMessages);
         } catch (error) {

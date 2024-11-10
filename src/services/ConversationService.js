@@ -540,13 +540,9 @@ const ConversationService = {
     async getUnreadMessagesByUserId(userId) {
         try {
             // Получаем ссылку на непрочитанные сообщения пользователя
-            const unreadMessagesRef = dbRef(db, `unreadMessages/${userId}`);
-            const unreadSnapshot = await get(unreadMessagesRef);
+            const unreadMessageIds = await this.getUnreadMessageIds(userId);
 
-            if (unreadSnapshot.exists()) {
-                // Извлекаем id непрочитанных сообщений
-                const unreadMessageIds = Object.keys(unreadSnapshot.val());
-
+            if (unreadMessageIds) {
                 // Загружаем сами сообщения по id
                 const unreadMessages = await Promise.all(
                     unreadMessageIds.map(async (messageId) => {
