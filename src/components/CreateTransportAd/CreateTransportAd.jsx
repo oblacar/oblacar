@@ -2,214 +2,223 @@ import React, { useRef, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { TransportAd } from '../../entities/Ads/TransportAd';
-
-// import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
 
 import TransportAdItem from '../TransportAds/TransportAdItem';
-
 import RouteSection from './RouteSection';
 import PaymentSection from './PaymentSection';
 import TransportSection from './TransportSection';
+import Overlay from '../common/Overlay/Overlay';
+import ConfirmationDialog from '../common/ConfirmationDialog/ConfirmationDialog';
 
-import './CreateTransportAd.css'; // Импортируйте файл стилей
+import './CreateTransportAd.css';
 import Button from '../common/Button/Button';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaPen } from 'react-icons/fa';
+
+const InitialTransportAdData = {
+    ownerId: '',
+    ownerName: '',
+    ownerPhotoUrl: '',
+    ownerRating: 0,
+    truckId: '',
+    truckName: '',
+    truckPhotoUrls: [],
+    transportType: '',
+    truckWeight: 0,
+    truckHeight: 0,
+    truckWidth: 0,
+    truckDepth: 0,
+    loadingTypes: [],
+    availabilityDate: '',
+    departureCity: '',
+    destinationCity: '',
+    price: 0,
+    paymentUnit: '',
+    readyToNegotiate: false,
+    paymentOptions: [],
+};
 
 const CreateTransportAd = () => {
     const { user } = useContext(UserContext);
     const { addAd } = useContext(TransportAdContext);
 
-    //ссылка на разделы для отработки валидации заполнения форм
+    const [isReadyForNewAd, setIsReadyForNewAd] = useState(true);
+
+    // const navigate = useNavigate();
+
+    // Ссылки на разделы для валидации
     const routeSectionRef = useRef();
     const paymentSectionRef = useRef();
     const transportSectionRef = useRef();
 
-    //TODO Пока не используем переброску на главную страницу
-    const navigate = useNavigate();
+    // Состояние данных формы
+    const [formData, setFormData] = useState(InitialTransportAdData);
 
-    const [formData, setFormData] = useState({
-        ownerId: '',
-        ownerName: '',
-        ownerPhotoUrl: '',
-        // ownerRating: user.userRating,
-        ownerRating: 0,
+    // Управление показом Overlay
+    const [isOverlayVisible, setOverlayVisible] = useState(false);
 
-        truckId: '',
-        truckName: '',
-        truckPhotoUrls: [],
-        transportType: '',
-        truckWeight: 0,
-        truckHeight: 0,
-        truckWidth: 0,
-        truckDepth: 0,
-        loadingTypes: [], // массив возможных типов загрузки
-        availabilityDate: '', // дата, когда машина доступна
-        departureCity: '', // город, где находится транспортное средство
-        destinationCity: '', // предполагаемое направление (если есть)
-        price: 0, // стоимость перевозки
-        paymentUnit: '', // единица стоимости (тыс.руб, руб, руб/км и т.д.)
-        readyToNegotiate: false, // готовность к торгу
-        paymentOptions: [], // условия оплаты: нал, б/нал, с Ндс, без НДС и т.д.
-    });
-
+    // Установка данных пользователя
     useEffect(() => {
         if (user) {
-            setFormData((prev) => ({
-                ...prev,
-                ownerId: user.userId,
-                ownerName: user.userName,
-                ownerPhotoUrl: user.userPhoto,
-                ownerRating: user.userRating || 3.5, // TODO. Если у user нет рейтинга, по умолчанию 3.5
-            }));
+            // setFormData((prev) => ({
+            //     ...prev,
+            //     ownerId: user.userId,
+            //     ownerName: user.userName,
+            //     ownerPhotoUrl: user.userPhoto,
+            //     ownerRating: user.userRating || 3.5,
+            // }));
+            setAdOwnerData();
         }
     }, [user]);
 
-    useEffect(() => {
-        if (user) {
-            setFormData((prev) => ({
-                ...prev,
-                ownerId: user.userId,
-                ownerName: user.userName,
-                ownerPhotoUrl: user.userPhoto,
-                ownerRating: user.userRating || 3.5, // TODO. Если у user нет рейтинга, по умолчанию 3.5
-            }));
-        }
-    }, []);
+    const setAdOwnerData = () => {
+        setFormData((prev) => ({
+            ...prev,
+            ownerId: user.userId,
+            ownerName: user.userName,
+            ownerPhotoUrl: user.userPhoto,
+            ownerRating: user.userRating || 3.5,
+        }));
+    };
 
     const updateFormData = (newData) => {
         setFormData((prevState) => ({
             ...prevState,
             ...newData,
         }));
-
-        // console.log(newData);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Предотвращаем стандартное поведение формы
-
+    // Открытие подтверждающего окна при отправке
+    const handleOpenConfirmation = (e) => {
+        e.preventDefault();
         let isValid = routeSectionRef.current.validateFields();
-        if (!isValid) {
-            return;
-        }
+        if (!isValid) return;
 
         isValid = paymentSectionRef.current.validateFields();
-        if (!isValid) {
-            return;
-        }
+        if (!isValid) return;
 
         isValid = transportSectionRef.current.validateFields();
-        if (!isValid) {
-            return;
-        }
+        if (!isValid) return;
 
-        // Создание нового объекта транспортного объявления
+        // Показываем Overlay и подтверждающий диалог
+        setOverlayVisible(true);
+    };
+
+    // Отправка данных при подтверждении
+    const handleConfirmPlacement = () => {
         const newTransportAd = new TransportAd({
-            adId: Date.now(), // TODO Пример генерации уникального ID
-
-            ownerId: formData.ownerId,
-            ownerName: formData.ownerName,
-            ownerPhotoUrl: formData.ownerPhotoUrl,
-            // ownerRating: formData.userRating,
-            ownerRating: 3.5,
-
-            availabilityDate: formData.availabilityDate,
-            //  ||
-            // new Date().toLocaleDateString('en-GB').replace(/\//g, '.'),
-
-            departureCity: formData.departureCity,
-            destinationCity: formData.destinationCity,
-
-            paymentUnit: formData.paymentUnit,
-            price: Number(formData.price),
-            readyToNegotiate: formData.readyToNegotiate,
+            adId: Date.now(),
+            ...formData,
             status: 'active',
-
-            paymentOptions:
-                formData.paymentOptions.length > 0
-                    ? formData.paymentOptions
-                    : '',
-
-            truckId: Date.now(), // TODO Замените на реальный truckId
-            truckName: formData.truckName,
-            truckPhotoUrls:
-                formData.truckPhotoUrls.length > 0
-                    ? formData.truckPhotoUrls
-                    : '',
-
-            transportType: formData.transportType,
-
-            loadingTypes:
-                formData.loadingTypes.length > 0 ? formData.loadingTypes : '',
-
-            truckWeight: Number(formData.truckWeight),
-            truckHeight: Number(formData.truckHeight),
-            truckWidth: Number(formData.truckWidth),
-            truckDepth: Number(formData.truckDepth),
         });
 
-        // Здесь вы можете отправить данные в базу данных позже
-        // console.log('Создано новое объявление:', newTransportAd);
-
         try {
-            const result = addAd(newTransportAd);
-
-            // if (result) {
-            //     navigate('/'); // TODO. Нужно подумать, а правильно ли перекидывать на главную страниуц.
-            // }
+            addAd(newTransportAd);
+            // navigate('/');/TODO не факт, что нужен принудильный переход на главную. Нужно подумать.
+            setIsReadyForNewAd(false);
         } catch (error) {
             console.error('Ошибка при создании объявления:', error);
+        } finally {
+            setOverlayVisible(false);
         }
+    };
+
+    const handleCloseOverlay = () => setOverlayVisible(false);
+
+    const handlePreparingForNewAdCreation = () => {
+        setIsReadyForNewAd(true);
+        setFormData(InitialTransportAdData);
+        setAdOwnerData();
     };
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className='create-transport-ad-form'
-        >
-            <h2>Новое объявление</h2>
-            <div className='new-ad-show'>
-                <div className='ad-example'>
-                    <TransportAdItem
-                        ad={{
-                            ad: formData,
-                            isInReviewAds: false,
-                        }}
-                        isViewMode={true}
-                    />
-                </div>
-                <div className='button-submit-ad-div'>
-                    <Button
-                        type='submit'
-                        type_btn='yes'
-                        children='Разместить'
-                        icon={<FaPlus />}
-                    />
-                </div>
-            </div>
-            <h3>Введите данные: </h3>
-            <div className='new-transport-ad'>
-                <RouteSection
-                    ref={routeSectionRef}
-                    updateFormData={updateFormData}
-                    formData={formData}
-                />
+        <>
+            <form
+                onSubmit={handleOpenConfirmation}
+                className='create-transport-ad-form'
+            >
+                {isReadyForNewAd ? (
+                    <h2>Новое объявление</h2>
+                ) : (
+                    <h2>Объявление размещено!</h2>
+                )}
 
-                <PaymentSection
-                    ref={paymentSectionRef}
-                    updateFormData={updateFormData}
-                    formData={formData}
-                />
+                <div className='new-ad-show'>
+                    <div className='ad-example'>
+                        <TransportAdItem
+                            ad={{
+                                ad: formData,
+                                isInReviewAds: false,
+                            }}
+                            isViewMode={true}
+                        />
+                    </div>
+                    <div className='button-submit-ad-div'>
+                        {isReadyForNewAd ? (
+                            <Button
+                                type='submit'
+                                type_btn='yes'
+                                icon={<FaPlus />}
+                            >
+                                Разместить
+                            </Button>
+                        ) : (
+                            <>
+                                {/* <Button
+                                    type='button'
+                                    icon={<FaPen />}
+                                    children='Создать новое'
+                                    onClick={handlePreparingForNewAdCreation}
+                                /> */}
+                            </>
+                        )}
+                    </div>
+                </div>
 
-                <TransportSection
-                    ref={transportSectionRef}
-                    updateFormData={updateFormData}
-                    formData={formData}
-                />
-            </div>
-        </form>
+                {isReadyForNewAd ? (
+                    <>
+                        <h3>Введите данные: </h3>
+                        <div className='new-transport-ad'>
+                            <RouteSection
+                                ref={routeSectionRef}
+                                updateFormData={updateFormData}
+                                formData={formData}
+                            />
+                            <PaymentSection
+                                ref={paymentSectionRef}
+                                updateFormData={updateFormData}
+                                formData={formData}
+                            />
+                            <TransportSection
+                                ref={transportSectionRef}
+                                updateFormData={updateFormData}
+                                formData={formData}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <Button
+                            type='button'
+                            icon={<FaPen />}
+                            children='Создать новое'
+                            onClick={handlePreparingForNewAdCreation}
+                        />
+                    </>
+                )}
+            </form>
+
+            {isOverlayVisible && (
+                <Overlay onClose={handleCloseOverlay}>
+                    <ConfirmationDialog
+                        message='Вы уверены, что хотите разместить объявление?'
+                        onConfirm={handleConfirmPlacement}
+                        onCancel={handleCloseOverlay}
+                    />
+                </Overlay>
+            )}
+        </>
     );
 };
 
