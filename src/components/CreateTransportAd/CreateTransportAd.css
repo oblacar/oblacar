@@ -286,7 +286,7 @@ label.label-dimension {
 }
 /*PaymentSection*/
 
-/*Блок радиобатаннов*/
+/*Блок радиобатанов*/
 
 .price-section {
     width: 100%;
@@ -352,4 +352,9 @@ label.label-dimension {
     position: absolute;
     top: 0;
     left: 30px;
+}
+
+/*текст ошибки вввода*/
+.error-text.create-transport-ad {
+    margin-top: -10px;
 }

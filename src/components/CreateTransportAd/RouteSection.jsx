@@ -1,24 +1,58 @@
-import React from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CitySearch from '../common/CitySearch/CitySearch';
 
-const RouteSection = ({ formData, updateFormData }) => {
+const RouteSection = forwardRef(({ formData, updateFormData }, ref) => {
+    const [errors, setErrors] = useState({
+        availabilityDate: '',
+        departureCity: '',
+        destinationCity: '',
+    });
+
     const handleDateChange = (date) => {
         if (date) {
-            // Форматируем дату в 'dd.mm.yyyy'
-            const formattedDate = date.toLocaleDateString('ru-RU'); // Формат даты
-            updateFormData({ availabilityDate: formattedDate }); // Обновляем дату
+            const formattedDate = date.toLocaleDateString('ru-RU');
+            updateFormData({ availabilityDate: formattedDate });
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                availabilityDate: '',
+            }));
         }
     };
 
     const handleDepartureCityChange = (city) => {
-        updateFormData({ departureCity: city }); // Обновляем город отправления
+        updateFormData({ departureCity: city });
+        setErrors((prevErrors) => ({ ...prevErrors, departureCity: '' }));
     };
 
     const handleDestinationCityChange = (city) => {
-        updateFormData({ destinationCity: city }); // Обновляем город назначения
+        updateFormData({ destinationCity: city });
+        setErrors((prevErrors) => ({ ...prevErrors, destinationCity: '' }));
     };
+
+    useImperativeHandle(ref, () => ({
+        validateFields: () => {
+            let isValid = true;
+            const newErrors = {};
+
+            if (!formData.availabilityDate) {
+                newErrors.availabilityDate =
+                    'Выберите дату готовности к перевозке';
+                isValid = false;
+            }
+            if (!formData.departureCity) {
+                newErrors.departureCity = 'Укажите пункт отправления';
+                isValid = false;
+            }
+            if (!formData.destinationCity) {
+                newErrors.destinationCity = 'Пустой пункт. Автозамена: Россия.';
+            }
+
+            setErrors(newErrors);
+            return isValid;
+        },
+    }));
 
     return (
         <div className='new-ad-section'>
@@ -38,30 +72,45 @@ const RouteSection = ({ formData, updateFormData }) => {
                                   )
                                 : null
                         }
-                        onChange={handleDateChange} // Устанавливаем дату
+                        onChange={handleDateChange}
                         dateFormat='dd.MM.yyyy'
                         placeholderText='Дата'
                         className='new-ad-date'
                     />
+                    {errors.availabilityDate && (
+                        <p className='error-text create-transport-ad'>
+                            {errors.availabilityDate}
+                        </p>
+                    )}
                 </div>
                 <CitySearch
-                    onCitySelected={handleDepartureCityChange} // Передаем функцию
+                    onCitySelected={handleDepartureCityChange}
                     inputClassName='new-ad-departure'
                     placeholder='Пункт отправления'
                 />
+                {errors.departureCity && (
+                    <p className='error-text create-transport-ad'>
+                        {errors.departureCity}
+                    </p>
+                )}
                 <p className='new-ad-title'>Конец маршрута:</p>
                 <p>
                     Если Вам не важно куда конкретно доставить груз по России,
                     ничего не пишите.
                 </p>
                 <CitySearch
-                    onCitySelected={handleDestinationCityChange} // Передаем функцию
+                    onCitySelected={handleDestinationCityChange}
                     inputClassName='new-ad-destination'
                     placeholder='Пункт назначения (Россия)'
                 />
+                {errors.destinationCity && (
+                    <p className='error-text create-transport-ad'>
+                        {errors.destinationCity}
+                    </p>
+                )}
             </div>
         </div>
     );
-};
+});
 
 export default RouteSection;

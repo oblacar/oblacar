@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useRef, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { TransportAd } from '../../entities/Ads/TransportAd';
@@ -21,6 +21,7 @@ const CreateTransportAd = () => {
     const { user } = useContext(UserContext);
     const { addAd } = useContext(TransportAdContext);
 
+    const routeSectionRef = useRef();
     //TODO Пока не используем переброску на главную страницу
     const navigate = useNavigate();
 
@@ -84,6 +85,11 @@ const CreateTransportAd = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Предотвращаем стандартное поведение формы
+
+        const isValid = routeSectionRef.current.validateFields();
+        if (!isValid) {
+            return;
+        }
 
         // Создание нового объекта транспортного объявления
         const newTransportAd = new TransportAd({
@@ -172,6 +178,7 @@ const CreateTransportAd = () => {
             <h3>Введите данные: </h3>
             <div className='new-transport-ad'>
                 <RouteSection
+                    ref={routeSectionRef}
                     updateFormData={updateFormData}
                     formData={formData}
                 />
