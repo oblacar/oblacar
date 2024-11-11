@@ -1,0 +1,28 @@
+.confirmation-dialog {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    width: 300px; /* Задайте ширину, подходящую для вашего макета */
+    text-align: center;
+}
+
+.confirmation-dialog p {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.confirmation-dialog-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.confirmation-dialog button {
+    width: 45%; /* Чтобы кнопки были шириной половины контейнера */
+    padding: 10px;
+}
