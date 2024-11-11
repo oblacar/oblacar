@@ -24,6 +24,7 @@ const CreateTransportAd = () => {
     //ссылка на разделы для отработки валидации заполнения форм
     const routeSectionRef = useRef();
     const paymentSectionRef = useRef();
+    const transportSectionRef = useRef();
 
     //TODO Пока не используем переброску на главную страницу
     const navigate = useNavigate();
@@ -95,6 +96,11 @@ const CreateTransportAd = () => {
         }
 
         isValid = paymentSectionRef.current.validateFields();
+        if (!isValid) {
+            return;
+        }
+
+        isValid = transportSectionRef.current.validateFields();
         if (!isValid) {
             return;
         }
@@ -198,6 +204,7 @@ const CreateTransportAd = () => {
                 />
 
                 <TransportSection
+                    ref={transportSectionRef}
                     updateFormData={updateFormData}
                     formData={formData}
                 />

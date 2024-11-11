@@ -1,38 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { FaUpload, FaCamera } from 'react-icons/fa';
 import { truckTypesWithLoading } from '../../constants/transportAdData'; // Импортируйте ваш массив типов грузовиков
 
 import MultiTruckPhotoUploader from '../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
 import AddPhotoButton from '../common/AddPhotoButton/AddPhotoButton';
 
-const TransportSection = ({ updateFormData, formData }) => {
+const TransportSection = forwardRef(({ updateFormData, formData }, ref) => {
     const [loadingTypes, setLoadingTypes] = useState([]);
+    const [errors, setErrors] = useState({
+        truckName: '',
+        transportType: '',
+        truckWeight: '',
+        truckHeight: '',
+        truckWidth: '',
+        truckDepth: '',
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         updateFormData({ [name]: value }); // Передаем данные в родительский компонент
+
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
     };
 
     const openFileDialog = () => {
         document.getElementById('file-upload').click();
     };
 
-    //TODO нужно понять, что именно мы хотим при  нажатии на кружок. Может он и не нужен, а будем вставлять первое фото и все
-    // const handleFileChange = (e) => {
-    //     const { files } = e.target;
-    //     if (files && files.length > 0) {
-    //         const file = files[0];
-    //         const reader = new FileReader();
-
-    //         reader.onloadend = () => {
-    //             updateFormData({ truckPhotoUrl: reader.result }); // Обновляем состояние с помощью updateFormData
-    //         };
-    //         reader.readAsDataURL(file);
-    //     }
-    // };
-
     const handleTransportTypeChange = (e) => {
         const transportTypeName = e.target.value;
+
+        setErrors((prevErrors) => ({ ...prevErrors, transportType: '' }));
 
         // Обнуляем loadingTypes и передаем пустой массив в updateFormData
         setLoadingTypes([]); // Сбрасываем состояние локального loadingTypes
@@ -65,6 +63,41 @@ const TransportSection = ({ updateFormData, formData }) => {
         updateFormData({ loadingTypes: updatedLoadingTypes }); // Обновляем состояние в родительском компоненте
     };
 
+    useImperativeHandle(ref, () => ({
+        validateFields: () => {
+            let isValid = true;
+            const newErrors = {};
+
+            if (!formData.truckName) {
+                newErrors.truckName = 'Укажите марку машины';
+                isValid = false;
+            }
+            if (!formData.transportType) {
+                newErrors.transportType = 'Выберете тип машины';
+                isValid = false;
+            }
+            if (!formData.truckWeight) {
+                newErrors.truckWeight = 'Введите вес';
+                isValid = false;
+            }
+            if (!formData.truckHeight) {
+                newErrors.truckHeight = 'Укажите высоту';
+                isValid = false;
+            }
+            if (!formData.truckWidth) {
+                newErrors.truckWidth = 'Укажите ширину';
+                isValid = false;
+            }
+            if (!formData.truckDepth) {
+                newErrors.truckDepth = 'Укажите глубину';
+                isValid = false;
+            }
+
+            setErrors(newErrors);
+            return isValid;
+        },
+    }));
+
     return (
         <div className='new-ad-section'>
             <p className='new-ad-division-title'>Транспорт</p>
@@ -83,9 +116,6 @@ const TransportSection = ({ updateFormData, formData }) => {
                 <div className='truck-corrector '>
                     <div className='truck-name-photo'>
                         <div className='truck-name'>
-                            {/* <p className='new-ad-title without-bottom-margine'>
-                                Марка машины:
-                            </p> */}
                             <input
                                 type='text'
                                 id='truckName'
@@ -95,36 +125,11 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 placeholder='Марка машины'
                             />
                         </div>
-                        {/* <div className='truck-photo'>
-                            <input
-                                type='file'
-                                id='truckPhoto'
-                                name='truckPhoto'
-                                accept='image/*'
-                                // onChange={handleFileChange}
-                                style={{ display: 'none' }} // Скрываем стандартное поле ввода
-                            />
-                            <div
-                                onClick={() =>
-                                    document
-                                        .getElementById('truckPhoto')
-                                        .click()
-                                }
-                                className='photo-circle'
-                            >
-                                {formData.truckPhotoUrls ? (
-                                    <img
-                                        src={formData.truckPhotoUrls[0]}
-                                        alt='Превью фото машины'
-                                        className='photo-preview'
-                                    />
-                                ) : (
-                                    <span>Фото</span>
-                                )}
-                            </div>
-                        </div> */}
                         <AddPhotoButton openFileDialog={openFileDialog} />
                     </div>
+                    {errors.truckName && (
+                        <p className='error-text'>{errors.truckName}</p>
+                    )}
                     <div>
                         <MultiTruckPhotoUploader
                             openFileDialog={openFileDialog}
@@ -154,6 +159,10 @@ const TransportSection = ({ updateFormData, formData }) => {
                             </option>
                         ))}
                     </select>
+
+                    {errors.transportType && (
+                        <p className='error-text'>{errors.transportType}</p>
+                    )}
 
                     <p className='new-ad-title without-bottom-margine'>
                         Вариант загрузки:
@@ -198,7 +207,11 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 min='0'
                             />
                         </div>
-
+                        {errors.truckWeight && (
+                            <p className='error-text create-transport-ad'>
+                                {errors.truckWeight}
+                            </p>
+                        )}
                         <p className='new-ad-title without-bottom-margine'>
                             Объем (м3) ВхШхГ:
                         </p>
@@ -239,11 +252,26 @@ const TransportSection = ({ updateFormData, formData }) => {
                                 </div>
                             </div>
                         </div>
+                        {errors.truckHeight && (
+                            <p className='error-text create-transport-ad'>
+                                {errors.truckHeight}
+                            </p>
+                        )}
+                        {errors.truckWidth && (
+                            <p className='error-text create-transport-ad'>
+                                {errors.truckWidth}
+                            </p>
+                        )}
+                        {errors.truckDepth && (
+                            <p className='error-text create-transport-ad'>
+                                {errors.truckDepth}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
         </div>
     );
-};
+});
 
 export default TransportSection;
