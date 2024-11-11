@@ -21,7 +21,10 @@ const CreateTransportAd = () => {
     const { user } = useContext(UserContext);
     const { addAd } = useContext(TransportAdContext);
 
+    //ссылка на разделы для отработки валидации заполнения форм
     const routeSectionRef = useRef();
+    const paymentSectionRef = useRef();
+
     //TODO Пока не используем переброску на главную страницу
     const navigate = useNavigate();
 
@@ -86,7 +89,12 @@ const CreateTransportAd = () => {
     const handleSubmit = (e) => {
         e.preventDefault(); // Предотвращаем стандартное поведение формы
 
-        const isValid = routeSectionRef.current.validateFields();
+        let isValid = routeSectionRef.current.validateFields();
+        if (!isValid) {
+            return;
+        }
+
+        isValid = paymentSectionRef.current.validateFields();
         if (!isValid) {
             return;
         }
@@ -184,6 +192,7 @@ const CreateTransportAd = () => {
                 />
 
                 <PaymentSection
+                    ref={paymentSectionRef}
                     updateFormData={updateFormData}
                     formData={formData}
                 />

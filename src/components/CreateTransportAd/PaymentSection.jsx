@@ -1,61 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { paymentUnits, paymentOptions } from '../../constants/paymentData'; // Импортируйте ваши константы
+import React, {
+    useState,
+    useEffect,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
+import { paymentUnits, paymentOptions } from '../../constants/paymentData';
 
-const PaymentSection = ({ formData, updateFormData }) => {
+const PaymentSection = forwardRef(({ formData, updateFormData }, ref) => {
     const [selectedPaymentUnit, setSelectedPaymentUnit] = useState(
         paymentUnits[0]
-    ); // Устанавливаем первый элемент по умолчанию
-
-    const [inputPrice, setInputPrice] = useState(''); //значение суммы
+    );
+    const [inputPrice, setInputPrice] = useState('');
+    const [errors, setErrors] = useState({
+        price: '',
+        paymentOptions: '',
+    });
 
     const handlePriceInputChange = (e) => {
-        // Проверяем, что введен только допустимый символ (цифры)
         const value = e.target.value.replace(/\D/g, '');
-
-        // Сохраняем числовое значение в state
         setInputPrice(value);
-
-        const { name } = e.target;
-        updateFormData({ [name]: value }); // Передаем данные в родительский компонент
+        updateFormData({ price: value });
+        setErrors((prevErrors) => ({ ...prevErrors, price: '' }));
     };
 
     useEffect(() => {
-        // Устанавливаем значение по умолчанию при первом рендере
         if (paymentUnits.length > 0) {
-            setSelectedPaymentUnit(paymentUnits[0]); // Выбираем первый элемент по умолчанию
-            updateFormData({ paymentUnit: paymentUnits[0] }); // Обновляем значение в родительском компоненте
+            setSelectedPaymentUnit(paymentUnits[0]);
+            updateFormData({ paymentUnit: paymentUnits[0] });
         }
-    }, [paymentUnits]); // Зависимость для выполнения при изменении paymentUnits
+    }, []);
 
     const handleRadioChange = (e) => {
-        setSelectedPaymentUnit(e.target.value); // Обновляем состояние при изменении
-
-        const { value } = e.target;
-        updateFormData({ paymentUnit: value }); // Передаем данные в родительский компонент
+        setSelectedPaymentUnit(e.target.value);
+        updateFormData({ paymentUnit: e.target.value });
     };
 
     const handleCheckboxChange = (e) => {
         const { name, value, checked } = e.target;
-
         if (name === 'readyToNegotiate') {
-            updateFormData({ readyToNegotiate: checked }); // Обновляем состояние готовности к торгу
+            updateFormData({ readyToNegotiate: checked });
         } else {
-            // Обрабатываем условия оплаты
             const updatedPaymentOptions = checked
-                ? [...formData.paymentOptions, value] // Добавляем в массив
-                : formData.paymentOptions.filter((option) => option !== value); // Убираем из массива
-
-            updateFormData({ paymentOptions: updatedPaymentOptions }); // Передаем данные в родительский компонент
+                ? [...formData.paymentOptions, value]
+                : formData.paymentOptions.filter((option) => option !== value);
+            updateFormData({ paymentOptions: updatedPaymentOptions });
+            setErrors((prevErrors) => ({ ...prevErrors, paymentOptions: '' }));
         }
     };
 
-    // Методы разрешающие ставить только цифры и расставляющие пробелы между разрядами тысяч
-    // Функция для добавления пробелов между тысячами
-    const formatNumber = (value) => {
-        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    };
+    const formatNumber = (value) => value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-    // Ограничиваем ввод только цифрами, разрешая стрелки, Delete, Backspace
     const handlePriceKeyDown = (e) => {
         const allowedKeys = [
             'ArrowUp',
@@ -66,14 +60,31 @@ const PaymentSection = ({ formData, updateFormData }) => {
             'Delete',
             'Tab',
         ];
-
-        if (
-            !allowedKeys.includes(e.key) && // Разрешаем навигационные клавиши
-            !/[0-9]/.test(e.key) // Разрешаем цифры
-        ) {
-            e.preventDefault(); // Запрещаем все остальное
+        if (!allowedKeys.includes(e.key) && !/[0-9]/.test(e.key)) {
+            e.preventDefault();
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        validateFields: () => {
+            let isValid = true;
+            const newErrors = {};
+
+            if (!inputPrice) {
+                newErrors.price = 'Укажите стоимость услуги';
+                isValid = false;
+            }
+
+            if (formData.paymentOptions.length === 0) {
+                newErrors.paymentOptions =
+                    'Выберите хотя бы одно условие оплаты';
+                isValid = false;
+            }
+
+            setErrors(newErrors);
+            return isValid;
+        },
+    }));
 
     return (
         <div className='new-ad-section'>
@@ -87,13 +98,11 @@ const PaymentSection = ({ formData, updateFormData }) => {
                         placeholder='Сумма'
                         className='without-bottom-margine'
                         value={inputPrice ? `${formatNumber(inputPrice)}` : ''}
-                        onChange={handlePriceInputChange} // Обработчик для ввода стоимости
-                        onKeyDown={handlePriceKeyDown} // Ограничение на ввод только цифр
+                        onChange={handlePriceInputChange}
+                        onKeyDown={handlePriceKeyDown}
                     />
-
-                    {/* Радиобатоны */}
                     <div className='radio-buttons'>
-                        {paymentUnits.map((unit, index) => (
+                        {paymentUnits.map((unit) => (
                             <label
                                 key={unit}
                                 className='radio-item'
@@ -103,14 +112,15 @@ const PaymentSection = ({ formData, updateFormData }) => {
                                     name='paymentUnit'
                                     value={unit}
                                     className='input-radio'
-                                    onChange={handleRadioChange} // Обработчик для радиокнопок
-                                    checked={selectedPaymentUnit === unit} // Проверяем, является ли этот элемент выбранным
+                                    onChange={handleRadioChange}
+                                    checked={selectedPaymentUnit === unit}
                                 />
                                 <span className='radio-title'>{unit}</span>
                             </label>
                         ))}
                     </div>
                 </div>
+                {errors.price && <p className='error-text'>{errors.price}</p>}
 
                 <p className='new-ad-title without-bottom-margine'>
                     Готовность торговаться:
@@ -121,13 +131,12 @@ const PaymentSection = ({ formData, updateFormData }) => {
                             name='readyToNegotiate'
                             type='checkbox'
                             className='input-checkbox'
-                            onChange={handleCheckboxChange} // Обработчик для чекбокса
+                            onChange={handleCheckboxChange}
                         />
                         <span className='checkbox-title'>Торг</span>
                     </label>
                 </div>
 
-                {/* Чекбоксы для условий оплаты */}
                 <div className='checkboxes'>
                     <p className='new-ad-title without-bottom-margine'>
                         Условия оплаты
@@ -140,11 +149,11 @@ const PaymentSection = ({ formData, updateFormData }) => {
                             <label className='checkbox-label'>
                                 <input
                                     type='checkbox'
-                                    id={`payment-option-${index}`} // Убедитесь, что id уникален
+                                    id={`payment-option-${index}`}
                                     value={paymentOption}
                                     className='input-checkbox'
                                     name='paymentOptions'
-                                    onChange={handleCheckboxChange} // Обработчик для условий оплаты
+                                    onChange={handleCheckboxChange}
                                 />
                                 <span className='checkbox-title'>
                                     {paymentOption}
@@ -152,10 +161,13 @@ const PaymentSection = ({ formData, updateFormData }) => {
                             </label>
                         </div>
                     ))}
+                    {errors.paymentOptions && (
+                        <p className='error-text'>{errors.paymentOptions}</p>
+                    )}
                 </div>
             </div>
         </div>
     );
-};
+});
 
 export default PaymentSection;
