@@ -1,5 +1,6 @@
 .active-conversation {
-    width: 100%;
+    width: calc(100% - 230px);
+    max-width: calc(100% - 230px);
     display: flex;
     flex-direction: column;
 }

@@ -54,13 +54,14 @@
     display: flex;
     flex-direction: column; /* Сохраняем текст и timestamp внутри */
     padding: 15px;
-    border-radius: 20px;
+
     font-size: 14px;
-    white-space: pre-wrap;
+    white-space: normal; /* Автоматический перенос текста */
     line-height: 1.2;
-    max-width: calc(100% - 20px); /* Учитываем ширину обоих узких блоков */
-    /* background: #eaeaea; Фон сообщения */
-    word-wrap: break-word; /* Перенос слов, чтобы текст не вылезал за пределы */
+    max-width: calc(100% - 20px); /*TODO check is we needed 20px?*/
+
+    word-break: break-all; /* Разбивает слова на части */
+    overflow-wrap: anywhere; /* Переносит длинные слова в любом месте */
 
     position: relative;
 }
