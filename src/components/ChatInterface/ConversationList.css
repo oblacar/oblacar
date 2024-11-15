@@ -3,9 +3,10 @@
     /* max-height: 400px; Установите желаемую максимальную высоту */
     overflow-y: auto; /* Добавляет вертикальный скролл при переполнении */
 
-    border-right: 1px solid #ccc;
+    /* border-right: 1px solid #ccc; */
     /* padding: 1rem; */
     background-color: #e0f6fe;
+    padding-bottom: 10px;
 }
 
 .conversation-list h2 {

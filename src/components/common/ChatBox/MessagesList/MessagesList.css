@@ -1,9 +1,8 @@
-/* src/components/MessagesList.css */
 .messages-list {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 10px;
     overflow-y: auto;
 }
@@ -13,47 +12,95 @@
 }
 
 .message {
-    display: inline-block;
+    display: flex; /* Выстраиваем три блока в ряд */
+    align-items: center; /* Центрируем элементы вертикально */
+    margin: 10px 0; /* Отступы между сообщениями */
+    /* gap: 5px;  */
+
+    /* position: relative; */
+}
+
+.message-narrow-point-shaper {
+    position: absolute;
+
+    width: 10px; /* Фиксированная ширина узкого блока */
+    height: 10px;
+
+    bottom: 0px;
+
+    background-color: red; /* Пока оставляем пустым */
+}
+
+.message-narrow-point-shaper.right {
+    right: -10px;
+    background-color: #1a5884;
+}
+
+.message-narrow-point-shaper.right div {
+    background-color: rgb(255, 255, 255);
+    width: 10px;
+    height: 10px;
+    border-bottom-left-radius: 100%;
+}
+
+.message-narrow-point-shaper.left {
+    left: -10px;
+    background-color: #ececec;
+}
+
+.message-narrow-point-shaper.left div {
+    background-color: rgb(255, 255, 255);
+    width: 10px;
+    height: 10px;
+    border-bottom-right-radius: 100%;
+}
+
+.message-main {
+    display: flex;
+    flex-direction: column; /* Сохраняем текст и timestamp внутри */
     padding: 8px;
     border-radius: 20px;
-    margin-bottom: 8px;
-    background: #e6f3ff;
-    max-width: 80%;
     font-size: 14px;
     white-space: pre-wrap;
     line-height: 1.2;
-    width: fit-content; /* Сообщение адаптируется по ширине текста */
+    max-width: calc(100% - 20px); /* Учитываем ширину обоих узких блоков */
+    /* background: #eaeaea; Фон сообщения */
+    word-wrap: break-word; /* Перенос слов, чтобы текст не вылезал за пределы */
+
+    position: relative;
 }
 
 .message.own {
     align-self: flex-end; /* Прижимает сообщения owner к правому краю */
     text-align: left;
-    border-bottom-right-radius: 0px;
+    margin-right: 10px;
+}
+
+.message.own .message-main {
     background: #1a5884;
     color: white;
+    border-radius: 20px 20px 0px 20px;
+    padding: 15px;
 }
 
 .message.other {
     align-self: flex-start; /* Прижимает сообщения других пользователей к левому краю */
-    background: #eaeaea;
     text-align: left;
-    border-bottom-left-radius: 0px;
-}
 
-.message.own .message-text,
-.message.other .message-text {
-    margin: 0 10px;
+    margin-left: 10px;
+}
+.message.other .message-main {
+    background: #ececec;
+    color: rgb(43, 43, 43);
+    border-radius: 20px 20px 20px 0px;
+    padding: 15px;
 }
 
 .timestamp {
-    display: block;
     font-size: 10px;
     margin-top: 4px;
-}
-
-.message.own .timestamp {
+    color: #e0e0e0;
     text-align: right;
-    color: #d5d5d5;
 }
 
 .message.other .timestamp {
