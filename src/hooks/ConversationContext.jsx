@@ -7,6 +7,8 @@ import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 import AuthContext from './Authorization/AuthContext';
 import UserContext from './UserContext';
 
+import { formatNumber } from '../utils/helper';
+
 const ConversationContext = createContext();
 
 export const ConversationProvider = ({ children }) => {
@@ -24,8 +26,7 @@ export const ConversationProvider = ({ children }) => {
             getUserConversations(userId);
 
             getUnreadMessagesByUserId(userId);
-        }
-        else{
+        } else {
             setUnreadMessages([]);
         }
     }, [isAuthenticated, userId]);
@@ -52,8 +53,6 @@ export const ConversationProvider = ({ children }) => {
 
             // Создаем массив для хранения расширенных разговоров
             const extendedConversations = [];
-
-
 
             for (const conversation of conversations) {
                 const {
@@ -88,7 +87,8 @@ export const ConversationProvider = ({ children }) => {
                     availabilityDate: availabilityDate || '',
                     departureCity: departureCity || '',
                     destinationCity: destinationCity || '',
-                    priceAndPaymentUnit: price + ' ' + paymentUnit || '',
+                    priceAndPaymentUnit:
+                        formatNumber(String(price)) + ' ' + paymentUnit || '',
                     participants: participants,
                     messages: conversationMessages,
                     lastMessage: lastMessage || null,

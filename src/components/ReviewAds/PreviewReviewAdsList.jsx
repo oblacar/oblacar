@@ -4,10 +4,6 @@ import TransportAdContext from '../../hooks/TransportAdContext';
 import './PreviewReviewAdsList.css';
 import ReviewAdItem from './ReviewAdItem';
 
-import { FaTrash, FaTimesCircle } from 'react-icons/fa';
-
-import { formatNumber } from '../../utils/helper';
-
 export const PrevieReviewAdsList = () => {
     const { reviewAds, removeReviewAd } = useContext(TransportAdContext);
 
@@ -21,7 +17,7 @@ export const PrevieReviewAdsList = () => {
                         <ReviewAdItem
                             ad={ad}
                             removeReviewAd={removeReviewAd}
-                            isActive={ad.ad.status==='active'}
+                            isActive={ad.ad.status === 'active'}
                         />
                     </div>
                 ))
