@@ -6,6 +6,7 @@ import Transportation from '../entities/Transportation/Transportation'; // Им�
 import AdTransportationRequests from '../entities/Transportation/AdTransportationRequests';
 import TransportationRequestMainData from '../entities/Transportation/TransportationRequestMainData';
 import TransportationRequest from '../entities/Transportation/TransportationRequest';
+import AdTransportationRequest from "../entities/Transportation/AdTransportationRequest";
 
 class TransportationService {
     // Сервис для отслеживанияя Транспортировки - основная логика перевозки==>>
@@ -144,6 +145,21 @@ class TransportationService {
             await set(requestRef, request);
 
             console.log('Transportation request added successfully.');
+
+            // Добавляем в коллекцию transportationRequestsSent
+            if (request.sender && request.sender.id) {
+                await TransportationService.addSentRequest(
+                    request.sender.id,
+                    requestId,
+                    {
+                        ownerId: userId,
+                        adId,
+                        requestId,
+                    }
+                );
+            }
+
+            return requestId;
         } catch (error) {
             console.error('Error adding transportation request:', error);
             throw new Error('Failed to add transportation request.');
@@ -212,7 +228,6 @@ class TransportationService {
         }
     }
 
-    //Методы для работы с коллекцией transportationRequestsSent
     /**
      * Добавляет запись в коллекцию transportationRequestsSent.
      * @param {string} senderId - ID отправителя.
@@ -235,7 +250,7 @@ class TransportationService {
             throw new Error('Failed to add to transportationRequestsSent.');
         }
     }
-    
+
     //Запросы на перевозку от лица сделавшего запрос-->
     /**
      * Получает все отправленные запросы для пользователя.
@@ -261,8 +276,147 @@ class TransportationService {
             throw new Error('Failed to fetch sent requests.');
         }
     }
+
+    /**
+     * Собирает статусы всех отправленных запросов пользователем.
+     * @param {string} senderId - ID отправителя (текущий пользователь).
+     * @returns {Promise<Array<{adId: string, status: string}>>} Массив объектов с adId и статусом запроса.
+     */
+    static async getSentRequestsStatuses(senderId) {
+        try {
+            // Ссылка на коллекцию transportationRequestsSent для пользователя
+            const sentRequestsRef = databaseRef(
+                db,
+                `transportationRequestsSent/${senderId}`
+            );
+            const sentSnapshot = await get(sentRequestsRef);
+
+            if (!sentSnapshot.exists()) {
+                console.warn('No sent requests found for sender:', senderId);
+                return [];
+            }
+
+            const sentRequests = sentSnapshot.val();
+            const statuses = [];
+
+            // Обрабатываем каждый запрос
+            for (const requestId in sentRequests) {
+                const { adId, ownerId } = sentRequests[requestId];
+
+                // Ищем запрос в основной коллекции transportationRequests
+                const requestRef = databaseRef(
+                    db,
+                    `transportationRequests/${ownerId}/${adId}/requests/${requestId}`
+                );
+                const requestSnapshot = await get(requestRef);
+
+                if (requestSnapshot.exists()) {
+                    const requestData = requestSnapshot.val();
+                    statuses.push({
+                        adId,
+                        status: requestData.status || 'none',
+                    });
+                } else {
+                    statuses.push({
+                        adId,
+                        status: 'none',
+                    });
+                }
+            }
+
+            return statuses;
+        } catch (error) {
+            console.error('Error fetching sent request statuses:', error);
+            throw new Error('Failed to fetch sent request statuses.');
+        }
+    }
+
+    static async cancelRequest(adId, senderId, ownerId, requestId) {
+        try {
+            // Удаляем запись из transportationRequestsSent
+            const sentRequestRef = databaseRef(
+                db,
+                `transportationRequestsSent/${senderId}/${requestId}`
+            );
+            await set(sentRequestRef, null);
+
+            // Обновляем статус в transportationRequests
+            const requestRef = databaseRef(
+                db,
+                `transportationRequests/${ownerId}/${adId}/requests/${requestId}`
+            );
+            await set(requestRef, { status: 'cancelled' });
+
+            console.log('Request cancelled successfully.');
+        } catch (error) {
+            console.error('Error cancelling request:', error);
+            throw new Error('Failed to cancel request.');
+        }
+    }
+
     //<--
     //<<==
+    //Методы для сборки массива объявлений, по которым были запросы==>>
+    /**
+     * Собирает массив AdTransportationRequest для текущего пользователя.
+     * @param {string} senderId - ID пользователя (отправителя).
+     * @returns {Promise<AdTransportationRequest[]>} Массив объектов AdTransportationRequest.
+     */
+    static async getAdTransportationRequests(senderId) {
+        try {
+            const sentRequestsRef = databaseRef(
+                db,
+                `transportationRequestsSent/${senderId}`
+            );
+            const sentSnapshot = await get(sentRequestsRef);
+
+            if (!sentSnapshot.exists()) {
+                console.warn('No sent requests found for user:', senderId);
+                return [];
+            }
+
+            const sentRequests = sentSnapshot.val();
+            const requests = [];
+
+            for (const requestId in sentRequests) {
+                const { adId, ownerId } = sentRequests[requestId];
+
+                // Получаем данные объявления
+                const adRef = databaseRef(
+                    db,
+                    `transportationRequests/${ownerId}/${adId}`
+                );
+                const adSnapshot = await get(adRef);
+
+                if (adSnapshot.exists()) {
+                    const adData = adSnapshot.val();
+                    const requestData = adData.requests[requestId];
+
+                    requests.push(
+                        new AdTransportationRequest({
+                            adId,
+                            adData: {
+                                locationFrom: adData.locationFrom,
+                                locationTo: adData.locationTo,
+                                date: adData.date,
+                                price: adData.price,
+                                paymentUnit: adData.paymentUnit,
+                                owner: adData.owner,
+                            },
+                            requestData,
+                        })
+                    );
+                }
+            }
+
+            return requests;
+        } catch (error) {
+            console.error('Error fetching AdTransportationRequests:', error);
+            throw new Error('Failed to fetch AdTransportationRequests.');
+        }
+    }
+    //<<==
+
     //
     static async testRead() {
         const userId = 'user001'; // Укажите существующий userId

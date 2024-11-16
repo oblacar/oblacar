@@ -8,6 +8,7 @@ import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 
 import ConversationContext from '../../hooks/ConversationContext';
 import UserContext from '../../hooks/UserContext';
+import TransportationContext from '../../hooks/TransportationContext';
 
 import { cutNumber, formatNumber } from '../../utils/helper';
 
@@ -15,6 +16,9 @@ import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
 import Button from '../common/Button/Button';
 import ChatBox from '../common/ChatBox/ChatBox';
 import Preloader from '../common/Preloader/Preloader';
+import RequestStatusBlock from './RequestStatusBlock';
+
+import TransportationService from '../../services/TransportationService';
 
 const OtherTransportAdProfile = ({
     ad,
@@ -31,6 +35,17 @@ const OtherTransportAdProfile = ({
         clearBasicConversationData,
     } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
+    const {
+        sendTransportationRequest,
+        getRequestStatusByAdId,
+        getAdTransportationRequestByAdId,
+        adTransportationRequests,
+    } = useContext(TransportationContext);
+
+    const [cargoDescription, setCargoDescription] = useState('');
+    const [adRequestStatus, setAdRequestStatus] = useState('');
+    const [adTransportationRequest, setAdTransportationRequest] =
+        useState(null);
 
     const {
         adId,
@@ -59,11 +74,34 @@ const OtherTransportAdProfile = ({
 
     const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
+    const [requestId, setRequestId] = useState(null);
+
     useEffect(() => {
         if (ad) {
             setIsLoading(false);
         }
     }, [ad]);
+
+    useEffect(() => {
+        //TODO shoulde undersand what from it depended
+        if (ad) {
+            const adTransportationRequest =
+                getAdTransportationRequestByAdId(adId);
+
+            let requestStatusByAdId;
+            if (adTransportationRequest) {
+                requestStatusByAdId =
+                    adTransportationRequest.requestData.status;
+            } else {
+                requestStatusByAdId = '';
+            }
+
+            setAdRequestStatus(requestStatusByAdId);
+
+            console.log('adTransportationRequest:', requestStatusByAdId);
+            setAdTransportationRequest(adTransportationRequest);
+        }
+    }, [adTransportationRequests]);
 
     useEffect(
         () => {
@@ -94,15 +132,7 @@ const OtherTransportAdProfile = ({
             };
         },
         // eslint-disable-next-line
-        [
-            // adId,
-            // ownerId,
-            // ownerName,
-            // ownerPhotoUrl,
-            // user.userId,
-            // user.userName,
-            // user.userPhoto,
-        ]
+        []
     );
 
     useEffect(() => {
@@ -169,6 +199,75 @@ const OtherTransportAdProfile = ({
 
         setIsChatBoxOpen(true);
     };
+
+    //==>>
+
+    const handleSendRequest = async () => {
+        if (!cargoDescription.trim()) {
+            console.error('Cargo description cannot be empty.');
+            return;
+        }
+
+        const adData = {
+            adId: adId,
+            locationFrom: departureCity,
+            locationTo: destinationCity,
+            date: availabilityDate,
+            price: price,
+            paymentUnit: paymentUnit,
+            owner: {
+                id: ownerId,
+                name: ownerName,
+                photoUrl: ownerPhotoUrl,
+                contact: 'не заполняется',
+            },
+        };
+
+        const request = {
+            sender: {
+                id: user.userId,
+                name: user.userName,
+                photoUrl: user.userPhoto,
+                contact: user.userPhone,
+            },
+            dateSent: new Date().toLocaleDateString('ru-RU'),
+            status: 'pending',
+            description: cargoDescription,
+        };
+
+        try {
+            const requestId = await sendTransportationRequest(adData, request);
+            console.log('Request sent successfully!');
+
+            setCargoDescription(''); // Очистить поле после отправки
+            // setRequestId(requestId);
+            // getAdTransportationRequestByAdId(requestId);
+
+            const adTransportationRequest =
+                getAdTransportationRequestByAdId(requestId);
+
+            setAdTransportationRequest(adTransportationRequest);
+        } catch (error) {
+            console.error('Failed to send request:', error);
+        }
+    };
+
+    const handleCancelRequest = async () => {
+        try {
+            await TransportationService.cancelRequest(
+                adId,
+                user.userId,
+                ownerId,
+                requestId
+            );
+            console.log('Request cancelled successfully.');
+            setAdRequestStatus('cancelled'); // Обновите локальный статус
+        } catch (error) {
+            console.error('Failed to cancel request:', error);
+        }
+    };
+
+    //<<==
 
     return (
         <>
@@ -250,18 +349,33 @@ const OtherTransportAdProfile = ({
                         </div>
                         {isLoadingConversation ? <Preloader /> : ''}
                     </div>
-                    <div className='transport-ad-profile-owner-send-request'>
-                        <strong>
-                            Опишите груз и отправьте Перевозчику запрос на
-                            подтверждение доставки.
-                        </strong>
-                        <textarea placeholder='Описание вашего груза и деталей перевозки.'></textarea>
-                        <Button
-                            type='button'
-                            children='Отправить запрос'
-                            icon={<FaEnvelope />}
+
+                    {adRequestStatus === 'none' || adRequestStatus === '' ? (
+                        <div className='transport-ad-profile-owner-send-request'>
+                            <strong>
+                                Опишите груз и отправьте Перевозчику запрос на
+                                подтверждение доставки.
+                            </strong>
+                            <textarea
+                                placeholder='Описание вашего груза и деталей перевозки.'
+                                value={cargoDescription}
+                                onChange={(e) =>
+                                    setCargoDescription(e.target.value)
+                                }
+                            ></textarea>
+                            <Button
+                                type='button'
+                                children='Отправить запрос'
+                                icon={<FaEnvelope />}
+                                onClick={handleSendRequest}
+                            />
+                        </div>
+                    ) : (
+                        <RequestStatusBlock
+                            status={adRequestStatus}
+                            onCancelRequest={handleCancelRequest}
                         />
-                    </div>
+                    )}
                 </div>
             </div>
 

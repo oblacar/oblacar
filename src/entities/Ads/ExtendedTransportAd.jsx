@@ -5,6 +5,7 @@ class ExtendedTransportAd {
         this.ad = ad; // Основное объявление
         this.isInReviewAds = isInReviewAds; // Варианты
         // this.isActive = isActive; // Статус активности
+
     }
 }
 

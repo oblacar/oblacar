@@ -74,8 +74,8 @@ function Home() {
                     userType='cargoOwner' // или "transportOwner"
                     ad={ads.length > 0 ? ads[0].ad : null}
                 /> */}
-                <TransportationTest />
-                {/* <TransportAdsList /> */}
+                {/* <TransportationTest /> */}
+                <TransportAdsList />
             </div>
         </>
     );
