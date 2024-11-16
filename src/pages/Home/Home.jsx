@@ -25,6 +25,8 @@ import MultiPhotoUploader from '../../components/MultiPhotoUploader/MultiPhotoUp
 
 import ChatInterface from '../../components/ChatInterface/ChatInterface';
 
+import TransportationTest from './TransportationTest';
+
 function Home() {
     const { ads } = useContext(TransportAdContext);
 
@@ -72,8 +74,8 @@ function Home() {
                     userType='cargoOwner' // или "transportOwner"
                     ad={ads.length > 0 ? ads[0].ad : null}
                 /> */}
-
-                <TransportAdsList />
+                <TransportationTest />
+                {/* <TransportAdsList /> */}
             </div>
         </>
     );
