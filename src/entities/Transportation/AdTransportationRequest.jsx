@@ -15,6 +15,7 @@ class AdTransportationRequest {
             },
         },
         requestData = {
+            description: '',//TODO добавляем тест запроса
             requestId: '',
             sender: {
                 id: '',

@@ -133,6 +133,7 @@ export const TransportationProvider = ({ children }) => {
                     sender: request.sender,
                     dateSent: request.dateSent,
                     status: request.status,
+                    description: request.description,//TODO добавляем. пока не отлажено
                 },
             });
 

@@ -46,6 +46,8 @@ const OtherTransportAdProfile = ({
     const [adRequestStatus, setAdRequestStatus] = useState('');
     const [adTransportationRequest, setAdTransportationRequest] =
         useState(null);
+    const [isTransportationRequestSending, setIsTransportationRequestSending] =
+        useState(false);
 
     const {
         adId,
@@ -100,6 +102,8 @@ const OtherTransportAdProfile = ({
 
             console.log('adTransportationRequest:', requestStatusByAdId);
             setAdTransportationRequest(adTransportationRequest);
+
+            setIsTransportationRequestSending(false);
         }
     }, [adTransportationRequests]);
 
@@ -208,6 +212,8 @@ const OtherTransportAdProfile = ({
             return;
         }
 
+        setIsTransportationRequestSending(true);
+
         const adData = {
             adId: adId,
             locationFrom: departureCity,
@@ -240,8 +246,6 @@ const OtherTransportAdProfile = ({
             console.log('Request sent successfully!');
 
             setCargoDescription(''); // Очистить поле после отправки
-            // setRequestId(requestId);
-            // getAdTransportationRequestByAdId(requestId);
 
             const adTransportationRequest =
                 getAdTransportationRequestByAdId(requestId);
@@ -350,32 +354,45 @@ const OtherTransportAdProfile = ({
                         {isLoadingConversation ? <Preloader /> : ''}
                     </div>
 
-                    {adRequestStatus === 'none' || adRequestStatus === '' ? (
-                        <div className='transport-ad-profile-owner-send-request'>
-                            <strong>
-                                Опишите груз и отправьте Перевозчику запрос на
-                                подтверждение доставки.
-                            </strong>
-                            <textarea
-                                placeholder='Описание вашего груза и деталей перевозки.'
-                                value={cargoDescription}
-                                onChange={(e) =>
-                                    setCargoDescription(e.target.value)
-                                }
-                            ></textarea>
-                            <Button
-                                type='button'
-                                children='Отправить запрос'
-                                icon={<FaEnvelope />}
-                                onClick={handleSendRequest}
-                            />
-                        </div>
-                    ) : (
-                        <RequestStatusBlock
-                            status={adRequestStatus}
-                            onCancelRequest={handleCancelRequest}
-                        />
-                    )}
+                    <div className='transport-ad-profile-owner-send-request'>
+                        {!isTransportationRequestSending &&
+                            (adRequestStatus === 'none' ||
+                            adRequestStatus === '' ? (
+                                <>
+                                    <strong>
+                                        Опишите груз и отправьте Перевозчику
+                                        запрос на подтверждение доставки.
+                                    </strong>
+                                    <textarea
+                                        placeholder='Описание вашего груза и деталей перевозки.'
+                                        value={cargoDescription}
+                                        onChange={(e) =>
+                                            setCargoDescription(e.target.value)
+                                        }
+                                    ></textarea>
+                                    <Button
+                                        type='button'
+                                        children='Отправить запрос'
+                                        icon={<FaEnvelope />}
+                                        onClick={handleSendRequest}
+                                    />
+                                </>
+                            ) : (
+                                <RequestStatusBlock
+                                    status={adRequestStatus}
+                                    onCancelRequest={handleCancelRequest}
+                                    adTransportationRequest={
+                                        adTransportationRequest
+                                    }
+                                />
+                            ))}
+
+                        {isTransportationRequestSending && (
+                            <div className='transport-ad-profile-send-request-preloader'>
+                                <Preloader />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

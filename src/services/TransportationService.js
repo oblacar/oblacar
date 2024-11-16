@@ -6,7 +6,7 @@ import Transportation from '../entities/Transportation/Transportation'; // Им�
 import AdTransportationRequests from '../entities/Transportation/AdTransportationRequests';
 import TransportationRequestMainData from '../entities/Transportation/TransportationRequestMainData';
 import TransportationRequest from '../entities/Transportation/TransportationRequest';
-import AdTransportationRequest from "../entities/Transportation/AdTransportationRequest";
+import AdTransportationRequest from '../entities/Transportation/AdTransportationRequest';
 
 class TransportationService {
     // Сервис для отслеживанияя Транспортировки - основная логика перевозки==>>
@@ -101,7 +101,7 @@ class TransportationService {
     //<<==
     // Работа с запросами на транспортировку ==>>
     /**
-     * Добавляет заголовок и запрос в коллекцию transportationRequests.
+     * Добавляет заголовок и запрос в коллекцию transportationRequests. Возвращает id запроса
      * @param {TransportationRequestMainData} mainData - Заголовок.
      * @param {TransportationRequest} request - Объект запроса.
      * @returns {Promise<void>}
@@ -213,6 +213,8 @@ class TransportationService {
                 for (const requestId in adData.requests) {
                     const requestData = adData.requests[requestId];
                     requests.push(new TransportationRequest(requestData));
+
+                    console.log(requestData);
                 }
 
                 // Создаем AdTransportationRequests и добавляем в массив

@@ -5,12 +5,14 @@ class TransportationRequest {
         dateSent,
         status = 'pending',
         dateConfirmed = null,
+        description = '',
     }) {
         this.requestId = requestId; // Уникальный ID запроса
         this.sender = sender; // Объект отправителя
         this.dateSent = dateSent; // Дата отправки (формат dd.mm.yyyy)
         this.status = status; // Статус запроса
         this.dateConfirmed = dateConfirmed; // Дата подтверждения (если есть)
+        this.description = description; //TODO добавляем. Пока не отлажено. Описание груза-машины в запросе
     }
 
     // Метод для обновления статуса

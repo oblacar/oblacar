@@ -1,11 +1,18 @@
 import React from 'react';
 import Button from '../common/Button/Button';
 
-const RequestStatusBlock = ({ status, onCancelRequest }) => {
+import './RequestStatusBlock.css';
+
+const RequestStatusBlock = ({
+    status,
+    onCancelRequest,
+    adTransportationRequest,
+}) => {
     return (
         <div className='transport-ad-profile-request-status'>
             <strong>Статус вашего запроса:</strong>
-            <p>
+            <p>"{adTransportationRequest.requestData.description}"</p>
+            <p className='transport-ad-profile-request-status-info'>
                 {status === 'pending' &&
                     'Запрос отправлен, ждем ответа владельца.'}
                 {status === 'accepted' &&
