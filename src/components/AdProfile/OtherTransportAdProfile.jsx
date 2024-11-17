@@ -40,6 +40,8 @@ const OtherTransportAdProfile = ({
         getRequestStatusByAdId,
         getAdTransportationRequestByAdId,
         adTransportationRequests,
+        cancelTransportationRequest,
+        restartTransportationRequest,
     } = useContext(TransportationContext);
 
     const [cargoDescription, setCargoDescription] = useState('');
@@ -71,6 +73,8 @@ const OtherTransportAdProfile = ({
         ownerRating,
     } = ad;
 
+    // console.log('Номер об: ', adId);
+
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -91,14 +95,19 @@ const OtherTransportAdProfile = ({
                 getAdTransportationRequestByAdId(adId);
 
             let requestStatusByAdId;
+            let requestId;
             if (adTransportationRequest) {
                 requestStatusByAdId =
                     adTransportationRequest.requestData.status;
+
+                requestId = adTransportationRequest.requestData.requestId;
             } else {
                 requestStatusByAdId = '';
+                requestId = null;
             }
 
             setAdRequestStatus(requestStatusByAdId);
+            setRequestId(requestId);
 
             console.log('adTransportationRequest:', requestStatusByAdId);
             setAdTransportationRequest(adTransportationRequest);
@@ -106,6 +115,10 @@ const OtherTransportAdProfile = ({
             setIsTransportationRequestSending(false);
         }
     }, [adTransportationRequests]);
+
+    useEffect(() => {
+        console.log('adTransportationRequest: ', adTransportationRequest);
+    }, [adTransportationRequest]);
 
     useEffect(
         () => {
@@ -258,14 +271,55 @@ const OtherTransportAdProfile = ({
 
     const handleCancelRequest = async () => {
         try {
-            await TransportationService.cancelRequest(
+            // console.log('Номера - параметры удаления');
+            // console.log('adId: ', adId);
+            // console.log('user.userId: ', user.userId);
+            // console.log('ownerId: ', ownerId);
+            // console.log('requestId: ', requestId);
+
+            await cancelTransportationRequest(
                 adId,
                 user.userId,
                 ownerId,
                 requestId
             );
+
+            // await TransportationService.cancelTransportationRequest(
+            //     adId,
+            //     user.userId,
+            //     ownerId,
+            //     requestId
+            // );
             console.log('Request cancelled successfully.');
             setAdRequestStatus('cancelled'); // Обновите локальный статус
+        } catch (error) {
+            console.error('Failed to cancel request:', error);
+        }
+    };
+
+    const handleRestartRequest = async () => {
+        try {
+            // console.log('Номера - параметры удаления');
+            // console.log('adId: ', adId);
+            // console.log('user.userId: ', user.userId);
+            // console.log('ownerId: ', ownerId);
+            // console.log('requestId: ', requestId);
+
+            await restartTransportationRequest(
+                adId,
+                user.userId,
+                ownerId,
+                requestId
+            );
+
+            // await TransportationService.cancelTransportationRequest(
+            //     adId,
+            //     user.userId,
+            //     ownerId,
+            //     requestId
+            // );
+            console.log('Request cancelled successfully.');
+            setAdRequestStatus('none'); // Обновите локальный статус
         } catch (error) {
             console.error('Failed to cancel request:', error);
         }
@@ -381,6 +435,7 @@ const OtherTransportAdProfile = ({
                                 <RequestStatusBlock
                                     status={adRequestStatus}
                                     onCancelRequest={handleCancelRequest}
+                                    onRestartRequest={handleRestartRequest}
                                     adTransportationRequest={
                                         adTransportationRequest
                                     }

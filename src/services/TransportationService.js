@@ -120,49 +120,111 @@ class TransportationService {
             // Проверяем, существует ли заголовок
             const snapshot = await get(userAdRef);
             if (!snapshot.exists()) {
+                console.log('Проверяем, существует ли заголовок');
+
                 // Если заголовка нет, создаем его с пустым объектом requests
                 await set(userAdRef, {
                     ...mainData,
-                    requests: {},
+                    requests: {}, // Создаем пустой объект для запросов
                 });
             }
 
-            // Добавляем запрос в объект requests
-            const requestId =
-                request.requestId ||
-                push(
+            // Поиск существующего запроса с таким же sender.id
+            let requestId = null;
+            const requestsSnapshot = await get(
+                databaseRef(
+                    db,
+                    `transportationRequests/${userId}/${adId}/requests`
+                )
+            );
+
+            if (requestsSnapshot.exists()) {
+                const requests = requestsSnapshot.val();
+
+                // Ищем запрос с совпадающим sender.id
+                for (const [key, value] of Object.entries(requests)) {
+                    if (value.sender?.id === request.sender.id) {
+                        requestId = key; // Если найдено, сохраняем ID
+                        break;
+                    }
+                }
+            }
+
+            // Если запрос найден, обновляем его
+            if (requestId) {
+                console.log('Запрос найден, обновляем данные:', requestId);
+
+                const requestRef = databaseRef(
+                    db,
+                    `transportationRequests/${userId}/${adId}/requests/${requestId}`
+                );
+
+                await update(requestRef, {
+                    status: request.status,
+                    description: request.description,
+                    dateSent: request.dateSent || new Date().toISOString(),
+                    sender: { ...request.sender }, // Обновляем данные отправителя
+                });
+
+                console.log('Transportation request updated successfully.');
+
+                // Добавляем в коллекцию transportationRequestsSent
+                if (request.sender?.id) {
+                    await TransportationService.addSentRequest(
+                        request.sender.id,
+                        requestId,
+                        {
+                            ownerId: userId,
+                            adId,
+                            requestId,
+                        }
+                    );
+                }
+            } else {
+                // Если запрос не найден, создаем новый
+                requestId = push(
                     databaseRef(
                         db,
                         `transportationRequests/${userId}/${adId}/requests`
                     )
                 ).key;
-            request.requestId = requestId;
 
-            const requestRef = databaseRef(
-                db,
-                `transportationRequests/${userId}/${adId}/requests/${requestId}`
-            );
-            await set(requestRef, request);
+                console.log('Создаем новый запрос, ID:', requestId);
 
-            console.log('Transportation request added successfully.');
-
-            // Добавляем в коллекцию transportationRequestsSent
-            if (request.sender && request.sender.id) {
-                await TransportationService.addSentRequest(
-                    request.sender.id,
-                    requestId,
-                    {
-                        ownerId: userId,
-                        adId,
-                        requestId,
-                    }
+                const newRequestRef = databaseRef(
+                    db,
+                    `transportationRequests/${userId}/${adId}/requests/${requestId}`
                 );
+
+                await set(newRequestRef, {
+                    ...request,
+                    requestId,
+                    dateSent: request.dateSent || new Date().toISOString(),
+                });
+
+                console.log('Transportation request added successfully.');
+
+                // Добавляем в коллекцию transportationRequestsSent
+                if (request.sender?.id) {
+                    await TransportationService.addSentRequest(
+                        request.sender.id,
+                        requestId,
+                        {
+                            ownerId: userId,
+                            adId,
+                            requestId,
+                        }
+                    );
+                }
             }
 
             return requestId;
         } catch (error) {
-            console.error('Error adding transportation request:', error);
-            throw new Error('Failed to add transportation request.');
+            console.error(
+                'Error adding or updating transportation request:',
+                error
+            );
+            throw new Error('Failed to add or update transportation request.');
         }
     }
 
@@ -333,8 +395,25 @@ class TransportationService {
         }
     }
 
-    static async cancelRequest(adId, senderId, ownerId, requestId) {
+    /**
+     * Отменяет запрос на транспортировку.
+     * @param {string} senderId - ID отправителя запроса.
+     * @param {string} adId - ID объявления.
+     * @param {string} ownerId - ID владельца объявления.
+     * @param {string} requestId - ID запроса.
+     * @returns {Promise<void>}
+     */
+    static async cancelTransportationRequest(
+        adId,
+        senderId,
+        ownerId,
+        requestId
+    ) {
+        //    adId, user.userId, ownerId, requestId;
+
         try {
+            console.log('В Сервисе adId: ', adId);
+
             // Удаляем запись из transportationRequestsSent
             const sentRequestRef = databaseRef(
                 db,
@@ -347,7 +426,7 @@ class TransportationService {
                 db,
                 `transportationRequests/${ownerId}/${adId}/requests/${requestId}`
             );
-            await set(requestRef, { status: 'cancelled' });
+            await update(requestRef, { status: 'cancelled' });
 
             console.log('Request cancelled successfully.');
         } catch (error) {
@@ -415,6 +494,35 @@ class TransportationService {
         } catch (error) {
             console.error('Error fetching AdTransportationRequests:', error);
             throw new Error('Failed to fetch AdTransportationRequests.');
+        }
+    }
+
+    /**
+     * Перезапускает запрос, устанавливая его статус на 'none'.
+     * @param {string} adId - ID объявления.
+     * @param {string} senderId - ID отправителя запроса.
+     * @param {string} ownerId - ID владельца объявления.
+     * @param {string} requestId - ID запроса.
+     * @returns {Promise<void>}
+     */
+    static async restartTransportationRequest(
+        adId,
+        senderId,
+        ownerId,
+        requestId
+    ) {
+        try {
+            // Обновляем статус в transportationRequests
+            const requestRef = databaseRef(
+                db,
+                `transportationRequests/${ownerId}/${adId}/requests/${requestId}`
+            );
+            await update(requestRef, { status: 'none' });
+
+            console.log('Request restarted successfully.');
+        } catch (error) {
+            console.error('Error restarting transportation request:', error);
+            throw new Error('Failed to restart transportation request.');
         }
     }
     //<<==

@@ -118,7 +118,7 @@ export const TransportationProvider = ({ children }) => {
                 );
 
             // Создаем новый объект AdTransportationRequest
-            const newAdTransportationRequest = new AdTransportationRequest({
+            const updatedAdTransportationRequest = new AdTransportationRequest({
                 adId: mainData.adId,
                 adData: {
                     locationFrom: mainData.locationFrom,
@@ -131,19 +131,33 @@ export const TransportationProvider = ({ children }) => {
                 requestData: {
                     requestId,
                     sender: request.sender,
-                    dateSent: request.dateSent,
+                    dateSent: request.dateSent || new Date().toISOString(),
                     status: request.status,
-                    description: request.description,//TODO добавляем. пока не отлажено
+                    description: request.description, // TODO добавляем. пока не отлажено
                 },
             });
 
-            // Добавляем новый объект в локальный стейт
-            setAdTransportationRequests((prevRequests) => [
-                ...prevRequests,
-                newAdTransportationRequest,
-            ]);
+            // Обновляем локальный стейт
+            setAdTransportationRequests((prevRequests) => {
+                const existingRequestIndex = prevRequests.findIndex(
+                    (req) => req.adId === mainData.adId
+                );
 
-            console.log('Request sent and added to local state successfully!');
+                if (existingRequestIndex !== -1) {
+                    // Если запрос существует, обновляем его
+                    const updatedRequests = [...prevRequests];
+                    updatedRequests[existingRequestIndex] =
+                        updatedAdTransportationRequest;
+                    return updatedRequests;
+                }
+
+                // Если запрос не существует, добавляем новый
+                return [...prevRequests, updatedAdTransportationRequest];
+            });
+
+            console.log(
+                'Request sent and updated in local state successfully!'
+            );
             return requestId;
         } catch (error) {
             console.error('Error sending transportation request:', error);
@@ -162,6 +176,106 @@ export const TransportationProvider = ({ children }) => {
         );
         return request || null;
     };
+
+    const cancelTransportationRequest = async (
+        adId,
+        userId,
+        ownerId,
+        requestId
+    ) => {
+        try {
+            // // Находим данные для отмены
+            // const adRequest = getAdTransportationRequestByAdId(adId);
+            // if (!adRequest) {
+            //     console.error('No request found for the given adId.');
+            //     return;
+            // }
+
+            // const { requestId } = adRequest.requestData;
+            // const { id: ownerId } = adRequest.adData.owner;
+
+            // Вызываем метод отмены в сервисе
+
+            console.log('в контексте номер об: ', adId); // передается не номер объявления
+
+            await TransportationService.cancelTransportationRequest(
+                adId,
+                userId,
+                ownerId,
+                requestId
+            );
+
+            // Обновляем локальный стейт
+            setAdTransportationRequests((prevRequests) =>
+                prevRequests.map((request) => {
+                    console.log('объекты в запросах: ', request);
+
+                    if (request.adId === adId) {
+                        console.log('В контексте: ', request);
+
+                        return {
+                            ...request,
+                            requestData: {
+                                ...request.requestData,
+                                status: 'cancelled',
+                            },
+                        };
+                    }
+                    return request;
+                })
+            );
+
+            console.log('Request cancelled and removed from local state.');
+        } catch (error) {
+            console.error('Error cancelling request:', error);
+        }
+    };
+
+    /**
+     * Перезапускает запрос, устанавливая его статус на 'none'.
+     * @param {string} adId - ID объявления.
+     * @param {string} senderId - ID отправителя запроса.
+     * @param {string} ownerId - ID владельца объявления.
+     * @param {string} requestId - ID запроса.
+     * @returns {Promise<void>}
+     */
+    const restartTransportationRequest = async (
+        adId,
+        senderId,
+        ownerId,
+        requestId
+    ) => {
+        try {
+            // Вызываем метод перезапуска в сервисе
+            await TransportationService.restartTransportationRequest(
+                adId,
+                senderId,
+                ownerId,
+                requestId
+            );
+
+            // Обновляем локальный стейт
+            setAdTransportationRequests((prevRequests) =>
+                prevRequests.map((request) => {
+                    if (request.adId === adId) {
+                        return {
+                            ...request,
+                            requestData: {
+                                ...request.requestData,
+                                status: 'none',
+                            },
+                        };
+                    }
+                    return request;
+                })
+            );
+
+            console.log('Request restarted and updated in local state.');
+        } catch (error) {
+            console.error('Error restarting request:', error);
+        }
+    };
+
     return (
         <TransportationContext.Provider
             value={{
@@ -172,6 +286,8 @@ export const TransportationProvider = ({ children }) => {
                 //объявления по которым отправлены запросы
                 adTransportationRequests,
                 getAdTransportationRequestByAdId,
+                cancelTransportationRequest,
+                restartTransportationRequest,
             }}
         >
             {children}
