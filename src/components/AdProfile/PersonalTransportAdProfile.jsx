@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import './PersonalTransportAdProfile.css';
+
+import IncomingRequestsList from './IncomingRequestsList';
+
 import {
     FaUser,
     FaEnvelope,
@@ -36,6 +39,7 @@ const PersonalTransportAdProfile = ({
     }
 
     const {
+        adId,
         ownerPhotoUrl,
         ownerName,
         availabilityDate,
@@ -170,10 +174,12 @@ const PersonalTransportAdProfile = ({
                     <strong>Запросы на перевозку</strong>
                     {/* TODO реализация блока запросов */}
                     <div>
-                        <p>
+                        {/* <p>
                             Запросов на перевозку по данному объявлению еще не
                             поступало
-                        </p>
+                        </p> */}
+
+                        <IncomingRequestsList adId={adId} />
                     </div>
                 </div>
             </div>

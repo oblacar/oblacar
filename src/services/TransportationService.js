@@ -229,7 +229,7 @@ class TransportationService {
     }
 
     /**
-     * Получает запросы пользователя и возвращает массив AdTransportationRequests.
+     * Получает запросы к пользователю по всем его объявлениям и возвращает массив AdTransportationRequests.
      * @param {string} userId - ID пользователя.
      * @returns {Promise<AdTransportationRequests[]>} Массив запросов.
      */

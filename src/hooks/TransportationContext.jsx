@@ -8,9 +8,13 @@ const TransportationContext = createContext();
 
 export const TransportationProvider = ({ children }) => {
     const { userId, isAuthenticated } = useContext(AuthContext); // Получаем текущего пользователя из AuthContext
+
+    // Запросы к пользователю по всем его объявлениям
     const [adsTransportationRequests, setAdsTransportationRequests] = useState(
         []
     );
+
+    //TODO запоментировать, что точно этим переменные хранят
     const [adTransportationRequests, setAdTransportationRequests] = useState(
         []
     );
@@ -166,11 +170,28 @@ export const TransportationProvider = ({ children }) => {
     };
 
     /**
+     * Получает объект AdTransportationRequest cо списком всех запросов по ID объявления.
+     * @param {string} adId - ID объявления.
+     * @returns {AdTransportationRequest | null} Объект AdTransportationRequest или null, если не найден.
+     */
+    const getAdTransportationRequestsByAdId = (adId) => {
+        const request = adsTransportationRequests.find(
+            (item) => item.mainData.adId === adId
+        );
+        return request || null;
+    };
+
+    /**
      * Получает объект AdTransportationRequest по ID объявления.
      * @param {string} adId - ID объявления.
      * @returns {AdTransportationRequest | null} Объект AdTransportationRequest или null, если не найден.
      */
     const getAdTransportationRequestByAdId = (adId) => {
+        console.log(
+            'в Контексте adTransportationRequests: ',
+            adTransportationRequests
+        );
+
         const request = adTransportationRequests.find(
             (item) => item.adId === adId
         );
@@ -288,6 +309,7 @@ export const TransportationProvider = ({ children }) => {
                 getAdTransportationRequestByAdId,
                 cancelTransportationRequest,
                 restartTransportationRequest,
+                getAdTransportationRequestsByAdId,
             }}
         >
             {children}
