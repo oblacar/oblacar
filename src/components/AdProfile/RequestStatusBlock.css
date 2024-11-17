@@ -14,3 +14,23 @@
     font-weight: 600;
     font-size: 18px;
 }
+
+.request-status-container {
+    margin-top: -20px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Расстояние между иконкой и текстом */
+}
+
+.request-status-container.pending {
+    color: rgb(1, 164, 1);
+}
+
+.request-status-container.cancelled {
+    color: rgb(225, 0, 0);
+}
+
+.request-status-icon {
+    width: 40px; /* Ширина иконки */
+    height: 40px; /* Высота иконки */
+}

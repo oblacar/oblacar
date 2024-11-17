@@ -38,13 +38,13 @@
 .button.reverse-no {
     background-color: white; /* Основной цвет */
     color: rgb(247, 72, 46);
-    border: 4px double rgb(247, 72, 46);
+    border: 3px double rgb(247, 72, 46);
 }
 
 .button.reverse-no:hover {
     background-color: rgb(247, 72, 46); /* Основной цвет */
     color: white;
-    border: 4px double white;
+    border: 3px double white;
 }
 
 .button.yes {
