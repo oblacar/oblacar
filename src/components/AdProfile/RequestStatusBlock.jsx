@@ -3,7 +3,12 @@ import Button from '../common/Button/Button';
 
 import './RequestStatusBlock.css';
 
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import {
+    CheckCircleIcon,
+    XCircleIcon,
+    XMarkIcon,
+    PencilIcon,
+} from '@heroicons/react/24/outline';
 // check - circle;
 
 const RequestStatusBlock = ({
@@ -51,6 +56,8 @@ const RequestStatusBlock = ({
                     type_btn='reverse-no'
                     children='Отменить запрос'
                     onClick={onCancelRequest}
+                    // icon={<XCircleIcon />}
+                    icon={<XMarkIcon />}
                 />
             )}
 
@@ -59,6 +66,7 @@ const RequestStatusBlock = ({
                     type='button'
                     children='Новый запрос'
                     onClick={onRestartRequest}
+                    icon={<PencilIcon />}
                 />
             )}
         </div>
