@@ -17,8 +17,7 @@ import Button from '../common/Button/Button';
 import ChatBox from '../common/ChatBox/ChatBox';
 import Preloader from '../common/Preloader/Preloader';
 import RequestStatusBlock from './RequestStatusBlock';
-
-import TransportationService from '../../services/TransportationService';
+import UserSmallCard from '../common/UserSmallCard/UserSmallCard';
 
 const OtherTransportAdProfile = ({
     ad,
@@ -271,12 +270,6 @@ const OtherTransportAdProfile = ({
 
     const handleCancelRequest = async () => {
         try {
-            // console.log('Номера - параметры удаления');
-            // console.log('adId: ', adId);
-            // console.log('user.userId: ', user.userId);
-            // console.log('ownerId: ', ownerId);
-            // console.log('requestId: ', requestId);
-
             await cancelTransportationRequest(
                 adId,
                 user.userId,
@@ -284,13 +277,6 @@ const OtherTransportAdProfile = ({
                 requestId
             );
 
-            // await TransportationService.cancelTransportationRequest(
-            //     adId,
-            //     user.userId,
-            //     ownerId,
-            //     requestId
-            // );
-            console.log('Request cancelled successfully.');
             setAdRequestStatus('cancelled'); // Обновите локальный статус
         } catch (error) {
             console.error('Failed to cancel request:', error);
@@ -299,12 +285,6 @@ const OtherTransportAdProfile = ({
 
     const handleRestartRequest = async () => {
         try {
-            // console.log('Номера - параметры удаления');
-            // console.log('adId: ', adId);
-            // console.log('user.userId: ', user.userId);
-            // console.log('ownerId: ', ownerId);
-            // console.log('requestId: ', requestId);
-
             await restartTransportationRequest(
                 adId,
                 user.userId,
@@ -312,13 +292,6 @@ const OtherTransportAdProfile = ({
                 requestId
             );
 
-            // await TransportationService.cancelTransportationRequest(
-            //     adId,
-            //     user.userId,
-            //     ownerId,
-            //     requestId
-            // );
-            console.log('Request cancelled successfully.');
             setAdRequestStatus('none'); // Обновите локальный статус
         } catch (error) {
             console.error('Failed to cancel request:', error);
@@ -371,42 +344,13 @@ const OtherTransportAdProfile = ({
                     </div>
                 </div>
                 <div className='transport-ad-profile-owner-data'>
-                    <div className='transport-ad-profile-user-data'>
-                        <div className='transport-ad-profile-user-photo-rating'>
-                            <div className='transport-ad-profile-user-photo'>
-                                {ownerPhotoUrl ? ( // Проверяем, есть ли фото
-                                    <img
-                                        src={ownerPhotoUrl}
-                                        alt='Хозяин объявления'
-                                        className='transport-ad-profile-photo-car-owner'
-                                    />
-                                ) : (
-                                    <FaUser />
-                                )}
-                                {ownerRating ? (
-                                    <div className='transport-ad-profile-user-rating'>
-                                        ★ {ownerRating}
-                                    </div>
-                                ) : (
-                                    ''
-                                )}
-                            </div>
-                        </div>
-                        <div className='transport-ad-profile-user-name'>
-                            {ownerName}
-                        </div>
-
-                        <div className='transport-ad-profile-user-btn-message'>
-                            <Button
-                                type='button'
-                                children='Написать'
-                                icon={<ChatBubbleLeftRightIcon />}
-                                onClick={handleStartChat}
-                                type_btn='reverse'
-                            />
-                        </div>
-                        {isLoadingConversation ? <Preloader /> : ''}
-                    </div>
+                    <UserSmallCard
+                        photoUrl={ownerPhotoUrl}
+                        rating={ownerRating}
+                        name={ownerName}
+                        onClick={handleStartChat}
+                        isLoading={false}
+                    />
 
                     <div className='transport-ad-profile-owner-send-request'>
                         {!isTransportationRequestSending &&
