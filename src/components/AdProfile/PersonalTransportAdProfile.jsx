@@ -7,6 +7,7 @@ import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { cutNumber, formatNumber } from '../../utils/helper';
 
 import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
+import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
 import Button from '../common/Button/Button';
 
 const PersonalTransportAdProfile = ({
@@ -102,8 +103,13 @@ const PersonalTransportAdProfile = ({
                 {/* Блок объявления */}
                 <div className={styles.transportAdProfile}>
                     <div className={styles.adContainer}>
-                        <div className={styles.photoArea}>
+                        {/* <div className={styles.photoArea}>
                             <PhotoCarousel photos={ad.truckPhotoUrls || []} />
+                        </div> */}
+                        <div className={styles.photoArea}>
+                            <HorizontalPhotoCarousel
+                                photos={ad.truckPhotoUrls || []}
+                            />
                         </div>
                         <div className={styles.routeDatePrice}>
                             <div className={`${styles.routeDatePriceRow}`}>
