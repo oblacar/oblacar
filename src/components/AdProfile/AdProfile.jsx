@@ -1,7 +1,7 @@
 // src/components/AdProfile/AdProfile.js
 
 import React, { useState, useEffect, useContext } from 'react';
-import './AdProfile.css';
+// import './AdProfile.css';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';

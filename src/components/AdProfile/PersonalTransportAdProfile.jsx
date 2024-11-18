@@ -1,20 +1,9 @@
-// src/components/AdProfile/AdProfile.js
-
-import React, { useState, useEffect, useRef } from 'react';
-import './PersonalTransportAdProfile.css';
+import React, { useState, useEffect } from 'react';
+import styles from './PersonalTransportAdProfile.module.css';
 
 import IncomingRequestsList from './IncomingRequestsList';
 
-import {
-    FaUser,
-    FaEnvelope,
-    FaCheck,
-    FaTimes,
-    FaEdit,
-    FaCommentDots,
-} from 'react-icons/fa';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
-
 import { cutNumber, formatNumber } from '../../utils/helper';
 
 import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
@@ -35,13 +24,11 @@ const PersonalTransportAdProfile = ({
     }, [ad]);
 
     if (isLoading) {
-        return <div className='loading'>Загрузка объявления...</div>;
+        return <div className={styles.loading}>Загрузка объявления...</div>;
     }
 
     const {
         adId,
-        ownerPhotoUrl,
-        ownerName,
         availabilityDate,
         departureCity,
         destinationCity,
@@ -56,7 +43,6 @@ const PersonalTransportAdProfile = ({
         truckHeight,
         truckWidth,
         truckDepth,
-        ownerRating,
     } = ad;
 
     const loadingTypesItem = () => {
@@ -111,79 +97,76 @@ const PersonalTransportAdProfile = ({
     };
 
     return (
-        <>
-            <div className='transport-ad-profile'>
-                <div className='transport-ad-profile-main-data'>
-                    <div className='transport-ad-profile-truck-photo-area'>
-                        <PhotoCarousel photos={ad.truckPhotoUrls || []} />
-                    </div>
-                    <div className='transport-ad-profile-rout-date-price'>
-                        <div className='transport-ad-profile-date transport-ad-profile-rout-date-price-row'>
-                            <strong>Доступен:</strong> {availabilityDate}
+        <div className={styles.fakePage}>
+            <div className={styles.pageContainer}>
+                {/* Блок объявления */}
+                <div className={styles.transportAdProfile}>
+                    <div className={styles.adContainer}>
+                        <div className={styles.photoArea}>
+                            <PhotoCarousel photos={ad.truckPhotoUrls || []} />
                         </div>
-                        <div className='transport-ad-profile-departure-city transport-ad-profile-rout-date-price-row'>
-                            <strong>Откуда:</strong> {departureCity}
-                        </div>
-                        <div className='transport-ad-profile-destination-city transport-ad-profile-rout-date-price-row'>
-                            <strong>Куда:</strong> {destinationCity}
-                        </div>
-                        <div className='transport-ad-profile-price transport-ad-profile-rout-date-price-row'>
-                            <strong>Цена:</strong> {formatNumber(String(price))}{' '}
-                            {paymentUnit}
-                        </div>
-                        <div className='transport-ad-profile-price transport-ad-profile-rout-date-price-row'>
-                            {paymentOptionsItem()}
-                        </div>
+                        <div className={styles.routeDatePrice}>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <strong>Доступен:</strong> {availabilityDate}
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <strong>Откуда:</strong> {departureCity}
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <strong>Куда:</strong> {destinationCity}
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <strong>Цена:</strong>{' '}
+                                {formatNumber(String(price))} {paymentUnit}
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                {paymentOptionsItem()}
+                            </div>
 
-                        <div className='transport-ad-profile-truck'>
-                            <div className='transport-ad-profile-truck-name transport-ad-profile-truck-row'>
-                                <strong>Марка: </strong>
-                                {truckName}
+                            <div className={styles.truck}>
+                                <div
+                                    className={`${styles.truckRow} ${styles.truckName}`}
+                                >
+                                    <strong>Марка: </strong>
+                                    {truckName}
+                                </div>
+                                <div className={`${styles.truckRow}`}>
+                                    <strong>Тип: </strong>
+                                    {transportType}
+                                </div>
+                                <div className={`${styles.truckRow}`}>
+                                    {truckWeightValue()}
+                                </div>
+                                <div className={`${styles.truckRow}`}>
+                                    {loadingTypesItem()}
+                                </div>
                             </div>
-                            <div className='transport-ad-profile-truck-type transport-ad-profile-truck-row'>
-                                <strong>Тип: </strong>
-                                {transportType}
-                            </div>
-                            <div className='transport-ad-profile-truck-weight-value transport-ad-profile-truck-row'>
-                                {truckWeightValue()}
-                            </div>
-                            <div className='transport-ad-profile-truck-loadings transport-ad-profile-truck-row'>
-                                {loadingTypesItem()}
-                            </div>
+                        </div>
+                        <div className={styles.btns}>
+                            <Button
+                                type='button'
+                                children='Редактировать'
+                                icon={<PencilSquareIcon />}
+                                className={styles.correctionBtn}
+                            />
+                            <Button
+                                type='button'
+                                children='Удалить'
+                                type_btn='reverse-no'
+                                icon={<TrashIcon />}
+                                className={styles.deleteBtn}
+                            />
                         </div>
                     </div>
                 </div>
-                <div className='transport-ad-profile-btns'>
-                    <Button
-                        type='button'
-                        children='Редактировать'
-                        icon={<PencilSquareIcon />}
-                        className='transport-ad-profile-correction-btn'
-                    />
-                    <Button
-                        type='button'
-                        children='Удалить'
-                        type_btn='reverse-no'
-                        icon={<TrashIcon />}
-                        className='transport-ad-profile-delete-btn'
-                    />
-                </div>
-            </div>
-            <div className='transport-ad-profile-requests'>
-                <div>
+
+                {/* Список запросов */}
+                <div className={styles.requests}>
                     <strong>Запросы на перевозку</strong>
-                    {/* TODO реализация блока запросов */}
-                    <div>
-                        {/* <p>
-                            Запросов на перевозку по данному объявлению еще не
-                            поступало
-                        </p> */}
-
-                        <IncomingRequestsList adId={adId} />
-                    </div>
+                    <IncomingRequestsList adId={adId} />
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

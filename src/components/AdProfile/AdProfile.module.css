@@ -1,0 +1,35 @@
+/* src/components/AdProfile/AdProfile.module.css */
+
+.adProfilePage {
+    display: flex;
+    height: 100vh; /* Высота экрана */
+    overflow: hidden; /* Убираем прокрутку родителя */
+    background-color: #f9f9f9; /* Общий фон */
+}
+
+.personalAdWrapper {
+    flex: 0 0 300px; /* Фиксированная ширина блока объявления */
+    height: 100vh; /* Фиксированная высота */
+    overflow-y: auto; /* Добавляем прокрутку для контента объявления */
+    position: fixed; /* Фиксируем блок объявления */
+    left: 0; /* Прижимаем к левому краю */
+    top: 0;
+    background-color: #fff; /* Белый фон */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Тень справа */
+    z-index: 10; /* Поверх остальных элементов */
+    padding: 20px; /* Внутренние отступы */
+}
+
+.otherAdWrapper {
+    margin-left: 320px; /* Отступ для учета фиксированного блока */
+    flex: 1; /* Занимаем оставшуюся ширину */
+    padding: 20px;
+    overflow-y: auto; /* Прокрутка для остального контента */
+}
+
+.loading {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    padding: 20px;
+}

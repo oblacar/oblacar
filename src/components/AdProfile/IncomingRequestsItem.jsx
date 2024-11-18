@@ -88,7 +88,7 @@ const IncomingRequestsItem = ({
                     <Button
                         type='button'
                         children='Вернуть'
-                        // type_btn='yes'
+                        type_btn='reverse'
                         icon={<ArrowUturnLeftIcon />}
                         onClick={() =>
                             onAccept(userId, adId, request.requestId)

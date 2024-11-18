@@ -1,0 +1,103 @@
+/* Основной контейнер страницы */
+.fakePage {
+    position: fixed;
+    left: 0;
+    top: 110px; /* Учитываем высоту верхнего меню */
+    width: 100%;
+    height: calc(
+        100vh - 140px
+    ); /* Высота страницы с учетом фиксированного меню */
+    background-color: #fcfcfc;
+    overflow-y: hidden; /* Отключаем общий скролл */
+}
+
+/* Контейнер с объявлением и запросами */
+.pageContainer {
+    display: flex;
+    flex-wrap: nowrap; /* Блоки располагаются в строку */
+    gap: 20px;
+    /* padding: 20px; */
+    height: 100%;
+    overflow-y: hidden; /* Скрываем скролл для всей страницы */
+}
+
+/* Фиксированный блок с объявлением */
+.transportAdProfile {
+    flex: 0 0 30%;
+    max-width: 500px;
+    min-width: 340px;
+    /* height: 100%;  */
+    /* position: sticky; */
+    /* top: 20px;  */
+    /* border: 1px solid #e1e1e1; */
+    /* border-radius: 8px; */
+    background-color: #fff;
+    padding: 50px 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* Скролл внутри блока, если контент не помещается */
+
+    display: flex;
+    justify-content: end; /* Центрируем горизонтально */
+}
+
+/*Стилизация скрола==>>*/
+/* Стили для самого скроллбара */
+.transportAdProfile::-webkit-scrollbar {
+    width: 4px; /* Ширина скроллбара */
+}
+
+/* Стили для трека (фон скроллбара) */
+.transportAdProfile::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Цвет фона */
+    border-radius: 10px; /* Закругленные края */
+}
+
+/* Стили для ползунка */
+.transportAdProfile::-webkit-scrollbar-thumb {
+    background: #cbc9cd; /* Цвет ползунка */
+    border-radius: 10px;
+}
+
+.adContainer {
+    margin-right: 5%;
+}
+
+/* Основной контент (запросы) */
+.requests {
+    flex: 1;
+    height: calc(100vh - 165px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+}
+
+/* Заголовок списка запросов */
+.requests strong {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #ff904c;
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+    .pageContainer {
+        flex-direction: column; /* Блоки располагаются друг под другом */
+        overflow-y: auto; /* Включаем общий скролл */
+    }
+
+    .transportAdProfile {
+        flex: 1;
+        max-width: 100%;
+        height: auto; /* Высота по содержимому */
+        position: static; /* Отключаем фиксацию */
+        margin-bottom: 20px; /* Отступ снизу */
+    }
+
+    .requests {
+        flex: 1;
+        max-width: 100%;
+        overflow-y: visible; /* Убираем внутренний скролл */
+    }
+}
