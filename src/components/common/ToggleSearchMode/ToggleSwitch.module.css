@@ -1,0 +1,57 @@
+.toggleContainer {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* background-color: #ffffff; */
+    /* border-radius: 10px; */
+    padding: 5px;
+    width: 400px; /* Общая ширина переключателя */
+    height: 60px; /* Общая высота переключателя */
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+}
+
+.option {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 2; /* Выше выделенной зоны */
+    gap: 8px; /* Отступ между иконкой и текстом */
+    color: #888; /* Серый цвет для невыбранной кнопки */
+    font-size: 18px; /* Размер текста */
+    font-weight: bold; /* Обычный шрифт для невыбранной кнопки */
+    transition: color 0.3s ease, font-weight 0.3s ease; /* Плавное изменение цвета и шрифта */
+}
+
+.option .icon {
+    height: 28px;
+    width: 28px;
+}
+
+.selected {
+    color: #ff6803;
+    /* font-weight: bold;  */
+}
+
+.highlight {
+    position: absolute;
+    top: 5px; /* Отступ сверху */
+    left: 5px; /* Начальное положение (первая кнопка) */
+    width: 50%; /* Ширина выделения (на одну кнопку) */
+    height: calc(100% - 10px); /* Высота с учётом отступов */
+    background-color: #f0f0f0; /* Серый фон выделенной зоны */
+    border-radius: 30px;
+    transition: left 0.3s ease; /* Анимация перемещения */
+    z-index: 1; /* Под кнопками */
+}
+
+.left {
+    left: 5px; /* Позиция для первой кнопки */
+}
+
+.right {
+    left: calc(50% + 3px); /* Позиция для второй кнопки */
+}

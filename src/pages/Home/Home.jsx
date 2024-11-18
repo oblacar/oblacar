@@ -20,15 +20,31 @@ import CreateTransportAd from '../../components/CreateTransportAd/CreateTranspor
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
+import {
+    TruckIcon,
+    CubeIcon,
+    XMarkIcon,
+    CheckIcon,
+} from '@heroicons/react/24/outline';
+
 import AdProfile from '../../components/AdProfile/AdProfile';
 import MultiPhotoUploader from '../../components/MultiPhotoUploader/MultiPhotoUploader';
 
 import ChatInterface from '../../components/ChatInterface/ChatInterface';
 
 import TransportationTest from './TransportationTest';
-
+import './testcss.css';
+import { FaTruck, FaBox } from 'react-icons/fa';
+import ToggleSearchMode from '../../components/common/ToggleSearchMode/ToggleSearchMode';
 function Home() {
     const { ads } = useContext(TransportAdContext);
+    const [isCarSearch, setIsCarSearch] = useState(true);
+
+    const [isSelectFirst, setIsSelectFirst] = useState(true);
+
+    const handleToggle = (isFirstSelected) => {
+        setIsSelectFirst(isFirstSelected);
+    };
 
     const handleUploadAds = async () => {
         await TransportAdService.uploadAdsToFirebase(ads); // Вызываем функцию загрузки из сервиса
@@ -38,6 +54,37 @@ function Home() {
 
     return (
         <>
+            <div style={{ padding: '20px' }}>
+                <ToggleSearchMode
+                    firstOption={{
+                        icon: <TruckIcon />,
+                        label: 'Найти машину',
+                    }}
+                    secondOption={{
+                        icon: <CubeIcon />,
+                        label: 'Найти груз',
+                    }}
+                    isSelectFirst={isSelectFirst}
+                    onToggle={handleToggle}
+                />
+            </div>
+            <div className='btn-toggle-mode-container'>
+                <div
+                    className={`btn-toggle-mode ${isCarSearch && `car`}`}
+                    onClick={() => setIsCarSearch(() => true)}
+                >
+                    <TruckIcon className='btn-toggle-mode-icon' />{' '}
+                    <span>Найти машину</span>
+                </div>
+                <div
+                    className={`btn-toggle-mode ${!isCarSearch && `cargo`}`}
+                    onClick={() => setIsCarSearch(() => false)}
+                >
+                    <CubeIcon className='btn-toggle-mode-icon' />
+                    <span>Найти груз</span>
+                </div>
+            </div>
+
             {/* <ChatInterface /> */}
             <div className={styles.container}>
                 {/* <div> */}
