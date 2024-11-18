@@ -57,9 +57,20 @@
     background: #cbc9cd; /* Цвет ползунка */
     border-radius: 10px;
 }
-
+/*<<--*/
 .adContainer {
     margin-right: 5%;
+}
+
+.photoArea {
+    margin-bottom: 20px;
+    width: 330px;
+    height: 210px;
+}
+
+.btns {
+    margin-top: 20px;
+    display: flex;
 }
 
 /* Основной контент (запросы) */

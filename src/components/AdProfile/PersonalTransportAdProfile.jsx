@@ -6,7 +6,6 @@ import IncomingRequestsList from './IncomingRequestsList';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { cutNumber, formatNumber } from '../../utils/helper';
 
-import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
 import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
 import Button from '../common/Button/Button';
 
@@ -103,9 +102,6 @@ const PersonalTransportAdProfile = ({
                 {/* Блок объявления */}
                 <div className={styles.transportAdProfile}>
                     <div className={styles.adContainer}>
-                        {/* <div className={styles.photoArea}>
-                            <PhotoCarousel photos={ad.truckPhotoUrls || []} />
-                        </div> */}
                         <div className={styles.photoArea}>
                             <HorizontalPhotoCarousel
                                 photos={ad.truckPhotoUrls || []}
@@ -151,16 +147,16 @@ const PersonalTransportAdProfile = ({
                         <div className={styles.btns}>
                             <Button
                                 type='button'
-                                children='Редактировать'
-                                icon={<PencilSquareIcon />}
-                                className={styles.correctionBtn}
-                            />
-                            <Button
-                                type='button'
                                 children='Удалить'
                                 type_btn='reverse-no'
                                 icon={<TrashIcon />}
                                 className={styles.deleteBtn}
+                            />
+                            <Button
+                                type='button'
+                                children='Редактировать'
+                                icon={<PencilSquareIcon />}
+                                className={styles.correctionBtn}
                             />
                         </div>
                     </div>

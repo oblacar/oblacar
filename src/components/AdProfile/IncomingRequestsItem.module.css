@@ -35,13 +35,15 @@
     right: 40%;
     z-index: 2;
 
-    border: 4px double rgb(255, 184, 184);
+    /* border: 4px double rgb(255, 184, 184); */
+    border: 4px double   rgb(223, 206, 206);
+  
     padding: 5px 10px;
     border-radius: 4px;
 
-    color: rgb(254, 161, 161);
-    /* font-weight: 600; */
+    /* color: rgb(254, 161, 161); */
 
+    color: rgb(223, 206, 206);
     transform: rotate(-20deg);
 }
 

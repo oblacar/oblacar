@@ -30,7 +30,7 @@ const HorizontalPhotoCarousel = ({ photos }) => {
             <div className={styles.photoContainer}>
                 <img
                     src={photos[currentIndex]}
-                    alt={`Photo ${currentIndex + 1}`}
+                    alt=''
                     className={styles.photo}
                 />
             </div>
