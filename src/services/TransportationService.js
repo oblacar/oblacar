@@ -102,6 +102,7 @@ class TransportationService {
     // Работа с запросами на транспортировку ==>>
     /**
      * Добавляет заголовок и запрос в коллекцию transportationRequests. Возвращает id запроса
+     * Отправляется заинтересовашимся объявлением Пользователем.
      * @param {TransportationRequestMainData} mainData - Заголовок.
      * @param {TransportationRequest} request - Объект запроса.
      * @returns {Promise<void>}
@@ -230,6 +231,7 @@ class TransportationService {
 
     /**
      * Получает запросы к пользователю по всем его объявлениям и возвращает массив AdTransportationRequests.
+     * Используется хозяином объявлений.
      * @param {string} userId - ID пользователя.
      * @returns {Promise<AdTransportationRequests[]>} Массив запросов.
      */
@@ -293,7 +295,35 @@ class TransportationService {
     }
 
     /**
+     * Метод отклоняет запрос на перевозку.
+     * Используется владельцем объявления для отказа принимать заявку на перевозку.
+     * @param {string} ownerId - ID владельца объявления.
+     * @param {string} adId - ID объявления.
+     * @param {string} requestId - ID запроса.
+     * @returns {Promise<void>}
+     */
+    static async declineTransportationRequest(ownerId, adId, requestId) {
+        try {
+            const requestRef = databaseRef(
+                db,
+                `transportationRequests/${ownerId}/${adId}/requests/${requestId}`
+            );
+
+            // Обновляем статус запроса
+            await update(requestRef, { status: 'declined' });
+
+            console.log(`Request ${requestId} declined successfully.`);
+        } catch (error) {
+            console.error('Error declining transportation request:', error);
+            throw new Error('Failed to decline transportation request.');
+        }
+    }
+
+    //Запросы на перевозку от лица сделавшего запрос-->
+    /**
      * Добавляет запись в коллекцию transportationRequestsSent.
+     * Используется Пользоватлем, который рассылает запросы к чужим объявлениям.
+     * Коллекция хранит его запросы.
      * @param {string} senderId - ID отправителя.
      * @param {string} requestId - ID запроса.
      * @param {Object} data - Данные запроса (ownerId, adId, requestId).
@@ -315,7 +345,6 @@ class TransportationService {
         }
     }
 
-    //Запросы на перевозку от лица сделавшего запрос-->
     /**
      * Получает все отправленные запросы для пользователя.
      * @param {string} senderId - ID отправителя.
@@ -439,7 +468,7 @@ class TransportationService {
     //<<==
     //Методы для сборки массива объявлений, по которым были запросы==>>
     /**
-     * Собирает массив AdTransportationRequest для текущего пользователя.
+     * Собирает массив объектов AdTransportationRequest для текущего пользователя.
      * @param {string} senderId - ID пользователя (отправителя).
      * @returns {Promise<AdTransportationRequest[]>} Массив объектов AdTransportationRequest.
      */
@@ -498,7 +527,7 @@ class TransportationService {
     }
 
     /**
-     * Перезапускает запрос, устанавливая его статус на 'none'.
+     * Перезапускает запрос, устанавливая его статус на 'none'. Используется отправителем запроса на Транспортировку.
      * @param {string} adId - ID объявления.
      * @param {string} senderId - ID отправителя запроса.
      * @param {string} ownerId - ID владельца объявления.

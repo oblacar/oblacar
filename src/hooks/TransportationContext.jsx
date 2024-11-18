@@ -20,6 +20,14 @@ export const TransportationProvider = ({ children }) => {
     );
     const [sentRequestsStatuses, setSentRequestsStatuses] = useState([]); // Статусы отправленных запросов
 
+    //TODO hook for checking state. Shoulde de deleted after checking
+    useEffect(() => {
+        console.log(
+            'Обновлённый adsTransportationRequests:',
+            adsTransportationRequests
+        );
+    }, [adsTransportationRequests]);
+
     useEffect(() => {
         const loadSentRequestsStatuses = async () => {
             if (isAuthenticated && userId) {
@@ -276,24 +284,76 @@ export const TransportationProvider = ({ children }) => {
             );
 
             // Обновляем локальный стейт
-            setAdTransportationRequests((prevRequests) =>
-                prevRequests.map((request) => {
-                    if (request.adId === adId) {
+            setAdsTransportationRequests((prevRequests) =>
+                prevRequests.map((ad) => {
+                    if (
+                        ad.mainData.adId === adId &&
+                        ad.requests.requestId === requestId
+                    ) {
                         return {
-                            ...request,
-                            requestData: {
-                                ...request.requestData,
+                            ...ad,
+                            requests: {
+                                ...ad.requests,
                                 status: 'none',
                             },
                         };
                     }
-                    return request;
+                    return ad;
                 })
             );
 
             console.log('Request restarted and updated in local state.');
         } catch (error) {
             console.error('Error restarting request:', error);
+        }
+    };
+
+    // Метод позволяет Владельцу объявления откланить запрос на транспортировку
+    // Метод для изменения статуса запроса и обновления локального стейта на decline.
+    const declineTransportationRequest = async (ownerId, adId, requestId) => {
+        try {
+            // Вызываем метод сервиса для обновления статуса в Firebase
+            await TransportationService.declineTransportationRequest(
+                ownerId,
+                adId,
+                requestId
+            );
+
+            console.log('Что это?: ', adsTransportationRequests);
+
+            // Обновляем локальный стейт
+            setAdsTransportationRequests((prevRequests) =>
+                prevRequests.map((ad) => {
+                    // Находим нужное объявление по adId
+                    if (ad.mainData.adId === adId) {
+                        // Обновляем конкретный запрос в массиве requests
+                        const updatedRequests = ad.requests.map((request) => {
+                            if (request.requestId === requestId) {
+                                return {
+                                    ...request,
+                                    status: 'declined', // Новый статус
+                                };
+                            }
+                            return request;
+                        });
+
+                        // Возвращаем обновлённое объявление
+                        return {
+                            ...ad,
+                            requests: updatedRequests,
+                        };
+                    }
+
+                    console.log(ad);
+
+                    // Возвращаем объявление без изменений
+                    return ad;
+                })
+            );
+
+            console.log(`Request ${requestId} declined and updated locally.`);
+        } catch (error) {
+            console.error('Error declining transportation request:', error);
         }
     };
 
@@ -310,6 +370,8 @@ export const TransportationProvider = ({ children }) => {
                 cancelTransportationRequest,
                 restartTransportationRequest,
                 getAdTransportationRequestsByAdId,
+                //
+                declineTransportationRequest,
             }}
         >
             {children}
