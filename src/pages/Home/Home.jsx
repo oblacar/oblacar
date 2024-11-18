@@ -68,22 +68,7 @@ function Home() {
                     onToggle={handleToggle}
                 />
             </div>
-            <div className='btn-toggle-mode-container'>
-                <div
-                    className={`btn-toggle-mode ${isCarSearch && `car`}`}
-                    onClick={() => setIsCarSearch(() => true)}
-                >
-                    <TruckIcon className='btn-toggle-mode-icon' />{' '}
-                    <span>Найти машину</span>
-                </div>
-                <div
-                    className={`btn-toggle-mode ${!isCarSearch && `cargo`}`}
-                    onClick={() => setIsCarSearch(() => false)}
-                >
-                    <CubeIcon className='btn-toggle-mode-icon' />
-                    <span>Найти груз</span>
-                </div>
-            </div>
+
 
             {/* <ChatInterface /> */}
             <div className={styles.container}>
@@ -102,7 +87,7 @@ function Home() {
                     </button> */}
                 </p>
                 {/* <CreateTransportAd /> */}
-                {/* <SearchTransport /> */}
+                <SearchTransport />
                 {/* <p>
                     1. добавить раздел: фото водителя и рейтинг, проверенный ли
                     водитель, проверенная ли машшина. 2. возле цены можно
