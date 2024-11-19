@@ -16,7 +16,7 @@ const IncomingRequestsList = ({ adId }) => {
     useEffect(() => {
         const adTransportationRequest = getAdTransportationRequestsByAdId(adId);
         setAdTransportationRequest(adTransportationRequest);
-    }, [adsTransportationRequests]);
+    }, [adsTransportationRequests, adId]);
 
     if (!adTransportationRequest) {
         return <p>Запросы не найдены или данные объявления отсутствуют.</p>;

@@ -12,8 +12,6 @@ const AdPage = () => {
 
     if (!ad) return <p>Объявление не найдено</p>;
 
-
-    
     return (
         <div>
             <AdProfile ad={ad.ad} />

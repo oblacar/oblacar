@@ -59,7 +59,9 @@
 }
 /*<<--*/
 .adContainer {
-    margin-right: 5%;
+    margin-right: 2%;
+    /* margin-left: 5%; */
+    width: 330px;
 }
 
 .photoArea {
@@ -79,15 +81,24 @@
     justify-content: start;
     align-items: center;
     gap: 15px;
+    flex-wrap: wrap; /* Добавляем перенос строк для flex-элементов */
 }
+
 .routeDatePriceRow .icon {
     color: #ff904c;
     height: 24px;
+    flex-shrink: 0; /* Иконка не сжимается при недостатке места */
+    margin-left: 10px;
 }
 
 .routeDatePriceRow span {
     display: block;
     color: #3b3b3b;
+    word-wrap: break-word; /* Перенос слов на следующую строку */
+    word-break: break-word; /* Дополнительный перенос для длинных слов */
+    white-space: normal; /* Сбрасываем поведение nowrap, если было */
+    max-width: 100%; /* Ограничиваем ширину текста */
+    flex: 1; /* Текст занимает оставшееся пространство */
 }
 
 .separator {
