@@ -71,8 +71,28 @@
 .btns {
     margin-top: 20px;
     display: flex;
+    padding-bottom: 100px;
 }
 
+.routeDatePriceRow {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 15px;
+}
+.routeDatePriceRow .icon {
+    color: #ff904c;
+    height: 24px;
+}
+
+.routeDatePriceRow span {
+    display: block;
+    color: #3b3b3b;
+}
+
+.separator {
+    height: 10px;
+}
 /* Основной контент (запросы) */
 .requests {
     flex: 1;

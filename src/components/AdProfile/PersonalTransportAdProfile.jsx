@@ -6,8 +6,22 @@ import IncomingRequestsList from './IncomingRequestsList';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { cutNumber, formatNumber } from '../../utils/helper';
 
+import {
+    CalendarDaysIcon,
+    MapPinIcon,
+    CreditCardIcon,
+    BanknotesIcon,
+    TruckIcon,
+    ArrowsPointingInIcon,
+    ScaleIcon,
+    ArrowsPointingOutIcon,
+    CloudIcon,
+    CheckBadgeIcon,
+} from '@heroicons/react/24/outline';
+
 import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
 import Button from '../common/Button/Button';
+import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
 
 const PersonalTransportAdProfile = ({
     ad,
@@ -47,11 +61,7 @@ const PersonalTransportAdProfile = ({
 
     const loadingTypesItem = () => {
         const loadingTypesString = loadingTypes?.join(', ');
-        return loadingTypesString ? (
-            <>
-                <strong>Загрузка:</strong> {loadingTypesString}
-            </>
-        ) : null;
+        return loadingTypesString ? <>Загрузка: {loadingTypesString}</> : null;
     };
 
     const paymentOptionsItem = () => {
@@ -63,7 +73,8 @@ const PersonalTransportAdProfile = ({
 
         return paymentOptionsString ? (
             <>
-                <strong>Условия:</strong> {paymentOptionsString}
+                {/* <strong>Условия:</strong>  */}
+                {paymentOptionsString}
             </>
         ) : null;
     };
@@ -74,23 +85,24 @@ const PersonalTransportAdProfile = ({
         const value = cutNumber(valueData);
 
         const valuePart = value ? (
-            <div>
-                <strong>Габариты: </strong>
+            <>
+                {/* <strong>Габариты: </strong> */}
                 {value}м<sup>3</sup> ({Number(truckHeight)}м x{' '}
                 {Number(truckWidth)}м x {Number(truckDepth)}м)
-            </div>
+            </>
         ) : null;
 
         const weightPart = truckWeight ? (
-            <div>
-                <strong>Тоннаж: </strong>
+            <>
+                {/* <strong>Тоннаж: </strong> */}
                 {Number(truckWeight)}т
-            </div>
+            </>
         ) : null;
 
         return (
             <>
                 {weightPart}
+                {', '}
                 {valuePart}
             </>
         );
@@ -109,39 +121,109 @@ const PersonalTransportAdProfile = ({
                         </div>
                         <div className={styles.routeDatePrice}>
                             <div className={`${styles.routeDatePriceRow}`}>
-                                <strong>Доступен:</strong> {availabilityDate}
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<CalendarDaysIcon />}
+                                        tooltipText='Дата готовности машины к перевозке'
+                                        size='24px'
+                                    />
+                                </div>
+                                <span>
+                                    <strong>{availabilityDate}</strong>
+                                </span>
                             </div>
                             <div className={`${styles.routeDatePriceRow}`}>
-                                <strong>Откуда:</strong> {departureCity}
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<MapPinIcon />}
+                                        tooltipText='Пункт отправления'
+                                        size='24px'
+                                    />
+                                </div>
+                                <span>
+                                    <strong>{departureCity}</strong>
+                                </span>
                             </div>
                             <div className={`${styles.routeDatePriceRow}`}>
-                                <strong>Куда:</strong> {destinationCity}
-                            </div>
-                            <div className={`${styles.routeDatePriceRow}`}>
-                                <strong>Цена:</strong>{' '}
-                                {formatNumber(String(price))} {paymentUnit}
-                            </div>
-                            <div className={`${styles.routeDatePriceRow}`}>
-                                {paymentOptionsItem()}
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<MapPinIcon />}
+                                        tooltipText='Пункт назначения'
+                                        size='24px'
+                                    />
+                                </div>
+                                <span>
+                                    <strong>{destinationCity}</strong>
+                                </span>
                             </div>
 
-                            <div className={styles.truck}>
-                                <div
-                                    className={`${styles.truckRow} ${styles.truckName}`}
-                                >
-                                    <strong>Марка: </strong>
-                                    {truckName}
+                            <div className={`${styles.separator}`}></div>
+
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<BanknotesIcon />}
+                                        tooltipText='Стоимость перевозки'
+                                        size='24px'
+                                    />
                                 </div>
-                                <div className={`${styles.truckRow}`}>
-                                    <strong>Тип: </strong>
-                                    {transportType}
+                                <span>
+                                    {formatNumber(String(price))} {paymentUnit}
+                                </span>
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<CreditCardIcon />}
+                                        tooltipText='Условия оплаты'
+                                        size='24px'
+                                    />
                                 </div>
-                                <div className={`${styles.truckRow}`}>
-                                    {truckWeightValue()}
+                                <span>{paymentOptionsItem()}</span>
+                            </div>
+
+                            <div className={`${styles.separator}`}></div>
+
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<TruckIcon />}
+                                        tooltipText='Марка автомобиля'
+                                        size='24px'
+                                    />
                                 </div>
-                                <div className={`${styles.truckRow}`}>
-                                    {loadingTypesItem()}
+                                <span>{truckName}</span>
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<CheckBadgeIcon />}
+                                        tooltipText='Тип кузова'
+                                        size='24px'
+                                    />
                                 </div>
+                                <span>{transportType}</span>
+                            </div>
+
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<ScaleIcon />}
+                                        tooltipText='Грузоподъемность и Габариты'
+                                        size='24px'
+                                    />
+                                </div>
+                                <span>{truckWeightValue()}</span>
+                            </div>
+                            <div className={`${styles.routeDatePriceRow}`}>
+                                <div className={`${styles.icon}`}>
+                                    <IconWithTooltip
+                                        icon={<ArrowsPointingInIcon />}
+                                        tooltipText='Доступные варианты загрузки'
+                                        size='24px'
+                                    />
+                                </div>
+                                <span> {loadingTypesItem()}</span>
                             </div>
                         </div>
                         <div className={styles.btns}>
