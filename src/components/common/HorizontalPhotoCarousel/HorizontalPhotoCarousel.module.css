@@ -35,11 +35,17 @@
     cursor: pointer;
     padding: 5px;
     z-index: 2;
+       color: #ff8000;
 }
 
 .arrowButton:hover {
-    background: rgba(255, 255, 255, 0.8);
-    color: #ff8000;
+    /* background: rgba(255, 255, 255, 0.8);
+    color: #ff8000; */
+       background: 
+       /* #ff8000; */
+       rgba(255, 132, 0, 0.6);
+       color: 
+       rgba(255, 255, 255, 0.8);
 }
 
 .arrowIcon {
