@@ -226,7 +226,7 @@ const PersonalTransportAdProfile = ({
                                 <span> {loadingTypesItem()}</span>
                             </div>
                         </div>
-                        <div className={styles.btns}>
+                        {/* <div className={styles.btns}>
                             <Button
                                 type='button'
                                 children='Удалить'
@@ -240,7 +240,7 @@ const PersonalTransportAdProfile = ({
                                 icon={<PencilSquareIcon />}
                                 className={styles.correctionBtn}
                             />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 

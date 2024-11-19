@@ -8,6 +8,7 @@ import UserContext from '../../hooks/UserContext';
 
 import PersonalTransportAdProfile from './PersonalTransportAdProfile';
 import OtherTransportAdProfile from './OtherTransportAdProfile';
+import AdEditMenu from '../AdEditMenu/AdEditMenu';
 
 const AdProfile = ({ ad }) => {
     const { isAuthenticated } = useContext(AuthContext);
@@ -29,6 +30,16 @@ const AdProfile = ({ ad }) => {
     return (
         <>
             <div>
+                <div
+                    style={{
+                        padding: '50px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <AdEditMenu />
+                </div>
+
                 {isAuthenticated && isUserLoaded && ownerId === user.userId ? (
                     <PersonalTransportAdProfile ad={ad} />
                 ) : (
