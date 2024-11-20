@@ -38,6 +38,7 @@ const UserSmallCard = ({
                     children='Написать'
                     icon={<ChatBubbleLeftRightIcon />}
                     onClick={onMessageClick}
+                    // onClick={() => console.log('в кнопке')}
                     type_btn='reverse'
                 />
             </div>

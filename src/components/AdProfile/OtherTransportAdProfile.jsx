@@ -348,7 +348,7 @@ const OtherTransportAdProfile = ({
                         photoUrl={ownerPhotoUrl}
                         rating={ownerRating}
                         name={ownerName}
-                        onClick={handleStartChat}
+                        onMessageClick={handleStartChat}
                         isLoading={false}
                     />
 

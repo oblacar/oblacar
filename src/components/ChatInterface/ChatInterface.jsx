@@ -26,21 +26,6 @@ const ChatInterface = ({ adId = null }) => {
 
             setDisplayedConversations(currentConversations);
         }
-
-        // if (!selectedConversation) {
-        //     return;
-        // }
-
-        // const conversationId = selectedConversation.conversationId;
-        // const conversation = conversations.find(
-        //     (con) => con.conversationId === conversationId
-        // );
-
-        // const conversation = displayedConversations.find(
-        //     (con) => con.conversationId === conversationId
-        // );
-
-        // setSelectedConversation(conversation);
     }, [conversations, adId, getConversationsByAdId]);
 
     useEffect(() => {
@@ -49,9 +34,6 @@ const ChatInterface = ({ adId = null }) => {
         }
 
         const conversationId = selectedConversation.conversationId;
-        // const conversation = conversations.find(
-        //     (con) => con.conversationId === conversationId
-        // );
 
         const conversation = displayedConversations.find(
             (con) => con.conversationId === conversationId
