@@ -1,5 +1,6 @@
 // src/components/ChatBox.js
 import React, { useEffect, useContext, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import ConversationContext from '../../../hooks/ConversationContext';
 
 import { XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
@@ -50,7 +51,7 @@ const ChatBox = ({
         sendMessage(adId, userId, chatPartnerId, text);
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div
             className='chatbox'
             ref={chatBoxRef}
@@ -85,7 +86,8 @@ const ChatBox = ({
             </div>
             <MessagesList messages={currentConversation?.messages || []} />
             <MessageInput onSend={handleSendMessage} />
-        </div>
+        </div>,
+        document.body // Рендерим чат в body
     );
 };
 

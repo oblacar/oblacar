@@ -17,6 +17,7 @@ const IncomingRequestsItem = ({
     userId,
     onDecline,
     onAccept,
+    onMessageClick,
 }) => {
     const { description, status } = request;
     const { name, photoUrl } = request.sender;
@@ -39,6 +40,13 @@ const IncomingRequestsItem = ({
                         rating={''}
                         name={name}
                         isLoading={false}
+                        onMessageClick={() =>
+                            onMessageClick({
+                                ownerName: request.sender.name,
+                                ownerPhotoUrl: request.sender.photoUrl,
+                                ownerId: request.sender.id,
+                            })
+                        }
                     />
                 </div>
                 <div className={styles.rightContainer}>

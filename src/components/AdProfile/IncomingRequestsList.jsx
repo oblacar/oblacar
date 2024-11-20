@@ -3,6 +3,7 @@ import TransportationContext from '../../hooks/TransportationContext';
 import UserContext from '../../hooks/UserContext';
 import styles from './IncomingRequestsList.module.css';
 import IncomingRequestsItem from './IncomingRequestsItem';
+import ChatBox from '../common/ChatBox/ChatBox';
 
 const IncomingRequestsList = ({ adId }) => {
     const {
@@ -18,6 +19,9 @@ const IncomingRequestsList = ({ adId }) => {
         setAdTransportationRequest(adTransportationRequest);
     }, [adsTransportationRequests, adId]);
 
+    const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
+    const [chatPartnerData, setChatPartnerData] = useState(null);
+
     if (!adTransportationRequest) {
         return <p>Запросы не найдены или данные объявления отсутствуют.</p>;
     }
@@ -32,25 +36,46 @@ const IncomingRequestsList = ({ adId }) => {
         console.log(`Подтверждение запроса: ${requestId}`);
     };
 
+    const handleStartChat = (userData) => {
+        setChatPartnerData(userData); // Устанавливаем данные о собеседнике
+        setIsChatBoxOpen(true); // Открываем чат
+    };
+
     return (
-        <div className={styles.requestsList}>
-            {(!requestsData || Object.keys(requestsData).length === 0) && (
-                <p>Запросы не найдены.</p>
-            )}
-            <div className={styles.listItems}>
-                {Object.entries(requestsData).map(([requestId, request]) => (
-                    <IncomingRequestsItem
-                        key={requestId}
-                        request={request}
-                        requestId={requestId}
-                        adId={adId}
-                        userId={user.userId}
-                        onDecline={handleDecline}
-                        onAccept={handleAccept}
-                    />
-                ))}
+        <>
+            <div className={styles.requestsList}>
+                {(!requestsData || Object.keys(requestsData).length === 0) && (
+                    <p>Запросы не найдены.</p>
+                )}
+                <div className={styles.listItems}>
+                    {Object.entries(requestsData).map(
+                        ([requestId, request]) => (
+                            <IncomingRequestsItem
+                                key={requestId}
+                                request={request}
+                                requestId={requestId}
+                                adId={adId}
+                                userId={user.userId}
+                                onDecline={handleDecline}
+                                onAccept={handleAccept}
+                                onMessageClick={(userData) =>
+                                    handleStartChat(userData)
+                                }
+                            />
+                        )
+                    )}
+                </div>
             </div>
-        </div>
+            {isChatBoxOpen && chatPartnerData && (
+                <ChatBox
+                    onClose={() => setIsChatBoxOpen(false)}
+                    adId={adId}
+                    chatPartnerName={chatPartnerData.ownerName}
+                    chatPartnerPhoto={chatPartnerData.ownerPhotoUrl}
+                    chatPartnerId={chatPartnerData.ownerId}
+                />
+            )}
+        </>
     );
 };
 
