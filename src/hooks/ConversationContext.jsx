@@ -137,6 +137,24 @@ export const ConversationProvider = ({ children }) => {
         setCurrentConversationBasicData(initialBasicConversationData);
     };
 
+    /**
+     * Возвращает массив разговоров, связанных с указанным номером объявления (adId).
+     *
+     * @param {string} adId - Идентификатор объявления для фильтрации.
+     * @param {Array} conversations - Массив разговоров.
+     * @returns {Array} - Массив разговоров с совпадающим adId, или пустой массив, если входные данные некорректны.
+     */
+    const getConversationsByAdId = (adId, conversations) => {
+        if (!adId || !Array.isArray(conversations)) {
+            console.error('Invalid adId or conversations array');
+            return [];
+        }
+
+        return conversations.filter(
+            (conversation) => conversation.adId === adId
+        );
+    };
+
     // Метод пытается получить "разговор" и записать его в "текщий разговор", если нет, то null
     const findConversation = async (adId, idParticipants) => {
         try {
@@ -330,6 +348,8 @@ export const ConversationProvider = ({ children }) => {
                 sendChatInterfaceMessage,
                 isConversationsLoaded,
                 unreadMessages,
+
+                getConversationsByAdId,
             }}
         >
             {children}

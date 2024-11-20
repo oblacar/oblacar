@@ -17,11 +17,16 @@ import {
     ArrowsPointingOutIcon,
     CloudIcon,
     CheckBadgeIcon,
+    CubeIcon,
+    EnvelopeIcon,
+    InboxArrowDownIcon,
 } from '@heroicons/react/24/outline';
 
 import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
 import Button from '../common/Button/Button';
 import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
+import ToggleSearchMode from '../common/ToggleSearchMode/ToggleSearchMode';
+import ChatInterface from '../ChatInterface/ChatInterface';
 
 const PersonalTransportAdProfile = ({
     ad,
@@ -37,6 +42,13 @@ const PersonalTransportAdProfile = ({
         }
     }, [ad]);
 
+    //Функционал для выбора, что показывыаем: Запросы или Сообщения--->
+    const [isSelectFirst, setIsSelectFirst] = useState(true);
+
+    const handleToggle = (isFirstSelected) => {
+        setIsSelectFirst(isFirstSelected);
+    };
+    //<---
     if (isLoading) {
         return <div className={styles.loading}>Загрузка объявления...</div>;
     }
@@ -246,8 +258,34 @@ const PersonalTransportAdProfile = ({
 
                 {/* Список запросов */}
                 <div className={styles.requests}>
-                    <strong>Запросы на перевозку</strong>
-                    <IncomingRequestsList adId={adId} />
+                    <div style={{ padding: '20px', marginBottom: '30px' }}>
+                        <ToggleSearchMode
+                            firstOption={{
+                                icon: <InboxArrowDownIcon />,
+                                label: 'Запросы',
+                            }}
+                            secondOption={{
+                                icon: <EnvelopeIcon />,
+                                label: 'Сообщения',
+                            }}
+                            isSelectFirst={isSelectFirst}
+                            onToggle={handleToggle}
+                        />
+                    </div>
+                    {isSelectFirst && (
+                        <>
+                            <strong>Запросы на перевозку</strong>
+
+                            <IncomingRequestsList adId={adId} />
+                        </>
+                    )}
+
+                    {!isSelectFirst && (
+                        <>
+                            <strong>Переписка по Вашему объявлению. </strong>
+                            <ChatInterface adId={adId} />
+                        </>
+                    )}
                 </div>
             </div>
         </div>

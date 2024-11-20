@@ -8,11 +8,40 @@ import ConversationContext from '../../hooks/ConversationContext';
 
 import './ChatInterface.css';
 
-const ChatInterface = () => {
+const ChatInterface = ({ adId = null }) => {
     const [selectedConversation, setSelectedConversation] = useState(null);
+    const [displayedConversations, setDisplayedConversations] = useState(null);
 
-    const { conversations, isConversationsLoaded } =
+    const { conversations, getConversationsByAdId, isConversationsLoaded } =
         useContext(ConversationContext);
+
+    useEffect(() => {
+        if (!adId) {
+            setDisplayedConversations(conversations);
+        } else {
+            const currentConversations = getConversationsByAdId(
+                adId,
+                conversations
+            );
+
+            setDisplayedConversations(currentConversations);
+        }
+
+        // if (!selectedConversation) {
+        //     return;
+        // }
+
+        // const conversationId = selectedConversation.conversationId;
+        // const conversation = conversations.find(
+        //     (con) => con.conversationId === conversationId
+        // );
+
+        // const conversation = displayedConversations.find(
+        //     (con) => con.conversationId === conversationId
+        // );
+
+        // setSelectedConversation(conversation);
+    }, [conversations, adId, getConversationsByAdId]);
 
     useEffect(() => {
         if (!selectedConversation) {
@@ -20,19 +49,26 @@ const ChatInterface = () => {
         }
 
         const conversationId = selectedConversation.conversationId;
-        const conversation = conversations.find(
+        // const conversation = conversations.find(
+        //     (con) => con.conversationId === conversationId
+        // );
+
+        const conversation = displayedConversations.find(
             (con) => con.conversationId === conversationId
         );
 
         setSelectedConversation(conversation);
-    }, [conversations]);
+    }, [displayedConversations, selectedConversation]);
 
     return (
         <>
             {isConversationsLoaded ? (
                 <div className='chat-interface'>
                     <ConversationList
-                        conversations={conversations ? conversations : []}
+                        // conversations={conversations ? conversations : []}
+                        conversations={
+                            displayedConversations ? displayedConversations : []
+                        }
                         onSelectConversation={setSelectedConversation}
                     />
                     <ActiveConversation conversation={selectedConversation} />

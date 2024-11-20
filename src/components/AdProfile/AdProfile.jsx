@@ -30,7 +30,7 @@ const AdProfile = ({ ad }) => {
     return (
         <>
             <div>
-                <div
+                {/* <div
                     style={{
                         padding: '50px',
                         display: 'flex',
@@ -38,8 +38,8 @@ const AdProfile = ({ ad }) => {
                     }}
                 >
                     <AdEditMenu />
-                </div>
-
+                </div> */}
+                {/* TODO сделать панель для свого объявления */}
                 {isAuthenticated && isUserLoaded && ownerId === user.userId ? (
                     <PersonalTransportAdProfile ad={ad} />
                 ) : (
