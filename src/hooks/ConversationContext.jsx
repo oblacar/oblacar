@@ -12,7 +12,7 @@ import { formatNumber } from '../utils/helper';
 const ConversationContext = createContext();
 
 export const ConversationProvider = ({ children }) => {
-    //conversations - диалоги для пользователя
+    //conversations - Расширенные диалоги для пользователя
     const [conversations, setConversations] = useState([]);
     const [isConversationsLoaded, setIsConversationsLoaded] = useState(false);
     const { isAuthenticated, userId } = useContext(AuthContext);
@@ -108,6 +108,8 @@ export const ConversationProvider = ({ children }) => {
     };
 
     // currentConversation - Расширенный conversation, где messages - это массив сообщений, а не только их id
+    // это очень важный стейт. Если он null то будет создаваться новый разговор.
+    // TODO - баг, если начать разговор из Запросов, то после перезагрузки не находит разговор.
     const [currentConversation, setCurrentConversation] = useState(null);
 
     // Основные данные разговора. Важно передавать данные в заданном формате
@@ -138,7 +140,8 @@ export const ConversationProvider = ({ children }) => {
     };
 
     /**
-     * Возвращает массив разговоров, связанных с указанным номером объявления (adId).
+     * Возвращает массив Расширенных разговоров из стейта,
+     * связанных с указанным номером объявления (adId).
      *
      * @param {string} adId - Идентификатор объявления для фильтрации.
      * @param {Array} conversations - Массив разговоров.
@@ -155,7 +158,9 @@ export const ConversationProvider = ({ children }) => {
         );
     };
 
-    // Метод пытается получить "разговор" и записать его в "текщий разговор", если нет, то null
+    // Метод пытается получить "разговор" из Сервиса (бд)
+    // и записать расширеный разговор в "текщий разговор", если нет, то null
+    // TODO проверяем...ы
     const findConversation = async (adId, idParticipants) => {
         try {
             // Проверка на наличие разговора по `adId`
@@ -250,22 +255,86 @@ export const ConversationProvider = ({ children }) => {
         }
     };
 
+    /**
+     * Получает расширенный разговор из массива conversations.
+     * @param {Array} conversations - Массив разговоров.
+     * @param {string} adId - ID объявления.
+     * @param {string} senderId - ID отправителя.
+     * @param {string} recipientId - ID получателя.
+     * @returns {Object|null} Расширенный разговор или null, если не найден.
+     */
+    const getExtendedConversation = (
+        conversations,
+        adId,
+        senderId,
+        recipientId
+    ) => {
+        if (
+            !Array.isArray(conversations) ||
+            !adId ||
+            !senderId ||
+            !recipientId
+        ) {
+            console.error('Некорректные параметры для поиска разговора.');
+            return null;
+        }
+
+        return (
+            conversations.find((conversation) => {
+                // Проверяем совпадение adId
+                if (conversation.adId !== adId) {
+                    return false;
+                }
+
+                // Проверяем участников разговора
+                const participantIds = conversation.participants.map(
+                    (p) => p.userId
+                );
+                return (
+                    participantIds.includes(senderId) &&
+                    participantIds.includes(recipientId)
+                );
+            }) || null
+        );
+    };
+
     // Метод отправки сообщений.
     // Очень важный метод, так как при первом отправлении создается conversation в коллекции
     const sendMessage = async (
         adId,
-        senderId,
-        recipientId,
+        // senderId,
+        // recipientId,
+
+        sender = {
+            userId: '',
+            userName: '',
+            userPhotoUrl: '',
+        },
+        recipient = {
+            userId: '',
+            userName: '',
+            userPhotoUrl: '',
+        },
+
         text,
         isDeliveryRequest = false
     ) => {
+        const test = {
+            adId: adId,
+            userId: sender.userId,
+            chatPartnerId: recipient.userId,
+            text: text,
+        };
+
+        console.log('Context: ', test);
+
         try {
             // Локально добавляем сообщение для мгновенного отображения
             const newMessage = {
                 messageId: `temp-${Date.now()}`, // Временный ID для локального отображения
                 conversationId: currentConversation?.conversationId || null, //TODO нужно сделать такой же метод для отправки из чата
-                senderId,
-                recipientId,
+                senderId: sender.userId,
+                recipientId: recipient.userId,
                 adId,
                 text,
                 timestamp: Date.now(),
@@ -274,10 +343,34 @@ export const ConversationProvider = ({ children }) => {
             };
 
             if (!currentConversation) {
+                //Нужно перепроверить, а точно ли нет currentConversation.
+                //Если все же есть в стейте, то обновим стейт текущего разговора.
+                const findedExtendedConversation = getExtendedConversation(
+                    conversations,
+                    adId,
+                    sender.userId,
+                    recipient.userId
+                );
+
+                setCurrentConversation(findedExtendedConversation);
+            }
+
+            if (!currentConversation) {
+                //Нужно перепроверить, а точно ли нет такого разговора в бд.
+                //Если все же есть, то обносить стейт текущего разговора.
+                findConversation(adId, [sender.userId, recipient.userId]);
+            }
+
+            if (!currentConversation) {
                 // Создаем расширенный разговор (ExtendedConversation) с полным массивом объектов сообщений
+                // const extendedConversation = new ExtendedConversation({
+                //     adId: currentConversationBasicData.adId,
+                //     participants: currentConversationBasicData.participants,
+                // });
+
                 const extendedConversation = new ExtendedConversation({
-                    adId: currentConversationBasicData.adId,
-                    participants: currentConversationBasicData.participants,
+                    adId: adId,
+                    participants: [sender, recipient],
                 });
 
                 setCurrentConversation(extendedConversation);
@@ -294,10 +387,24 @@ export const ConversationProvider = ({ children }) => {
 
             if (!conversationId) {
                 // Разговор не существует, создаем новый в фоне
+
+                console.log('adId: ', adId);
+
+                //    senderId,
+                //         recipientId,
+
+                const participants = [sender, recipient];
+
+                console.log('usery: ', participants);
+
                 const newConversation =
+                    // await ConversationService.createConversation(
+                    //     currentConversationBasicData.adId,
+                    //     currentConversationBasicData.participants
+                    // );
                     await ConversationService.createConversation(
-                        currentConversationBasicData.adId,
-                        currentConversationBasicData.participants
+                        adId,
+                        participants
                     );
 
                 conversationId = newConversation.conversationId;
@@ -313,8 +420,8 @@ export const ConversationProvider = ({ children }) => {
             // Сохраняем сообщение на сервере после создания разговора
             await ConversationService.addMessage(
                 conversationId,
-                senderId,
-                recipientId,
+                sender.userId,
+                recipient.userId,
                 adId,
                 text,
                 isDeliveryRequest

@@ -4,6 +4,7 @@ import UserContext from '../../hooks/UserContext';
 import styles from './IncomingRequestsList.module.css';
 import IncomingRequestsItem from './IncomingRequestsItem';
 import ChatBox from '../common/ChatBox/ChatBox';
+import ConversationContext from '../../hooks/ConversationContext';
 
 const IncomingRequestsList = ({ adId }) => {
     const {
@@ -12,6 +13,9 @@ const IncomingRequestsList = ({ adId }) => {
         declineTransportationRequest,
     } = useContext(TransportationContext);
     const { user } = useContext(UserContext);
+    const { setBasicConversationData, findConversation } =
+        useContext(ConversationContext);
+
     const [adTransportationRequest, setAdTransportationRequest] = useState();
 
     useEffect(() => {
@@ -38,6 +42,9 @@ const IncomingRequestsList = ({ adId }) => {
 
     const handleStartChat = (userData) => {
         setChatPartnerData(userData); // Устанавливаем данные о собеседнике
+
+        findConversation(adId, [userData.ownerId, user.userId]);
+
         setIsChatBoxOpen(true); // Открываем чат
     };
 

@@ -10,6 +10,7 @@ import MessageInput from './MessageInput/MessageInput';
 import './ChatBox.css';
 
 import AuthContext from '../../../hooks/Authorization/AuthContext';
+import UserContext from '../../../hooks/UserContext';
 
 const ChatBox = ({
     onClose,
@@ -18,9 +19,13 @@ const ChatBox = ({
     chatPartnerName = '',
     chatPartnerPhoto = '',
 }) => {
-    const { userId } = useContext(AuthContext);
-    const { currentConversation, sendMessage } =
-        useContext(ConversationContext);
+    const { user } = useContext(UserContext);
+    const {
+        currentConversation,
+        sendMessage,
+        setBasicConversationData,
+        findConversation,
+    } = useContext(ConversationContext);
 
     const [height, setHeight] = useState(400); // Начальная высота чата
     const chatBoxRef = useRef(null);
@@ -48,7 +53,31 @@ const ChatBox = ({
 
     //Отправка сообщений
     const handleSendMessage = (text) => {
-        sendMessage(adId, userId, chatPartnerId, text);
+        // const test = {
+        //     adId: adId,
+        //     userId: userId,
+        //     chatPartnerId: chatPartnerId,
+        //     text: text,
+        // };
+
+        // console.log('test: ', test);
+
+        const chatPartner1 = {
+            userId: user.userId,
+            userName: user.userName,
+            userPhotoUrl: user.userPhoto,
+        };
+        const chatPartner2 = {
+            userId: chatPartnerId,
+            userName: chatPartnerName,
+            userPhotoUrl: chatPartnerPhoto,
+        };
+
+        // setBasicConversationData(adId, [chatPartner1, chatPartner2]);
+
+        // findConversation(adId, [chatPartnerId, user.userId]);
+
+        sendMessage(adId, chatPartner1, chatPartner2, text);
     };
 
     return ReactDOM.createPortal(
