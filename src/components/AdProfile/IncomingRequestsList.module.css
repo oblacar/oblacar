@@ -69,3 +69,7 @@ div.description {
     align-items: center;
     gap: 10px; /* Расстояние между кнопками */
 }
+
+.listItems:last-child {
+    margin-bottom: 30px;
+}

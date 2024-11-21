@@ -8,6 +8,7 @@
         100vh - 140px
     ); /* Высота страницы с учетом фиксированного меню */
     background-color: #fcfcfc;
+
     overflow-y: hidden; /* Отключаем общий скролл */
 }
 
@@ -61,7 +62,7 @@
 .adContainer {
     margin-right: 2%;
     /* margin-left: 5%; */
-    width: 330px;
+    width: 330p;
 }
 
 .photoArea {
