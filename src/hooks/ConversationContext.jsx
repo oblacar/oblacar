@@ -101,6 +101,7 @@ export const ConversationProvider = ({ children }) => {
      * Используется при отправке сообщений из Чата Запросов и Объявлений
      * @param {Object} currentConversation - Текущий разговор, который нужно добавить или обновить.
      */
+    //TODO метод нужно изучить и возможно его в хуке обновления использовать, сейчас там код
     const updateConversationsState = (currentConversation) => {
         setConversations((prevConversations) => {
             if (!currentConversation || !currentConversation.conversationId) {
@@ -199,6 +200,7 @@ export const ConversationProvider = ({ children }) => {
     };
 
     // Основные данные разговора. Важно передавать данные в заданном формате
+    // TODO как информация - полезно, но не уверен, что мы с этим работаем
     const initialBasicConversationData = {
         adId: '',
         participants: [
@@ -214,13 +216,15 @@ export const ConversationProvider = ({ children }) => {
             },
         ],
     };
+
+    //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
     const [currentConversationBasicData, setCurrentConversationBasicData] =
         useState(initialBasicConversationData);
-
+    //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
     const setBasicConversationData = (basicConversationData) => {
         setCurrentConversationBasicData(basicConversationData);
     };
-
+    //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
     const clearBasicConversationData = () => {
         setCurrentConversationBasicData(initialBasicConversationData);
     };
@@ -247,7 +251,7 @@ export const ConversationProvider = ({ children }) => {
     // Метод пытается получить "разговор" из Сервиса (бд)
     // и записать расширеный разговор в "текщий разговор", если нет, то null
     // Сначала проверим разговор в Стейте, и вернем его в currentConversation
-    // TODO проверяем...ы
+    // TODO проверяем...Кажется. что сейчас этот метод не нужен, т.к. есть аналогичный setCurrentConversationState
 
     const findConversation = async (adId, idParticipants) => {
         try {

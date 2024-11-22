@@ -4,6 +4,8 @@
     flex-direction: column; /* Размещаем элементы вертикально */
     margin: 0 auto; /* Центрирование блока по горизонтали */
     text-align: center; /* Выравнивание текста внутри по центру */
+
+    height: 100%;
 }
 
 .transport-ad-profile-request-status-description {
@@ -13,10 +15,13 @@
     color: rgb(234, 79, 1);
     font-weight: 600;
     font-size: 18px;
+
+    flex-grow: 1; /* Занимает всё доступное вертикальное пространство */
+    overflow-y: auto; /* Если контента много, добавляет скролл */
 }
 
 .request-status-container {
-    margin-top: -20px;
+    /* margin-top: -20px; */
     display: flex;
     align-items: center;
     gap: 8px; /* Расстояние между иконкой и текстом */

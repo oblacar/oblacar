@@ -142,7 +142,7 @@ const OtherTransportAdProfile = ({
 
             setBasicConversationData(basicConversationData);
 
-            findConversation(adId, [ownerId, user.userId]);
+            // findConversation(adId, [ownerId, user.userId]);
 
             setCurrentConversationState(adId, user.userId, ownerId);
             // Очистка состояния при размонтировании компонента
