@@ -16,29 +16,37 @@ const Header = () => {
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (!entry.isIntersecting) {
-                    bottomLineRef.current.classList.add('fixed-bottom-line');
-                    document
-                        .querySelector('.header-padding')
-                        .classList.add('visible');
+                const bottomLineElement = bottomLineRef.current;
+                const headerPaddingElement =
+                    document.querySelector('.header-padding');
 
+                // Проверяем, что элементы существуют
+                if (!bottomLineElement || !headerPaddingElement) {
+                    console.warn('Required elements not found in DOM.');
+                    return;
+                }
+
+                if (!entry.isIntersecting) {
+                    bottomLineElement.classList.add('fixed-bottom-line');
+                    headerPaddingElement.classList.add('visible');
                     setIsNarrowHeader(() => true);
                 } else {
-                    bottomLineRef.current.classList.remove('fixed-bottom-line');
-                    document
-                        .querySelector('.header-padding')
-                        .classList.remove('visible');
-
+                    bottomLineElement.classList.remove('fixed-bottom-line');
+                    headerPaddingElement.classList.remove('visible');
                     setIsNarrowHeader(() => false);
                 }
             },
             { threshold: 0 }
         );
 
+        // Проверяем наличие nextLineRef.current перед наблюдением
         if (nextLineRef.current) {
             observer.observe(nextLineRef.current);
+        } else {
+            console.warn('nextLineRef is not set.');
         }
 
+        // Очищаем наблюдателя при размонтировании
         return () => {
             if (nextLineRef.current) {
                 observer.unobserve(nextLineRef.current);

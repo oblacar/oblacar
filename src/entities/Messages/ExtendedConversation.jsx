@@ -11,13 +11,18 @@
 //     availabilityDate: '2023-11-01',
 // });
 class ExtendedConversation {
-    constructor(conversationData, messages, adData) {
+    constructor(conversationData = {}, messages = [], adData = {}) {
+        // Если передан объект conversationData
         if (
             typeof conversationData === 'object' &&
             conversationData !== null &&
             !Array.isArray(conversationData)
         ) {
-            // Если передан объект conversationData в готовом виде
+            // console.log(
+            //     'Создание из готового объекта conversationData: ',
+            //     conversationData
+            // );
+
             this.conversationId = conversationData.conversationId || '';
             this.adId = conversationData.adId || '';
             this.availabilityDate = conversationData.availabilityDate || '';
@@ -28,8 +33,20 @@ class ExtendedConversation {
             this.participants = conversationData.participants || [];
             this.messages = conversationData.messages || [];
             this.lastMessage = conversationData.lastMessage || null;
-        } else if (conversationData && messages && adData) {
-            // Если переданы conversation, messages и adData как отдельные параметры
+        }
+        // Если переданы отдельные параметры conversationData, messages и adData
+        else if (
+            Object.keys(conversationData).length > 0 ||
+            messages.length > 0 ||
+            Object.keys(adData).length > 0
+        ) {
+            // console.log(
+            //     'Создание из отдельных параметров conversationData, messages, adData:'
+            // );
+            // console.log('conversationData:', conversationData);
+            // console.log('messages:', messages);
+            // console.log('adData:', adData);
+
             this.conversationId = conversationData.conversationId || '';
             this.adId = conversationData.adId || '';
             this.availabilityDate = adData.availabilityDate || '';
@@ -37,19 +54,32 @@ class ExtendedConversation {
             this.destinationCity = adData.destinationCity || '';
             this.priceAndPaymentUnit = `${adData.price || ''} ${
                 adData.paymentUnit || ''
-            }`;
+            }`.trim();
             this.participants = conversationData.participants || [];
             this.messages = messages || [];
             this.lastMessage = conversationData.lastMessage || null;
-        } else {
-            throw new Error(
-                'Invalid arguments passed to ExtendedConversation constructor'
-            );
         }
+        // Пустой объект
+        else {
+            // console.log('Создание пустого объекта ExtendedConversation');
+
+            this.conversationId = '';
+            this.adId = '';
+            this.availabilityDate = '';
+            this.departureCity = '';
+            this.destinationCity = '';
+            this.priceAndPaymentUnit = '';
+            this.participants = [];
+            this.messages = [];
+            this.lastMessage = null;
+        }
+
+        // console.log('Результат создания объекта:', this);
     }
 }
 
 export default ExtendedConversation;
+
 // // Примеры использования:
 
 // // 1. Создание из готового объекта conversationData

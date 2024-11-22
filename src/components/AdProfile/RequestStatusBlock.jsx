@@ -9,7 +9,6 @@ import {
     XMarkIcon,
     PencilIcon,
 } from '@heroicons/react/24/outline';
-// check - circle;
 
 const RequestStatusBlock = ({
     status,
@@ -21,7 +20,9 @@ const RequestStatusBlock = ({
         <div className='transport-ad-profile-request-status'>
             <strong>Статус вашего запроса:</strong>
             <p>"{adTransportationRequest.requestData.description}"</p>
-            <p className='transport-ad-profile-request-status-info'>
+
+            {/* Отдельный блок для информации о статусе */}
+            <div className='transport-ad-profile-request-status-info'>
                 {status === 'pending' && (
                     <div className='request-status-container pending'>
                         <CheckCircleIcon className='request-status-icon' />
@@ -29,12 +30,16 @@ const RequestStatusBlock = ({
                     </div>
                 )}
 
-                {status === 'accepted' &&
-                    'Ваш запрос принят! Свяжитесь с владельцем для деталей.'}
-                {status === 'declined' && 'Ваш запрос отклонен владельцем.'}
-                {/* 
-                {status === 'cancelled' &&
-                    'Вы отменили запрос! Но вы можете отправить новый запрос.'} */}
+                {status === 'accepted' && (
+                    <span>
+                        Ваш запрос принят! Свяжитесь с владельцем для деталей.
+                    </span>
+                )}
+
+                {status === 'declined' && (
+                    <span>Ваш запрос отклонен владельцем.</span>
+                )}
+
                 {status === 'cancelled' && (
                     <div className='request-status-container cancelled'>
                         <XCircleIcon className='request-status-icon' />
@@ -45,18 +50,22 @@ const RequestStatusBlock = ({
                     </div>
                 )}
 
-                {status === 'inProgress' && 'Перевозка в процессе.'}
-                {status === 'completed' && 'Перевозка завершена.'}
-                {status === 'failed' && 'Перевозка завершена с ошибкой.'}
-            </p>
+                {status === 'inProgress' && <span>Перевозка в процессе.</span>}
 
+                {status === 'completed' && <span>Перевозка завершена.</span>}
+
+                {status === 'failed' && (
+                    <span>Перевозка завершена с ошибкой.</span>
+                )}
+            </div>
+
+            {/* Кнопки действий */}
             {status === 'pending' && (
                 <Button
                     type='button'
                     type_btn='reverse-no'
                     children='Отменить запрос'
                     onClick={onCancelRequest}
-                    // icon={<XCircleIcon />}
                     icon={<XMarkIcon />}
                 />
             )}

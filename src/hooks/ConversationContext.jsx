@@ -37,13 +37,50 @@ export const ConversationProvider = ({ children }) => {
 
     useEffect(() => {
         if (currentConversation) {
-            console.log('Стейт currentConv: ', currentConversation);
+            console.log(
+                '>> useEffect срабатывает при изменении currentConversation'
+            );
+            console.log('Текущий разговор:', currentConversation);
 
-            console.log('Стейт c-s: ', conversations);
+            setConversations((prevConversations) => {
+                const index = prevConversations.findIndex(
+                    (conv) =>
+                        conv.conversationId ===
+                        currentConversation.conversationId
+                );
 
-            // updateConversationsState(currentConversation);
+                if (index === -1) {
+                    console.log(
+                        'Разговор отсутствует в списке, добавляем новый'
+                    );
+                    return [...prevConversations, currentConversation];
+                }
+
+                console.log(
+                    'Обновляем существующий разговор по индексу:',
+                    index
+                );
+                return prevConversations.map((conv, i) =>
+                    i === index
+                        ? {
+                              ...conv,
+                              messages: [...currentConversation.messages],
+                          }
+                        : conv
+                );
+            });
+
+            console.log('Обновлен conversations:', conversations);
+        } else {
+            console.log(
+                'currentConversation отсутствует, обновления conversations не требуется'
+            );
         }
-    }, [currentConversation, conversations]);
+    }, [currentConversation]);
+
+    useEffect(() => {
+        console.log('отслеживаем объект: ', currentConversation);
+    }, [currentConversation]);
 
     const getUnreadMessagesByUserId = async (userId) => {
         try {
@@ -258,6 +295,11 @@ export const ConversationProvider = ({ children }) => {
                 messages: messages,
             });
 
+            console.log(
+                'Расширенный разговор из поиска: ',
+                extendedConversation
+            );
+
             // Устанавливаем разговор в currentConversation
             setCurrentConversation(extendedConversation);
         } catch (error) {
@@ -403,13 +445,29 @@ export const ConversationProvider = ({ children }) => {
         );
     };
 
+    //Очищаем Текущий разговор. Нужно использовать выходе из компоненты
+    const clearCurrentConversation = () => {
+        setCurrentConversation(null);
+    };
+
+    //Очищаем Текущий разговор. Нужно использовать выходе из компоненты
+    const setCurrentConversationState = (adId, senderId, recipientId) => {
+        // conversations,
+
+        const extendedConversation = getExtendedConversation(
+            conversations,
+            adId,
+            senderId,
+            recipientId
+        );
+
+        setCurrentConversation(extendedConversation);
+    };
+
     // Метод отправки сообщений.
     // Очень важный метод, так как при первом отправлении создается conversation в коллекции
     const sendMessage = async (
         adId,
-        // senderId,
-        // recipientId,
-
         sender = {
             userId: '',
             userName: '',
@@ -420,15 +478,16 @@ export const ConversationProvider = ({ children }) => {
             userName: '',
             userPhotoUrl: '',
         },
-
         text,
         isDeliveryRequest = false
     ) => {
         try {
-            // Локально добавляем сообщение для мгновенного отображения
+            console.log('>> Начало sendMessage');
+            console.log('Параметры:', { adId, sender, recipient, text });
+
             const newMessage = {
-                messageId: `temp-${Date.now()}`, // Временный ID для локального отображения
-                conversationId: currentConversation?.conversationId || null, //TODO нужно сделать такой же метод для отправки из чата
+                messageId: `temp-${Date.now()}`,
+                conversationId: currentConversation?.conversationId || null,
                 senderId: sender.userId,
                 recipientId: recipient.userId,
                 adId,
@@ -438,121 +497,153 @@ export const ConversationProvider = ({ children }) => {
                 isDeliveryRequest,
             };
 
-            // console.log('Мы в sendMessage');
+            console.log('Новое сообщение:', newMessage);
 
-            // if (currentConversation)
-            //     console.log('текущий разговор есть: ', currentConversation);
+            let conversation = new ExtendedConversation();
+            conversation = currentConversation;
 
-            if (!currentConversation) {
-                //Нужно перепроверить, а точно ли нет currentConversation.
-                //Если все же есть в стейте, то обновим стейт текущего разговора.
-                const findedExtendedConversation = getExtendedConversation(
+            console.log(
+                'Проверим есть ли currentConversation: ',
+                currentConversation
+            );
+
+            if (!conversation) {
+                console.log(
+                    'Текущий разговор отсутствует, ищем в локальном списке...'
+                );
+                conversation = getExtendedConversation(
                     conversations,
                     adId,
                     sender.userId,
                     recipient.userId
                 );
 
-                // console.log(
-                //     'Разговора нет в списке разговоров: ',
-                //     findedExtendedConversation
-                // );
+                console.log('В локальном списке: ', conversation);
 
-                setCurrentConversation(findedExtendedConversation);
+                if (!conversation) {
+                    console.log(
+                        'Разговор отсутствует в локальном списке, проверяем в базе...'
+                    );
+                    //TODO тут может идти смена типа объекта. Нужно возвращать или превращать в расширенный разговор
+                    conversation =
+                        await ConversationService.getConversationByAdIdAndParticipantsId(
+                            adId,
+                            [sender.userId, recipient.userId]
+                        );
+
+                    console.log('В базе: ', conversation);
+
+                    if (!conversation) {
+                        console.log(
+                            'Разговор отсутствует в базе, создаем новый...'
+                        );
+
+                        const participants = [sender, recipient];
+
+                        const newConversation =
+                            await ConversationService.createConversation(
+                                adId,
+                                participants
+                            );
+
+                        console.log(
+                            'Ответ от createConversation:',
+                            newConversation
+                        );
+
+                        // Если переданы conversation, messages и adData как отдельные параметры
+                        // this.availabilityDate = adData.availabilityDate || '';
+                        // this.departureCity = adData.departureCity || '';
+                        // this.destinationCity = adData.destinationCity || '';
+                        // this.priceAndPaymentUnit = `${adData.price || ''} ${
+                        //     adData.paymentUnit || ''
+                        // }`;
+
+                        // *this.conversationId =
+                        //     conversationData.conversationId || '';
+                        // *this.adId = conversationData.adId || '';
+                        // *this.participants = conversationData.participants || [];
+                        // *this.lastMessage = conversationData.lastMessage || null;
+
+                        // this.messages = messages || [];
+
+                        // Создаем новый объект ExtendedConversation
+                        const newExtendedConversation =
+                            new ExtendedConversation();
+
+                        newExtendedConversation.conversationId =
+                            newConversation.conversationId;
+                        newExtendedConversation.adId = newConversation.adId;
+                        newExtendedConversation.participants = [
+                            sender,
+                            recipient,
+                        ];
+                        newExtendedConversation.lastMessage = '';
+                        newExtendedConversation.availabilityDate = '';
+                        newExtendedConversation.departureCity = '';
+                        newExtendedConversation.destinationCity = '';
+                        newExtendedConversation.messages = [];
+
+                        conversation = newExtendedConversation;
+
+                        // const extendedConversation = new ExtendedConversation({
+                        //     conversationData: {
+                        //         conversationId: newConversation.conversationId,
+                        //         adId: newConversation.adId,
+                        //         participants: participants,
+                        //         lastMessage: '', // Пока нет последнего сообщения
+
+                        //         availabilityDate: '',
+                        //         departureCity: '',
+                        //         destinationCity: '',
+                        //         priceAndPaymentUnit: '',
+                        //         messages: '',
+                        //     },
+                        //     // messages: [newMessage], // Сразу добавляем новое сообщение
+                        // messages: [],
+                        // adData: {
+                        //     availabilityDate: '',
+                        //     departureCity: '',
+                        //     destinationCity: '',
+                        //     price: '',
+                        //     paymentUnit: '',
+                        // },
+
+                        console.log(
+                            'Создан новый ExtendedConversation:',
+                            conversation
+                        );
+
+                        // Обновляем текущий разговор
+                        // setCurrentConversation(conversation);
+
+                        // Добавляем в список разговоров
+                        // setConversations((prevConversations) => [
+                        //     ...prevConversations,
+                        //     extendedConversation,
+                        // ]);
+                    }
+                }
             }
 
-            if (!currentConversation) {
-                //Нужно перепроверить, а точно ли нет такого разговора в бд.
-                //Если все же есть, то обносить стейт текущего разговора.
+            console.log('Текущий разговор после поиска:', conversation);
 
-                findConversation(adId, [sender.userId, recipient.userId]);
-
-                console.log(
-                    'Поискали разговор в массиве, добавил: ',
-                    currentConversation
-                );
-            }
-
-            if (!currentConversation) {
-                // Создаем расширенный разговор (ExtendedConversation) с полным массивом объектов сообщений
-                // const extendedConversation = new ExtendedConversation({
-                //     adId: currentConversationBasicData.adId,
-                //     participants: currentConversationBasicData.participants,
-                // });
-
-                //TODO Сейчас неправильно создается Новый Расширенный разговор.
-                //Мы его делаем здесь для ускорения, а асинхронно загружаем в БД
-                const extendedConversation = new ExtendedConversation({
-                    adId: adId,
-                    participants: [sender, recipient],
-                });
-
-                console.log(
-                    'Разговора нет. Создали и добавили в стей: ',
-                    extendedConversation
-                );
-
-                setCurrentConversation(extendedConversation);
-            }
-
-            // Обновляем локальный интерфейс чата
-            setCurrentConversation((prevConversation) => ({
-                ...prevConversation,
-                messages: [...(prevConversation?.messages || []), newMessage],
+            // setCurrentConversation((prev) => ({
+            //     ...conversation,
+            //     messages: [...(conversation?.messages || []), newMessage],
+            // }));
+            setCurrentConversation((prev) => ({
+                ...conversation,
+                messages: [...(prev?.messages || []), newMessage],
             }));
 
-            // Проверяем существование разговора
-            let conversationId = currentConversation?.conversationId;
+            // console.log('Обновлен currentConversation:', {
+            //     ...conversation,
+            //     messages: [...(conversation?.messages || []), newMessage],
+            // });
 
-            if (!conversationId) {
-                //TODO мне кажется, что этот блок проверки дублирует логику сверху.
-                // Нужно проверять логи, заходит ли сюда вообще.
-                // Разговор не существует, создаем новый в фоне
-
-                console.log('adId: ', adId);
-
-                //    senderId,
-                //         recipientId,
-
-                const participants = [sender, recipient];
-
-                console.log('usery: ', participants);
-
-                const newConversation =
-                    // await ConversationService.createConversation(
-                    //     currentConversationBasicData.adId,
-                    //     currentConversationBasicData.participants
-                    // );
-                    await ConversationService.createConversation(
-                        adId,
-                        participants
-                    );
-
-                conversationId = newConversation.conversationId;
-
-                // Сохраняем текущий расширенный разговор в состоянии
-                setCurrentConversation((prevConversation) => ({
-                    ...prevConversation,
-                    conversationId: conversationId,
-                }));
-                // setCurrentConversation(extendedConversation);
-            }
-
-            // Обновляем локальный интерфейс чата - метод скопирован из отправки из чата
-            setConversations((prevConversations) =>
-                prevConversations.map((conv) =>
-                    conv.conversationId === currentConversation.conversationId
-                        ? {
-                              ...conv,
-                              messages: [...conv.messages, newMessage],
-                          }
-                        : conv
-                )
-            );
-
-            // Сохраняем сообщение на сервере после создания разговора
             await ConversationService.addMessage(
-                conversationId,
+                conversation.conversationId,
                 sender.userId,
                 recipient.userId,
                 adId,
@@ -560,10 +651,9 @@ export const ConversationProvider = ({ children }) => {
                 isDeliveryRequest
             );
 
-            console.log('Сообщение отправлено и сохранено в базе');
+            console.log('Сообщение успешно сохранено в базе');
         } catch (error) {
             console.error('Ошибка при отправке сообщения:', error);
-            // Дополнительно: можно добавить обработку ошибки для уведомления пользователя
         }
     };
 
@@ -590,6 +680,9 @@ export const ConversationProvider = ({ children }) => {
                 unreadMessages,
 
                 getConversationsByAdId,
+
+                clearCurrentConversation,
+                setCurrentConversationState,
             }}
         >
             {children}

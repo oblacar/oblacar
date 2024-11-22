@@ -25,11 +25,18 @@ const ChatBox = ({
         sendMessage,
         setBasicConversationData,
         findConversation,
+
+        clearCurrentConversation,
     } = useContext(ConversationContext);
 
     const [height, setHeight] = useState(400); // Начальная высота чата
     const chatBoxRef = useRef(null);
     const startYRef = useRef(0); // Используем useRef для стартовой позиции
+
+    const handleClose = () => {
+        clearCurrentConversation(); // Выполняем дополнительную логику
+        if (onClose) onClose(); // Вызываем переданный обработчик
+    };
 
     /// Растягивание области чата мышкой--->>>
     const handleMouseDown = (e) => {
@@ -110,7 +117,7 @@ const ChatBox = ({
 
                 <XMarkIcon
                     className='close-chat-icon-btn'
-                    onClick={onClose}
+                    onClick={handleClose}
                 />
             </div>
             <MessagesList messages={currentConversation?.messages || []} />

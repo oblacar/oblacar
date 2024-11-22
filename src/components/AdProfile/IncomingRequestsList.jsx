@@ -13,8 +13,12 @@ const IncomingRequestsList = ({ adId }) => {
         declineTransportationRequest,
     } = useContext(TransportationContext);
     const { user } = useContext(UserContext);
-    const { setBasicConversationData, findConversation } =
-        useContext(ConversationContext);
+    const {
+        setBasicConversationData,
+        findConversation,
+
+        setCurrentConversationState,
+    } = useContext(ConversationContext);
 
     const [adTransportationRequest, setAdTransportationRequest] = useState();
 
@@ -43,7 +47,9 @@ const IncomingRequestsList = ({ adId }) => {
     const handleStartChat = (userData) => {
         setChatPartnerData(userData); // Устанавливаем данные о собеседнике
 
-        findConversation(adId, [userData.ownerId, user.userId]);
+        // findConversation(adId, [userData.ownerId, user.userId]);
+
+        setCurrentConversationState(adId, userData.ownerId, user.userId);
 
         setIsChatBoxOpen(true); // Открываем чат
     };

@@ -19,6 +19,7 @@ const ConversationService = {
     // Метод createConversation создает новый разговор в базе данных
     // Создаем новый разговор в концепции объектов.
     // метод createConversation, который преобразует participants в объект с userId в качестве ключа:
+    // не совсем понимаю, зачем мы собеседников в объект переделываем... но пока пусть будет так.
     // -+ проходит тестирование
     async createConversation(adId, participantsArray) {
         console.log('Проверка данных перед созданием разговора:', {
@@ -57,6 +58,7 @@ const ConversationService = {
                 'Разговор успешно создан с ID:',
                 conversationData.conversationId
             );
+
             return conversationData;
         } catch (error) {
             console.error('Ошибка при создании разговора:', error);

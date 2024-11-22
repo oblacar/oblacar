@@ -32,6 +32,9 @@ const OtherTransportAdProfile = ({
         clearConversation,
         setBasicConversationData,
         clearBasicConversationData,
+
+        setCurrentConversationState,
+        clearCurrentConversation,
     } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
     const {
@@ -141,10 +144,13 @@ const OtherTransportAdProfile = ({
 
             findConversation(adId, [ownerId, user.userId]);
 
+            setCurrentConversationState(adId, user.userId, ownerId);
             // Очистка состояния при размонтировании компонента
             return () => {
                 clearConversation();
                 clearBasicConversationData();
+                //TODO отлаживаем обновления стейтов
+                // clearCurrentConversation();
             };
         },
         // eslint-disable-next-line
