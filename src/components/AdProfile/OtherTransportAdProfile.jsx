@@ -29,16 +29,9 @@ const OtherTransportAdProfile = ({
 }) => {
     const {
         currentConversation,
-        // findConversation,
-
-        clearConversation,
-        setBasicConversationData,
-        clearBasicConversationData,
 
         setCurrentConversationState,
         isConversationsInitialized,
-
-        clearCurrentConversation,
     } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
     const {
@@ -130,26 +123,6 @@ const OtherTransportAdProfile = ({
 
     useEffect(
         () => {
-            // const basicConversationData = {
-            //     adId: ad.adId,
-            //     participants: [
-            //         {
-            //             userId: ownerId,
-            //             userName: ownerName,
-            //             userPhotoUrl: ownerPhotoUrl,
-            //         },
-            //         {
-            //             userId: user.userId,
-            //             userName: user.userName,
-            //             userPhotoUrl: user.userPhoto,
-            //         },
-            //     ],
-            // };
-
-            // setBasicConversationData(basicConversationData);
-
-            // findConversation(adId, [ownerId, user.userId]);
-
             if (isConversationsInitialized) {
                 setCurrentConversationState(adId, user.userId, ownerId);
                 setIsModalBackShow(false);

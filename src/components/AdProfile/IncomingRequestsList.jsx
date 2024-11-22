@@ -5,7 +5,7 @@ import styles from './IncomingRequestsList.module.css';
 import IncomingRequestsItem from './IncomingRequestsItem';
 import ChatBox from '../common/ChatBox/ChatBox';
 import ConversationContext from '../../hooks/ConversationContext';
-import Preloader from '../common/Preloader/Preloader';
+
 import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
 import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
 
@@ -17,9 +17,6 @@ const IncomingRequestsList = ({ adId }) => {
     } = useContext(TransportationContext);
     const { user } = useContext(UserContext);
     const {
-        setBasicConversationData,
-        // findConversation,
-
         isConversationsInitialized,
         setCurrentConversationState,
     } = useContext(ConversationContext);
@@ -73,17 +70,12 @@ const IncomingRequestsList = ({ adId }) => {
     const handleStartChat = (userData) => {
         setChatPartnerData(userData); // Устанавливаем данные о собеседнике
 
-        // findConversation(adId, [userData.ownerId, user.userId]);
-
-        // setConversationData();
-
         const baseConversationData = {
             adId: adId,
             ownerId: userData.ownerId,
             userId: user.userId,
         };
         setConversationData(baseConversationData);
-        // setCurrentConversationState(adId, userData.ownerId, user.userId);
 
         setIsChatBoxOpen(true); // Открываем чат
 
@@ -131,13 +123,6 @@ const IncomingRequestsList = ({ adId }) => {
                     chatPartnerId={chatPartnerData.ownerId}
                 />
             )}
-            {/* {isChatBoxOpen &&
-                chatPartnerData &&
-                !isConversationsInitialized && (
-                    <>
-                        <Preloader /> <p>загружается разговор...</p>
-                    </>
-                )} */}
 
             {isModalBackShow && (
                 <ModalBackdrop

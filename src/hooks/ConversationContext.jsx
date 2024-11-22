@@ -48,11 +48,6 @@ export const ConversationProvider = ({ children }) => {
 
     useEffect(() => {
         if (currentConversation) {
-            console.log(
-                '>> useEffect срабатывает при изменении currentConversation'
-            );
-            console.log('Текущий разговор:', currentConversation);
-
             setConversations((prevConversations) => {
                 const index = prevConversations.findIndex(
                     (conv) =>
@@ -61,16 +56,9 @@ export const ConversationProvider = ({ children }) => {
                 );
 
                 if (index === -1) {
-                    console.log(
-                        'Разговор отсутствует в списке, добавляем новый'
-                    );
                     return [...prevConversations, currentConversation];
                 }
 
-                console.log(
-                    'Обновляем существующий разговор по индексу:',
-                    index
-                );
                 return prevConversations.map((conv, i) =>
                     i === index
                         ? {
@@ -80,8 +68,6 @@ export const ConversationProvider = ({ children }) => {
                         : conv
                 );
             });
-
-            console.log('Обновлен conversations:', conversations);
         } else {
             console.log(
                 'currentConversation отсутствует, обновления conversations не требуется'
@@ -229,16 +215,16 @@ export const ConversationProvider = ({ children }) => {
     };
 
     //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
-    const [currentConversationBasicData, setCurrentConversationBasicData] =
-        useState(initialBasicConversationData);
-    //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
-    const setBasicConversationData = (basicConversationData) => {
-        setCurrentConversationBasicData(basicConversationData);
-    };
-    //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
-    const clearBasicConversationData = () => {
-        setCurrentConversationBasicData(initialBasicConversationData);
-    };
+    // const [currentConversationBasicData, setCurrentConversationBasicData] =
+    //     useState(initialBasicConversationData);
+    // //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
+    // const setBasicConversationData = (basicConversationData) => {
+    //     setCurrentConversationBasicData(basicConversationData);
+    // };
+    // //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
+    // const clearBasicConversationData = () => {
+    //     setCurrentConversationBasicData(initialBasicConversationData);
+    // };
 
     /**
      * Возвращает массив Расширенных разговоров из стейта,
@@ -263,69 +249,27 @@ export const ConversationProvider = ({ children }) => {
     // и записать расширеный разговор в "текщий разговор", если нет, то null
     // Сначала проверим разговор в Стейте, и вернем его в currentConversation
     // TODO проверяем...Кажется. что сейчас этот метод не нужен, т.к. есть аналогичный setCurrentConversationState
-
-    const findConversation = async (adId, idParticipants) => {
-        try {
-            // Проверяем сначала в локальном массиве conversations
-            const localConversation = conversations.find((conversation) => {
-                return (
-                    conversation.adId === adId &&
-                    idParticipants.every((id) =>
-                        conversation.participants.some(
-                            (participant) => participant.userId === id
-                        )
-                    )
-                );
-            });
-
-            if (localConversation) {
-                // Если разговор найден локально, устанавливаем его в currentConversation
-                setCurrentConversation(localConversation);
-                return;
-            }
-            //TODO блок формирования нового разговора нужно еще проверять
-            // Если разговор не найден локально, ищем в базе данных через сервис
-            const conversation =
-                await ConversationService.getConversationByAdIdAndParticipantsId(
-                    adId,
-                    idParticipants
-                );
-
-            if (!conversation) {
-                setCurrentConversation(null);
-                return;
-            }
-
-            // Получаем массив сообщений для существующего conversation из базы
-            const messages =
-                await ConversationService.getMessagesByConversationId(
-                    conversation.conversationId
-                );
-
-            // Создаём расширенный разговор
-            const extendedConversation = new ExtendedConversation({
-                conversationId: conversation.conversationId,
-                adId: conversation.adId,
-                participants: conversation.participants,
-                messages: messages,
-            });
-
-            console.log(
-                'Расширенный разговор из поиска: ',
-                extendedConversation
-            );
-
-            // Устанавливаем разговор в currentConversation
-            setCurrentConversation(extendedConversation);
-        } catch (error) {
-            console.error('Ошибка при поиске разговора:', error);
-            setCurrentConversation(null); // Сбрасываем состояние в случае ошибки
-        }
-    };
-
     // const findConversation = async (adId, idParticipants) => {
     //     try {
-    //         // Проверка на наличие разговора по `adId`
+    //         // Проверяем сначала в локальном массиве conversations
+    //         const localConversation = conversations.find((conversation) => {
+    //             return (
+    //                 conversation.adId === adId &&
+    //                 idParticipants.every((id) =>
+    //                     conversation.participants.some(
+    //                         (participant) => participant.userId === id
+    //                     )
+    //                 )
+    //             );
+    //         });
+
+    //         if (localConversation) {
+    //             // Если разговор найден локально, устанавливаем его в currentConversation
+    //             setCurrentConversation(localConversation);
+    //             return;
+    //         }
+    //         //TODO блок формирования нового разговора нужно еще проверять
+    //         // Если разговор не найден локально, ищем в базе данных через сервис
     //         const conversation =
     //             await ConversationService.getConversationByAdIdAndParticipantsId(
     //                 adId,
@@ -337,12 +281,13 @@ export const ConversationProvider = ({ children }) => {
     //             return;
     //         }
 
-    //         //Получаем массив сообщений для существующего conversation
+    //         // Получаем массив сообщений для существующего conversation из базы
     //         const messages =
     //             await ConversationService.getMessagesByConversationId(
     //                 conversation.conversationId
     //             );
 
+    //         // Создаём расширенный разговор
     //         const extendedConversation = new ExtendedConversation({
     //             conversationId: conversation.conversationId,
     //             adId: conversation.adId,
@@ -350,10 +295,16 @@ export const ConversationProvider = ({ children }) => {
     //             messages: messages,
     //         });
 
+    //         console.log(
+    //             'Расширенный разговор из поиска: ',
+    //             extendedConversation
+    //         );
+
+    //         // Устанавливаем разговор в currentConversation
     //         setCurrentConversation(extendedConversation);
     //     } catch (error) {
     //         console.error('Ошибка при поиске разговора:', error);
-    //         setCurrentConversation(null); // Обрабатываем ошибку, сбрасывая состояние
+    //         setCurrentConversation(null); // Сбрасываем состояние в случае ошибки
     //     }
     // };
 
@@ -467,8 +418,6 @@ export const ConversationProvider = ({ children }) => {
 
     //Очищаем Текущий разговор. Нужно использовать выходе из компоненты
     const setCurrentConversationState = (adId, senderId, recipientId) => {
-        // conversations,
-
         const extendedConversation = getExtendedConversation(
             conversations,
             adId,
@@ -497,9 +446,6 @@ export const ConversationProvider = ({ children }) => {
         isDeliveryRequest = false
     ) => {
         try {
-            console.log('>> Начало sendMessage');
-            console.log('Параметры:', { adId, sender, recipient, text });
-
             const newMessage = {
                 messageId: `temp-${Date.now()}`,
                 conversationId: currentConversation?.conversationId || null,
@@ -512,20 +458,10 @@ export const ConversationProvider = ({ children }) => {
                 isDeliveryRequest,
             };
 
-            console.log('Новое сообщение:', newMessage);
-
             let conversation = new ExtendedConversation();
             conversation = currentConversation;
 
-            console.log(
-                'Проверим есть ли currentConversation: ',
-                currentConversation
-            );
-
             if (!conversation) {
-                console.log(
-                    'Текущий разговор отсутствует, ищем в локальном списке...'
-                );
                 conversation = getExtendedConversation(
                     conversations,
                     adId,
@@ -533,26 +469,14 @@ export const ConversationProvider = ({ children }) => {
                     recipient.userId
                 );
 
-                console.log('В локальном списке: ', conversation);
-
                 if (!conversation) {
-                    console.log(
-                        'Разговор отсутствует в локальном списке, проверяем в базе...'
-                    );
-                    //TODO тут может идти смена типа объекта. Нужно возвращать или превращать в расширенный разговор
                     conversation =
                         await ConversationService.getConversationByAdIdAndParticipantsId(
                             adId,
                             [sender.userId, recipient.userId]
                         );
 
-                    console.log('В базе: ', conversation);
-
                     if (!conversation) {
-                        console.log(
-                            'Разговор отсутствует в базе, создаем новый...'
-                        );
-
                         const participants = [sender, recipient];
 
                         const newConversation =
@@ -560,27 +484,6 @@ export const ConversationProvider = ({ children }) => {
                                 adId,
                                 participants
                             );
-
-                        console.log(
-                            'Ответ от createConversation:',
-                            newConversation
-                        );
-
-                        // Если переданы conversation, messages и adData как отдельные параметры
-                        // this.availabilityDate = adData.availabilityDate || '';
-                        // this.departureCity = adData.departureCity || '';
-                        // this.destinationCity = adData.destinationCity || '';
-                        // this.priceAndPaymentUnit = `${adData.price || ''} ${
-                        //     adData.paymentUnit || ''
-                        // }`;
-
-                        // *this.conversationId =
-                        //     conversationData.conversationId || '';
-                        // *this.adId = conversationData.adId || '';
-                        // *this.participants = conversationData.participants || [];
-                        // *this.lastMessage = conversationData.lastMessage || null;
-
-                        // this.messages = messages || [];
 
                         // Создаем новый объект ExtendedConversation
                         const newExtendedConversation =
@@ -600,62 +503,14 @@ export const ConversationProvider = ({ children }) => {
                         newExtendedConversation.messages = [];
 
                         conversation = newExtendedConversation;
-
-                        // const extendedConversation = new ExtendedConversation({
-                        //     conversationData: {
-                        //         conversationId: newConversation.conversationId,
-                        //         adId: newConversation.adId,
-                        //         participants: participants,
-                        //         lastMessage: '', // Пока нет последнего сообщения
-
-                        //         availabilityDate: '',
-                        //         departureCity: '',
-                        //         destinationCity: '',
-                        //         priceAndPaymentUnit: '',
-                        //         messages: '',
-                        //     },
-                        //     // messages: [newMessage], // Сразу добавляем новое сообщение
-                        // messages: [],
-                        // adData: {
-                        //     availabilityDate: '',
-                        //     departureCity: '',
-                        //     destinationCity: '',
-                        //     price: '',
-                        //     paymentUnit: '',
-                        // },
-
-                        console.log(
-                            'Создан новый ExtendedConversation:',
-                            conversation
-                        );
-
-                        // Обновляем текущий разговор
-                        // setCurrentConversation(conversation);
-
-                        // Добавляем в список разговоров
-                        // setConversations((prevConversations) => [
-                        //     ...prevConversations,
-                        //     extendedConversation,
-                        // ]);
                     }
                 }
             }
 
-            console.log('Текущий разговор после поиска:', conversation);
-
-            // setCurrentConversation((prev) => ({
-            //     ...conversation,
-            //     messages: [...(conversation?.messages || []), newMessage],
-            // }));
             setCurrentConversation((prev) => ({
                 ...conversation,
                 messages: [...(prev?.messages || []), newMessage],
             }));
-
-            // console.log('Обновлен currentConversation:', {
-            //     ...conversation,
-            //     messages: [...(conversation?.messages || []), newMessage],
-            // });
 
             await ConversationService.addMessage(
                 conversation.conversationId,
@@ -680,8 +535,8 @@ export const ConversationProvider = ({ children }) => {
                 sendMessage,
 
                 // методы задающие базовые данные для разговора
-                setBasicConversationData,
-                clearBasicConversationData,
+                // setBasicConversationData,
+                // clearBasicConversationData,
                 //Методы для чат-листа
                 conversations,
                 getUserConversations,

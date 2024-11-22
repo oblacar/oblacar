@@ -9,7 +9,6 @@ import MessagesList from './MessagesList/MessagesList';
 import MessageInput from './MessageInput/MessageInput';
 import './ChatBox.css';
 
-import AuthContext from '../../../hooks/Authorization/AuthContext';
 import UserContext from '../../../hooks/UserContext';
 
 const ChatBox = ({
@@ -23,8 +22,6 @@ const ChatBox = ({
     const {
         currentConversation,
         sendMessage,
-        // setBasicConversationData,
-        // findConversation,
 
         clearCurrentConversation,
     } = useContext(ConversationContext);
@@ -48,7 +45,17 @@ const ChatBox = ({
 
     const handleMouseMove = (e) => {
         const deltaY = startYRef.current - e.clientY; // Смещение мыши вверх/вниз
-        setHeight((prevHeight) => Math.max(200, prevHeight + deltaY));
+
+        setHeight((prevHeight) => {
+            // Ограничение минимальной и максимальной высоты
+            const newHeight = prevHeight + deltaY;
+
+            const maxHeight = window.innerHeight - 40; // Верхний край окна не выше 100px от верхней границы
+            const minHeight = 200; // Минимальная высота чата
+
+            return Math.max(minHeight, Math.min(maxHeight, newHeight));
+        });
+
         startYRef.current = e.clientY; // Обновляем позицию мыши для плавного изменения
     };
 
@@ -60,15 +67,6 @@ const ChatBox = ({
 
     //Отправка сообщений
     const handleSendMessage = (text) => {
-        // const test = {
-        //     adId: adId,
-        //     userId: userId,
-        //     chatPartnerId: chatPartnerId,
-        //     text: text,
-        // };
-
-        // console.log('test: ', test);
-
         const chatPartner1 = {
             userId: user.userId,
             userName: user.userName,
@@ -79,10 +77,6 @@ const ChatBox = ({
             userName: chatPartnerName,
             userPhotoUrl: chatPartnerPhoto,
         };
-
-        // setBasicConversationData(adId, [chatPartner1, chatPartner2]);
-
-        // findConversation(adId, [chatPartnerId, user.userId]);
 
         sendMessage(adId, chatPartner1, chatPartner2, text);
     };
