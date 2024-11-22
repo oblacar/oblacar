@@ -6,6 +6,8 @@ import IncomingRequestsItem from './IncomingRequestsItem';
 import ChatBox from '../common/ChatBox/ChatBox';
 import ConversationContext from '../../hooks/ConversationContext';
 import Preloader from '../common/Preloader/Preloader';
+import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
+import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
 
 const IncomingRequestsList = ({ adId }) => {
     const {
@@ -26,6 +28,8 @@ const IncomingRequestsList = ({ adId }) => {
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [chatPartnerData, setChatPartnerData] = useState(null);
 
+    const [isModalBackShow, setIsModalBackShow] = useState(false);
+
     // стейт данный для разговора. Нужен, что бы применить, когда разговоры прогрузятся на сайте.
     // в обычном режиме все будет происходить быстро, но сразу после перезагрузки, будет пауза
     // для этого используем стейт.
@@ -42,6 +46,8 @@ const IncomingRequestsList = ({ adId }) => {
                 conversationData.ownerId,
                 conversationData.userId
             );
+
+            setIsModalBackShow(false);
         }
     }, [isConversationsInitialized, isChatBoxOpen]);
 
@@ -80,6 +86,15 @@ const IncomingRequestsList = ({ adId }) => {
         // setCurrentConversationState(adId, userData.ownerId, user.userId);
 
         setIsChatBoxOpen(true); // Открываем чат
+
+        if (!isConversationsInitialized) {
+            setIsModalBackShow(true);
+        }
+    };
+
+    const handleCloseModalBack = () => {
+        setIsModalBackShow(false);
+        setIsChatBoxOpen(false);
     };
 
     return (
@@ -116,13 +131,20 @@ const IncomingRequestsList = ({ adId }) => {
                     chatPartnerId={chatPartnerData.ownerId}
                 />
             )}
-            {isChatBoxOpen &&
+            {/* {isChatBoxOpen &&
                 chatPartnerData &&
                 !isConversationsInitialized && (
                     <>
                         <Preloader /> <p>загружается разговор...</p>
                     </>
-                )}
+                )} */}
+
+            {isModalBackShow && (
+                <ModalBackdrop
+                    children={<ConversationLoadingInfo />}
+                    onClose={handleCloseModalBack}
+                />
+            )}
         </>
     );
 };

@@ -18,6 +18,8 @@ import ChatBox from '../common/ChatBox/ChatBox';
 import Preloader from '../common/Preloader/Preloader';
 import RequestStatusBlock from './RequestStatusBlock';
 import UserSmallCard from '../common/UserSmallCard/UserSmallCard';
+import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
+import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
 
 const OtherTransportAdProfile = ({
     ad,
@@ -82,6 +84,8 @@ const OtherTransportAdProfile = ({
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [isModalBackShow, setIsModalBackShow] = useState(false);
+
     const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
     const [requestId, setRequestId] = useState(null);
@@ -126,37 +130,33 @@ const OtherTransportAdProfile = ({
 
     useEffect(
         () => {
-            const basicConversationData = {
-                adId: ad.adId,
-                participants: [
-                    {
-                        userId: ownerId,
-                        userName: ownerName,
-                        userPhotoUrl: ownerPhotoUrl,
-                    },
-                    {
-                        userId: user.userId,
-                        userName: user.userName,
-                        userPhotoUrl: user.userPhoto,
-                    },
-                ],
-            };
+            // const basicConversationData = {
+            //     adId: ad.adId,
+            //     participants: [
+            //         {
+            //             userId: ownerId,
+            //             userName: ownerName,
+            //             userPhotoUrl: ownerPhotoUrl,
+            //         },
+            //         {
+            //             userId: user.userId,
+            //             userName: user.userName,
+            //             userPhotoUrl: user.userPhoto,
+            //         },
+            //     ],
+            // };
 
             // setBasicConversationData(basicConversationData);
 
             // findConversation(adId, [ownerId, user.userId]);
 
-            setCurrentConversationState(adId, user.userId, ownerId);
-            // Очистка состояния при размонтировании компонента
-            return () => {
-                // clearConversation();
-                // clearBasicConversationData();
-                //TODO отлаживаем обновления стейтов
-                // clearCurrentConversation();
-            };
+            if (isConversationsInitialized) {
+                setCurrentConversationState(adId, user.userId, ownerId);
+                setIsModalBackShow(false);
+            }
         },
         // eslint-disable-next-line
-        [isConversationsInitialized]
+        [isConversationsInitialized, user, ownerId]
     );
 
     useEffect(() => {
@@ -222,6 +222,10 @@ const OtherTransportAdProfile = ({
         setIsLoadingConversation(true);
 
         setIsChatBoxOpen(true);
+
+        if (!isConversationsInitialized) {
+            setIsModalBackShow(true);
+        }
     };
 
     //==>>
@@ -307,6 +311,11 @@ const OtherTransportAdProfile = ({
     };
 
     //<<==
+
+    const handleCloseModalBack = () => {
+        setIsModalBackShow(false);
+        setIsChatBoxOpen(false);
+    };
 
     return (
         <>
@@ -412,10 +421,11 @@ const OtherTransportAdProfile = ({
                     chatPartnerId={ownerId}
                 />
             )}
-            {isChatBoxOpen && !isConversationsInitialized && (
-                <>
-                    <Preloader /> <p>загружается разговор...</p>
-                </>
+            {isModalBackShow && (
+                <ModalBackdrop
+                    children={<ConversationLoadingInfo />}
+                    onClose={handleCloseModalBack}
+                />
             )}
         </>
     );

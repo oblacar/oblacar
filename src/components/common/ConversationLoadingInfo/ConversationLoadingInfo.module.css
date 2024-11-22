@@ -1,0 +1,8 @@
+.preloaderContainer {
+    height: 100px;
+    display: flex;
+    flex-direction: column; /* Размещаем элементы вертикально */
+    justify-content: center; /* Центрируем по вертикали */
+    align-items: center; /* Центрируем по горизонтали */
+    text-align: center; /* Центрируем текст */
+}
