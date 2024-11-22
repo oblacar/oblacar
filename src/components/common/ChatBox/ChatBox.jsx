@@ -23,8 +23,8 @@ const ChatBox = ({
     const {
         currentConversation,
         sendMessage,
-        setBasicConversationData,
-        findConversation,
+        // setBasicConversationData,
+        // findConversation,
 
         clearCurrentConversation,
     } = useContext(ConversationContext);

@@ -23,6 +23,10 @@ export const ConversationProvider = ({ children }) => {
     // TODO - баг, если начать разговор из Запросов, то после перезагрузки не находит разговор.
     const [currentConversation, setCurrentConversation] = useState(null);
 
+    // Флаг готовности контекста. Является событием для прогрузки разговоров: текущего и вообще
+    const [isConversationsInitialized, setConversationsIsInitialized] =
+        useState(false);
+
     useEffect(() => {
         if (isAuthenticated) {
             setIsConversationsLoaded(false);
@@ -34,6 +38,13 @@ export const ConversationProvider = ({ children }) => {
             setUnreadMessages([]);
         }
     }, [isAuthenticated, userId]);
+
+    // Устанавливаем флаг `isInitialized`, если пользователь и разговоры готовы
+    useEffect(() => {
+        if (isAuthenticated && userId && conversations.length > 0) {
+            setConversationsIsInitialized(true);
+        }
+    }, [isAuthenticated, userId, conversations]);
 
     useEffect(() => {
         if (currentConversation) {
@@ -661,17 +672,12 @@ export const ConversationProvider = ({ children }) => {
         }
     };
 
-    const clearConversation = () => {
-        setCurrentConversation(null);
-    };
-
     return (
         <ConversationContext.Provider
             value={{
-                findConversation,
+                // findConversation,
                 currentConversation,
                 sendMessage,
-                clearConversation,
 
                 // методы задающие базовые данные для разговора
                 setBasicConversationData,
@@ -687,6 +693,8 @@ export const ConversationProvider = ({ children }) => {
 
                 clearCurrentConversation,
                 setCurrentConversationState,
+
+                isConversationsInitialized,
             }}
         >
             {children}

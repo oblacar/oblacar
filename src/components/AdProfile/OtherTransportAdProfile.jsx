@@ -27,13 +27,15 @@ const OtherTransportAdProfile = ({
 }) => {
     const {
         currentConversation,
-        findConversation,
+        // findConversation,
 
         clearConversation,
         setBasicConversationData,
         clearBasicConversationData,
 
         setCurrentConversationState,
+        isConversationsInitialized,
+
         clearCurrentConversation,
     } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
@@ -140,21 +142,21 @@ const OtherTransportAdProfile = ({
                 ],
             };
 
-            setBasicConversationData(basicConversationData);
+            // setBasicConversationData(basicConversationData);
 
             // findConversation(adId, [ownerId, user.userId]);
 
             setCurrentConversationState(adId, user.userId, ownerId);
             // Очистка состояния при размонтировании компонента
             return () => {
-                clearConversation();
-                clearBasicConversationData();
+                // clearConversation();
+                // clearBasicConversationData();
                 //TODO отлаживаем обновления стейтов
                 // clearCurrentConversation();
             };
         },
         // eslint-disable-next-line
-        []
+        [isConversationsInitialized]
     );
 
     useEffect(() => {
@@ -401,7 +403,7 @@ const OtherTransportAdProfile = ({
                 </div>
             </div>
 
-            {isChatBoxOpen && (
+            {isChatBoxOpen && isConversationsInitialized && (
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
                     adId={ad.adId}
@@ -409,6 +411,11 @@ const OtherTransportAdProfile = ({
                     chatPartnerPhoto={ownerPhotoUrl}
                     chatPartnerId={ownerId}
                 />
+            )}
+            {isChatBoxOpen && !isConversationsInitialized && (
+                <>
+                    <Preloader /> <p>загружается разговор...</p>
+                </>
             )}
         </>
     );
