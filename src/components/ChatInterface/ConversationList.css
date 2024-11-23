@@ -43,6 +43,12 @@
     cursor: pointer;
     border-radius: 5px 0px 0px 5px;
     transition: background-color 0.3s;
+
+    position: relative;
+}
+
+.conversation-item:hover {
+    background-color: #c7e7f4;
 }
 
 .conversation-item.selected {
@@ -51,6 +57,36 @@
     -webkit-box-shadow: -7px 3px 10px -2px rgba(34, 60, 80, 0.49);
     -moz-box-shadow: -7px 3px 10px -2px rgba(34, 60, 80, 0.49);
     box-shadow: -7px 3px 10px -2px rgba(34, 60, 80, 0.49);
+
+    cursor: default;
+}
+.count-unread-messages-container {
+    position: absolute;
+    left: 0px;
+    top: 10px;
+    min-width: 20px;
+    height: 20px;
+
+    border-radius: 10px 10px 0px 10px;
+
+    background-color: rgb(255, 255, 255);
+
+    /* border: 1px solid rgb(195, 173, 232); */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    -webkit-box-shadow: -1px 1px 8px 0px rgba(34, 60, 80, 0.29);
+    -moz-box-shadow: -1px 1px 8px 0px rgba(34, 60, 80, 0.29);
+    box-shadow: -1px 1px 8px 0px rgba(34, 60, 80, 0.29);
+}
+
+.count-unread-messages {
+    color: #ff3300;
+    font-size: 14px; /* Укажите размер шрифта для более точного отображения */
+    line-height: 1; /* Уменьшите межстрочный интервал, чтобы текст лучше центрировался */
+    font-weight: 600;
 }
 
 .conversation-photo {

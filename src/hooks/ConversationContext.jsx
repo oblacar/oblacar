@@ -528,6 +528,28 @@ export const ConversationProvider = ({ children }) => {
         }
     };
 
+    /**
+     * Возвращает количество непрочитанных сообщений для конкретного объявления и получателя.
+     * Статический метод для оторажения количества непрочитанных сообщений, например, в диалогах.
+     * @param {Array} messages - Массив сообщений.
+     * @param {string} adId - ID объявления.
+     * @param {string} recipientId - ID получателя.
+     * @returns {number} - Количество непрочитанных сообщений.
+     */
+    const countUnreadMessages = (messages, adId, recipientId) => {
+        if (!Array.isArray(messages)) {
+            console.error('messages должен быть массивом');
+            return 0;
+        }
+
+        return messages.filter(
+            (message) =>
+                message.adId === adId &&
+                message.recipientId === recipientId &&
+                !message.isRead
+        ).length;
+    };
+
     return (
         <ConversationContext.Provider
             value={{
@@ -549,6 +571,8 @@ export const ConversationProvider = ({ children }) => {
 
                 clearCurrentConversation,
                 setCurrentConversationState,
+
+                countUnreadMessages,
             }}
         >
             {children}

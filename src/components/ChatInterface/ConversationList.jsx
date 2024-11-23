@@ -1,10 +1,13 @@
 // ConversationList.js
 import React, { useContext, useState, useEffect } from 'react';
+
 import './ConversationList.css';
 import UserContext from '../../hooks/UserContext';
+import ConversationContext from '../../hooks/ConversationContext';
 
 const ConversationList = ({ onSelectConversation, conversations }) => {
     const { user } = useContext(UserContext);
+    const { countUnreadMessages } = useContext(ConversationContext);
 
     const [selectedConversationId, setSelectedConversationId] = useState(null);
 
@@ -25,6 +28,13 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
 
                     const isSelected =
                         selectedConversationId === conversation.conversationId;
+
+                    const countUserUnreadMessages = countUnreadMessages(
+                        conversation.messages,
+                        conversation.adId,
+                        user.userId // Используем ID текущего пользователя как получателя
+                    );
+
                     return (
                         <div
                             key={conversation.conversationId}
@@ -53,15 +63,22 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
                                         ].userName
                                     }
                                 </p>
-                                
+
                                 <h4>{conversation.availabilityDate}</h4>
                                 <h4>
                                     {conversation.departureCity} -{' '}
                                     {conversation.destinationCity}
                                 </h4>
                                 <p>{conversation.priceAndPaymentUnit}</p>
-
                             </div>
+
+                            {countUserUnreadMessages && (
+                                <div className='count-unread-messages-container'>
+                                    <div className='count-unread-messages'>
+                                        {countUserUnreadMessages}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     );
                 })}
