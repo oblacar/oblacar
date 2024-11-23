@@ -388,7 +388,16 @@ const OtherTransportAdProfile = ({
             {isChatBoxOpen && isConversationsLoaded && (
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
-                    adId={ad.adId}
+                    // adId={ad.adId}
+
+                    adData={{
+                        adId: adId,
+                        availabilityDate: availabilityDate,
+                        departureCity: departureCity,
+                        destinationCity: destinationCity,
+                        priceAndPaymentUnit:
+                            formatNumber(String(price)) + ' ' + paymentUnit,
+                    }}
                     chatPartnerName={ownerName}
                     chatPartnerPhoto={ownerPhotoUrl}
                     chatPartnerId={ownerId}

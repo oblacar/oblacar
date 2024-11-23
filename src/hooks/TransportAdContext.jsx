@@ -12,6 +12,8 @@ export const TransportAdProvider = ({ children }) => {
     // const { user } = useContext(AuthContext);//TODO for relocated on UserContext
     const { userId } = useContext(AuthContext);
     const { user, isUserLoaded } = useContext(UserContext);
+
+    //стейт расширенных объявлений
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

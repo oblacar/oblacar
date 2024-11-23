@@ -13,7 +13,15 @@ import UserContext from '../../../hooks/UserContext';
 
 const ChatBox = ({
     onClose,
-    adId,
+
+    adData = {
+        adId: '',
+        availabilityDate: '',
+        departureCity: '',
+        destinationCity: '',
+        priceAndPaymentUnit: '',
+    },
+
     chatPartnerId = '',
     chatPartnerName = '',
     chatPartnerPhoto = '',
@@ -78,7 +86,7 @@ const ChatBox = ({
             userPhotoUrl: chatPartnerPhoto,
         };
 
-        sendMessage(adId, chatPartner1, chatPartner2, text);
+        sendMessage(adData, chatPartner1, chatPartner2, text);
     };
 
     return ReactDOM.createPortal(

@@ -5,6 +5,9 @@ import styles from './IncomingRequestsList.module.css';
 import IncomingRequestsItem from './IncomingRequestsItem';
 import ChatBox from '../common/ChatBox/ChatBox';
 import ConversationContext from '../../hooks/ConversationContext';
+import TransportAdContext from '../../hooks/TransportAdContext';
+
+import { formatNumber } from '../../utils/helper';
 
 import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
 import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
@@ -16,16 +19,24 @@ const IncomingRequestsList = ({ adId }) => {
         declineTransportationRequest,
     } = useContext(TransportationContext);
     const { user } = useContext(UserContext);
-    const {
-        isConversationsLoaded,
-        setCurrentConversationState,
-    } = useContext(ConversationContext);
+    const { isConversationsLoaded, setCurrentConversationState } =
+        useContext(ConversationContext);
+    const { getAdById } = useContext(TransportAdContext);
 
     const [adTransportationRequest, setAdTransportationRequest] = useState();
     const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
     const [chatPartnerData, setChatPartnerData] = useState(null);
 
     const [isModalBackShow, setIsModalBackShow] = useState(false);
+
+    //Собираем основные данные объявления для отображения в чатах
+    const [adData, setAdData] = useState({
+        adId: '',
+        availabilityDate: '',
+        departureCity: '',
+        destinationCity: '',
+        priceAndPaymentUnit: '',
+    });
 
     // стейт данный для разговора. Нужен, что бы применить, когда разговоры прогрузятся на сайте.
     // в обычном режиме все будет происходить быстро, но сразу после перезагрузки, будет пауза
@@ -51,6 +62,21 @@ const IncomingRequestsList = ({ adId }) => {
     useEffect(() => {
         const adTransportationRequest = getAdTransportationRequestsByAdId(adId);
         setAdTransportationRequest(adTransportationRequest);
+
+        if (adId) {
+            const ad = getAdById(adId);
+
+            const priceAndPaymentUnit =
+                formatNumber(String(ad.ad.price)) + ' ' + ad.ad.paymentUnit;
+
+            setAdData({
+                adId: ad.ad.adId,
+                availabilityDate: ad.ad.availabilityDate,
+                departureCity: ad.ad.departureCity,
+                destinationCity: ad.ad.destinationCity,
+                priceAndPaymentUnit: priceAndPaymentUnit,
+            });
+        }
     }, [adsTransportationRequests, adId]);
 
     if (!adTransportationRequest) {
@@ -117,7 +143,8 @@ const IncomingRequestsList = ({ adId }) => {
             {isChatBoxOpen && chatPartnerData && isConversationsLoaded && (
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
-                    adId={adId}
+                    // adId={adId}
+                    adData={adData}
                     chatPartnerName={chatPartnerData.ownerName}
                     chatPartnerPhoto={chatPartnerData.ownerPhotoUrl}
                     chatPartnerId={chatPartnerData.ownerId}

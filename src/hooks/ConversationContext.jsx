@@ -411,8 +411,16 @@ export const ConversationProvider = ({ children }) => {
 
     // Метод отправки сообщений.
     // Очень важный метод, так как при первом отправлении создается conversation в коллекции
+    //TODO меняем метод на получение базовой информации об объявлении
     const sendMessage = async (
-        adId,
+        // adId,
+        adData = {
+            adId: '',
+            availabilityDate: '',
+            departureCity: '',
+            destinationCity: '',
+            priceAndPaymentUnit: '',
+        },
         sender = {
             userId: '',
             userName: '',
@@ -426,6 +434,14 @@ export const ConversationProvider = ({ children }) => {
         text,
         isDeliveryRequest = false
     ) => {
+        const {
+            adId,
+            availabilityDate,
+            departureCity,
+            destinationCity,
+            priceAndPaymentUnit,
+        } = adData;
+
         try {
             const newMessage = {
                 messageId: `temp-${Date.now()}`,
@@ -478,10 +494,14 @@ export const ConversationProvider = ({ children }) => {
                             recipient,
                         ];
                         newExtendedConversation.lastMessage = '';
-                        newExtendedConversation.availabilityDate = '';
-                        newExtendedConversation.departureCity = '';
-                        newExtendedConversation.destinationCity = '';
+                        newExtendedConversation.availabilityDate =
+                            availabilityDate;
+                        newExtendedConversation.departureCity = departureCity;
+                        newExtendedConversation.destinationCity =
+                            destinationCity;
                         newExtendedConversation.messages = [];
+                        newExtendedConversation.priceAndPaymentUnit =
+                            priceAndPaymentUnit;
 
                         conversation = newExtendedConversation;
                     }
