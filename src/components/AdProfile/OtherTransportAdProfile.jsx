@@ -31,7 +31,7 @@ const OtherTransportAdProfile = ({
         currentConversation,
 
         setCurrentConversationState,
-        isConversationsInitialized,
+        isConversationsLoaded,
     } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
     const {
@@ -123,13 +123,13 @@ const OtherTransportAdProfile = ({
 
     useEffect(
         () => {
-            if (isConversationsInitialized) {
+            if (isConversationsLoaded) {
                 setCurrentConversationState(adId, user.userId, ownerId);
                 setIsModalBackShow(false);
             }
         },
         // eslint-disable-next-line
-        [isConversationsInitialized, user, ownerId]
+        [isConversationsLoaded, user, ownerId]
     );
 
     useEffect(() => {
@@ -196,7 +196,7 @@ const OtherTransportAdProfile = ({
 
         setIsChatBoxOpen(true);
 
-        if (!isConversationsInitialized) {
+        if (!isConversationsLoaded) {
             setIsModalBackShow(true);
         }
     };
@@ -385,7 +385,7 @@ const OtherTransportAdProfile = ({
                 </div>
             </div>
 
-            {isChatBoxOpen && isConversationsInitialized && (
+            {isChatBoxOpen && isConversationsLoaded && (
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
                     adId={ad.adId}

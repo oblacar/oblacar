@@ -50,7 +50,7 @@ const ChatBox = ({
             // Ограничение минимальной и максимальной высоты
             const newHeight = prevHeight + deltaY;
 
-            const maxHeight = window.innerHeight - 40; // Верхний край окна не выше 100px от верхней границы
+            const maxHeight = window.innerHeight - 40; // Верхний край окна не выше 40px от верхней границы
             const minHeight = 200; // Минимальная высота чата
 
             return Math.max(minHeight, Math.min(maxHeight, newHeight));

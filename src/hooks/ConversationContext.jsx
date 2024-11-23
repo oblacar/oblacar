@@ -5,7 +5,6 @@ import TransportAdService from '../services/TransportAdService';
 import ExtendedConversation from '../entities/Messages/ExtendedConversation';
 
 import AuthContext from './Authorization/AuthContext';
-import UserContext from './UserContext';
 
 import { formatNumber } from '../utils/helper';
 
@@ -14,18 +13,15 @@ const ConversationContext = createContext();
 export const ConversationProvider = ({ children }) => {
     //conversations - Расширенные диалоги для пользователя
     const [conversations, setConversations] = useState([]);
-    const [isConversationsLoaded, setIsConversationsLoaded] = useState(false);
-    const { isAuthenticated, userId } = useContext(AuthContext);
-    // const { user } = useContext(UserContext);
-    const [unreadMessages, setUnreadMessages] = useState([]);
-    // currentConversation - Расширенный conversation, где messages - это массив сообщений, а не только их id
-    // это очень важный стейт. Если он null то будет создаваться новый разговор.
-    // TODO - баг, если начать разговор из Запросов, то после перезагрузки не находит разговор.
-    const [currentConversation, setCurrentConversation] = useState(null);
 
     // Флаг готовности контекста. Является событием для прогрузки разговоров: текущего и вообще
-    const [isConversationsInitialized, setConversationsIsInitialized] =
-        useState(false);
+    const [isConversationsLoaded, setIsConversationsLoaded] = useState(false);
+    const { isAuthenticated, userId } = useContext(AuthContext);
+    const [unreadMessages, setUnreadMessages] = useState([]);
+
+    // currentConversation - Расширенный conversation, где messages - это массив сообщений, а не только их id
+    // это очень важный стейт. Если он null то будет создаваться новый разговор.
+    const [currentConversation, setCurrentConversation] = useState(null);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -38,13 +34,6 @@ export const ConversationProvider = ({ children }) => {
             setUnreadMessages([]);
         }
     }, [isAuthenticated, userId]);
-
-    // Устанавливаем флаг `isInitialized`, если пользователь и разговоры готовы
-    useEffect(() => {
-        if (isAuthenticated && userId && conversations.length > 0) {
-            setConversationsIsInitialized(true);
-        }
-    }, [isAuthenticated, userId, conversations]);
 
     useEffect(() => {
         if (currentConversation) {
@@ -75,16 +64,10 @@ export const ConversationProvider = ({ children }) => {
         }
     }, [currentConversation]);
 
-    useEffect(() => {
-        console.log('отслеживаем объект: ', currentConversation);
-    }, [currentConversation]);
-
     const getUnreadMessagesByUserId = async (userId) => {
         try {
             const unreadMessages =
                 await ConversationService.getUnreadMessagesByUserId(userId);
-
-            console.log('unreadMessages: ', unreadMessages);
 
             setUnreadMessages(unreadMessages);
         } catch (error) {
@@ -163,8 +146,6 @@ export const ConversationProvider = ({ children }) => {
                     paymentUnit,
                 } = adData || {}; // Если данных нет, значения будут undefined
 
-                console.log('messages для расширенного объекта:', messages);
-
                 //Получаем массив сообщений для массива Id messages
                 const conversationMessages =
                     await ConversationService.getMessagesByIds(messages);
@@ -198,21 +179,21 @@ export const ConversationProvider = ({ children }) => {
 
     // Основные данные разговора. Важно передавать данные в заданном формате
     // TODO как информация - полезно, но не уверен, что мы с этим работаем
-    const initialBasicConversationData = {
-        adId: '',
-        participants: [
-            {
-                userId: '',
-                userName: '',
-                userPhotoUrl: '',
-            },
-            {
-                userId: '',
-                userName: '',
-                userPhotoUrl: '',
-            },
-        ],
-    };
+    // const initialBasicConversationData = {
+    //     adId: '',
+    //     participants: [
+    //         {
+    //             userId: '',
+    //             userName: '',
+    //             userPhotoUrl: '',
+    //         },
+    //         {
+    //             userId: '',
+    //             userName: '',
+    //             userPhotoUrl: '',
+    //         },
+    //     ],
+    // };
 
     //TODO Это тоже нужно проверить, кажется, что мы эти данные не используем
     // const [currentConversationBasicData, setCurrentConversationBasicData] =
@@ -548,8 +529,6 @@ export const ConversationProvider = ({ children }) => {
 
                 clearCurrentConversation,
                 setCurrentConversationState,
-
-                isConversationsInitialized,
             }}
         >
             {children}

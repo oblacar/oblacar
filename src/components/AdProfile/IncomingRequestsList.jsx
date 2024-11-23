@@ -17,7 +17,7 @@ const IncomingRequestsList = ({ adId }) => {
     } = useContext(TransportationContext);
     const { user } = useContext(UserContext);
     const {
-        isConversationsInitialized,
+        isConversationsLoaded,
         setCurrentConversationState,
     } = useContext(ConversationContext);
 
@@ -37,7 +37,7 @@ const IncomingRequestsList = ({ adId }) => {
     });
 
     useEffect(() => {
-        if (isConversationsInitialized && isChatBoxOpen) {
+        if (isConversationsLoaded && isChatBoxOpen) {
             setCurrentConversationState(
                 conversationData.adId,
                 conversationData.ownerId,
@@ -46,7 +46,7 @@ const IncomingRequestsList = ({ adId }) => {
 
             setIsModalBackShow(false);
         }
-    }, [isConversationsInitialized, isChatBoxOpen]);
+    }, [isConversationsLoaded, isChatBoxOpen]);
 
     useEffect(() => {
         const adTransportationRequest = getAdTransportationRequestsByAdId(adId);
@@ -79,7 +79,7 @@ const IncomingRequestsList = ({ adId }) => {
 
         setIsChatBoxOpen(true); // Открываем чат
 
-        if (!isConversationsInitialized) {
+        if (!isConversationsLoaded) {
             setIsModalBackShow(true);
         }
     };
@@ -114,7 +114,7 @@ const IncomingRequestsList = ({ adId }) => {
                     )}
                 </div>
             </div>
-            {isChatBoxOpen && chatPartnerData && isConversationsInitialized && (
+            {isChatBoxOpen && chatPartnerData && isConversationsLoaded && (
                 <ChatBox
                     onClose={() => setIsChatBoxOpen(false)}
                     adId={adId}
