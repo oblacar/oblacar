@@ -536,6 +536,9 @@ export const ConversationProvider = ({ children }) => {
      * @param {string} recipientId - ID получателя.
      * @returns {number} - Количество непрочитанных сообщений.
      */
+
+    //TODO я не уверен, что нужно id получаетеля передавать, если отправителей много, то они все суммируются, но это не правильно
+    //нужно что отправителей смотреть, т.к. получатель в таком случае user.
     const countUnreadMessages = (messages, adId, recipientId) => {
         if (!Array.isArray(messages)) {
             console.error('messages должен быть массивом');
@@ -548,6 +551,47 @@ export const ConversationProvider = ({ children }) => {
                 message.recipientId === recipientId &&
                 !message.isRead
         ).length;
+    };
+
+    /**
+     * Возвращает количество непрочитанных сообщений от отправителя по указанному adId и собеседникам.
+     * Использует локальный стейт conversations
+     * @param {string} adId - ID объявления.
+     * @param {string} senderId - ID отправителя.
+     * @returns {number} - Количество непрочитанных сообщений.
+     */
+    const countUnreadMessagesFromSender = (adId, senderId) => {
+        if (!Array.isArray(conversations)) {
+            console.error('conversations должен быть массивом');
+            return 0;
+        }
+
+        // Находим все разговоры, связанные с указанным adId и участником senderId
+        const relevantConversations = conversations.filter((conversation) => {
+            return (
+                conversation.adId === adId &&
+                conversation.participants.some(
+                    (participant) => participant.userId === senderId
+                )
+            );
+        });
+
+        if (relevantConversations.length === 0) {
+            console.warn(
+                `Не найдено разговоров для adId: ${adId} и отправителя senderId: ${senderId}`
+            );
+            return 0;
+        }
+
+        // Считаем количество непрочитанных сообщений от senderId
+        return relevantConversations.reduce((unreadCount, conversation) => {
+            const messages = conversation.messages || [];
+            const senderUnreadMessages = messages.filter(
+                (message) => message.senderId === senderId && !message.isRead // Сообщение должно быть непрочитанным
+            ).length;
+
+            return unreadCount + senderUnreadMessages;
+        }, 0);
     };
 
     return (
@@ -573,6 +617,7 @@ export const ConversationProvider = ({ children }) => {
                 setCurrentConversationState,
 
                 countUnreadMessages,
+                countUnreadMessagesFromSender,
             }}
         >
             {children}

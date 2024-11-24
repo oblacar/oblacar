@@ -36,8 +36,8 @@
     z-index: 2;
 
     /* border: 4px double rgb(255, 184, 184); */
-    border: 4px double   rgb(223, 206, 206);
-  
+    border: 4px double rgb(223, 206, 206);
+
     padding: 5px 10px;
     border-radius: 4px;
 
@@ -66,6 +66,36 @@
     margin-top: -30px;
     min-width: 120px; /* Минимальная ширина для блока */
     scale: 0.7;
+
+    position: relative;
+}
+
+.unreadMessagesContainer {
+    position: absolute;
+    left: 110px;
+    top: 0px;
+    min-width: 40px;
+    height: 40px;
+
+    border-radius: 20px 20px 20px 0px;
+
+    background-color: rgb(255, 255, 255);
+
+    /* border: 1px solid rgb(195, 173, 232); */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    -webkit-box-shadow: -1px 1px 8px 0px rgba(34, 60, 80, 0.29);
+    -moz-box-shadow: -1px 1px 8px 0px rgba(34, 60, 80, 0.29);
+    box-shadow: -1px 1px 8px 0px rgba(34, 60, 80, 0.29);
+}
+.countUnreadMessages {
+    color: #ff3300;
+    font-size: 20px; /* Укажите размер шрифта для более точного отображения */
+    line-height: 1; /* Уменьшите межстрочный интервал, чтобы текст лучше центрировался */
+    font-weight: 600;
 }
 
 .rightContainer {
