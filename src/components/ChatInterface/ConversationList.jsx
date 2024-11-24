@@ -1,5 +1,6 @@
 // ConversationList.js
 import React, { useContext, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import './ConversationList.css';
 import UserContext from '../../hooks/UserContext';
@@ -63,13 +64,30 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
                                         ].userName
                                     }
                                 </p>
-
-                                <h4>{conversation.availabilityDate}</h4>
-                                <h4>
-                                    {conversation.departureCity} -{' '}
-                                    {conversation.destinationCity}
-                                </h4>
-                                <p>{conversation.priceAndPaymentUnit}</p>
+                                {isSelected && (
+                                    <Link to={`/ads/${conversation.adId}`}>
+                                        <h4>{conversation.availabilityDate}</h4>
+                                        <h4>
+                                            {conversation.departureCity} -{' '}
+                                            {conversation.destinationCity}
+                                        </h4>
+                                        <p>
+                                            {conversation.priceAndPaymentUnit}
+                                        </p>
+                                    </Link>
+                                )}
+                                {!isSelected && (
+                                    <>
+                                        <h4>{conversation.availabilityDate}</h4>
+                                        <h4>
+                                            {conversation.departureCity} -{' '}
+                                            {conversation.destinationCity}
+                                        </h4>
+                                        <p>
+                                            {conversation.priceAndPaymentUnit}
+                                        </p>
+                                    </>
+                                )}
                             </div>
 
                             {countUserUnreadMessages > 0 && (
