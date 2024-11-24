@@ -57,7 +57,7 @@ const IncomingRequestsItem = ({
                         }
                     />
 
-                    {countUserUnreadMessages && (
+                    {countUserUnreadMessages > 0 && (
                         <div className={styles.unreadMessagesContainer}>
                             <div className={styles.countUnreadMessages}>
                                 {countUserUnreadMessages}

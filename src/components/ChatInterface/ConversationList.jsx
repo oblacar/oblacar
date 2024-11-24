@@ -72,7 +72,7 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
                                 <p>{conversation.priceAndPaymentUnit}</p>
                             </div>
 
-                            {countUserUnreadMessages && (
+                            {countUserUnreadMessages > 0 && (
                                 <div className='count-unread-messages-container'>
                                     <div className='count-unread-messages'>
                                         {countUserUnreadMessages}
