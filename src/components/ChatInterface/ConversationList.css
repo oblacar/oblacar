@@ -120,3 +120,7 @@
     color: #666;
     font-size: 14px;
 }
+
+.conversation-details:hover p {
+    color: #1b1b1b;
+}

@@ -62,20 +62,20 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
                                 className='conversation-photo'
                             />
                             <div className='conversation-details'>
-                                <p>
+                                <h4>
                                     {
                                         conversation.participants[
                                             chatPartnerIindex
                                         ].userName
                                     }
-                                </p>
+                                </h4>
                                 {isSelected && (
                                     <Link to={`/ads/${conversation.adId}`}>
-                                        <h4>{conversation.availabilityDate}</h4>
-                                        <h4>
+                                        <p>{conversation.availabilityDate}</p>
+                                        <p>
                                             {conversation.departureCity} -{' '}
                                             {conversation.destinationCity}
-                                        </h4>
+                                        </p>
                                         <p>
                                             {conversation.priceAndPaymentUnit}
                                         </p>
@@ -83,11 +83,11 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
                                 )}
                                 {!isSelected && (
                                     <>
-                                        <h4>{conversation.availabilityDate}</h4>
-                                        <h4>
+                                        <p>{conversation.availabilityDate}</p>
+                                        <p>
                                             {conversation.departureCity} -{' '}
                                             {conversation.destinationCity}
-                                        </h4>
+                                        </p>
                                         <p>
                                             {conversation.priceAndPaymentUnit}
                                         </p>
