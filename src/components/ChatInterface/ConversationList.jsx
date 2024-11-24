@@ -2,6 +2,8 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+import imgPath from '../../assets/234.jpg'; // Импорт картинки
+
 import './ConversationList.css';
 import UserContext from '../../hooks/UserContext';
 import ConversationContext from '../../hooks/ConversationContext';
@@ -18,7 +20,10 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
     };
 
     return (
-        <div className='conversation-list'>
+        <div
+            className='conversation-list'
+            style={{ backgroundImage: `url(${imgPath})` }} // Передача картинки через стиль
+        >
             <h2>Диалоги</h2>
             {conversations &&
                 conversations.map((conversation) => {

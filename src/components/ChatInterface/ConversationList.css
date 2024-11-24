@@ -7,7 +7,13 @@
 
     /* border-right: 1px solid #ccc; */
     /* padding: 1rem; */
-    background-color: #e0f6fe;
+    /* background-color: #e0f6fe; */
+
+    /* background-image: url('/images/123.jpg'); */
+
+    background-repeat: repeat;
+    background-size: auto;
+
     padding-bottom: 10px;
 }
 
@@ -44,11 +50,14 @@
     border-radius: 5px 0px 0px 5px;
     transition: background-color 0.3s;
 
+    background-color: rgba(202, 216, 224, 0.5);
+    margin-bottom: 5px;
+
     position: relative;
 }
 
 .conversation-item:hover {
-    background-color: #c7e7f4;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
 .conversation-item.selected {
