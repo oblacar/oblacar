@@ -5,6 +5,25 @@
     flex-direction: column;
 }
 
+.no-conversation {
+    color: rgb(47, 116, 153);
+
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.no-conversation .no-conversation-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.no-conversation span {
+    font-size: 18px;
+}
+
 /* .message-list {
     flex: 1;
     overflow-y: auto;

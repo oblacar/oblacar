@@ -24,7 +24,7 @@ const ConversationList = ({ onSelectConversation, conversations }) => {
             className='conversation-list'
             style={{ backgroundImage: `url(${imgPath})` }} // Передача картинки через стиль
         >
-            <h2>Диалоги</h2>
+            <h2>Чаты</h2>
             {conversations &&
                 conversations.map((conversation) => {
                     const chatPartnerIindex =

@@ -5,6 +5,7 @@ import MessagesList from '../common/ChatBox/MessagesList/MessagesList';
 import MessageInput from '../common/ChatBox/MessageInput/MessageInput';
 import ConversationContext from '../../hooks/ConversationContext';
 import UserContext from '../../hooks/UserContext';
+import { CursorArrowRippleIcon } from '@heroicons/react/24/outline';
 
 const ActiveConversation = ({ conversation }) => {
     const { sendChatInterfaceMessage } = useContext(ConversationContext);
@@ -33,7 +34,8 @@ const ActiveConversation = ({ conversation }) => {
                 </>
             ) : (
                 <div className='no-conversation'>
-                    Выберите диалог, чтобы начать чат
+                    <CursorArrowRippleIcon className='no-conversation-icon' />
+                    <span>Выберите Чат, чтобы продолжить переписку.</span>
                 </div>
             )}
         </div>

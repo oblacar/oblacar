@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Header.css'; // Импортируем стили
 
+import imgPath from '../../assets/567-2.jpg'; // Импорт картинки
+
 import { IconDropdownMenuBar } from '../IconHoverCardBar/IconHoverCardBar';
 
 import { Link, useAsyncError } from 'react-router-dom';
@@ -77,6 +79,7 @@ const Header = () => {
             <div
                 className='bottom-line'
                 ref={bottomLineRef}
+                // style={{ backgroundImage: `url(${imgPath})` }} // Передача картинки через стиль
             >
                 {isNarrowHeader ? (
                     <Link to='/'>

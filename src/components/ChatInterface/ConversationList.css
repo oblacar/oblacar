@@ -20,6 +20,8 @@
 .conversation-list h2 {
     text-align: center;
     margin-top: 5px;
+    color: #8991b0;
+
 }
 
 /*Стилизация скрола==>>*/
@@ -50,7 +52,8 @@
     border-radius: 5px 0px 0px 5px;
     transition: background-color 0.3s;
 
-    background-color: rgba(202, 216, 224, 0.5);
+    /* background-color: rgba(202, 216, 224, 0.5); */
+    background-color: rgba(217, 229, 236, 0.5);
     margin-bottom: 5px;
 
     position: relative;
