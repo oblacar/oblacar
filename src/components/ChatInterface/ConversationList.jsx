@@ -3,6 +3,8 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import imgPath from '../../assets/234.jpg'; // Импорт картинки
+// import imgPath from '../../assets/567-2.jpg'; // Импорт картинки
+
 
 import './ConversationList.css';
 import UserContext from '../../hooks/UserContext';

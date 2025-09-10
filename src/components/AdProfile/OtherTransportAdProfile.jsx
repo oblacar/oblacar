@@ -21,12 +21,7 @@ import UserSmallCard from '../common/UserSmallCard/UserSmallCard';
 import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
 import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
 
-const OtherTransportAdProfile = ({
-    ad,
-    // onSendRequest,
-    // onMessage,
-    // userType,
-}) => {
+const OtherTransportAdProfile = ({ ad }) => {
     const {
         currentConversation,
 
@@ -36,7 +31,7 @@ const OtherTransportAdProfile = ({
     const { user } = useContext(UserContext);
     const {
         sendTransportationRequest,
-        getRequestStatusByAdId,
+        // getRequestStatusByAdId,
         getAdTransportationRequestByAdId,
         adTransportationRequests,
         cancelTransportationRequest,
@@ -79,6 +74,7 @@ const OtherTransportAdProfile = ({
 
     const [isModalBackShow, setIsModalBackShow] = useState(false);
 
+    //TODO check for what isLoadingConversation - it is never used
     const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
     const [requestId, setRequestId] = useState(null);
@@ -110,7 +106,6 @@ const OtherTransportAdProfile = ({
             setAdRequestStatus(requestStatusByAdId);
             setRequestId(requestId);
 
-            console.log('adTransportationRequest:', requestStatusByAdId);
             setAdTransportationRequest(adTransportationRequest);
 
             setIsTransportationRequestSending(false);
