@@ -10,6 +10,7 @@ import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
 import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страницы аутентификации
 import NewTransportAd from './pages/Ads/NewTransportAd/NewTransportAd';
 import AdPage from './pages/Ads/AdPage';
+import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
@@ -70,6 +71,10 @@ const App = () => {
                                             <Route
                                                 path='/dialogs'
                                                 element={<ConversationsPage />}
+                                            />
+                                            <Route
+                                                path='/new-vehicle'
+                                                element={<NewVehiclePage />}
                                             />
                                         </Route>
                                     </Routes>

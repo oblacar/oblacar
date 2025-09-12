@@ -1,0 +1,114 @@
+.profile-section {
+    padding: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    background: #fff;
+    /* твои hover/active уже заданы в проекте */
+}
+
+.profile-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.profile-section__title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.profile-section__subtitle {
+    margin: 4px 0 0 0;
+    color: #6b7280; /* gray-500 */
+    font-size: 13px;
+}
+
+/* Список превью-элементов */
+.profile-section__items {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.profile-section__item-link {
+    text-decoration: none;
+}
+
+/* Чип: круглый аватар + подпись */
+.profile-section__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 999px;
+    background: #fff;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.profile-section__chip:hover {
+    background: #fffef5;
+}
+
+.profile-section__chip-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6; /* gray-100 */
+    color: #111827;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.profile-section__chip-avatar--img img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-section__chip-title {
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #111827;
+    font-size: 14px;
+}
+
+/* Плашка +N */
+.profile-section__more {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #374151; /* gray-700 */
+    text-decoration: none;
+    font-weight: 600;
+    background: #fff;
+}
+.profile-section__more:hover {
+    background: #fffbe6;
+}
+
+/* Пустое состояние */
+.profile-section__empty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+    color: #6b7280; /* gray-500 */
+}
+.profile-section__empty-text {
+    font-size: 14px;
+}

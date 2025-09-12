@@ -40,11 +40,10 @@ h2 {
 
 .profile-section {
     cursor: pointer;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .profile-section:hover {
-    /* background-color: rgb(255, 205, 143); */
     background-color: rgb(255, 254, 193);
 }
 
