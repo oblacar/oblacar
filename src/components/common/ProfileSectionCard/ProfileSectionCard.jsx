@@ -67,7 +67,8 @@ const ProfileSectionCard = ({
 
     return (
         <div
-            className={`profile-section ${className}`}
+            // className={`profile-section ${className}`}
+            className={`${className}`}
             role='link'
             tabIndex={0}
             onClick={goToList}
