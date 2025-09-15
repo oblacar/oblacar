@@ -35,13 +35,14 @@ const NewVehiclePage = () => {
 
     return (
         <div className='new-ad-section'>
-            <VerticalPhotoCarousel
+            {/* <VerticalPhotoCarousel
                 photos={formData.truckPhotoUrls} // массив или объект {ph1: url, ph2: url}
                 mainWidth={480}
                 mainHeight={360}
                 stripWidth={84}
                 gap={10}
-            />
+            /> */}
+
 
             <p className='new-ad-division-title'>Новая машина</p>
 
