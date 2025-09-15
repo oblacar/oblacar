@@ -1,0 +1,127 @@
+/* Корневая карточка */
+.vehicle-card-full {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr; /* слева галерея, справа описание */
+    gap: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+}
+
+@media (max-width: 900px) {
+    .vehicle-card-full {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Левая колонка: галерея ===== */
+.vehicle-gallery {
+    display: grid;
+    grid-template-columns: 84px 1fr; /* слева вертикальные превью, справа главное */
+    gap: 10px;
+}
+
+@media (max-width: 520px) {
+    .vehicle-gallery {
+        grid-template-columns: 72px 1fr;
+    }
+}
+
+.vehicle-gallery-thumbs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+    max-height: 360px; /* мягкое ограничение высоты; подгоняй под свои карточки */
+    padding-right: 2px;
+}
+
+.vehicle-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #f3f4f6;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    flex: 0 0 auto;
+}
+
+.vehicle-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.vehicle-thumb--placeholder {
+    color: #9ca3af;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+}
+
+.vehicle-gallery-main {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #f3f4f6;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.vehicle-gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.vehicle-card-photo--placeholder {
+    width: 100%;
+    height: 100%;
+    color: #9ca3af;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* ===== Правая колонка: описание ===== */
+.vehicle-card-right {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+}
+
+.vehicle-card-title {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.vehicle-card-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.vehicle-card-label {
+    color: #6b7280; /* gray-500 */
+}
+
+.vehicle-card-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.vehicle-card-tag {
+    padding: 2px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    font-size: 12px;
+    background: #fff;
+}
