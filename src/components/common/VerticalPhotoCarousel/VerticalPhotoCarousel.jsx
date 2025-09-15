@@ -3,20 +3,10 @@ import './VerticalPhotoCarousel.css';
 
 /**
  * Вертикальная фото-карусель:
- *  - слева лента превью фикcированной ширины, по высоте = высоте главного фото
- *  - без скроллбаров: появляются круглые кнопки ↑/↓ для «шажковой» прокрутки
- *  - справа — главное фото фиксированного размера (cover + обрезка)
- *  - невидимые стрелки поверх главного фото (слева/справа), показываются при hover
- *  - бесконечная навигация по фото, синхронизация выделения превью
- *
- * props:
- *  - photos: string[] | Record<string,string>
- *  - mainWidth?: number   (px) ширина главного фото (по умолчанию 480)
- *  - mainHeight?: number  (px) высота главного фото (по умолчанию 360)
- *  - stripWidth?: number  (px) ширина колонки превью (по умолчанию 84)
- *  - gap?: number         (px) зазор между превью (по умолчанию 10)
- *  - className?: string
- *  - onSelect?: (index:number, url:string) => void
+ *  - превью слева: ширина = stripWidth, высота сохраняет пропорции оригинала
+ *  - прокрутка ленты кнопками ↑/↓ (без нативного скролла)
+ *  - справа большое фото, невидимые стрелки слева/справа проявляются на hover
+ *  - бесконечная навигация, активное превью синхронизируется с главным фото
  */
 const VerticalPhotoCarousel = ({
     photos,
@@ -28,69 +18,70 @@ const VerticalPhotoCarousel = ({
     onSelect,
 }) => {
     const list = useMemo(() => toArray(photos), [photos]);
-    const [index, setIndex] = useState(0); // выбранное большое фото
-    const [scrollIdx, setScrollIdx] = useState(0); // «верхний» индекс в ленте
-    const [step, setStep] = useState(stripWidth); // шаг прокрутки в px (высота одного превью + gap)
-    const [visibleCount, setVisibleCount] = useState(1);
+    const [index, setIndex] = useState(0);
 
-    const thumbsRef = useRef(null); // контейнер окна (с overflow: hidden)
-    const thumbsInnerRef = useRef(null); // внутренняя колонка превью
+    // пиксельный оффсет (на сколько прокручена внутренняя колонка превью)
+    const [offset, setOffset] = useState(0);
+    const [viewportH, setViewportH] = useState(mainHeight);
+    const [contentH, setContentH] = useState(0);
 
-    // пересчёт геометрии (высота превью + gap) и видимого количества
+    const thumbsRef = useRef(null); // окно (видимая область)
+    const thumbsInnerRef = useRef(null); // колонка с превью
+
+    // Измеряем геометрию при монтировании/изменении размеров/данных
     useEffect(() => {
         const measure = () => {
-            if (!thumbsRef.current) return;
-            const wrap = thumbsRef.current;
-            const firstThumb = wrap.querySelector('.vpc__thumb');
-            const containerH = wrap.clientHeight || mainHeight;
+            if (!thumbsRef.current || !thumbsInnerRef.current) return;
+            const vpH = thumbsRef.current.clientHeight;
+            const ctH = thumbsInnerRef.current.scrollHeight;
+            setViewportH(vpH);
+            setContentH(ctH);
 
-            // gap из стилей
-            let gapPx = gap;
-            try {
-                const cs = getComputedStyle(thumbsInnerRef.current || wrap);
-                if (cs && cs.gap) {
-                    const n = parseFloat(cs.gap);
-                    if (!Number.isNaN(n)) gapPx = n;
-                }
-            } catch (_) {}
-
-            // высота превью — по первому элементу (они квадратные)
-            let thumbH = stripWidth;
-            if (firstThumb) thumbH = firstThumb.offsetHeight || stripWidth;
-
-            const stepPx = Math.max(1, Math.round(thumbH + gapPx));
-            const count = Math.max(1, Math.floor(containerH / stepPx));
-
-            setStep(stepPx);
-            setVisibleCount(count);
+            // удерживаем offset в допустимых пределах
+            const max = Math.max(0, ctH - vpH);
+            setOffset((o) => clamp(o, 0, max));
         };
-
         measure();
-        // пересчитываем при ресайзе окна
-        const onResize = () => measure();
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const ro = new ResizeObserver(measure);
+        ro.observe(thumbsRef.current);
+        ro.observe(thumbsInnerRef.current);
+        window.addEventListener('resize', measure);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener('resize', measure);
+        };
     }, [list.length, mainHeight, stripWidth, gap]);
 
-    // держим scrollIdx в допустимом диапазоне при смене данных/размеров
-    useEffect(() => {
-        const maxScroll = Math.max(0, list.length - visibleCount);
-        if (scrollIdx > maxScroll) setScrollIdx(maxScroll);
-    }, [list.length, visibleCount, scrollIdx]);
-
-    // если список поменялся и текущий index «уехал» — сбросим его
+    // если индекс вышел за пределы при замене массива — сбросить
     useEffect(() => {
         if (index >= list.length) setIndex(0);
     }, [list.length, index]);
 
-    // при выборе фото — прокрутить ленту, чтобы выбранное было видно
     const ensureVisible = (i) => {
-        const maxScroll = Math.max(0, list.length - visibleCount);
-        if (i < scrollIdx) {
-            setScrollIdx(i);
-        } else if (i >= scrollIdx + visibleCount) {
-            setScrollIdx(Math.min(maxScroll, i - visibleCount + 1));
+        // прокрутить ленту так, чтобы превью с индексом i оказался в окне
+        if (!thumbsRef.current || !thumbsInnerRef.current) return;
+        const wrap = thumbsRef.current;
+        const el = thumbsInnerRef.current.querySelector(
+            `.vpc__thumb[data-i="${i}"]`
+        );
+        if (!el) return;
+
+        const wrapRect = wrap.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+
+        // сколько пикселей нужно сдвинуть, чтобы элемент попал в зону
+        let delta = 0;
+        if (elRect.top < wrapRect.top) {
+            // элемент выше окна — сдвинуть вверх (уменьшить offset)
+            delta = elRect.top - wrapRect.top - gap;
+        } else if (elRect.bottom > wrapRect.bottom) {
+            // элемент ниже окна — сдвинуть вниз (увеличить offset)
+            delta = elRect.bottom - wrapRect.bottom + gap;
+        }
+
+        if (delta !== 0) {
+            const max = Math.max(0, contentH - viewportH);
+            setOffset((o) => clamp(o + delta, 0, max));
         }
     };
 
@@ -100,7 +91,6 @@ const VerticalPhotoCarousel = ({
         onSelect?.(i, list[i]);
     };
 
-    // стрелки на большом фото
     const nav = (dir) => {
         if (!list.length) return;
         const next = mod(index + dir, list.length);
@@ -109,17 +99,21 @@ const VerticalPhotoCarousel = ({
         onSelect?.(next, list[next]);
     };
 
-    // кнопки ↑/↓ у ленты
-    const canScrollUp = scrollIdx > 0;
-    const canScrollDown = scrollIdx + visibleCount < list.length;
+    // шаг прокрутки кнопками ↑/↓: «немного» — ориентируемся на ширину ленты
+    const scrollDelta = Math.max(44, Math.round(stripWidth + gap));
+    const canScrollUp = offset > 0;
+    const canScrollDown = offset < Math.max(0, contentH - viewportH);
     const scrollUp = () => {
         if (!canScrollUp) return;
-        setScrollIdx((s) => Math.max(0, s - 1));
+        setOffset((o) =>
+            clamp(o - scrollDelta, 0, Math.max(0, contentH - viewportH))
+        );
     };
     const scrollDown = () => {
         if (!canScrollDown) return;
-        const maxScroll = Math.max(0, list.length - visibleCount);
-        setScrollIdx((s) => Math.min(maxScroll, s + 1));
+        setOffset((o) =>
+            clamp(o + scrollDelta, 0, Math.max(0, contentH - viewportH))
+        );
     };
 
     const styleVars = {
@@ -127,7 +121,7 @@ const VerticalPhotoCarousel = ({
         ['--vpc-main-h']: `${mainHeight}px`,
         ['--vpc-strip-w']: `${stripWidth}px`,
         ['--vpc-gap']: `${gap}px`,
-        ['--vpc-shift']: `-${scrollIdx * step}px`,
+        ['--vpc-shift']: `-${Math.round(offset)}px`,
     };
 
     const main = list[index];
@@ -137,18 +131,18 @@ const VerticalPhotoCarousel = ({
             className={`vpc ${className}`}
             style={styleVars}
         >
-            {/* Лента превью без скролла — прокрутка кнопками */}
+            {/* Лента превью без нативного скролла */}
             <div
                 className='vpc__thumbs'
                 ref={thumbsRef}
             >
-                {/* Кнопка вверх (появляется только когда есть что крутить) */}
                 {canScrollUp && (
                     <button
                         type='button'
                         className='vpc__thumbs-btn vpc__thumbs-btn--up'
                         onClick={scrollUp}
                         title='Вверх'
+                        aria-label='Вверх'
                     >
                         {ChevronUp}
                     </button>
@@ -157,11 +151,13 @@ const VerticalPhotoCarousel = ({
                 <div
                     className='vpc__thumbs-inner'
                     ref={thumbsInnerRef}
+                    style={{ transform: `translateY(var(--vpc-shift))` }}
                 >
                     {list.length ? (
                         list.map((url, i) => (
                             <button
                                 key={`${url}-${i}`}
+                                data-i={i}
                                 type='button'
                                 className={`vpc__thumb ${
                                     i === index ? 'is-active' : ''
@@ -170,6 +166,7 @@ const VerticalPhotoCarousel = ({
                                 onClick={() => handleSelectThumb(i)}
                                 title={`Фото ${i + 1}`}
                             >
+                                {/* пропорциональное превью: ширина = ленте, высота по содержимому */}
                                 <img
                                     src={url}
                                     alt=''
@@ -183,20 +180,20 @@ const VerticalPhotoCarousel = ({
                     )}
                 </div>
 
-                {/* Кнопка вниз */}
                 {canScrollDown && (
                     <button
                         type='button'
                         className='vpc__thumbs-btn vpc__thumbs-btn--down'
                         onClick={scrollDown}
                         title='Вниз'
+                        aria-label='Вниз'
                     >
                         {ChevronDown}
                     </button>
                 )}
             </div>
 
-            {/* Главное фото с невидимыми стрелками слева/справа (hover → показать) */}
+            {/* Большое фото с «невидимыми» стрелками */}
             <div className='vpc__main'>
                 {main ? (
                     <>
@@ -252,8 +249,11 @@ function toArray(input) {
 function mod(n, m) {
     return ((n % m) + m) % m;
 }
+function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+}
 
-// --- inline SVG icons ---
+/* --- inline SVG icons --- */
 const ChevronUp = (
     <svg
         viewBox='0 0 24 24'
