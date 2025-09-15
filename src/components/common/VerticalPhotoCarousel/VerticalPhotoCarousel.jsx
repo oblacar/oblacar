@@ -16,6 +16,7 @@ const VerticalPhotoCarousel = ({
     gap = 10,
     className = '',
     onSelect,
+    showThumbs = true, // <-- НОВОЕ: можно скрыть ленту превью
 }) => {
     const list = useMemo(() => toArray(photos), [photos]);
     const [index, setIndex] = useState(0);
@@ -28,43 +29,96 @@ const VerticalPhotoCarousel = ({
     const thumbsRef = useRef(null); // окно (видимая область)
     const thumbsInnerRef = useRef(null); // колонка с превью
 
+
+
     // Измеряем геометрию при монтировании/изменении размеров/данных
     useEffect(() => {
-        const measure = () => {
-            if (!thumbsRef.current || !thumbsInnerRef.current) return;
-            const vpH = thumbsRef.current.clientHeight;
-            const ctH = thumbsInnerRef.current.scrollHeight;
+        const measure = (reason = 'measure') => {
+            const hasThumbs = !!thumbsRef.current;
+            const hasInner = !!thumbsInnerRef.current;
+
+            if (!hasThumbs || !hasInner) {
+                console.log('[VPC]', reason, 'refs missing', { hasThumbs, hasInner });
+                return;
+            }
+
+            const vpH = thumbsRef.current.clientHeight || 0;
+            const ctH = thumbsInnerRef.current.scrollHeight || 0;
+            const max = Math.max(0, ctH - vpH);
+
             setViewportH(vpH);
             setContentH(ctH);
 
-            // удерживаем offset в допустимых пределах
-            const max = Math.max(0, ctH - vpH);
-            setOffset((o) => clamp(o, 0, max));
+            // логируем текущее и скорректированное значение offset
+            setOffset((o) => {
+                const clamped = clamp(o, 0, max);
+                if (clamped !== o) {
+                    console.log('[VPC]', reason, 'clamp offset', { before: o, after: clamped, max, vpH, ctH });
+                } else {
+                    console.log('[VPC]', reason, { offset: o, max, vpH, ctH });
+                }
+                return clamped;
+            });
         };
-        measure();
-        const ro = new ResizeObserver(measure);
-        ro.observe(thumbsRef.current);
-        ro.observe(thumbsInnerRef.current);
-        window.addEventListener('resize', measure);
+
+        measure('initial');
+
+        // Если ResizeObserver доступен — наблюдаем только за реальными элементами
+        let ro;
+        const el1 = thumbsRef.current;
+        const el2 = thumbsInnerRef.current;
+
+        console.log('[VPC] setup observer', {
+            hasResizeObserver: typeof ResizeObserver !== 'undefined',
+            el1IsElement: el1 instanceof Element,
+            el2IsElement: el2 instanceof Element,
+        });
+
+        if (typeof ResizeObserver !== 'undefined') {
+            ro = new ResizeObserver(() => {
+                console.log('[VPC] resize-observer tick');
+                measure('resize-observer');
+            });
+            if (el1 instanceof Element) ro.observe(el1);
+            if (el2 instanceof Element) ro.observe(el2);
+        }
+
+        const onResize = () => {
+            console.log('[VPC] window resize');
+            measure('window-resize');
+        };
+        window.addEventListener('resize', onResize);
+
         return () => {
-            ro.disconnect();
-            window.removeEventListener('resize', measure);
+            window.removeEventListener('resize', onResize);
+            if (ro) {
+                ro.disconnect();
+                console.log('[VPC] observer disconnected');
+            }
         };
+        // зависимости те же:
     }, [list.length, mainHeight, stripWidth, gap]);
 
     // если индекс вышел за пределы при замене массива — сбросить
     useEffect(() => {
-        if (index >= list.length) setIndex(0);
+        if (index >= list.length) {
+            console.log('[VPC] reset index', { index, listLen: list.length });
+            setIndex(0);
+        }
     }, [list.length, index]);
 
     const ensureVisible = (i) => {
-        // прокрутить ленту так, чтобы превью с индексом i оказался в окне
-        if (!thumbsRef.current || !thumbsInnerRef.current) return;
+        // прокрутить ленту так, чтобы превью с индексом i оказалось в окне
+        if (!thumbsRef.current || !thumbsInnerRef.current) {
+            console.log('[VPC] ensureVisible: refs missing', { i });
+            return;
+        }
         const wrap = thumbsRef.current;
-        const el = thumbsInnerRef.current.querySelector(
-            `.vpc__thumb[data-i="${i}"]`
-        );
-        if (!el) return;
+        const el = thumbsInnerRef.current.querySelector(`.vpc__thumb[data-i="${i}"]`);
+        if (!el) {
+            console.log('[VPC] ensureVisible: thumb not found', { i });
+            return;
+        }
 
         const wrapRect = wrap.getBoundingClientRect();
         const elRect = el.getBoundingClientRect();
@@ -72,18 +126,24 @@ const VerticalPhotoCarousel = ({
         // сколько пикселей нужно сдвинуть, чтобы элемент попал в зону
         let delta = 0;
         if (elRect.top < wrapRect.top) {
-            // элемент выше окна — сдвинуть вверх (уменьшить offset)
             delta = elRect.top - wrapRect.top - gap;
         } else if (elRect.bottom > wrapRect.bottom) {
-            // элемент ниже окна — сдвинуть вниз (увеличить offset)
             delta = elRect.bottom - wrapRect.bottom + gap;
         }
 
-        if (delta !== 0) {
-            const max = Math.max(0, contentH - viewportH);
-            setOffset((o) => clamp(o + delta, 0, max));
-        }
+        const max = Math.max(0, contentH - viewportH);
+        const newOffset = clamp(offset + delta, 0, max);
+
+        console.log('[VPC] ensureVisible', {
+            i, delta, offsetBefore: offset, newOffset, max,
+            wrapRectTop: wrapRect.top, wrapRectBottom: wrapRect.bottom,
+            elRectTop: elRect.top, elRectBottom: elRect.bottom,
+            viewportH, contentH
+        });
+
+        if (newOffset !== offset) setOffset(newOffset);
     };
+
 
     const handleSelectThumb = (i) => {
         setIndex(i);
@@ -126,102 +186,97 @@ const VerticalPhotoCarousel = ({
 
     const main = list[index];
 
+    console.log('[VPC] render', {
+        listLen: list.length,
+        mainWidth, mainHeight, stripWidth, gap,
+        showThumbs   // если пробрасываешь этот проп
+    });
+
+
     return (
         <div
-            className={`vpc ${className}`}
+            className={`vpc ${!showThumbs ? 'vpc--main-only' : ''} ${className}`}
             style={styleVars}
         >
-            {/* Лента превью без нативного скролла */}
-            <div
-                className='vpc__thumbs'
-                ref={thumbsRef}
-            >
-                {canScrollUp && (
-                    <button
-                        type='button'
-                        className='vpc__thumbs-btn vpc__thumbs-btn--up'
-                        onClick={scrollUp}
-                        title='Вверх'
-                        aria-label='Вверх'
-                    >
-                        {ChevronUp}
-                    </button>
-                )}
+            {/* Лента превью — рисуем только если showThumbs */}
+            {showThumbs && (
+                <div className="vpc__thumbs" ref={thumbsRef}>
+                    {canScrollUp && (
+                        <button
+                            type="button"
+                            className="vpc__thumbs-btn vpc__thumbs-btn--up"
+                            onClick={scrollUp}
+                            title="Вверх"
+                            aria-label="Вверх"
+                        >
+                            {ChevronUp}
+                        </button>
+                    )}
 
-                <div
-                    className='vpc__thumbs-inner'
-                    ref={thumbsInnerRef}
-                    style={{ transform: `translateY(var(--vpc-shift))` }}
-                >
-                    {list.length ? (
-                        list.map((url, i) => (
-                            <button
-                                key={`${url}-${i}`}
-                                data-i={i}
-                                type='button'
-                                className={`vpc__thumb ${
-                                    i === index ? 'is-active' : ''
-                                }`}
-                                aria-selected={i === index}
-                                onClick={() => handleSelectThumb(i)}
-                                title={`Фото ${i + 1}`}
-                            >
-                                {/* пропорциональное превью: ширина = ленте, высота по содержимому */}
-                                <img
-                                    src={url}
-                                    alt=''
-                                />
-                            </button>
-                        ))
-                    ) : (
-                        <div className='vpc__thumb vpc__thumb--placeholder'>
-                            —
-                        </div>
+                    <div
+                        className="vpc__thumbs-inner"
+                        ref={thumbsInnerRef}
+                        style={{ transform: `translateY(var(--vpc-shift))` }}
+                    >
+                        {list.length ? (
+                            list.map((url, i) => (
+                                <button
+                                    key={`${url}-${i}`}
+                                    data-i={i}
+                                    type="button"
+                                    className={`vpc__thumb ${i === index ? 'is-active' : ''}`}
+                                    aria-selected={i === index}
+                                    onClick={() => handleSelectThumb(i)}
+                                    title={`Фото ${i + 1}`}
+                                >
+                                    <img src={url} alt="" />
+                                </button>
+                            ))
+                        ) : (
+                            <div className="vpc__thumb vpc__thumb--placeholder">—</div>
+                        )}
+                    </div>
+
+                    {canScrollDown && (
+                        <button
+                            type="button"
+                            className="vpc__thumbs-btn vpc__thumbs-btn--down"
+                            onClick={scrollDown}
+                            title="Вниз"
+                            aria-label="Вниз"
+                        >
+                            {ChevronDown}
+                        </button>
                     )}
                 </div>
+            )}
 
-                {canScrollDown && (
-                    <button
-                        type='button'
-                        className='vpc__thumbs-btn vpc__thumbs-btn--down'
-                        onClick={scrollDown}
-                        title='Вниз'
-                        aria-label='Вниз'
-                    >
-                        {ChevronDown}
-                    </button>
-                )}
-            </div>
-
-            {/* Большое фото с «невидимыми» стрелками */}
-            <div className='vpc__main'>
+            {/* Главное фото */}
+            <div className="vpc__main">
                 {main ? (
                     <>
-                        <img
-                            src={main}
-                            alt='Главное фото'
-                        />
+                        <img src={main} alt="Главное фото" />
                         <button
-                            type='button'
-                            className='vpc__nav vpc__nav--left'
+                            type="button"
+                            className="vpc__nav vpc__nav--left"
                             onClick={() => nav(-1)}
-                            title='Предыдущее фото'
-                            aria-label='Предыдущее фото'
+                            title="Предыдущее фото"
+                            aria-label="Предыдущее фото"
                         >
                             {ChevronLeft}
                         </button>
                         <button
-                            type='button'
-                            className='vpc__nav vpc__nav--right'
+                            type="button"
+                            className="vpc__nav vpc__nav--right"
                             onClick={() => nav(1)}
-                            title='Следующее фото'
-                            aria-label='Следующее фото'
+                            title="Следующее фото"
+                            aria-label="Следующее фото"
                         >
                             {ChevronRight}
                         </button>
                     </>
                 ) : (
-                    <div className='vpc__main-placeholder'>Фото</div>
+                    <div className="vpc__main-placeholder">Фото</div>
                 )}
             </div>
         </div>

@@ -1,17 +1,14 @@
 import React from 'react';
 import './VehicleCard.css';
-import VerticalPhotoCarousel from './../common/VerticalPhotoCarousel/VerticalPhotoCarousel';
+// import VerticalPhotoCarousel from './../common/VerticalPhotoCarousel/VerticalPhotoCarousel';
+
+import ResponsiveVehicleGallery from './../common/VerticalPhotoCarousel/ResponsiveVehicleGallery';
 
 // Карточка транспорта: слева — галерея (карусель), справа — характеристики.
 const VehicleCard = ({ vehicle = {}, className = '' }) => {
     const {
-        truckName,
-        transportType,
-        loadingTypes,
-        truckWeight,
-        truckHeight,
-        truckWidth,
-        truckDepth,
+        truckName, transportType, loadingTypes,
+        truckWeight, truckHeight, truckWidth, truckDepth,
         truckPhotoUrls,
     } = vehicle;
 
@@ -19,46 +16,39 @@ const VehicleCard = ({ vehicle = {}, className = '' }) => {
 
     return (
         <div className={`vehicle-card-full ${className}`}>
-            {/* Левая колонка: вертикальная карусель фото */}
+            {/* Левая колонка: авто-галерея */}
             <div className="vehicle-gallery">
-                <VerticalPhotoCarousel
-                    photos={truckPhotoUrls}  // можно массив или объект {ph1: url, ph2: url}
-                    mainWidth={480}
-                    mainHeight={360}
-                    stripWidth={84}
-                    gap={10}
-                />
+                <div className="vehicle-gallery">
+                    <ResponsiveVehicleGallery
+                        photos={truckPhotoUrls}
+                        aspectRatio={4 / 3}
+                        stripWidth={84}
+                        gap={10}
+                        minMainWidth={380}
+                    // maxMainHeight={460} // опционально
+                    />
+                </div>
             </div>
 
             {/* Правая колонка: описание */}
             <div className="vehicle-card-right">
-                <h3 className="vehicle-card-title">
-                    {truckName || 'Без названия'}
-                </h3>
-
+                <h3 className="vehicle-card-title">{truckName || 'Без названия'}</h3>
                 <div className="vehicle-card-row">
                     <span className="vehicle-card-label">Тип: </span>
                     <span>{transportType || '—'}</span>
                 </div>
-
                 <div className="vehicle-card-row">
                     <span className="vehicle-card-label">Загрузка: </span>
                     <span className="vehicle-card-tags">
-                        {loadingList.length
-                            ? loadingList.map((t) => (
-                                  <span key={t} className="vehicle-card-tag">
-                                      {t}
-                                  </span>
-                              ))
-                            : '—'}
+                        {loadingList.length ? loadingList.map((t) => (
+                            <span key={t} className="vehicle-card-tag">{t}</span>
+                        )) : '—'}
                     </span>
                 </div>
-
                 <div className="vehicle-card-row">
                     <span className="vehicle-card-label">Вес (т): </span>
                     <span>{fmtNum(truckWeight)}</span>
                 </div>
-
                 <div className="vehicle-card-row">
                     <span className="vehicle-card-label">Габариты (м): </span>
                     <span>{fmtDims(truckHeight, truckWidth, truckDepth)}</span>

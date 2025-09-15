@@ -34,16 +34,8 @@ const NewVehiclePage = () => {
         setFormData((prev) => ({ ...prev, ...patch }));
 
     return (
-        <div className='new-ad-section'>
-            {/* <VerticalPhotoCarousel
-                photos={formData.truckPhotoUrls} // массив или объект {ph1: url, ph2: url}
-                mainWidth={480}
-                mainHeight={360}
-                stripWidth={84}
-                gap={10}
-            /> */}
-
-
+        // <div className='new-ad-section'>
+        <div className=''>
             <p className='new-ad-division-title'>Новая машина</p>
 
             <div className='new-vehicle-layout'>
@@ -53,7 +45,8 @@ const NewVehiclePage = () => {
                 </div>
 
                 {/* Справа — форма ввода параметров */}
-                <div className='new-vehicle-right new-ad-card-main-area'>
+                {/* <div className='new-vehicle-right new-ad-card-main-area'> */}
+                <div className='new-vehicle-right'>
                     <VehicleFormSection
                         ref={vehicleRef}
                         formData={formData}

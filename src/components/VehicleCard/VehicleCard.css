@@ -1,169 +1,76 @@
-/* Корневая карточка */
-.vehicle-card-full {
-    display: grid;
-    grid-template-columns: 1.15fr 1fr; /* слева галерея, справа описание */
-    gap: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 12px;
-    background: #fff;
-    padding: 12px;
-}
-
-@media (max-width: 900px) {
-    .vehicle-card-full {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ===== Левая колонка: галерея ===== */
-.vehicle-gallery {
-    display: grid;
-    grid-template-columns: 84px 1fr; /* слева вертикальные превью, справа главное */
-    gap: 10px;
-}
-
-@media (max-width: 520px) {
-    .vehicle-gallery {
-        grid-template-columns: 72px 1fr;
-    }
-}
-
-.vehicle-gallery-thumbs {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    overflow: auto;
-    max-height: 360px; /* мягкое ограничение высоты; подгоняй под свои карточки */
-    padding-right: 2px;
-}
-
-.vehicle-thumb {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background: #f3f4f6;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    flex: 0 0 auto;
-}
-
-.vehicle-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.vehicle-thumb--placeholder {
-    color: #9ca3af;
-    display: grid;
-    place-items: center;
-    font-size: 12px;
-}
-
-.vehicle-gallery-main {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    background: #f3f4f6;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.vehicle-gallery-main img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.vehicle-card-photo--placeholder {
-    width: 100%;
-    height: 100%;
-    color: #9ca3af;
-    display: grid;
-    place-items: center;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-
-/* ===== Правая колонка: описание ===== */
-.vehicle-card-right {
-    display: grid;
-    align-content: start;
-    gap: 8px;
-}
-
-.vehicle-card-title {
-    margin: 0 0 4px 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.vehicle-card-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    font-size: 14px;
-}
-
-.vehicle-card-label {
-    color: #6b7280; /* gray-500 */
-}
-
-.vehicle-card-tags {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.vehicle-card-tag {
-    padding: 2px 8px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 999px;
-    font-size: 12px;
-    background: #fff;
-}
-
-/* Корень карточки: две колонки, но с переносом при нехватке места */
+/* ===== Корневая карточка (две колонки с переносом) ===== */
 .vehicle-card-full {
   display: flex;
-  flex-wrap: wrap;          /* <-- ключ! позволит переносить блоки */
+  flex-wrap: wrap;          /* перенос при нехватке места */
   gap: 12px;
   align-items: flex-start;
+
   border: 1px solid rgba(0,0,0,0.06);
   border-radius: 12px;
   background: #fff;
   padding: 12px;
 }
 
-/* Левая колонка (галерея) — стремится быть шире, но может переноситься */
+/* ===== Левая колонка: контейнер для карусели ===== */
 .vehicle-gallery {
-  flex: 1 1 500px;          /* базовая ширина ~500px, но сжимается/переносится */
-  min-width: 360px;         /* минимально комфортная ширина для галереи */
-  min-height: 1px;          /* страховка против переполнения */
+  flex: 1 1 520px;         /* базовая ширина; можно 480–560 по вкусу */
+  min-width: 340px;        /* минимальная комфортная ширина */
+  min-height: 1px;         /* защита от переполнения */
+  width: 100%;             /* карусель видит реальную ширину */
 }
 
-/* Правая колонка (описание) — более узкая, но тоже гибкая */
-.vehicle-card-right {
-  flex: 1 1 320px;          /* базовая ширина ~320px */
-  min-width: 260px;
-  min-height: 1px;
-}
-
-/* Не даём дочерним блокам выталкивать колонки по горизонтали */
+/* Не даём колонкам раздувать карточку по горизонтали */
 .vehicle-gallery,
-.vehicle-card-right {
-  min-width: 0;             /* важно для предотвращения overflow */
-}
+.vehicle-card-right { min-width: 0; }
 
-/* Галерея не должна шире контейнера карточки */
+/* Карусель не шире своей колонки */
 .vehicle-gallery .vpc {
+  width: 100%;
   max-width: 100%;
 }
 
-/* На узких экранах принудительно одна колонка (по желанию) */
+/* ===== Правая колонка: описание ===== */
+.vehicle-card-right {
+  flex: 1 1 320px;
+  min-width: 260px;
+  min-height: 1px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.vehicle-card-title {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.vehicle-card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.vehicle-card-label {
+  color: #6b7280; /* gray-500 */
+}
+
+.vehicle-card-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vehicle-card-tag {
+  padding: 2px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  font-size: 12px;
+  background: #fff;
+}
+
+/* ===== Адаптив: на узких экранах колонки встают друг под другом ===== */
 @media (max-width: 760px) {
   .vehicle-gallery,
   .vehicle-card-right {
