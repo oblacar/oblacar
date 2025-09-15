@@ -125,3 +125,49 @@
     font-size: 12px;
     background: #fff;
 }
+
+/* Корень карточки: две колонки, но с переносом при нехватке места */
+.vehicle-card-full {
+  display: flex;
+  flex-wrap: wrap;          /* <-- ключ! позволит переносить блоки */
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+/* Левая колонка (галерея) — стремится быть шире, но может переноситься */
+.vehicle-gallery {
+  flex: 1 1 500px;          /* базовая ширина ~500px, но сжимается/переносится */
+  min-width: 360px;         /* минимально комфортная ширина для галереи */
+  min-height: 1px;          /* страховка против переполнения */
+}
+
+/* Правая колонка (описание) — более узкая, но тоже гибкая */
+.vehicle-card-right {
+  flex: 1 1 320px;          /* базовая ширина ~320px */
+  min-width: 260px;
+  min-height: 1px;
+}
+
+/* Не даём дочерним блокам выталкивать колонки по горизонтали */
+.vehicle-gallery,
+.vehicle-card-right {
+  min-width: 0;             /* важно для предотвращения overflow */
+}
+
+/* Галерея не должна шире контейнера карточки */
+.vehicle-gallery .vpc {
+  max-width: 100%;
+}
+
+/* На узких экранах принудительно одна колонка (по желанию) */
+@media (max-width: 760px) {
+  .vehicle-gallery,
+  .vehicle-card-right {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
