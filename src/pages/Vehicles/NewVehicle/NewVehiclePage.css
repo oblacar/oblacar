@@ -1,0 +1,11 @@
+/* контейнер, внутри которого лежит карточка */
+.card-wrap {
+    display: flex;
+    justify-content: center; /* по горизонтали */
+    /* align-items: flex-start; // опционально по вертикали */
+    padding-inline: 12px;
+}
+.vehicle-card-full {
+    /* max-width: 740px; */
+    width: 100%;
+}

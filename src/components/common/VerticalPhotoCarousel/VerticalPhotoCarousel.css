@@ -6,186 +6,186 @@
 /* Базовые переменные можно переопределять снаружи:
    .vpc { --vpc-strip-w: 84px; --vpc-gap: 10px; --vpc-aspect: 4/3; } */
 .vpc {
-  --vpc-strip-w: 84px;     /* ширина ленты превью слева */
-  --vpc-gap: 10px;         /* зазор между лентой и большим фото */
-  --vpc-aspect: 4 / 3;     /* соотношение сторон большого фото (например 16/9) */
+    --vpc-strip-w: 84px; /* ширина ленты превью слева */
+    --vpc-gap: 10px; /* зазор между лентой и большим фото */
+    --vpc-aspect: 4 / 3; /* соотношение сторон большого фото (например 16/9) */
 
-  display: grid;
-  grid-template-columns: var(--vpc-strip-w) minmax(0, 1fr);
-  column-gap: var(--vpc-gap);
-  align-items: stretch;    /* обе колонки в одном ряду одинаковой высоты */
-  width: 100%;
+    display: grid;
+    grid-template-columns: var(--vpc-strip-w) minmax(0, 1fr);
+    column-gap: var(--vpc-gap);
+    align-items: stretch; /* обе колонки в одном ряду одинаковой высоты */
+    width: 100%;
 }
 
 /* Режим «только большое фото» (если понадобится классом) */
 .vpc.vpc--main-only {
-  grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 /* ===== Лента превью (слева) ===== */
 .vpc__thumbs {
-  position: relative;
-  width: var(--vpc-strip-w);
-  overflow: hidden;        /* без нативного скролла */
-  padding-right: 6px;      /* чтобы не «срезало» правые радиусы */
+    position: relative;
+    width: var(--vpc-strip-w);
+    overflow: hidden; /* без нативного скролла */
+    padding-right: 6px; /* чтобы не «срезало» правые радиусы */
 }
 
 /* Прокручиваемая внутренняя колонка превью */
 .vpc__thumbs-inner {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--vpc-gap) - 2px);
-  transition: transform 160ms ease;
-  will-change: transform;
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--vpc-gap) - 2px);
+    transition: transform 160ms ease;
+    will-change: transform;
 }
 
 /* Кнопки ↑/↓ — центр по X; полупрозрачный фон, без обводок */
 .vpc__thumbs-btn {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 28px;
-  border-radius: 10px;
-  border: none;
-  background: rgba(91, 97, 108, 0.5);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-  cursor: pointer;
-  z-index: 2;
-  transition: background 0.15s ease, transform 0.05s ease;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 28px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(91, 97, 108, 0.5);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.15s ease, transform 0.05s ease;
 }
-.vpc__thumbs-btn--up { top: 6px; }
-.vpc__thumbs-btn--down { bottom: 6px; }
-.vpc__thumbs-btn:hover { background: rgba(91, 97, 108, 0.7); }
-.vpc__thumbs-btn:active { transform: translateX(-50%) scale(0.98); }
+.vpc__thumbs-btn--up {
+    top: 6px;
+}
+.vpc__thumbs-btn--down {
+    bottom: 6px;
+}
+.vpc__thumbs-btn:hover {
+    background: rgba(91, 97, 108, 0.7);
+}
+.vpc__thumbs-btn:active {
+    transform: translateX(-50%) scale(0.98);
+}
 
 /* Превью */
 .vpc__thumb {
-  box-sizing: border-box;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: #f3f4f6;
-  width: 100%;
-  padding: 0;
-  flex: 0 0 auto;
-  cursor: pointer;
-  outline: none;
+    box-sizing: border-box;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: #f3f4f6;
+    width: 100%;
+    padding: 0;
+    flex: 0 0 auto;
+    cursor: pointer;
+    outline: none;
 }
-.vpc__thumb:hover { box-shadow: none; }
+.vpc__thumb:hover {
+    /* box-shadow: none; */
+}
 .vpc__thumb.is-active {
-  /* оранжевое кольцо активного превью */
-  -webkit-box-shadow: 0 0 0 3px #ffd74f;
-  box-shadow: 0 0 0 3px #ffd74f;
+    /* оранжевое кольцо активного превью */
+    -webkit-box-shadow: 0 0 0 3px #ffd74f;
+    box-shadow: 0 0 0 3px #ffd74f;
 }
 
 .vpc__thumb img {
-  display: block;
-  width: 100%;
-  height: auto;          /* сохраняем пропорции оригинала */
-  border-radius: inherit;
+    display: block;
+    width: 100%;
+    height: auto; /* сохраняем пропорции оригинала */
+    border-radius: inherit;
 }
 
 /* Плейсхолдер превью (когда нет фото) */
 .vpc__thumb--placeholder {
-  width: 100%;
-  min-height: 48px;
-  color: #9ca3af;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
+    width: 100%;
+    min-height: 48px;
+    color: #9ca3af;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
 }
 
 /* ===== Большое фото (справа) ===== */
 .vpc__main {
-  position: relative;
-  width: 100%;
-  aspect-ratio: var(--vpc-aspect);        /* высота считается от ширины */
-  /* при желании можно ограничить высоту: */
-  /* max-height: var(--vpc-max-h, 460px); */
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--vpc-aspect); /* высота считается от ширины */
+    /* при желании можно ограничить высоту: */
+    /* max-height: var(--vpc-max-h, 460px); */
 
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.06);
-  background: #f3f4f6;
-  min-width: 0;                            /* важно для сжатия в гриде */
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: #f3f4f6;
+    min-width: 0; /* важно для сжатия в гриде */
 }
 
 .vpc__main img {
-  position: absolute;   /* исключаем из потока, чтобы aspect-ratio держал высоту */
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;     /* заполняем с обрезкой */
-  display: block;
+    position: absolute; /* исключаем из потока, чтобы aspect-ratio держал высоту */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* заполняем с обрезкой */
+    display: block;
 }
 
 /* «Невидимые» стрелки поверх большого фото */
 .vpc__nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
-  border: none;
-  background: rgba(255, 255, 255, 0);
-  color: #111827;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.15s ease, background 0.15s ease, transform 0.05s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: rgba(255, 255, 255, 0);
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease, transform 0.05s ease;
 }
-.vpc__nav--left { left: 8px; }
-.vpc__nav--right { right: 8px; }
+.vpc__nav--left {
+    left: 8px;
+}
+.vpc__nav--right {
+    right: 8px;
+}
 
 .vpc__main:hover .vpc__nav {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.5);
 }
 .vpc__main .vpc__nav:hover {
-  background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.6);
 }
 .vpc__nav:active {
-  transform: translateY(-50%) scale(0.98);
+    transform: translateY(-50%) scale(0.98);
 }
 
 /* Чтобы SVG не смещался из-за baseline */
 .vpc__thumbs-btn svg,
 .vpc__nav svg {
-  display: block;
-}
-
-/* Убираем браузерные фокусы/обводки у кнопок карусели */
-.vpc button { outline: none; }
-.vpc button:focus,
-.vpc button:focus-visible,
-.vpc button:focus-within {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* ===== Адаптив через container queries =====
-   Считаем ширину КОНТЕЙНЕРА .vehicle-gallery (родитель колонки).
-   Включи контейнер в своих стилях: .vehicle-gallery { container-type: inline-size; }
-   Хочешь прятать раньше/позже — просто поменяй 560px на нужное значение. */
-@container (max-width: 300px) {
-  .vpc { grid-template-columns: 1fr; }
-  .vpc__thumbs { display: none; }
+    display: block;
 }
 
 /* Фолбэк на случай отсутствия поддержки container queries:
    если ВЬЮПОРТ до 480px — прячем ленту */
-@media (max-width: 480px) {
-  .vpc { grid-template-columns: 1fr; }
-  .vpc__thumbs { display: none; }
+@media (max-width: 590px) {
+    .vpc {
+        grid-template-columns: 1fr;
+    }
+    .vpc__thumbs {
+        display: none;
+    }
 }

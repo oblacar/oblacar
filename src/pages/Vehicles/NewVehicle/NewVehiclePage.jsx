@@ -11,9 +11,6 @@ import VehicleCard from '../../../components/VehicleCard/VehicleCard';
 import AddPhotoButton from '../../../components/common/AddPhotoButton/AddPhotoButton';
 import MultiTruckPhotoUploader from '../../../components/MultiTruckPhotoUploader/MultiTruckPhotoUploader';
 
-import VerticalPhotoCarousel from '../../../components/common/VerticalPhotoCarousel/VerticalPhotoCarousel';
-
-// Страница создания новой машины: слева превью, справа форма.
 // ЛОГИКИ СОХРАНЕНИЯ НЕТ — только разметка и локальный стейт.
 
 const NewVehiclePage = () => {
@@ -36,17 +33,15 @@ const NewVehiclePage = () => {
     return (
         // <div className='new-ad-section'>
         <div className=''>
-            <p className='new-ad-division-title'>Новая машина</p>
+            <h2>Новая машина</h2>
 
             <div className='new-vehicle-layout'>
-                {/* Слева — превью карточки по текущим данным формы */}
-                <div className='new-vehicle-left'>
+                <div className='new-vehicle-card card-wrap'>
                     <VehicleCard vehicle={formData} />
                 </div>
 
-                {/* Справа — форма ввода параметров */}
                 {/* <div className='new-vehicle-right new-ad-card-main-area'> */}
-                <div className='new-vehicle-right'>
+                <div className='new-vehicle-data'>
                     <VehicleFormSection
                         ref={vehicleRef}
                         formData={formData}
