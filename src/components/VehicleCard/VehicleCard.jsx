@@ -24,7 +24,8 @@ const VehicleCard = ({ vehicle = {}, className = '' }) => {
                         aspectRatio={4 / 3}
                         stripWidth={84}
                         gap={10}
-                        minMainWidth={380}
+                        minMainWidth={270}
+                        //Порог скрытия превью = stripWidth + gap + minMainWidth
                     // maxMainHeight={460} // опционально
                     />
                 </div>

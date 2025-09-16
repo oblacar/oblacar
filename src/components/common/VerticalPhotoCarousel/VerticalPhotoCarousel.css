@@ -99,7 +99,7 @@
 .vpc__main {
   position: relative;
   width: 100%;
-  max-width: 280px;
+  /* max-width: 280px; */
   aspect-ratio: var(--vpc-aspect);  /* ВАЖНО: высота вычисляется от ширины */
   border-radius: 10px;
   overflow: hidden;
@@ -153,6 +153,6 @@
 .vpc button:focus-within { outline: none !important; box-shadow: none !important; }
 
 /* адаптив: слегка ужимаем ленту */
-@media (max-width: 560px) {
+@media (max-width: 400px) {
   .vpc { grid-template-columns: 72px 1fr; column-gap: 8px; }
 }
