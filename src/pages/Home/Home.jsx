@@ -36,6 +36,9 @@ import TransportationTest from './TransportationTest';
 import './testcss.css';
 import { FaTruck, FaBox } from 'react-icons/fa';
 import ToggleSearchMode from '../../components/common/ToggleSearchMode/ToggleSearchMode';
+
+import DevVehicleQuickTest from './DevVehicleQuickTest';
+
 function Home() {
     const { ads } = useContext(TransportAdContext);
     const [isCarSearch, setIsCarSearch] = useState(true);
@@ -54,6 +57,11 @@ function Home() {
 
     return (
         <>
+            <div>
+                {/* ...твой текущий контент... */}
+                <DevVehicleQuickTest />
+            </div>
+
             <div style={{ padding: '20px' }}>
                 <ToggleSearchMode
                     firstOption={{
