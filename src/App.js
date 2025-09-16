@@ -15,7 +15,7 @@ import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
 import { TransportAdProvider } from './hooks/TransportAdContext';
-import { TransportProvider } from './hooks/TransportContext';
+
 import { ConversationProvider } from './hooks/ConversationContext';
 import { TransportationProvider } from './hooks/TransportationContext';
 import ConversationsPage from './pages/ConversationsPage/ConversationsPage';
@@ -29,7 +29,6 @@ const App = () => {
                     <UserProvider>
                         <VehicleProvider>
                             <ConversationProvider>
-                                {/* <TransportProvider> */}
                                 <TransportAdProvider>
                                     <TransportationProvider>
                                         <Routes>
@@ -90,7 +89,6 @@ const App = () => {
                                         </Routes>
                                     </TransportationProvider>
                                 </TransportAdProvider>
-                                {/* </TransportProvider> */}
                             </ConversationProvider>
                         </VehicleProvider>
                     </UserProvider>
