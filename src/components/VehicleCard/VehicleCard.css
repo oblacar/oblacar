@@ -1,11 +1,12 @@
 /* ===== Корень карточки: 2 колонки, с переносом при нехватке места ===== */
 .vehicle-card-full {
   display: flex;
-  flex-wrap: wrap;              /* при нехватке места блоки уйдут в столбик */
+  flex-wrap: wrap;
+  /* при нехватке места блоки уйдут в столбик */
   gap: 12px;
   align-items: flex-start;
 
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   background: #fff;
   padding: 12px;
@@ -17,9 +18,12 @@
    - min-width задаёт «минимально комфортную» ширину карусели
 */
 .vehicle-gallery {
-  flex: 0 0 370px;              /* grow:1, shrink:1, basis:520px */
-  min-width: 300px;             /* можно 320px, если нужно раньше ставить в 2 колонки */
-  min-height: 1px;              /* защита от переполнения */
+  flex: 0 0 370px;
+  /* grow:1, shrink:1, basis:520px */
+  min-width: 300px;
+  /* можно 320px, если нужно раньше ставить в 2 колонки */
+  min-height: 1px;
+  /* защита от переполнения */
 
   /* ВАЖНО: не задаём width:100%, чтобы колонка не захватывала всю строку */
 }
@@ -65,7 +69,8 @@
 }
 
 .vehicle-card-label {
-  color: #6b7280; /* gray-500 */
+  color: #6b7280;
+  /* gray-500 */
 }
 
 .vehicle-card-tags {
@@ -82,8 +87,15 @@
   background: #fff;
 }
 
+/* Родитель левой колонки, где лежит карусель */
+.vehicle-gallery {
+  container-type: inline-size;
+}
+
+
 /* ===== Адаптив: на узких экранах колонки становятся в столбик ===== */
 @media (max-width: 500px) {
+
   .vehicle-gallery,
   .vehicle-card-right {
     flex: 1 1 100%;

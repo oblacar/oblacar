@@ -1,8 +1,6 @@
 import React from 'react';
 import './VehicleCard.css';
-// import VerticalPhotoCarousel from './../common/VerticalPhotoCarousel/VerticalPhotoCarousel';
-
-import ResponsiveVehicleGallery from './../common/VerticalPhotoCarousel/ResponsiveVehicleGallery';
+import VerticalPhotoCarousel from './../common/VerticalPhotoCarousel/VerticalPhotoCarousel';
 
 // Карточка транспорта: слева — галерея (карусель), справа — характеристики.
 const VehicleCard = ({ vehicle = {}, className = '' }) => {
@@ -19,15 +17,10 @@ const VehicleCard = ({ vehicle = {}, className = '' }) => {
             {/* Левая колонка: авто-галерея */}
             <div className="vehicle-gallery">
                 <div className="vehicle-gallery">
-                    <ResponsiveVehicleGallery
-                        photos={truckPhotoUrls}
-                        aspectRatio={4 / 3}
-                        stripWidth={84}
-                        gap={10}
-                        minMainWidth={270}
-                        //Порог скрытия превью = stripWidth + gap + minMainWidth
-                    // maxMainHeight={460} // опционально
-                    />
+                    <div className="vehicle-gallery">
+                        <VerticalPhotoCarousel photos={truckPhotoUrls} />
+                    </div>
+
                 </div>
             </div>
 
