@@ -1,11 +1,22 @@
-/* контейнер, внутри которого лежит карточка */
+/* контейнер раздела с карточкой (уровень страницы) */
 .card-wrap {
     display: flex;
-    justify-content: center; /* по горизонтали */
-    /* align-items: flex-start; // опционально по вертикали */
-    padding-inline: 12px;
-}
-.vehicle-card-full {
-    /* max-width: 740px; */
+    justify-content: center; /* по центру горизонтально */
+    padding-top: 12px;
+    padding-bottom: 12px;
     width: 100%;
 }
+
+/* оболочка вокруг самой карточки: здесь контролируем max-width */
+.card-wrap .vehicle-card-shell {
+    width: 100%;
+    max-width: 740px; /* ТВОЙ предел */
+    margin-inline: auto; /* на случай, если родитель не flex */
+}
+
+/* (опционально) если хочешь таргетить прямо карточку, не добавляя оболочку: */
+/* .new-vehicle-card .vehicle-card-full {
+    max-width: 740px;
+    margin-inline: auto;
+    width: 100%;
+} */

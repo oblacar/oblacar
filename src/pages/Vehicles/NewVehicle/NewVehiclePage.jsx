@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 
+import './NewVehiclePage.css';
+
 // Готовая форма ввода (из твоего проекта)
 import VehicleFormSection from '../../../components/CreateTransportAd/VehicleFormSection';
 import { truckTypesWithLoading } from '../../../constants/transportAdData';
@@ -37,7 +39,9 @@ const NewVehiclePage = () => {
 
             <div className='new-vehicle-layout'>
                 <div className='new-vehicle-card card-wrap'>
-                    <VehicleCard vehicle={formData} />
+                    <div className='vehicle-card-shell'>
+                        <VehicleCard vehicle={formData} />
+                    </div>
                 </div>
 
                 {/* <div className='new-vehicle-right new-ad-card-main-area'> */}
