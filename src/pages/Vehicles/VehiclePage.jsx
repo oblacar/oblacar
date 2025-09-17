@@ -30,7 +30,7 @@ const VehicleDetailsPage = () => {
   // если пришли по прямой ссылке и в стейте нет машины — подтянем список
   useEffect(() => {
     if (!vehicle && !loading) {
-      refresh().catch(() => {});
+      refresh().catch(() => { });
     }
   }, [vehicle, loading, refresh]);
 
@@ -54,9 +54,9 @@ const VehicleDetailsPage = () => {
 
   return (
     <div className="deliveries-container">
-      <div className="page-header" style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
+      <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <h1 className="page-title">{vehicle.truckName || 'Машина'}</h1>
-        <div style={{display:'flex',gap:8}}>
+        <div style={{ display: 'flex', gap: 8 }}>
           <Link to="/vehicles">
             <Button type_btn="">К списку</Button>
           </Link>
@@ -73,8 +73,12 @@ const VehicleDetailsPage = () => {
         </div>
       </div>
 
-      <div className="card-wrap">
-        <VehicleCard vehicle={vehicle} />
+      {/* <div className="card-wrap"> */}
+      <div>
+        <VehicleCard
+          vehicle={vehicle}
+          isCreateCard={false}
+        />
       </div>
 
       {showConfirm && (
