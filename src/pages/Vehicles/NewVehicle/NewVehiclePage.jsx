@@ -22,6 +22,7 @@ import ConfirmationDialog from '../../../components/common/ConfirmationDialog/Co
 
 const NewVehiclePage = () => {
     const vehicleRef = useRef(null);
+    // const uploaderRef = useRef(null);
 
     const { createVehicle } = useContext(VehicleContext);
 
@@ -108,6 +109,8 @@ const NewVehiclePage = () => {
                 truckPhotoUrls: [],
             });
 
+            vehicleRef.current?.clearPhotos?.();
+
             // window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (e) {
             setUi((u) => ({ ...u, saving: false, error: e?.message || 'Ошибка сохранения' }));
@@ -130,6 +133,8 @@ const NewVehiclePage = () => {
             truckDepth: '',
             truckPhotoUrls: [],
         });
+
+        vehicleRef.current?.clearPhotos?.();
     };
 
     return (

@@ -3,6 +3,7 @@ import React, {
     forwardRef,
     useImperativeHandle,
     useMemo,
+    useRef
 } from 'react';
 // Секция «Транспорт»:
 
@@ -27,6 +28,8 @@ const VehicleFormSection = forwardRef(
             truckWidth: '',
             truckDepth: '',
         });
+
+        const uploaderRef = useRef(null);   // ← ref на аплоадер
 
         const allowedLoadingTypes = useMemo(() => {
             const item = truckTypesWithLoading?.find(
@@ -134,6 +137,13 @@ const VehicleFormSection = forwardRef(
                 setErrors(newErrors);
                 return isValid;
             },
+            clearPhotos: () => {
+                uploaderRef.current?.clear?.();   // ← вызов метода аплоадера
+            },
+            // опционально: открыть диалог выбора файлов снаружи
+            openPhotoPicker: () => {
+                uploaderRef.current?.open?.();
+            },
         }));
 
         return (
@@ -159,10 +169,18 @@ const VehicleFormSection = forwardRef(
 
                 {MultiTruckPhotoUploader && (
                     <div>
-                        <MultiTruckPhotoUploader
+                        {/* <MultiTruckPhotoUploader
                             openFileDialog={openFileDialog}
                             updateFormData={updateFormData}
+                        /> */}
+
+                        <MultiTruckPhotoUploader
+                            // value={formData.truckPhotoUrls}    // ← держим в синхронизации
+                            updateFormData={updateFormData}
+                            openFileDialog={openFileDialog}
+                            ref={uploaderRef}                /* ← передали ref в аплоадер */
                         />
+
                     </div>
                 )}
 
