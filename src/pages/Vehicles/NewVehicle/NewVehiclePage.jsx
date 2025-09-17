@@ -1,6 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useContext } from 'react';
 
 import './NewVehiclePage.css';
+
+import { VehicleContext } from '../../../hooks/VehicleContext';
 
 // Готовая форма ввода (из твоего проекта)
 import VehicleFormSection from '../../../components/CreateTransportAd/VehicleFormSection';
@@ -18,6 +20,8 @@ import MultiTruckPhotoUploader from '../../../components/MultiTruckPhotoUploader
 const NewVehiclePage = () => {
     const vehicleRef = useRef(null);
 
+    const { createVehicle } = useContext(VehicleContext);
+
     const [formData, setFormData] = useState({
         truckName: '',
         transportType: '',
@@ -32,6 +36,28 @@ const NewVehiclePage = () => {
     const updateFormData = (patch) =>
         setFormData((prev) => ({ ...prev, ...patch }));
 
+    const handleSaveVehicle = async () => {
+        // 1) Вызвать валидацию у формы
+        const ok = vehicleRef.current?.validateFields?.();
+        if (!ok) {
+            // опционально: проскроллить к первой ошибке
+            document
+                .querySelector('.error-text')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // 2) Если всё ок — сохраняем (через контекст/сервис)
+        try {
+            console.log(formData);
+            // await createVehicle(formData);
+            // ... дальше: показать уведомление / редирект / очистить форму
+        } catch (e) {
+            console.error(e);
+            // показать ошибку пользователю при необходимости
+        }
+    };
+
     return (
         <div className=''>
             <div className='page-header'>
@@ -42,7 +68,12 @@ const NewVehiclePage = () => {
             <div className='new-vehicle-layout'>
                 <div className='new-vehicle-card card-wrap'>
                     <div className='vehicle-card-shell'>
-                        <VehicleCard vehicle={formData} />
+                        <VehicleCard
+                            vehicle={formData}
+                            isCreateCard
+                            onCreateClick={handleSaveVehicle} // кнопка на превью тоже валидирует и сохраняет
+                            createButtonText='Добавить в гараж'
+                        />
                     </div>
                 </div>
 
