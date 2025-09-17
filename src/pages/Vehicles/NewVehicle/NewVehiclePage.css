@@ -72,3 +72,60 @@
     margin-inline: auto;
     width: 100%;
 } */
+
+/* Нотификации */
+.notice {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.notice.success {
+  background: #f0fff4;
+  color: #176b2c;
+  border: 1px solid #d1f3da;
+}
+.notice.error {
+  background: #fff5f5;
+  color: #a32020;
+  border: 1px solid #f5d0d0;
+}
+
+/* Обёртка карточки, чтобы положить оверлей поверх неё */
+.vehicle-card-holder {
+  position: relative;
+}
+
+/* Оверлей "сохранение…" */
+.saving-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  border-radius: 12px; /* под твои радиусы карточек, если есть */
+}
+
+/* Спиннер */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(0,0,0,0.15);
+  border-top-color: rgba(0,0,0,0.55);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Бэкдроп для диалога подтверждения */
+.confirmation-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
