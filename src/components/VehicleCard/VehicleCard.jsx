@@ -31,6 +31,9 @@ const VehicleCard = ({
 
     const loadingList = normalizeLoadingTypes(loadingTypes);
 
+    const mainPhoto = getFirstPhoto(truckPhotoUrls);
+    const isCompact = className?.includes('vehicle-card--compact');
+
     return (
         <div className={`vehicle-card-full ${className}`}>
             {/* Оверлей-кнопка только в режиме создания */}
@@ -38,7 +41,7 @@ const VehicleCard = ({
                 <div className='vehicle-card-action'>
                     <Button
                         type='button'
-                        type_btn='yes' 
+                        type_btn='yes'
                         size_width='auto'
                         size_height='low'
                         icon={<FaSave />}
@@ -50,13 +53,24 @@ const VehicleCard = ({
             )}
 
             {/* Левая колонка: авто-галерея */}
-            <div className='vehicle-gallery'>
+
+            {isCompact ? (
+                mainPhoto ? (
+                    <img
+                        src={mainPhoto}
+                        alt={truckName || 'Фото машины'}
+                        className="vehicle-thumb"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ) : (
+                    <div className="vehicle-thumb-placeholder">Фото</div>
+                )
+            ) : (
                 <div className='vehicle-gallery'>
-                    <div className='vehicle-gallery'>
-                        <VerticalPhotoCarousel photos={truckPhotoUrls} />
-                    </div>
+                    <VerticalPhotoCarousel photos={truckPhotoUrls} />
                 </div>
-            </div>
+            )}
 
             {/* Правая колонка: описание */}
             <div className='vehicle-card-right'>
@@ -72,13 +86,13 @@ const VehicleCard = ({
                     <span className='vehicle-card-tags'>
                         {loadingList.length
                             ? loadingList.map((t) => (
-                                  <span
-                                      key={t}
-                                      className='vehicle-card-tag'
-                                  >
-                                      {t}
-                                  </span>
-                              ))
+                                <span
+                                    key={t}
+                                    className='vehicle-card-tag'
+                                >
+                                    {t}
+                                </span>
+                            ))
                             : '—'}
                     </span>
                 </div>
@@ -125,4 +139,18 @@ function fmtDims(h, w, d) {
             ? String(Math.round(Number(x) * 100) / 100).replace(/\.00?$/, '')
             : '—';
     return `${s(H)}×${s(W)}×${s(D)}`;
+}
+
+function getFirstPhoto(urls) {
+    if (!urls) return null;
+    if (Array.isArray(urls)) return urls[0] || null;
+    if (typeof urls === 'object') {
+        const entries = Object.entries(urls);
+        if (!entries.length) return null;
+        entries.sort((a, b) =>
+            String(a[0]).localeCompare(String(b[0]), undefined, { numeric: true })
+        );
+        return entries[0][1];
+    }
+    return null;
 }

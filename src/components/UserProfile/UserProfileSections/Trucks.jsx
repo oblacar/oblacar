@@ -13,8 +13,8 @@ const Tracks = ({ vehicles = [] }) => {
             title='Мой транспорт'
             subtitle='Здесь будет весь Ваш транспорт.'
             items={vehicles}
-            // toList='/vehicles'
-            toList='/new-vehicle'
+            toList='/vehicles'
+            // toList='/new-vehicle'
             idKey='truckId'
             buildItemTo={(v) => `/vehicles/${v.truckId}`}
             emptyText='Пока нет машин'
