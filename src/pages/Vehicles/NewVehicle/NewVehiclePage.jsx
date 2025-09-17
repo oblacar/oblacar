@@ -33,10 +33,12 @@ const NewVehiclePage = () => {
         setFormData((prev) => ({ ...prev, ...patch }));
 
     return (
-        // <div className='new-ad-section'>
         <div className=''>
-            <h2>Новая машина</h2>
+            <div className='page-header'>
+                <h1 className='page-title'>Новая машина</h1>
+            </div>
 
+            <h2 className='section-title'>Превью</h2>
             <div className='new-vehicle-layout'>
                 <div className='new-vehicle-card card-wrap'>
                     <div className='vehicle-card-shell'>
@@ -44,34 +46,20 @@ const NewVehiclePage = () => {
                     </div>
                 </div>
 
-                {/* <div className='new-vehicle-right new-ad-card-main-area'> */}
+                <h2 className='section-title'>Введите характеристики:</h2>
                 <div className='new-vehicle-data'>
-                    <VehicleFormSection
-                        ref={vehicleRef}
-                        formData={formData}
-                        updateFormData={updateFormData}
-                        truckTypesWithLoading={truckTypesWithLoading}
-                        openFileDialog={() =>
-                            document.getElementById('file-upload')?.click()
-                        }
-                        AddPhotoButton={AddPhotoButton}
-                        MultiTruckPhotoUploader={MultiTruckPhotoUploader}
-                    />
-
-                    {/* Кнопки — пока без логики сохранения */}
-                    <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-                        <button
-                            className='btn primary'
-                            disabled
-                        >
-                            Сохранить (позже)
-                        </button>
-                        <button
-                            className='btn'
-                            onClick={() => window.history.back()}
-                        >
-                            Отмена
-                        </button>
+                    <div className='new-vehicle-data-container'>
+                        <VehicleFormSection
+                            ref={vehicleRef}
+                            formData={formData}
+                            updateFormData={updateFormData}
+                            truckTypesWithLoading={truckTypesWithLoading}
+                            openFileDialog={() =>
+                                document.getElementById('file-upload')?.click()
+                            }
+                            AddPhotoButton={AddPhotoButton}
+                            MultiTruckPhotoUploader={MultiTruckPhotoUploader}
+                        />
                     </div>
                 </div>
             </div>
