@@ -2,11 +2,30 @@ import React from 'react';
 import './VehicleCard.css';
 import VerticalPhotoCarousel from './../common/VerticalPhotoCarousel/VerticalPhotoCarousel';
 
+// кнопка и иконка
+import Button from '../common/Button/Button';
+import { FaWarehouse } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
+import { FaSave } from 'react-icons/fa';
+
 // Карточка транспорта: слева — галерея (карусель), справа — характеристики.
-const VehicleCard = ({ vehicle = {}, className = '' }) => {
+const VehicleCard = ({
+    vehicle = {},
+    className = '',
+    // новые пропсы:
+    isCreateCard = true,
+    // isCreateCard = false,
+    onCreateClick,
+    createButtonText = 'Сохранить',
+}) => {
     const {
-        truckName, transportType, loadingTypes,
-        truckWeight, truckHeight, truckWidth, truckDepth,
+        truckName,
+        transportType,
+        loadingTypes,
+        truckWeight,
+        truckHeight,
+        truckWidth,
+        truckDepth,
         truckPhotoUrls,
     } = vehicle;
 
@@ -14,37 +33,61 @@ const VehicleCard = ({ vehicle = {}, className = '' }) => {
 
     return (
         <div className={`vehicle-card-full ${className}`}>
+            {/* Оверлей-кнопка только в режиме создания */}
+            {isCreateCard && (
+                <div className='vehicle-card-action'>
+                    <Button
+                        type='button'
+                        type_btn='reverse-yes' // стандартный стиль твоей кнопки
+                        size_width='auto'
+                        size_height='low'
+                        icon={<FaSave />}
+                        onClick={onCreateClick}
+                    >
+                        {createButtonText}
+                    </Button>
+                </div>
+            )}
+
             {/* Левая колонка: авто-галерея */}
-            <div className="vehicle-gallery">
-                <div className="vehicle-gallery">
-                    <div className="vehicle-gallery">
+            <div className='vehicle-gallery'>
+                <div className='vehicle-gallery'>
+                    <div className='vehicle-gallery'>
                         <VerticalPhotoCarousel photos={truckPhotoUrls} />
                     </div>
-
                 </div>
             </div>
 
             {/* Правая колонка: описание */}
-            <div className="vehicle-card-right">
-                <h3 className="vehicle-card-title">{truckName || 'Без названия'}</h3>
-                <div className="vehicle-card-row">
-                    <span className="vehicle-card-label">Тип: </span>
+            <div className='vehicle-card-right'>
+                <h3 className='vehicle-card-title'>
+                    {truckName || 'Без названия'}
+                </h3>
+                <div className='vehicle-card-row'>
+                    <span className='vehicle-card-label'>Тип: </span>
                     <span>{transportType || '—'}</span>
                 </div>
-                <div className="vehicle-card-row">
-                    <span className="vehicle-card-label">Загрузка: </span>
-                    <span className="vehicle-card-tags">
-                        {loadingList.length ? loadingList.map((t) => (
-                            <span key={t} className="vehicle-card-tag">{t}</span>
-                        )) : '—'}
+                <div className='vehicle-card-row'>
+                    <span className='vehicle-card-label'>Загрузка: </span>
+                    <span className='vehicle-card-tags'>
+                        {loadingList.length
+                            ? loadingList.map((t) => (
+                                  <span
+                                      key={t}
+                                      className='vehicle-card-tag'
+                                  >
+                                      {t}
+                                  </span>
+                              ))
+                            : '—'}
                     </span>
                 </div>
-                <div className="vehicle-card-row">
-                    <span className="vehicle-card-label">Вес (т): </span>
+                <div className='vehicle-card-row'>
+                    <span className='vehicle-card-label'>Вес (т): </span>
                     <span>{fmtNum(truckWeight)}</span>
                 </div>
-                <div className="vehicle-card-row">
-                    <span className="vehicle-card-label">Габариты (м): </span>
+                <div className='vehicle-card-row'>
+                    <span className='vehicle-card-label'>Габариты (м): </span>
                     <span>{fmtDims(truckHeight, truckWidth, truckDepth)}</span>
                 </div>
             </div>
@@ -74,7 +117,8 @@ function fmtDims(h, w, d) {
     const H = Number(h);
     const W = Number(w);
     const D = Number(d);
-    const hasAny = Number.isFinite(H) || Number.isFinite(W) || Number.isFinite(D);
+    const hasAny =
+        Number.isFinite(H) || Number.isFinite(W) || Number.isFinite(D);
     if (!hasAny) return '—';
     const s = (x) =>
         Number.isFinite(Number(x))

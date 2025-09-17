@@ -13,6 +13,8 @@
     border-radius: 12px;
     background: #fff;
     padding: 12px;
+
+    position: relative;
 }
 
 /* ===== Левая колонка: контейнер для карусели =====
@@ -93,6 +95,30 @@
 /* Родитель левой колонки, где лежит карусель */
 .vehicle-gallery {
     container-type: inline-size;
+}
+
+/* оверлей-кнопка в правом верхнем углу */
+.vehicle-card-action {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+}
+
+/* можно сделать кнопку чуть компактнее в оверлее */
+.vehicle-card-action .button {
+    /* при желании добавить тень:
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    */
+}
+
+@media (max-width: 480px) {
+    .vehicle-card-action {
+        top: 6px;
+        right: 6px;
+    }
 }
 
 /* ===== Адаптив: на узких экранах колонки становятся в столбик ===== */

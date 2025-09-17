@@ -6,14 +6,14 @@
 // размеры по ширине: large, medium, small, width
 // размеры по высоте: high medium low
 // type_btn = '', // тип кнопки: пустая - страндарт, yes - да, no - нет, orange -оранжевая, reverse - обычная перевернутая
-// reverse-no
+// reverse-no, reverse-yes
 
 import React from 'react';
 import './Button.css'; // Импортируйте стили
 
 const Button = ({
     type = 'button',
-    type_btn = '', // тип кнопки: пустая - страндарт, yes - да, no - нет.
+    type_btn = '', 
     size_width = '',
     size_height = 'medium',
     children,

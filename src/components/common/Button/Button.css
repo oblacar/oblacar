@@ -47,6 +47,18 @@
     border: 3px double white;
 }
 
+.button.reverse-yes {
+    background-color: white; /* Основной цвет */
+    color: rgb(49, 147, 72);
+    border: 3px double rgb(49, 147, 72);
+}
+
+.button.reverse-yes:hover {
+    background-color: rgb(49, 147, 72); /* Основной цвет */
+    color: white;
+    border: 3px double white;
+}
+
 .button.yes {
     background-color: rgb(49, 147, 72); /* Основной цвет */
 }
