@@ -92,10 +92,22 @@ const NewVehiclePage = () => {
             console.log(formData);
 
             setUi((u) => ({ ...u, saving: true, error: '' }));
-            // await createVehicle(formData);
+            
+            await createVehicle(formData);
             setUi((u) => ({ ...u, saving: false, success: true }));
+            
             // опционально: очистить форму
-            // setFormData({...});
+            setFormData({
+                truckName: '',
+                transportType: '',
+                loadingTypes: [],
+                truckWeight: '',
+                truckHeight: '',
+                truckWidth: '',
+                truckDepth: '',
+                truckPhotoUrls: [],
+            });
+
             // window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (e) {
             setUi((u) => ({ ...u, saving: false, error: e?.message || 'Ошибка сохранения' }));

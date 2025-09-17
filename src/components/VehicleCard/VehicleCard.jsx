@@ -38,7 +38,7 @@ const VehicleCard = ({
                 <div className='vehicle-card-action'>
                     <Button
                         type='button'
-                        type_btn='reverse-yes' // стандартный стиль твоей кнопки
+                        type_btn='yes' 
                         size_width='auto'
                         size_height='low'
                         icon={<FaSave />}

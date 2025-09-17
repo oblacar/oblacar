@@ -100,8 +100,8 @@
 /* оверлей-кнопка в правом верхнем углу */
 .vehicle-card-action {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    bottom: 0px;
+    right: 0px;
     z-index: 2;
     display: flex;
     align-items: center;
