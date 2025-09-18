@@ -1,12 +1,27 @@
+/* src/components/common/ProfileSectionCard/ProfileSectionCard.css */
+
 .profile-section-card {
     display: flex;
     flex-direction: column;
-    /* padding: 12px;
-    border-radius: 12px; */
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    padding: 12px;
+    border-radius: 12px;
+    transition: background-color .2s ease, box-shadow .2s ease;
+    min-width: 0;
+    cursor: pointer;
+    /* фон кликабелен -> на список */
 }
 
-.profile-section__header {
+.profile-section-card:hover {
+    background-color: rgb(255, 254, 193);
+}
+
+.profile-section-card.ps-active {
+    -webkit-box-shadow: 0 0 0 8px rgba(255, 203, 112, .53);
+    -moz-box-shadow: 0 0 0 8px rgba(255, 203, 112, .53);
+    box-shadow: 0 0 0 8px rgba(255, 203, 112, .53);
+}
+
+.profile-section-card__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -14,76 +29,69 @@
     margin-bottom: 8px;
 }
 
-.profile-section__title {
+.profile-section-card__title {
     margin: 0;
     font-size: 18px;
     line-height: 1.2;
     font-weight: 600;
 }
 
-.profile-section__subtitle {
+.profile-section-card__subtitle {
     margin: 4px 0 0 0;
     color: #6b7280;
     font-size: 13px;
 }
 
 /* Слот под кастомную ленту (renderContent) */
-/* карточка заполняет доступную высоту ячейки */
+.profile-section-card__custom {
+    margin-top: 8px;
+}
+
+/* карточка растягивается по высоте колонки */
 .profile-section--fill {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    min-width: 0; /* ← не даём контенту распирать секцию */
+    /* width: 100%; */
+    min-width: 0;
 }
 
-.profile-section__custom {
-    /* по умолчанию просто идёт после заголовка */
-    margin-top: 8px;
-}
-
-/* Модификатор: прижать ленту к низу карточки */
-.profile-section--stick-bottom {
-    display: flex;
-    flex-direction: column;
-}
-.profile-section--stick-bottom .profile-section__custom {
+/* прижать контент-слот вниз (если модификатор на родителе ИЛИ на самой карточке) */
+.profile-section--stick-bottom .profile-section-card__custom,
+.profile-section-card.profile-section--stick-bottom .profile-section-card__custom {
     margin-top: auto;
 }
 
-/* Модификатор: ограничить ширину ленты */
-.profile-section--narrow .profile-section__custom {
-    max-width: 520px;
-}
+/* ===== дефолтная лента чипов (если не передан renderContent) ===== */
 
-/* ===== ДЕФОЛТНАЯ ЛЕНТА чипов (когда НЕТ renderContent) ===== */
-
-.profile-section__items {
+.profile-section-card__items {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.profile-section__item-link {
+.profile-section-card__item-link {
     text-decoration: none;
 }
 
-.profile-section__chip {
+/* Чип: круглый аватар + подпись */
+.profile-section-card__chip {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, .06);
     border-radius: 999px;
     background: #fff;
-    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+    transition: background-color .15s ease, box-shadow .15s ease;
 }
-.profile-section__chip:hover {
+
+.profile-section-card__chip:hover {
     background: #fffef5;
 }
 
-.profile-section__chip-avatar {
+.profile-section-card__chip-avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -95,7 +103,8 @@
     font-weight: 700;
     text-transform: uppercase;
 }
-.profile-section__chip-avatar--img img {
+
+.profile-section-card__chip-avatar--img img {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -103,7 +112,7 @@
     display: block;
 }
 
-.profile-section__chip-title {
+.profile-section-card__chip-title {
     max-width: 140px;
     white-space: nowrap;
     overflow: hidden;
@@ -113,11 +122,11 @@
 }
 
 /* Плашка +N */
-.profile-section__more {
+.profile-section-card__more {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px dashed rgba(0, 0, 0, 0.2);
+    border: 1px dashed rgba(0, 0, 0, .2);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -126,34 +135,20 @@
     font-weight: 600;
     background: #fff;
 }
-.profile-section__more:hover {
+
+.profile-section-card__more:hover {
     background: #fffbe6;
 }
 
-/* Пустое состояние (дефолтного списка) */
-.profile-section__empty {
+/* Пустое состояние */
+.profile-section-card__empty {
     display: flex;
     align-items: center;
     gap: 10px;
     min-height: 36px;
     color: #6b7280;
 }
-.profile-section__empty-text {
+
+.profile-section-card__empty-text {
     font-size: 14px;
-}
-
-/* Ховер фона карточки — только если не навели на интерактив внутри */
-.profile-section-card:hover:not(
-        :has(a:hover, button:hover, .va-row__item:hover)
-    ) {
-    background-color: rgb(255, 254, 193);
-}
-
-/* Актив (оранжевая тень) — только если клик именно по карточке, а не по элементу ленты/ссылке */
-.profile-section-card:active:not(
-        :has(a:active, button:active, .va-row__item:active)
-    ) {
-    -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
 }

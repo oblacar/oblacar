@@ -1,25 +1,8 @@
-import React from 'react';
+// src/components/common/ProfileSectionCard/ProfileSectionCard.jsx
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
 import './ProfileSectionCard.css';
 
-/**
- * Универсальный «прямоугольный» блок профиля.
- * - Клик по блоку → переход на общий список (toList)
- * - Клик по мини‑карточке элемента → переход на детальную (buildItemTo)
- * - Никаких вложенных ссылок: родитель — div с navigate(), дочерние — <Link/>
- *
- * Props:
- *  - title: string — заголовок
- *  - subtitle?: string — подпись под заголовком (необязательно)
- *  - items: any[] — элементы для превью
- *  - toList: string — маршрут списка
- *  - buildItemTo?: (item) => string — как получить ссылку на элемент
- *  - idKey?: string — ключ id внутри item (по умолчанию 'id')
- *  - limit?: number — сколько превью показать (по умолчанию 6)
- *  - renderItem?: (item) => JSX — как отрисовать превью‑чип
- *  - className?: string — доп. классы корневого блока
- */
 const ProfileSectionCard = ({
     title,
     subtitle,
@@ -31,36 +14,47 @@ const ProfileSectionCard = ({
     renderItem,
     className = '',
     emptyText = 'Пока пусто',
-    renderContent, // ← НОВЫЙ проп
+    renderContent, // если передан — кастомная лента (машины и т.п.)
 }) => {
     const navigate = useNavigate();
+    const [isActive, setIsActive] = useState(false);
+
     const goToList = () => navigate(toList);
-    const onKey = (e) => {
-        if (e.key === 'Enter' || e.key === ' ') goToList();
+
+    // что считаем интерактивом (клик по нему НЕ должен вести карточку на список)
+    const isInteractive = (el) =>
+        el?.closest?.(
+            'a,button,[role="button"],[role="link"],.va-row__item,.va-row__nav,input,select,textarea,label'
+        );
+
+    const handleCardClick = (e) => {
+        if (isInteractive(e.target)) return; // клик по элементу ленты/ссылке— игнорим
+        goToList();                           // клик по "фону" карточки — идём на список
     };
 
-    const stop = (e) => e.stopPropagation();
-    const stopKey = (e) => {
-        if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+    const handleKeyDown = (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && !isInteractive(e.target)) {
+            e.preventDefault();
+            goToList();
+        }
     };
+
+    const handleMouseDown = (e) => {
+        if (!isInteractive(e.target)) setIsActive(true);
+    };
+    const clearActive = () => setIsActive(false);
 
     const visible = items.slice(0, limit);
     const overflow = Math.max(items.length - visible.length, 0);
 
     const defaultRenderItem = (item) => (
-        <div className='profile-section__chip'>
-            <div className='profile-section__chip-avatar'>
-                {String(
-                    item.title ||
-                        item.name ||
-                        item.truckName ||
-                        item[idKey] ||
-                        '?'
-                )
+        <div className="profile-section-card__chip">
+            <div className="profile-section-card__chip-avatar">
+                {String(item.title || item.name || item.truckName || item[idKey] || '?')
                     .slice(0, 1)
                     .toUpperCase()}
             </div>
-            <div className='profile-section__chip-title'>
+            <div className="profile-section-card__chip-title">
                 {item.title || item.name || item.truckName || '—'}
             </div>
         </div>
@@ -68,86 +62,59 @@ const ProfileSectionCard = ({
 
     return (
         <div
-            className={`profile-section-card ${className}`} /* ← вернул базовый класс */
-            role='link'
+            className={`profile-section-card ${isActive ? 'ps-active' : ''} ${className}`}
+            role="link"
             tabIndex={0}
-            onClick={goToList}
-            onKeyDown={onKey}
+            onClick={handleCardClick}
+            onKeyDown={handleKeyDown}
+            onMouseDown={handleMouseDown}
+            onMouseUp={clearActive}
+            onMouseLeave={clearActive}
         >
-            <div className='profile-section__header'>
+            <div className="profile-section-card__header">
                 <div>
-                    <h2 className='profile-section__title'>{title}</h2>
-                    {subtitle && !items && (
-                        <p className='profile-section__subtitle'>{subtitle}</p>
-                    )}
+                    <h2 className="profile-section-card__title">{title}</h2>
+                    {subtitle && items.length === 0 && <p className="profile-section-card__subtitle">{subtitle}</p>}
                 </div>
             </div>
 
-            {/* КАСТОМНЫЙ КОНТЕНТ (например, лента кружков) */}
             {typeof renderContent === 'function' ? (
-                <div
-                    className='profile-section__custom'
-                    onClick={stop}
-                    onKeyDown={stopKey}
-                >
-                    {renderContent(items)}
+                <div className="profile-section-card__custom">
+                    {renderContent(items)} {/* ВАЖНО: без stopPropagation — карточка сама разбирает target */}
+                </div>
+            ) : items.length === 0 ? (
+                <div className="profile-section-card__empty">
+                    <div className="profile-section-card__empty-text">{emptyText}</div>
                 </div>
             ) : (
-                // СТАНДАРТНЫЙ РЕНДЕР: чипы + "+ещё"
-                <>
-                    {items.length === 0 ? (
-                        <div className='profile-section__empty'>
-                            <div className='profile-section__empty-text'>
-                                {emptyText}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className='profile-section__items'>
-                            {visible.map((item) => {
-                                const key = String(
-                                    item[idKey] ??
-                                        item.id ??
-                                        item.key ??
-                                        Math.random()
-                                );
-                                const to = buildItemTo
-                                    ? buildItemTo(item)
-                                    : `${toList}/${item[idKey]}`;
-                                return (
-                                    <Link
-                                        key={key}
-                                        to={to}
-                                        className='profile-section__item-link'
-                                        onClick={stop}
-                                        onKeyDown={stopKey}
-                                    >
-                                        {(renderItem || defaultRenderItem)(
-                                            item
-                                        )}
-                                    </Link>
-                                );
-                            })}
-                            {overflow > 0 && (
-                                <Link
-                                    to={toList}
-                                    className='profile-section__more'
-                                    onClick={stop}
-                                    onKeyDown={stopKey}
-                                    aria-label={`Перейти ко всем, ещё ${overflow}`}
-                                    title={`Перейти ко всем, ещё ${overflow}`}
-                                >
-                                    +{overflow}
-                                </Link>
-                            )}
-                        </div>
+                <div className="profile-section-card__items">
+                    {visible.map((item) => {
+                        const key = String(item[idKey] ?? item.id ?? item.key ?? Math.random());
+                        const to = buildItemTo ? buildItemTo(item) : `${toList}/${item[idKey]}`;
+                        return (
+                            <Link key={key} to={to} className="profile-section-card__item-link">
+                                {(renderItem || defaultRenderItem)(item)}
+                            </Link>
+                        );
+                    })}
+                    {overflow > 0 && (
+                        <Link
+                            to={toList}
+                            className="profile-section-card__more"
+                            aria-label={`Перейти ко всем, ещё ${overflow}`}
+                            title={`Перейти ко всем, ещё ${overflow}`}
+                        >
+                            +{overflow}
+                        </Link>
                     )}
-                </>
+                </div>
             )}
         </div>
     );
 };
 
 export default ProfileSectionCard;
+
 
 // Вспомогательное: получить первую фотку из объекта { ph1: url, ph2: url }
 export const firstPhotoFromObject = (obj = {}) => {

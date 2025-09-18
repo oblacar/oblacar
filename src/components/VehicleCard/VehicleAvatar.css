@@ -12,28 +12,46 @@
     justify-content: center;
     user-select: none;
     transition: box-shadow 0.18s ease, transform 0.12s ease;
+
+    /* box-shadow: 0 0 0 2px #fff */
+    border: 2px white solid;
 }
+
+.vehicle-avatar:active{
+    /* -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53); */
+
+    
+    box-shadow: 0px 0px 0px 8px rgba(16, 15, 13, 1);
+} 
 
 .vehicle-avatar.is-clickable {
     cursor: pointer;
 }
+
 .vehicle-avatar.is-clickable:hover {
-    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.18);
+    /* box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.18); */
 }
+
 .vehicle-avatar.is-clickable:active {
     transform: scale(0.98);
+       
+    box-shadow: 0px 0px 0px 8px rgba(16, 15, 13, 1);
 }
 
 .vehicle-avatar__img {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: cover; /* фото заполняет круг с обрезанием */
+    object-fit: cover;
+    /* фото заполняет круг с обрезанием */
 }
 
 .vehicle-avatar__icon {
     width: 60%;
     height: 60%;
-    color: #ff7a00; /* можно поменять под тему проекта */
+    color: #ff7a00;
+    /* можно поменять под тему проекта */
     opacity: 0.9;
 }

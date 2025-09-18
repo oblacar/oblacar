@@ -92,9 +92,13 @@ const VehicleAvatarRow = ({
             const wrap = rootRef.current;
             if (!wrap) return;
 
+            // маленький зазор против округления и т.п.
+            // const FIT_EPS = 18; // px
+            // const W = wrap.clientWidth - FIT_EPS;  // было: wrap.clientWidth
+
             // доступная ширина контейнера (внутренняя)
             const W = wrap.clientWidth;
-            const s = itemSize;
+            const s = itemSize + 6;//TODO костыль 6 - увеличиваем диаметр на 6 для обводки 
 
             // 1) попытка без наезда (plain) с gap
             const wPlain = n * s + (n - 1) * gap;
@@ -170,7 +174,7 @@ const VehicleAvatarRow = ({
         return () => {
             try {
                 if (rootRef.current) ro.unobserve(rootRef.current);
-            } catch {}
+            } catch { }
             ro.disconnect?.();
             window.removeEventListener('resize', calc);
         };
@@ -184,27 +188,26 @@ const VehicleAvatarRow = ({
     const list = isAuto
         ? vehicles.slice(0, autoMode.visible)
         : isFixedOverlap
-        ? vehicles.slice(0, maxVisible)
-        : vehicles;
+            ? vehicles.slice(0, maxVisible)
+            : vehicles;
 
     const overflow = isAuto
         ? autoMode.overflow
         : isFixedOverlap
-        ? Math.max(vehicles.length - maxVisible, 0)
-        : 0;
+            ? Math.max(vehicles.length - maxVisible, 0)
+            : 0;
     const effOverlap = isAuto
         ? autoMode.overlap
         : isFixedOverlap
-        ? overlapOffset
-        : 0;
+            ? overlapOffset
+            : 0;
     const showOverlap = isAuto ? autoMode.mode === 'overlap' : isFixedOverlap;
 
     return (
         <div
             ref={rootRef}
-            className={`va-row ${
-                showOverlap ? 'va-row--overlap' : ''
-            } ${className}`}
+            className={`va-row ${showOverlap ? 'va-row--overlap' : ''
+                } ${className}`}
             style={{
                 '--va-size': `${itemSize}px`,
                 '--va-overlap': `${effOverlap}px`,
@@ -256,16 +259,15 @@ const VehicleAvatarRow = ({
 
                         const commonProps = {
                             key: v.truckId,
-                            className: `va-row__item ${
-                                showOverlap ? 'va-row__item--overlap' : ''
-                            }`,
+                            className: `va-row__item ${showOverlap ? 'va-row__item--overlap' : ''
+                                }`,
                             title: v.truckName || 'Машина',
                             style:
                                 showOverlap && idx > 0
                                     ? {
-                                          marginLeft:
-                                              'calc(-1 * var(--va-overlap))',
-                                      }
+                                        marginLeft:
+                                            'calc(-1 * var(--va-overlap))',
+                                    }
                                     : undefined,
                         };
 

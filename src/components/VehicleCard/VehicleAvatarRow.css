@@ -9,7 +9,8 @@
 .va-row__scroll {
     display: flex;
     align-items: center;
-    overflow-x: auto; /* в overlap/auto перезаписывается на hidden */
+    overflow-x: auto;
+    /* в overlap/auto перезаписывается на hidden */
     padding: 4px 6px;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
@@ -19,10 +20,12 @@
 .va-row__scroll::-webkit-scrollbar {
     height: 6px;
 }
+
 .va-row__scroll::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
     border-radius: 4px;
 }
+
 @supports (scrollbar-width: thin) {
     .va-row__scroll {
         scrollbar-width: thin;
@@ -81,15 +84,19 @@
     transition: background 0.15s ease, opacity 0.15s ease, transform 0.08s ease;
     z-index: 2;
 }
+
 .va-row__nav:hover {
     background: rgba(0, 0, 0, 0.12);
 }
+
 .va-row__nav:active {
     transform: translateY(-50%) scale(0.96);
 }
+
 .va-row__nav--left {
     left: -6px;
 }
+
 .va-row__nav--right {
     right: -6px;
 }
@@ -98,6 +105,7 @@
     .va-row__nav--left {
         left: -2px;
     }
+
     .va-row__nav--right {
         right: -2px;
     }
@@ -117,6 +125,7 @@
     z-index: 1;
     transition: transform 0.12s ease, z-index 0.12s ease;
 }
+
 .va-row__item--overlap:hover {
     z-index: 2;
     transform: translateY(-2px);
@@ -124,7 +133,7 @@
 
 /* Аккуратное белое «кольцо» вокруг кружков при overlap (улучшает вид перекрытия) */
 .va-row--overlap .vehicle-avatar {
-    box-shadow: 0 0 0 2px #fff;
+    /* box-shadow: 0 0 0 2px #fff; */
 }
 
 /* Кружок "+N" (показывается при overflow) */
@@ -139,6 +148,7 @@
     text-decoration: none;
     font-weight: 700;
 }
+
 .va-row__more:hover {
     background: #fffbe6;
 }
@@ -156,24 +166,33 @@
     transform: translateY(-2px);
     z-index: 2;
 }
+
 .va-row .va-row__item:hover .vehicle-avatar {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); */
 }
 
 /* В overlap добавляем белое кольцо + более глубокую тень */
 .va-row--overlap .va-row__item:hover .vehicle-avatar {
-    box-shadow: 0 0 0 2px #fff, 0 8px 18px rgba(0, 0, 0, 0.18);
+    /* box-shadow: 0 0 0 2px #fff, 0 8px 18px rgba(0, 0, 0, 0.18); */
 }
 
 /* Active: ощущение клика */
 .va-row .va-row__item:active {
     transform: translateY(-1px) scale(0.98);
 }
+
 .va-row .va-row__item:active .vehicle-avatar {
-    box-shadow: 0 0 0 2px #fff, 0 12px 22px rgba(0, 0, 0, 0.22);
+    /* box-shadow: 0 0 0 2px #fff, 0 12px 22px rgba(0, 0, 0, 0.22); */
 }
 
 /* Фокус с клавиатуры */
 .va-row .va-row__item:focus-visible .vehicle-avatar {
     box-shadow: 0 0 0 2px #ff9a2f;
 }
+
+.va-row .va-row__item:hover {
+    transform: translateY(-2px);
+    z-index: 2;
+}
+
+/* .va-row .va-row__item:hover .vehicle-avatar { box-shadow: 0 4px 12px rgba(0,0,0,.15); } */
