@@ -68,6 +68,7 @@ const ProfileSectionCard = ({
 
     return (
         <div
+            className={`profile-section-card ${className}`} /* ← вернул базовый класс */
             role='link'
             tabIndex={0}
             onClick={goToList}
@@ -76,7 +77,7 @@ const ProfileSectionCard = ({
             <div className='profile-section__header'>
                 <div>
                     <h2 className='profile-section__title'>{title}</h2>
-                    {subtitle && (
+                    {subtitle && !items && (
                         <p className='profile-section__subtitle'>{subtitle}</p>
                     )}
                 </div>

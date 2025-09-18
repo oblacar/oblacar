@@ -10,9 +10,11 @@ const Tracks = () => {
 
     return (
         <ProfileSectionCard
+            className='profile-section--fill profile-section--stick-bottom' // прижать ленту вниз
             title='Мой транспорт'
+            subtitle='Здесь будет весь Ваш транспорт.'
             toList='/vehicles'
-            items={vehicles} // чтобы ProfileSectionCard знал, пусто или нет
+            items={vehicles} // нужен, чтобы карточка знала, пусто или нет (для клика по фону)
             emptyText='Пока нет машин'
             renderContent={() => {
                 if (loading)
@@ -25,11 +27,23 @@ const Tracks = () => {
                     );
                 return (
                     <VehicleAvatarRow
+                        // vehicles={vehicles}
+                        // itemSize={60}
+                        // gap={10}
+                        // linkToBase='/vehicles'
+                        // emptyText='Пока нет машин'
+
+                        // vehicles={vehicles}
+                        // itemSize={60}
+                        // variant='overlap' // ← новый режим. если их не передать — будет скролл-режим.
+                        // overlapOffset={14}
+                        // maxVisible={4}
+                        // linkToBase='/vehicles'
+
                         vehicles={vehicles}
                         itemSize={60}
-                        gap={10}
-                        linkToBase='/vehicles' // клики по кружкам → /vehicles/:id
-                        emptyText='Пока нет машин'
+                        /* variant="auto" — по умолчанию */
+                        linkToBase='/vehicles'
                     />
                 );
             }}

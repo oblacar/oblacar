@@ -6,15 +6,23 @@
 }
 
 .personal-info {
-    flex: 1; /* Занимает 1/4 пространства */
-    padding: 20px; /* Отступы */
-    min-width: 320px;
+    /* flex: 1; 
+    padding: 20px; 
+    min-width: 320px; */
+    flex: 0 0 400px;
+    min-width: 280px;
 }
 
 .side-info {
-    flex: 1; /* Занимает 2/4 пространства */
+    /* flex: 1; 
     display: flex;
-    flex-direction: column; /* Вертикальное размещение */
+    flex-direction: column;  */
+
+    flex: 1 1 0; /* одинаковая доля + можно сжиматься */
+    min-width: 0; /* КРИТИЧНО: разрешить сжатие содержимого */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .requests-wrapper,
@@ -41,6 +49,12 @@ h2 {
 .profile-section {
     cursor: pointer;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
+
+    display: flex;
+    flex-direction: column; /* вертикальная колонка */
+    min-height: 0; /* важно для корректного расчёта высоты во flex/grid */
+
+    min-width: 0;
 }
 
 .profile-section:hover {

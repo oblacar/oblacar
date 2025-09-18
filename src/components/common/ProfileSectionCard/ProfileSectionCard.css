@@ -1,9 +1,9 @@
-.profile-section {
-    /* padding: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+.profile-section-card {
+    display: flex;
+    flex-direction: column;
+    /* padding: 12px;
     border-radius: 12px; */
-    /* background: #fff; */
-    /* твои hover/active уже заданы в проекте */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .profile-section__header {
@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .profile-section__title {
@@ -23,11 +23,41 @@
 
 .profile-section__subtitle {
     margin: 4px 0 0 0;
-    color: #6b7280; /* gray-500 */
+    color: #6b7280;
     font-size: 13px;
 }
 
-/* Список превью-элементов */
+/* Слот под кастомную ленту (renderContent) */
+/* карточка заполняет доступную высоту ячейки */
+.profile-section--fill {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0; /* ← не даём контенту распирать секцию */
+}
+
+.profile-section__custom {
+    /* по умолчанию просто идёт после заголовка */
+    margin-top: 8px;
+}
+
+/* Модификатор: прижать ленту к низу карточки */
+.profile-section--stick-bottom {
+    display: flex;
+    flex-direction: column;
+}
+.profile-section--stick-bottom .profile-section__custom {
+    margin-top: auto;
+}
+
+/* Модификатор: ограничить ширину ленты */
+.profile-section--narrow .profile-section__custom {
+    max-width: 520px;
+}
+
+/* ===== ДЕФОЛТНАЯ ЛЕНТА чипов (когда НЕТ renderContent) ===== */
+
 .profile-section__items {
     display: flex;
     align-items: center;
@@ -39,7 +69,6 @@
     text-decoration: none;
 }
 
-/* Чип: круглый аватар + подпись */
 .profile-section__chip {
     display: inline-flex;
     align-items: center;
@@ -58,7 +87,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #f3f4f6; /* gray-100 */
+    background: #f3f4f6;
     color: #111827;
     display: inline-flex;
     align-items: center;
@@ -92,7 +121,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #374151; /* gray-700 */
+    color: #374151;
     text-decoration: none;
     font-weight: 600;
     background: #fff;
@@ -101,13 +130,13 @@
     background: #fffbe6;
 }
 
-/* Пустое состояние */
+/* Пустое состояние (дефолтного списка) */
 .profile-section__empty {
     display: flex;
     align-items: center;
     gap: 10px;
     min-height: 36px;
-    color: #6b7280; /* gray-500 */
+    color: #6b7280;
 }
 .profile-section__empty-text {
     font-size: 14px;
