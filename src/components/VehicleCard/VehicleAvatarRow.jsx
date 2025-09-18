@@ -6,40 +6,32 @@ import './VehicleAvatarRow.css';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const VehicleAvatarRow = ({
-    vehicles = [], // [{ truckId, truckName, truckPhotoUrls, ... }]
-    itemSize = 64, // диаметр кружка
-    gap = 10, // зазор между кружками (для "без наезда")
+    vehicles = [],
+    itemSize = 64,
+    gap = 10,
     className = '',
-    onItemClick, // (vehicle) => void — если передан, используем его
+    onItemClick,
     linkToBase = '/vehicles',
     emptyText = 'Пока нет машин',
-
-    // РЕЖИМ: 'auto' (умный), 'scroll' (гор. скролл со стрелками), 'overlap' (фикс. наезд)
     variant = 'auto',
-
-    // для overlap
-    overlapOffset = 14, // px — базовый наезд (используется при variant='overlap')
-    maxVisible = 4, // сколько показывать при overlap, дальше +N
-    // лимиты для авто-режима
-    minAutoOverlap = 6, // минимальная величина наезда px
-    maxAutoOverlapRatio = 0.6, // максимум наезда как доля itemSize (например, 0.6 => 60%)
+    overlapOffset = 14,
+    maxVisible = 4,
+    minAutoOverlap = 6,
+    maxAutoOverlapRatio = 0.6,
 }) => {
     const rootRef = useRef(null);
     const scrollerRef = useRef(null);
 
-    // для scroll-режима
     const [canLeft, setCanLeft] = useState(false);
     const [canRight, setCanRight] = useState(false);
 
-    // для auto-режима вычисляем: plain/overlap, величину наезда и сколько показывать
     const [autoMode, setAutoMode] = useState({
-        mode: 'plain', // 'plain' | 'overlap'
-        overlap: 0, // px
-        visible: vehicles.length, // сколько реально отображаем
-        overflow: 0, // сколько скрыто (для +N)
+        mode: 'plain',
+        overlap: 0,
+        visible: vehicles.length,
+        overflow: 0,
     });
 
-    // ===== scroll-логика (только для variant='scroll') =====
     const recalcScroll = () => {
         if (variant !== 'scroll') return;
         const el = scrollerRef.current;
@@ -50,9 +42,7 @@ const VehicleAvatarRow = ({
         setCanRight(scrollLeft < maxLeft - 2);
     };
 
-    useEffect(() => {
-        recalcScroll();
-    }, [vehicles, itemSize, gap, variant]);
+    useEffect(() => { recalcScroll(); }, [vehicles, itemSize, gap, variant]);
 
     useEffect(() => {
         if (variant !== 'scroll') return;
@@ -74,113 +64,65 @@ const VehicleAvatarRow = ({
         el.scrollBy({ left: amount, behavior: 'smooth' });
     };
 
-    // ===== авто-режим: расчёт наезда, чтобы вписаться в ширину =====
     useLayoutEffect(() => {
         if (variant !== 'auto') return;
 
         const calc = () => {
             const n = vehicles.length;
             if (n === 0) {
-                setAutoMode({
-                    mode: 'plain',
-                    overlap: 0,
-                    visible: 0,
-                    overflow: 0,
-                });
+                setAutoMode({ mode: 'plain', overlap: 0, visible: 0, overflow: 0 });
                 return;
             }
             const wrap = rootRef.current;
             if (!wrap) return;
 
-            // маленький зазор против округления и т.п.
-            // const FIT_EPS = 18; // px
-            // const W = wrap.clientWidth - FIT_EPS;  // было: wrap.clientWidth
-
-            // доступная ширина контейнера (внутренняя)
+            // небольшой запас от подрезания
+            // const FIT_EPS = 2;
+            // const W = wrap.clientWidth - FIT_EPS;
             const W = wrap.clientWidth;
-            const s = itemSize + 6;//TODO костыль 6 - увеличиваем диаметр на 6 для обводки 
+            const s = itemSize + 6; // твой «+6» под белое кольцо
 
-            // 1) попытка без наезда (plain) с gap
             const wPlain = n * s + (n - 1) * gap;
             if (wPlain <= W) {
-                setAutoMode({
-                    mode: 'plain',
-                    overlap: 0,
-                    visible: n,
-                    overflow: 0,
-                });
+                setAutoMode({ mode: 'plain', overlap: 0, visible: n, overflow: 0 });
                 return;
             }
 
-            // 2) считаем наезд, чтобы вписать все n
-            // ширина при наезде: width = s + (n-1) * (s - overlap)
-            // => overlapNeeded = s - (W - s) / (n - 1)
             let overlapNeeded = s - (W - s) / (n - 1);
-            if (overlapNeeded < 0) overlapNeeded = 0; // теоретически не должно, мы проверили plain
+            if (overlapNeeded < 0) overlapNeeded = 0;
             const maxAutoOverlap = s * maxAutoOverlapRatio;
-            const overlapClamped = Math.max(
-                minAutoOverlap,
-                Math.min(overlapNeeded, maxAutoOverlap)
-            );
+            const overlapClamped = Math.max(minAutoOverlap, Math.min(overlapNeeded, maxAutoOverlap));
 
-            // если этого наезда хватает — показываем все n
             const widthWithClamped = s + (n - 1) * (s - overlapClamped);
             if (widthWithClamped <= W) {
-                setAutoMode({
-                    mode: 'overlap',
-                    overlap: overlapClamped,
-                    visible: n,
-                    overflow: 0,
-                });
+                setAutoMode({ mode: 'overlap', overlap: overlapClamped, visible: n, overflow: 0 });
                 return;
             }
 
-            // 3) даже с максимально допустимым наездом не влезаем — показываем максимум + кружок "+N"
-            const step = s - maxAutoOverlap; // эффективный шаг по x на элемент
-            // хотим уместить: [видимые элементы] + [кружок +N]
-            let k = Math.floor((W - s) / step); // столько шагов умещается после первого s
-            // k — это кол-во ДОПОЛНИТЕЛЬНЫХ элементов, которые поместятся, но нам нужно место и под "+N"
-            // поэтому уменьшаем на 1, чтобы уместился ещё кружок +N (если будет overflow)
+            const step = s - maxAutoOverlap;
+            let k = Math.floor((W - s) / step);
             k = Math.max(0, k - 1);
-
-            let visible = Math.min(n, Math.max(1, k + 1)); // +1, т.к. k — дополнительные к первому
+            let visible = Math.min(n, Math.max(1, k + 1));
             const overflow = Math.max(0, n - visible);
 
-            // если overflow == 0 (вдруг поместились все) — просто показываем все
             if (overflow === 0) {
-                setAutoMode({
-                    mode: 'overlap',
-                    overlap: maxAutoOverlap,
-                    visible: n,
-                    overflow: 0,
-                });
+                setAutoMode({ mode: 'overlap', overlap: maxAutoOverlap, visible: n, overflow: 0 });
             } else {
-                setAutoMode({
-                    mode: 'overlap',
-                    overlap: maxAutoOverlap,
-                    visible,
-                    overflow,
-                });
+                setAutoMode({ mode: 'overlap', overlap: maxAutoOverlap, visible, overflow });
             }
         };
 
         calc();
-
-        // слушаем ресайз контейнера (ResizeObserver)
         const ro = new ResizeObserver(() => calc());
         if (rootRef.current) ro.observe(rootRef.current);
         window.addEventListener('resize', calc);
-
         return () => {
-            try {
-                if (rootRef.current) ro.unobserve(rootRef.current);
-            } catch { }
+            try { if (rootRef.current) ro.unobserve(rootRef.current); } catch { }
             ro.disconnect?.();
             window.removeEventListener('resize', calc);
         };
     }, [variant, vehicles, itemSize, gap, minAutoOverlap, maxAutoOverlapRatio]);
 
-    // какие данные использовать для рендера
     const isAuto = variant === 'auto';
     const isScroll = variant === 'scroll';
     const isFixedOverlap = variant === 'overlap';
@@ -196,18 +138,16 @@ const VehicleAvatarRow = ({
         : isFixedOverlap
             ? Math.max(vehicles.length - maxVisible, 0)
             : 0;
-    const effOverlap = isAuto
-        ? autoMode.overlap
-        : isFixedOverlap
-            ? overlapOffset
-            : 0;
+
+    const effOverlap = isAuto ? autoMode.overlap : isFixedOverlap ? overlapOffset : 0;
     const showOverlap = isAuto ? autoMode.mode === 'overlap' : isFixedOverlap;
 
     return (
+        // ... внутри return в VehicleAvatarRow.jsx
+
         <div
+            className={`va-row ${showOverlap ? 'va-row--overlap' : ''} ${className}`}
             ref={rootRef}
-            className={`va-row ${showOverlap ? 'va-row--overlap' : ''
-                } ${className}`}
             style={{
                 '--va-size': `${itemSize}px`,
                 '--va-overlap': `${effOverlap}px`,
@@ -216,27 +156,29 @@ const VehicleAvatarRow = ({
             {/* стрелки — только для scroll */}
             {isScroll && canLeft && (
                 <button
-                    type='button'
-                    className='va-row__nav va-row__nav--left'
-                    onClick={() => scrollByAmount(-1)}
-                    aria-label='Прокрутить влево'
+                    type="button"
+                    className="va-row__nav va-row__nav--left"
+                    data-stop-card="true"
+                    onClick={(e) => { e.stopPropagation(); scrollByAmount(-1); }}
+                    aria-label="Прокрутить влево"
                 >
                     <FaChevronLeft />
                 </button>
             )}
             {isScroll && canRight && (
                 <button
-                    type='button'
-                    className='va-row__nav va-row__nav--right'
-                    onClick={() => scrollByAmount(1)}
-                    aria-label='Прокрутить вправо'
+                    type="button"
+                    className="va-row__nav va-row__nav--right"
+                    data-stop-card="true"
+                    onClick={(e) => { e.stopPropagation(); scrollByAmount(1); }}
+                    aria-label="Прокрутить вправо"
                 >
                     <FaChevronRight />
                 </button>
             )}
 
             <div
-                className='va-row__scroll'
+                className="va-row__scroll"
                 ref={isScroll ? scrollerRef : undefined}
                 style={{
                     gap: showOverlap ? 0 : `${gap}px`,
@@ -244,48 +186,48 @@ const VehicleAvatarRow = ({
                 }}
             >
                 {list.length === 0 ? (
-                    <div className='va-row__empty'>{emptyText}</div>
+                    <div className="va-row__empty">{emptyText}</div>
                 ) : (
                     list.map((v, idx) => {
+                        const itemClass = `va-row__item ${showOverlap ? 'va-row__item--overlap' : ''}`;
+                        const itemStyle = showOverlap && idx > 0
+                            ? { marginLeft: 'calc(-1 * var(--va-overlap))' }
+                            : undefined;
+
                         const content = (
                             <VehicleAvatar
-                                key={v.truckId}
                                 vehicle={v}
                                 size={itemSize}
                                 title={v.truckName}
-                                className='va-row__avatar'
+                                className="va-row__avatar"
                             />
                         );
-
-                        const commonProps = {
-                            key: v.truckId,
-                            className: `va-row__item ${showOverlap ? 'va-row__item--overlap' : ''
-                                }`,
-                            title: v.truckName || 'Машина',
-                            style:
-                                showOverlap && idx > 0
-                                    ? {
-                                        marginLeft:
-                                            'calc(-1 * var(--va-overlap))',
-                                    }
-                                    : undefined,
-                        };
 
                         if (onItemClick) {
                             return (
                                 <button
-                                    {...commonProps}
-                                    type='button'
-                                    onClick={() => onItemClick(v)}
+                                    key={v.truckId}
+                                    type="button"
+                                    className={itemClass}
+                                    style={itemStyle}
+                                    title={v.truckName || 'Машина'}
+                                    data-stop-card="true"
+                                    onClick={(e) => { e.stopPropagation(); onItemClick(v); }}
                                 >
                                     {content}
                                 </button>
                             );
                         }
+
                         return (
                             <Link
-                                {...commonProps}
+                                key={v.truckId}
                                 to={`${linkToBase}/${v.truckId}`}
+                                className={itemClass}
+                                style={itemStyle}
+                                title={v.truckName || 'Машина'}
+                                data-stop-card="true"
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 {content}
                             </Link>
@@ -293,17 +235,16 @@ const VehicleAvatarRow = ({
                     })
                 )}
 
-                {/* "+N" — в авто и фикс overlap когда есть overflow */}
                 {showOverlap && overflow > 0 && (
                     <Link
                         to={linkToBase}
-                        className='va-row__more'
+                        className="va-row__more"
+                        data-stop-card="true"
+                        onClick={(e) => e.stopPropagation()}
                         style={{
                             width: 'var(--va-size)',
                             height: 'var(--va-size)',
-                            marginLeft: list.length
-                                ? 'calc(-1 * var(--va-overlap))'
-                                : 0,
+                            marginLeft: list.length ? 'calc(-1 * var(--va-overlap))' : 0,
                         }}
                         title={`Ещё ${overflow}`}
                         aria-label={`Ещё ${overflow}`}

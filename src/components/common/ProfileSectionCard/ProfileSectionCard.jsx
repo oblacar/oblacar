@@ -1,7 +1,11 @@
 // src/components/common/ProfileSectionCard/ProfileSectionCard.jsx
+// src/components/common/ProfileSectionCard/ProfileSectionCard.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './ProfileSectionCard.css';
+
+const DEBUG = true;
+const dlog = (...a) => DEBUG && console.log('[PSC]', ...a);
 
 const ProfileSectionCard = ({
     title,
@@ -14,35 +18,51 @@ const ProfileSectionCard = ({
     renderItem,
     className = '',
     emptyText = 'Пока пусто',
-    renderContent, // если передан — кастомная лента (машины и т.п.)
+    renderContent,
 }) => {
     const navigate = useNavigate();
     const [isActive, setIsActive] = useState(false);
 
-    const goToList = () => navigate(toList);
+    // ⬇️ target — откуда пришёл клик, container — сама карточка (e.currentTarget)
+    const isInteractive = (target, container) => {
+        if (!target) return false;
 
-    // что считаем интерактивом (клик по нему НЕ должен вести карточку на список)
-    const isInteractive = (el) =>
-        el?.closest?.(
-            'a,button,[role="button"],[role="link"],.va-row__item,.va-row__nav,input,select,textarea,label'
+        // Явные интерактивы: что помечено data-stop-card, а также стандартные контролы
+        const n = target.closest?.(
+            '[data-stop-card="true"], a, button, [role="button"], input, select, textarea, label'
         );
+        if (n) return true;
 
-    const handleCardClick = (e) => {
-        if (isInteractive(e.target)) return; // клик по элементу ленты/ссылке— игнорим
-        goToList();                           // клик по "фону" карточки — идём на список
-    };
-
-    const handleKeyDown = (e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && !isInteractive(e.target)) {
-            e.preventDefault();
-            goToList();
-        }
+        // Игнорируем role="link" у САМОЙ карточки; считаем интерактивом только вложенные элементы с role="link"
+        const rl = target.closest?.('[role="link"]');
+        return Boolean(rl && rl !== container);
     };
 
     const handleMouseDown = (e) => {
-        if (!isInteractive(e.target)) setIsActive(true);
+        if (!isInteractive(e.target, e.currentTarget)) {
+            setIsActive(true);
+            dlog('mousedown bg -> ps-active ON');
+        }
     };
     const clearActive = () => setIsActive(false);
+
+    const handleClick = (e) => {
+        dlog('click bubble target=', e.target);
+        if (isInteractive(e.target, e.currentTarget)) {
+            dlog('click on interactive -> skip navigate');
+            return;
+        }
+        dlog('navigate to', toList);
+        navigate(toList);
+    };
+
+    const handleKeyDown = (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && !isInteractive(e.target, e.currentTarget)) {
+            e.preventDefault();
+            dlog('kbd navigate to', toList);
+            navigate(toList);
+        }
+    };
 
     const visible = items.slice(0, limit);
     const overflow = Math.max(items.length - visible.length, 0);
@@ -65,11 +85,12 @@ const ProfileSectionCard = ({
             className={`profile-section-card ${isActive ? 'ps-active' : ''} ${className}`}
             role="link"
             tabIndex={0}
-            onClick={handleCardClick}
-            onKeyDown={handleKeyDown}
             onMouseDown={handleMouseDown}
             onMouseUp={clearActive}
             onMouseLeave={clearActive}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            style={DEBUG ? { outline: '1px dashed #f90', cursor: 'pointer' } : { cursor: 'pointer' }}
         >
             <div className="profile-section-card__header">
                 <div>
@@ -79,9 +100,7 @@ const ProfileSectionCard = ({
             </div>
 
             {typeof renderContent === 'function' ? (
-                <div className="profile-section-card__custom">
-                    {renderContent(items)} {/* ВАЖНО: без stopPropagation — карточка сама разбирает target */}
-                </div>
+                <div className="profile-section-card__custom">{renderContent(items)}</div>
             ) : items.length === 0 ? (
                 <div className="profile-section-card__empty">
                     <div className="profile-section-card__empty-text">{emptyText}</div>
@@ -92,7 +111,13 @@ const ProfileSectionCard = ({
                         const key = String(item[idKey] ?? item.id ?? item.key ?? Math.random());
                         const to = buildItemTo ? buildItemTo(item) : `${toList}/${item[idKey]}`;
                         return (
-                            <Link key={key} to={to} className="profile-section-card__item-link">
+                            <Link
+                                key={key}
+                                to={to}
+                                className="profile-section-card__item-link"
+                                data-stop-card="true"
+                                onClick={(e) => e.stopPropagation()} // не даём всплыть до карточки
+                            >
                                 {(renderItem || defaultRenderItem)(item)}
                             </Link>
                         );
@@ -101,6 +126,8 @@ const ProfileSectionCard = ({
                         <Link
                             to={toList}
                             className="profile-section-card__more"
+                            data-stop-card="true"
+                            onClick={(e) => e.stopPropagation()}
                             aria-label={`Перейти ко всем, ещё ${overflow}`}
                             title={`Перейти ко всем, ещё ${overflow}`}
                         >
@@ -114,6 +141,8 @@ const ProfileSectionCard = ({
 };
 
 export default ProfileSectionCard;
+
+
 
 
 // Вспомогательное: получить первую фотку из объекта { ph1: url, ph2: url }
