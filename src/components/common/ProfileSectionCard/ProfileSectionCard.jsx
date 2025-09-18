@@ -1,11 +1,7 @@
 // src/components/common/ProfileSectionCard/ProfileSectionCard.jsx
-// src/components/common/ProfileSectionCard/ProfileSectionCard.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './ProfileSectionCard.css';
-
-const DEBUG = true;
-const dlog = (...a) => DEBUG && console.log('[PSC]', ...a);
 
 const ProfileSectionCard = ({
     title,
@@ -41,25 +37,22 @@ const ProfileSectionCard = ({
     const handleMouseDown = (e) => {
         if (!isInteractive(e.target, e.currentTarget)) {
             setIsActive(true);
-            dlog('mousedown bg -> ps-active ON');
         }
     };
     const clearActive = () => setIsActive(false);
 
     const handleClick = (e) => {
-        dlog('click bubble target=', e.target);
         if (isInteractive(e.target, e.currentTarget)) {
-            dlog('click on interactive -> skip navigate');
             return;
         }
-        dlog('navigate to', toList);
+
         navigate(toList);
     };
 
     const handleKeyDown = (e) => {
         if ((e.key === 'Enter' || e.key === ' ') && !isInteractive(e.target, e.currentTarget)) {
             e.preventDefault();
-            dlog('kbd navigate to', toList);
+
             navigate(toList);
         }
     };
@@ -90,7 +83,6 @@ const ProfileSectionCard = ({
             onMouseLeave={clearActive}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
-            style={DEBUG ? { outline: '1px dashed #f90', cursor: 'pointer' } : { cursor: 'pointer' }}
         >
             <div className="profile-section-card__header">
                 <div>
@@ -141,9 +133,6 @@ const ProfileSectionCard = ({
 };
 
 export default ProfileSectionCard;
-
-
-
 
 // Вспомогательное: получить первую фотку из объекта { ph1: url, ph2: url }
 export const firstPhotoFromObject = (obj = {}) => {
