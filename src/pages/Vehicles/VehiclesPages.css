@@ -1,14 +1,25 @@
 /* Сетка карточек */
 .vehicles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.vehicle-grid-item {
+    border-radius: 5px;
+}
+
+.vehicle-grid-item:hover {
+    -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
 }
 
 /* Чуть компактнее карточку в списке */
 .vehicle-card--compact .vehicle-gallery {
-  max-width: 38%;
+    max-width: 38%;
 }
+
 .vehicle-card--compact .vehicle-card-right .vehicle-card-title {
-  font-size: 16px;
+    font-size: 16px;
 }

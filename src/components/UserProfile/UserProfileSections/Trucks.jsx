@@ -1,40 +1,38 @@
-import React from 'react';
-import ProfileSectionCard, {
-    firstPhotoFromObject,
-} from './../../common/ProfileSectionCard/ProfileSectionCard';
+// src/components/Tracks/Tracks.jsx
+import React, { useContext } from 'react';
 
-// Прямоугольный блок «Мой транспорт».
-// Ожидает проп vehicles = [] (массив машин).
-// Переход по блоку → /vehicles, по элементу → /vehicles/:truckId.
+import ProfileSectionCard from './../../common/ProfileSectionCard/ProfileSectionCard';
+import VehicleAvatarRow from './../../VehicleCard/VehicleAvatarRow';
+import { VehicleContext } from '../../../hooks/VehicleContext';
 
-const Tracks = ({ vehicles = [] }) => {
+const Tracks = () => {
+    const { vehicles, loading, error } = useContext(VehicleContext);
+
     return (
         <ProfileSectionCard
             title='Мой транспорт'
-            subtitle='Здесь будет весь Ваш транспорт.'
-            items={vehicles}
             toList='/vehicles'
-            // toList='/new-vehicle'
-            idKey='truckId'
-            buildItemTo={(v) => `/vehicles/${v.truckId}`}
+            items={vehicles} // чтобы ProfileSectionCard знал, пусто или нет
             emptyText='Пока нет машин'
-            renderItem={(v) => (
-                <div className='profile-section__chip'>
-                    <div className='profile-section__chip-avatar profile-section__chip-avatar--img'>
-                        {firstPhotoFromObject(v.truckPhotoUrls) ? (
-                            <img
-                                src={firstPhotoFromObject(v.truckPhotoUrls)}
-                                alt=''
-                            />
-                        ) : (
-                            <span>ТР</span>
-                        )}
-                    </div>
-                    <div className='profile-section__chip-title'>
-                        {v.truckName || 'Без названия'}
-                    </div>
-                </div>
-            )}
+            renderContent={() => {
+                if (loading)
+                    return <div style={{ padding: '6px 0' }}>Загрузка…</div>;
+                if (error)
+                    return (
+                        <div className='error-text'>
+                            Ошибка: {String(error)}
+                        </div>
+                    );
+                return (
+                    <VehicleAvatarRow
+                        vehicles={vehicles}
+                        itemSize={60}
+                        gap={10}
+                        linkToBase='/vehicles' // клики по кружкам → /vehicles/:id
+                        emptyText='Пока нет машин'
+                    />
+                );
+            }}
         />
     );
 };

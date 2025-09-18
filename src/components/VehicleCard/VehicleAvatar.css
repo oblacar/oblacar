@@ -1,0 +1,39 @@
+/* src/components/VehicleAvatar/VehicleAvatar.css */
+
+.vehicle-avatar {
+    --va-size: 64px;
+    width: var(--va-size);
+    height: var(--va-size);
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f3f3f3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    transition: box-shadow 0.18s ease, transform 0.12s ease;
+}
+
+.vehicle-avatar.is-clickable {
+    cursor: pointer;
+}
+.vehicle-avatar.is-clickable:hover {
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.18);
+}
+.vehicle-avatar.is-clickable:active {
+    transform: scale(0.98);
+}
+
+.vehicle-avatar__img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover; /* фото заполняет круг с обрезанием */
+}
+
+.vehicle-avatar__icon {
+    width: 60%;
+    height: 60%;
+    color: #ff7a00; /* можно поменять под тему проекта */
+    opacity: 0.9;
+}

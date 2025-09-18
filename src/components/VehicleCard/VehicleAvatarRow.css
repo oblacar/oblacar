@@ -1,0 +1,92 @@
+/* src/components/VehicleAvatarRow/VehicleAvatarRow.css */
+
+.va-row {
+    position: relative;
+}
+
+.va-row__scroll {
+    display: flex;
+    overflow-x: auto;
+    padding: 4px 6px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* скрыть полосы прокрутки по возможности */
+.va-row__scroll::-webkit-scrollbar {
+    height: 6px;
+}
+.va-row__scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+@supports (scrollbar-width: thin) {
+    .va-row__scroll {
+        scrollbar-width: thin;
+    }
+}
+
+.va-row__item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.va-row__btn {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.va-row__avatar {
+    /* доп. стили к самому кружку можно накинуть тут при желании */
+}
+
+/* пустое состояние */
+.va-row__empty {
+    padding: 8px 0;
+    color: #888;
+    font-size: 14px;
+}
+
+/* кнопки-навигации */
+.va-row__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.08s ease;
+    z-index: 2;
+}
+.va-row__nav:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+.va-row__nav:active {
+    transform: translateY(-50%) scale(0.96);
+}
+
+.va-row__nav--left {
+    left: -6px;
+}
+.va-row__nav--right {
+    right: -6px;
+}
+
+@media (max-width: 480px) {
+    .va-row__nav--left {
+        left: -2px;
+    }
+    .va-row__nav--right {
+        right: -2px;
+    }
+}

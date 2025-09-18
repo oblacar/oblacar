@@ -31,6 +31,7 @@ const ProfileSectionCard = ({
     renderItem,
     className = '',
     emptyText = 'Пока пусто',
+    renderContent, // ← НОВЫЙ проп
 }) => {
     const navigate = useNavigate();
     const goToList = () => navigate(toList);
@@ -67,8 +68,6 @@ const ProfileSectionCard = ({
 
     return (
         <div
-            // className={`profile-section ${className}`}
-            className={`${className}`}
             role='link'
             tabIndex={0}
             onClick={goToList}
@@ -83,47 +82,65 @@ const ProfileSectionCard = ({
                 </div>
             </div>
 
-            {items.length === 0 ? (
-                <div className='profile-section__empty'>
-                    <div className='profile-section__empty-text'>
-                        {emptyText}
-                    </div>
+            {/* КАСТОМНЫЙ КОНТЕНТ (например, лента кружков) */}
+            {typeof renderContent === 'function' ? (
+                <div
+                    className='profile-section__custom'
+                    onClick={stop}
+                    onKeyDown={stopKey}
+                >
+                    {renderContent(items)}
                 </div>
             ) : (
-                <div className='profile-section__items'>
-                    {visible.map((item) => {
-                        const key = String(
-                            item[idKey] ?? item.id ?? item.key ?? Math.random()
-                        );
-                        const to = buildItemTo
-                            ? buildItemTo(item)
-                            : `${toList}/${item[idKey]}`;
-                        return (
-                            <Link
-                                key={key}
-                                to={to}
-                                className='profile-section__item-link'
-                                onClick={stop}
-                                onKeyDown={stopKey}
-                            >
-                                {(renderItem || defaultRenderItem)(item)}
-                            </Link>
-                        );
-                    })}
-
-                    {overflow > 0 && (
-                        <Link
-                            to={toList}
-                            className='profile-section__more'
-                            onClick={stop}
-                            onKeyDown={stopKey}
-                            aria-label={`Перейти ко всем, ещё ${overflow}`}
-                            title={`Перейти ко всем, ещё ${overflow}`}
-                        >
-                            +{overflow}
-                        </Link>
+                // СТАНДАРТНЫЙ РЕНДЕР: чипы + "+ещё"
+                <>
+                    {items.length === 0 ? (
+                        <div className='profile-section__empty'>
+                            <div className='profile-section__empty-text'>
+                                {emptyText}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className='profile-section__items'>
+                            {visible.map((item) => {
+                                const key = String(
+                                    item[idKey] ??
+                                        item.id ??
+                                        item.key ??
+                                        Math.random()
+                                );
+                                const to = buildItemTo
+                                    ? buildItemTo(item)
+                                    : `${toList}/${item[idKey]}`;
+                                return (
+                                    <Link
+                                        key={key}
+                                        to={to}
+                                        className='profile-section__item-link'
+                                        onClick={stop}
+                                        onKeyDown={stopKey}
+                                    >
+                                        {(renderItem || defaultRenderItem)(
+                                            item
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                            {overflow > 0 && (
+                                <Link
+                                    to={toList}
+                                    className='profile-section__more'
+                                    onClick={stop}
+                                    onKeyDown={stopKey}
+                                    aria-label={`Перейти ко всем, ещё ${overflow}`}
+                                    title={`Перейти ко всем, ещё ${overflow}`}
+                                >
+                                    +{overflow}
+                                </Link>
+                            )}
+                        </div>
                     )}
-                </div>
+                </>
             )}
         </div>
     );
