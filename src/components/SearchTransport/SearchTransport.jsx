@@ -10,6 +10,8 @@ import './SearchTransport.css';
 import CitySearch from '../common/CitySearch/CitySearch';
 import Button from '../common/Button/Button';
 
+import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
+
 const SearchTransport = () => {
     // Состояния для полей
     const [departureCity, setDepartureCity] = useState('');
@@ -169,22 +171,39 @@ const SearchTransport = () => {
                 </div>
 
                 <div className='lower-search-row'>
-                    <button
-                        type='button'
-                        className='additional-button'
-                        onClick={() =>
-                            setShowAdditionalOptions(!showAdditionalOptions)
-                        }
+                    <div
+                        className='additional-toggle'
+                        role='button'
+                        tabIndex={0}
+                        aria-expanded={showAdditionalOptions}
+                        onClick={() => setShowAdditionalOptions((v) => !v)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setShowAdditionalOptions((v) => !v);
+                            }
+                        }}
                     >
-                        Дополнительно
-                    </button>
+                        {/* <span className='additional-toggle__label'>
+                            Дополнительно
+                        </span> */}
+                        <span
+                            className='additional-toggle__icon'
+                            aria-hidden='true'
+                        >
+                            {showAdditionalOptions ? (
+                                <FaAngleUp />
+                            ) : (
+                                <FaAngleDown />
+                            )}
+                        </span>
+                    </div>
                 </div>
 
                 {showAdditionalOptions && (
                     <div className='additional-options'>
-                        {/* Здесь будут дополнительные опции для поиска */}
                         <p>
-                            Здесь можно будет выбрать дополнительные параметры
+                            Здесь можно выбрать дополнительные параметры
                             поиска
                         </p>
                     </div>

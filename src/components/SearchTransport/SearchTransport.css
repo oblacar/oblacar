@@ -111,6 +111,59 @@ input.search-input {
     box-shadow: inset 0 0 0 1px #ff9e5d;
 }
 
+/* Строка с переключателем */
+.lower-search-row {
+    display: flex;
+    justify-content: center;
+}
+
+/* Кликабельный div вместо кнопки */
+.additional-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background-color: #f1f1f1;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease, box-shadow 0.15s ease,
+        transform 0.05s ease;
+    outline: none;
+
+    color: #aaaaaa;
+}
+
+.additional-toggle:hover {
+    background-color: #fdfafa;
+    color: #ff8b39;
+    transition: color 0.2s ease;
+}
+
+.additional-toggle:active {
+    transform: translateY(1px);
+}
+
+.additional-toggle:focus-visible {
+    box-shadow: 0 0 0 2px #ff9e5d;
+}
+
+.additional-toggle__icon {
+    display: inline-flex;
+    line-height: 0;
+    font-size: 18px;
+}
+
+.additional-toggle__icon svg {
+    fill: currentColor; /* для иконок с заливкой */
+    stroke: currentColor; /* на случай обводочных иконок */
+}
+
+/* Секция дополнительных опций (анимация уже есть у тебя) */
+.additional-options {
+    margin-top: 12px;
+}
+
 /* ===== БРЕЙКПОИНТЫ ===== */
 
 /* Планшет: ДВЕ СТРОКИ —

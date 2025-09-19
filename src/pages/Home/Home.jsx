@@ -57,10 +57,9 @@ function Home() {
 
     return (
         <>
-            <div>
-                {/* ...твой текущий контент... */}
+            {/* <div>
                 <DevVehicleQuickTest />
-            </div>
+            </div> */}
 
             <div style={{ padding: '20px' }}>
                 <ToggleSearchMode
@@ -76,7 +75,6 @@ function Home() {
                     onToggle={handleToggle}
                 />
             </div>
-
 
             {/* <ChatInterface /> */}
             <div className={styles.container}>
