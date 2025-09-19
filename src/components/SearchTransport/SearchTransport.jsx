@@ -80,6 +80,10 @@ const SearchTransport = () => {
         }
     };
 
+    const PopperWrap = ({ children }) => (
+        <div className='datepicker-popper-portal'>{children}</div>
+    );
+
     return (
         <div className='search-transport-container'>
             <form
@@ -110,7 +114,8 @@ const SearchTransport = () => {
                         dateFormat='dd/MM/yyyy'
                         placeholderText='Дата'
                         className='search-input search-field date'
-                        withPortal // календарь рендерится в портал поверх страницы
+                        // withPortal // календарь рендерится в портал поверх страницы
+                        popperContainer={PopperWrap}
                         popperPlacement='bottom-start'
                         showPopperArrow={false}
                         /* необязательно, но полезно на Windows, если боишься скроллбаров: */

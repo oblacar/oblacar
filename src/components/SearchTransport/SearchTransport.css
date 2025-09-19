@@ -25,6 +25,12 @@ input.search-input {
     box-sizing: border-box;
 }
 
+/* попап поверх всего, без влияния на поток */
+.datepicker-popper-portal {
+    position: absolute;
+    z-index: 9999;
+}
+
 /* ===== Верхний ряд — GRID с именованными областями ===== */
 .upper-search-row {
     display: grid;
@@ -122,28 +128,28 @@ input.search-input {
 
 /* Чуть уже — можно вернуть небольшой горизонтальный зазор,
    чтобы не «лизались» поля на пределе ширины */
-@media (max-width: 1279px) {
-    .upper-search-row {
-        /* column-gap: 4px;  */
-        /* небольшой зазор */
-    }
-    /* Подправим скругления, т.к. появился gap */
-    .departure-city {
-        /* border-radius: 5px; */
-    }
+/* @media (max-width: 1279px) {
+    .upper-search-row { */
+/* column-gap: 4px;  */
+/* небольшой зазор */
+/* } */
+/* Подправим скругления, т.к. появился gap */
+/* .departure-city { */
+/* border-radius: 5px; */
+/* }
     .destination-city,
     .search-field.date,
     .search-field.weight,
-    .search-field.search-volume {
-        /* border-radius: 5px; */
-    }
-}
+    .search-field.search-volume { */
+/* border-radius: 5px; */
+/* }
+} */
 
 /* Tablet: 3 РЯДА
    1: from | to | date
    2: weight | volume | (пусто)
    3: search (кнопка не на всю ширину) */
-@media (max-width: 900px) {
+/* @media (max-width: 900px) {
     .upper-search-row {
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-areas:
@@ -155,117 +161,22 @@ input.search-input {
 
     .search-field,
     .departure-city,
-    .destination-city {
+    .destination-city,
+    .react-datepicker__input-container input {
         height: 44px;
     }
 
     .search-submit {
         justify-self: start;
-    } /* кнопка не растягивается */
+    } 
     .search-submit > .button {
         width: auto;
         height: 44px;
     }
-}
+} */
 
 /* ДВЕ СТРОКИ — города + дата сверху; вес + объём + кнопка снизу */
-@media (max-width: 10px) {
-    .upper-search-row {
-        grid-template-columns:
-            minmax(160px, 1fr) /* from */
-            minmax(160px, 1fr) /* to */
-            120px; /* date */
-        grid-template-areas:
-            'from   to     date'
-            'weight volume search';
-        column-gap: 0px; /* можно добавить небольшой зазор в многострочном режиме */
-    }
-
-    .search-field.date {
-        border-radius: 0 5px 5px 0;
-    }
-
-    /* в многострочном режиме поля уже НЕ «встык» → у всех одинаковые скругления */
-    /* .departure-city,
-    .destination-city,
-    .search-field.date, */
-    .search-field.weight,
-    .search-field.search-volume {
-        border-radius: 5px;
-    }
-
-    .search-field,
-    .departure-city,
-    .destination-city {
-        height: 44px;
-    }
-    .search-submit > .button {
-        height: 44px;
-        width: auto; /* кнопка не на всю ширину */
-        justify-self: start; /* прижать влево или поставить end — по вкусу */
-    }
-}
-
-@media (max-width: 10px) {
-    .upper-search-row {
-        /* 1-я строка: from | to | date
-       2-я строка: weight | volume | search */
-        grid-template-columns:
-            minmax(160px, 1fr) /* from — тянется */
-            minmax(160px, 1fr) /* to — тянется */
-            120px; /* date — фикс */
-        grid-template-areas:
-            'from   to     date'
-            'weight volume search';
-        column-gap: 0; /* обе строки — без зазора между колонками 1 и 2 */
-        align-items: center; /* вертикальное выравнивание всего ряда */
-    }
-
-    /* --- 1-я строка (оставляем плотной): скругления крайних полей --- */
-    .departure-city {
-        border-radius: 5px 0 0 5px;
-    }
-    .destination-city {
-        border-radius: 0;
-    }
-    .search-field.date {
-        border-radius: 0 5px 5px 0;
-    }
-
-    /* --- 2-я строка: вес + объём «встык» слева --- */
-    .search-field.weight {
-        grid-area: weight;
-        width: 120px;
-        justify-self: start;
-        border-radius: 5px 0 0 5px; /* левое крайнее */
-    }
-    .search-field.search-volume {
-        grid-area: volume;
-        width: 120px;
-        justify-self: start;
-        border-radius: 0 5px 5px 0; /* середина — без скругления */
-    }
-
-    /* кнопка вправо, не на всю ширину */
-    .search-submit {
-        grid-area: search;
-        justify-self: end; /* ← прижать вправо */
-    }
-    .search-submit > .button {
-        height: 44px;
-        width: max-content;
-        white-space: nowrap;
-    }
-
-    /* высота инпутов на планшете */
-    .search-field,
-    .departure-city,
-    .destination-city {
-        height: 44px;
-    }
-}
-
-@media (max-width: 1000px) {
+@media (max-width: 1030px) {
     .upper-search-row {
         /* 1-я строка: from | to | date
        2-я строка: (вес+объём вместе) | search */
@@ -324,13 +235,14 @@ input.search-input {
 
     .search-field,
     .departure-city,
-    .destination-city {
+    .destination-city,
+    .react-datepicker__input-container input {
         height: 44px;
     }
 }
 
 /* Large mobile: можно сохранить ту же трёхстрочную логику */
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
     .upper-search-row {
         grid-template-columns: 1fr 1fr;
         grid-template-areas:
@@ -339,7 +251,7 @@ input.search-input {
             'weight volume'
             'search search';
     }
-}
+} */
 
 /* Mobile: всё в одну колонку */
 @media (max-width: 639px) {
@@ -358,6 +270,8 @@ input.search-input {
     .search-field,
     .departure-city,
     .destination-city,
+    .react-datepicker__input-container input,
+    .search-input,
     .search-submit > .button {
         height: 48px;
     }
