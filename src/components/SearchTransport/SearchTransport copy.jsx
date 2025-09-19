@@ -89,78 +89,42 @@ const SearchTransport = () => {
                 <div className='upper-search-row'>
                     <CitySearch
                         onCitySelected={handleDepartureCitySelected}
-                        inputClassName='search-input departure-city'
+                        inputClassName='departure-city'
                         placeholder='От куда'
                     />
                     <CitySearch
                         onCitySelected={handleDestinationCitySelected}
-                        inputClassName='search-input destination-city'
+                        inputClassName='destination-city'
                         placeholder='Куда'
                     />
-                    {/* <DatePicker
+                    <DatePicker
                         selected={date}
                         onChange={(date) => setDate(date)}
                         dateFormat='dd/MM/yyyy'
                         placeholderText='Дата'
-                        className='search-input search-field date'
-                    /> */}
-                    <DatePicker
-                        selected={date}
-                        onChange={(d) => setDate(d)}
-                        dateFormat='dd/MM/yyyy'
-                        placeholderText='Дата'
-                        className='search-input search-field date'
-                        withPortal // календарь рендерится в портал поверх страницы
-                        popperPlacement='bottom-start'
-                        showPopperArrow={false}
-                        /* необязательно, но полезно на Windows, если боишься скроллбаров: */
-                        shouldCloseOnScroll={(e) => true}
+                        className='search-field date'
                     />
-
-                    <div className='wv-group'>
-                        <input
-                            type='text'
-                            placeholder='Вес (кг)'
-                            value={weight ? `${formatNumber(weight)} кг` : ''}
-                            onChange={handleWeightChange}
-                            onKeyDown={handleKeyDown}
-                            className='search-input search-field weight'
-                        />
-                        <input
-                            type='text'
-                            placeholder='Объем (м³)'
-                            value={volume ? `${formatNumber(volume)} м³` : ''}
-                            onChange={handleVolumeChange}
-                            onKeyDown={handleKeyDown}
-                            className='search-input search-field search-volume'
-                        />
-                    </div>
-
-                    {/* <input
+                    <input
                         type='text'
                         placeholder='Вес (кг)'
                         value={weight ? `${formatNumber(weight)} кг` : ''}
                         onChange={handleWeightChange}
-                        onKeyDown={handleKeyDown}
-                        className='search-input search-field weight'
+                        onKeyDown={handleKeyDown} // Ограничение на ввод только цифр
+                        className='search-field weight'
                     />
                     <input
                         type='text'
                         placeholder='Объем (м³)'
                         value={volume ? `${formatNumber(volume)} м³` : ''}
                         onChange={handleVolumeChange}
-                        onKeyDown={handleKeyDown}
-                        className='search-input search-field search-volume'
-                    /> */}
-                    {/* ⬇️ обёртка под кнопку — чтобы положить в grid-area: search */}
-                    <div className='search-submit'>
-                        <Button
-                            type='submit'
-                            size_height='high'
-                        >
-                            Поиск
-                        </Button>
-                    </div>
+                        onKeyDown={handleKeyDown} // Ограничение на ввод только цифр
+                        className='search-field search-volume'
+                    />
+                    <Button
+                        type='submit'
+                        size_height='high'
+                        children='Поиск'
+                    />
                 </div>
 
                 <div className='lower-search-row'>

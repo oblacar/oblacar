@@ -1,0 +1,141 @@
+/* Контейнер формы поиска */
+.search-transport-container {
+    width: min(
+        880px,
+        100%
+    ); /* адаптивная ширина: не шире 880 и не шире экрана */
+    margin-inline: auto; /* центрируем блок по горизонтали */
+    border-radius: 10px;
+    background-color: #e7e7e7;
+}
+
+.departure-city {
+    min-width: 200px;
+    border-radius: 5px 0px 0px 5px;
+}
+.destination-city {
+    min-width: 200px;
+    border-radius: 0px;
+}
+
+/* .departure-city {
+    width: 200px;
+    border-radius: 5px 0px 0px 5px;
+} */
+.destination-city:focus,
+.departure-city:focus {
+    outline: none; /* Убираем стандартное выделение */
+    border: 1px solid #ff9e5d;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px #ff9e5d; /* Внутренний "border" */
+    /* transition: box-shadow 0.2s ease; Плавный переход */
+}
+
+.search-field.date {
+    width: 110px;
+    border-radius: 0px;
+}
+
+.search-field.weight {
+    border-radius: 0px;
+}
+
+.search-field.search-volume {
+    margin-right: 10px;
+}
+
+.search-field.weight,
+.search-field.search-volume {
+    width: 100px;
+    /* background-color: #007bff; */
+}
+
+.search-field.search-volume {
+    border-radius: 0px 5px 5px 0px;
+}
+
+/* Сбрасываем padding у родителя */
+/* .search-form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+} */
+
+/* Верхний ряд с полями поиска */
+.upper-search-row {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 10px 10px 5px 10px;
+    /* border: 1px solid black; */
+}
+
+.search-field {
+    flex: 1;
+    /* margin-right: 10px; */
+    padding: 10px;
+    border: 1px solid #ccc;
+    /* border-radius: 5px; */
+    font-size: 16px;
+    height: 40px;
+}
+
+.search-field:last-child {
+    margin-right: 0;
+}
+
+.search-button {
+    padding: 10px 20px;
+    height: 40px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+/* Нижняя полоса */
+.lower-search-row {
+    display: flex;
+    justify-content: center;
+    /* margin-top: 10px; */
+}
+
+.additional-button {
+    padding: 8px 16px;
+    background-color: #f1f1f1;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.additional-button:hover {
+    background-color: #e2e2e2;
+}
+
+/* Дополнительные опции */
+.additional-options {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f4f4f4;
+    animation: slide-down 0.2s ease-out forwards;
+}
+
+@keyframes slide-down {
+    from {
+        height: 0;
+        opacity: 0;
+    }
+    to {
+        height: auto;
+        opacity: 1;
+    }
+}
