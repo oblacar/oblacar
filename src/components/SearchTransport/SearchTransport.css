@@ -1,12 +1,6 @@
 /* Контейнер формы поиска */
 .search-transport-container {
-    /*TODO нужно расчитать правильную ширину и отступы форму поиска*/
     width: 880px;
-
-    margin-left: calc(
-        30vw - 440px - 40px
-    ); /* Смещение, чтобы центрировать элемент*/
-    margin-right: calc(30vw - 440px - 40px);
 
     border-radius: 10px;
     background-color: #e7e7e7;

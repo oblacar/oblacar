@@ -2,48 +2,109 @@
 
 .layout {
     display: flex;
-    flex-direction: column; /* Устанавливаем вертикальное расположение для Header и Footer */
-    min-height: 100vh; /* Минимальная высота, чтобы заполнить весь экран */
-
-    /*вставка картинки на задний фон*/
-    /* background-image: url('../assets/winter_track.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 100; /* Или любую другую высоту по вашему усмотрению */
-    /* margin: 0; Убираем отступы */
+    flex-direction: column;
+    min-height: 100vh;
 }
 
+/* Центральная зона: 3 колонки */
 .container {
-    display: flex; /* Используем Flexbox для центральной части */
-    flex: 1; /* Позволяем центральной части занимать доступное пространство */
-    justify-content: center; /* Центрируем по горизонтали */
-    /* background-color: #fcfcfc; Светло-серый фон для всей страницы */
-    background-color: white; /* Светло-серый фон для всей страницы */
+    display: flex;
+    flex: 1;
+    justify-content: center; /* центрируем общий блок */
+    align-items: stretch;
+    gap: 16px; /* зазор между колонками */
+    padding-inline: 16px; /* «поля» у краёв экрана */
+    background-color: white;
 }
 
+/* Боковые панели: по умолчанию ~20% и «управляются» переменной */
 .sidebar {
-    width: 20%; /* Ширина боковых панелей */
-    /* background: #fafafa; Цвет фона боковой панели */
-    /* background: white; Цвет фона боковой панели */
-   
-    /* opacity: 0.3;ПРОЗРАЧНОСТЬ - нужно будет убрать */
-    padding: 20px; /* Отступы */
+    --sb-w: 20%;
+    flex: 0 0 var(--sb-w);
+    max-width: 360px;
+    min-width: 220px; /* не даём стать слишком узкими */
+    padding: 20px;
+    /* background: #fafafa;  при необходимости */
 }
 
+/* Центральная колонка: растягивается между сайдбарами */
 .content {
-    width: 60%; /* Ширина центральной части */
-    max-width: 1200px; /* Максимальная ширина для больших экранов */
-    background: white; /* Белый фон для центральной части */
-    padding: 20px; /* Внутренние отступы для контента */
-    border-radius: 5px; /* Скругленные углы */
-    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); Тень для выделения */
+    flex: 1 1 720px; /* базовая ширина + возможность сжиматься/расти */
+    width: auto;
+    max-width: 1200px;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
 }
 
-/*персональный настройки для личных объявлений пользователя*/
+/* ====== Брейкпоинты ====== */
 
+/* Очень широкие — почти без изменений, но можно слегка уменьшить сайдбар */
+@media (max-width: 1440px) {
+    .sidebar {
+        --sb-w: 18%;
+        min-width: 210px;
+    }
+    .content {
+        max-width: 1120px;
+    }
+}
+
+/* Средние десктопы — сайдбар поуAlreadyже */
+@media (max-width: 1280px) {
+    .sidebar {
+        --sb-w: 16%;
+        min-width: 200px;
+        padding: 16px;
+    }
+    .content {
+        max-width: 1000px;
+    }
+}
+
+/* Узкие десктопы/большие планшеты — ещё уже */
+@media (max-width: 1100px) {
+    .sidebar {
+        --sb-w: 14%;
+        min-width: 180px;
+        padding: 14px;
+    }
+    .content {
+        max-width: 920px;
+    }
+}
+
+/* Планшеты и уже — обе боковые панели скрываем */
+@media (max-width: 992px) {
+    .sidebar {
+        display: none;
+    }
+    .container {
+        gap: 0; /* без «зазора», раз колонок стало меньше */
+        padding-inline: 12px;
+        justify-content: center;
+    }
+    .content {
+        max-width: 940px; /* центральная чуть расширяется */
+        padding: 16px;
+    }
+}
+
+/* Мобильные — убираем закругления и лишние отступы */
+@media (max-width: 640px) {
+    .content {
+        padding: 12px;
+        border-radius: 0;
+        max-width: 100%;
+    }
+    .container {
+        padding-inline: 0;
+    }
+}
+
+/* персональные настройки для личных объявлений пользователя */
 .personalAdPageContainer {
-    width: 100%; /* Занимает всю ширину */
-    max-width: none; /* Убираем ограничения */
-    padding: 0; /* Убираем внутренние отступы */
+    width: 100%;
+    max-width: none;
+    padding: 0;
 }
