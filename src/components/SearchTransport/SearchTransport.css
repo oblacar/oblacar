@@ -1,7 +1,10 @@
 /* Контейнер формы поиска */
 .search-transport-container {
-    width: 880px;
-
+    width: min(
+        880px,
+        100%
+    ); /* адаптивная ширина: не шире 880 и не шире экрана */
+    margin-inline: auto; /* центрируем блок по горизонтали */
     border-radius: 10px;
     background-color: #e7e7e7;
 }
