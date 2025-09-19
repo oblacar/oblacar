@@ -1,0 +1,35 @@
+.vehicle-page__form {
+  margin-top: 10px;
+}
+
+.vehicle-page__saved {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: inline-block;
+}
+
+.dirty-indicator {
+  font-size: 13px;
+  margin-right: 6px;
+}
+
+.dirty-indicator.clean {
+  color: #6b7280;
+  /* серый */
+}
+
+.dirty-indicator.dirty {
+  color: #92400e;
+  /* коричнево-оранжевый текст */
+  background: #fff7ed;
+  /* светлый фон */
+  border: 1px solid #fdba74;
+  /* светло-оранжевая рамка */
+  border-radius: 8px;
+  padding: 4px 8px;
+}
