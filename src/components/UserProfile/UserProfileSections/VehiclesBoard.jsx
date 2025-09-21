@@ -1,11 +1,10 @@
-// src/components/Trucks/Trucks.jsx
 import React, { useContext } from 'react';
 import ProfileSectionCard from '../../common/ProfileSectionCard/ProfileSectionCard';
 import InlineOverlapRow from '../../common/ProfileSectionCard/InlineOverlapRow';
 import VehicleAvatar from '../../VehicleCard/VehicleAvatar';
 import { VehicleContext } from '../../../hooks/VehicleContext';
 
-const Trucks = () => {
+const VehiclesBoard = () => {
     const { vehicles = [], loading, error } = useContext(VehicleContext);
 
     return (
@@ -39,4 +38,4 @@ const Trucks = () => {
     );
 };
 
-export default Trucks;
+export default VehiclesBoard;
