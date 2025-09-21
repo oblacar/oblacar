@@ -19,22 +19,22 @@ const ProfileSectionCard = ({
     const navigate = useNavigate();
     const [isActive, setIsActive] = useState(false);
 
-    // target — откуда пришёл клик/тап, container — сама карточка (e.currentTarget)
+    // ⬇️ target — откуда пришёл клик, container — сама карточка (e.currentTarget)
     const isInteractive = (target, container) => {
         if (!target) return false;
-        // Явные интерактивы: data-stop-card, стандартные контролы + contenteditable
+
+        // Явные интерактивы: что помечено data-stop-card, а также стандартные контролы
         const n = target.closest?.(
-            '[data-stop-card="true"], a, button, [role="button"], input, select, textarea, label, [contenteditable=""], [contenteditable="true"]'
+            '[data-stop-card="true"], a, button, [role="button"], input, select, textarea, label'
         );
         if (n) return true;
 
-        // Интерактивные ссылки внутри, но не сама карточка с role="link"
+        // Игнорируем role="link" у САМОЙ карточки; считаем интерактивом только вложенные элементы с role="link"
         const rl = target.closest?.('[role="link"]');
         return Boolean(rl && rl !== container);
     };
 
-    // pointer вместо mouse — будет работать и для тач/стилуса
-    const handlePointerDown = (e) => {
+    const handleMouseDown = (e) => {
         if (!isInteractive(e.target, e.currentTarget)) {
             setIsActive(true);
         }
@@ -42,19 +42,18 @@ const ProfileSectionCard = ({
     const clearActive = () => setIsActive(false);
 
     const handleClick = (e) => {
-        if (isInteractive(e.target, e.currentTarget)) return;
-        if (!toList) return; // защита: маршрут не задан
+        if (isInteractive(e.target, e.currentTarget)) {
+            return;
+        }
+
         navigate(toList);
     };
 
     const handleKeyDown = (e) => {
-        const go = () => {
-            if (!toList) return;
-            navigate(toList);
-        };
         if ((e.key === 'Enter' || e.key === ' ') && !isInteractive(e.target, e.currentTarget)) {
             e.preventDefault();
-            go();
+
+            navigate(toList);
         }
     };
 
@@ -79,18 +78,16 @@ const ProfileSectionCard = ({
             className={`profile-section-card ${isActive ? 'ps-active' : ''} ${className}`}
             role="link"
             tabIndex={0}
-            onPointerDown={handlePointerDown}
-            onPointerUp={clearActive}
-            onPointerLeave={clearActive}
+            onMouseDown={handleMouseDown}
+            onMouseUp={clearActive}
+            onMouseLeave={clearActive}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
         >
             <div className="profile-section-card__header">
                 <div>
                     <h2 className="profile-section-card__title">{title}</h2>
-                    {subtitle && items.length === 0 && (
-                        <p className="profile-section-card__subtitle">{subtitle}</p>
-                    )}
+                    {subtitle && items.length === 0 && <p className="profile-section-card__subtitle">{subtitle}</p>}
                 </div>
             </div>
 
@@ -111,7 +108,7 @@ const ProfileSectionCard = ({
                                 to={to}
                                 className="profile-section-card__item-link"
                                 data-stop-card="true"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()} // не даём всплыть до карточки
                             >
                                 {(renderItem || defaultRenderItem)(item)}
                             </Link>
@@ -119,13 +116,10 @@ const ProfileSectionCard = ({
                     })}
                     {overflow > 0 && (
                         <Link
-                            to={toList || '#'}
+                            to={toList}
                             className="profile-section-card__more"
                             data-stop-card="true"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (!toList) e.preventDefault();
-                            }}
+                            onClick={(e) => e.stopPropagation()}
                             aria-label={`Перейти ко всем, ещё ${overflow}`}
                             title={`Перейти ко всем, ещё ${overflow}`}
                         >
@@ -145,7 +139,8 @@ export const firstPhotoFromObject = (obj = {}) => {
     const entries = Object.entries(obj);
     if (!entries.length) return null;
     const sorted = entries.sort(
-        (a, b) => Number(a[0].replace('ph', '')) - Number(b[0].replace('ph', ''))
+        (a, b) =>
+            Number(a[0].replace('ph', '')) - Number(b[0].replace('ph', ''))
     );
     return sorted[0][1];
 };

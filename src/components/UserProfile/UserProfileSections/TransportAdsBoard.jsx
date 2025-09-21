@@ -5,17 +5,17 @@ import InlineOverlapRow from '../../common/ProfileSectionCard/InlineOverlapRow';
 import VehicleAvatar from '../../VehicleCard/VehicleAvatar';
 import { VehicleContext } from '../../../hooks/VehicleContext';
 
-const Trucks = () => {
+const TransportAdsBoard = () => {
     const { vehicles = [], loading, error } = useContext(VehicleContext);
 
     return (
         <ProfileSectionCard
             className="profile-section--fill profile-section--stick-bottom"
-            title="Мой транспорт"
-            subtitle="Здесь будет весь Ваш транспорт."
+            title="Мои объявления о Траспорте"
+            subtitle="Здесь будут размещенные вами объявления о наличие Транспорта для перевозки."
             toList="/vehicles"
             items={vehicles}
-            emptyText="Пока нет машин"
+            emptyText="Пока нет объявлений"
             renderContent={() => {
                 if (loading) return <div style={{ padding: '6px 0' }}>Загрузка…</div>;
                 if (error) return <div className="error-text">Ошибка: {String(error)}</div>;
@@ -39,4 +39,4 @@ const Trucks = () => {
     );
 };
 
-export default Trucks;
+export default TransportAdsBoard;

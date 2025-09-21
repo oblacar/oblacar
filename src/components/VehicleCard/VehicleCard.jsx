@@ -43,7 +43,7 @@ const VehicleCard = ({
                         type='button'
                         type_btn='yes'
                         size_width='auto'
-                        size_height='low'
+                        size_height=''
                         icon={<FaSave />}
                         onClick={onCreateClick}
                     >

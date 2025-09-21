@@ -1,0 +1,42 @@
+/* Корневая карточка: «листок» 2:3 */
+.ta-mini {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 6px 6px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px;
+  background: #fff;
+
+  font-size: 11px;         /* читабельный, но компактный */
+  line-height: 1.15;
+  color: #111827;          /* near-black */
+
+  /* лёгкая интерактивность */
+  transition: transform 0.12s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.ta-mini:hover {
+  background: #fffef5;     /* едва заметное подсвечивание */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+}
+
+.ta-mini:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+/* Строки: в одну линию, с обрезкой */
+.ta-mini__row {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Дата — чуть приглушённо */
+.ta-mini__date {
+  color: #6b7280; /* gray-500 */
+  font-weight: 500;
+}

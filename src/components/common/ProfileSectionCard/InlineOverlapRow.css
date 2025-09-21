@@ -1,0 +1,83 @@
+.ior-row {
+  position: relative;
+  overflow: hidden;
+  /* не распираем колонку */
+  min-width: 0;
+}
+
+.ior-row__list {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  /* не таблица */
+  gap: var(--ior-gap);
+  /* в plain-режиме */
+}
+
+.ior-row__item {
+  flex: 0 0 auto;
+  text-decoration: none;
+  color: inherit;
+  transition: transform .12s ease, z-index .12s ease;
+  outline: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.ior-row__btn {
+  cursor: pointer;
+}
+
+.ior-row__link {
+  text-decoration: none;
+}
+
+.ior-row__box {
+  width: var(--ior-size);
+  aspect-ratio: var(--ior-aspect);
+  display: block;
+}
+
+/* overlap-режим */
+.ior-row--overlap .ior-row__list {
+  gap: 0;
+}
+
+.ior-row__item--overlap {
+  margin-left: calc(-1 * var(--ior-overlap));
+  position: relative;
+  z-index: 1;
+}
+
+/* hover/active — лёгкий подъём, одинаково для всех лент */
+.ior-row__item:hover {
+  transform: translateY(-2px);
+  z-index: 2;
+}
+
+.ior-row__item:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* +N */
+.ior-row__more {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(0, 0, 0, .25);
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 700;
+}
+
+.ior-row__more:hover {
+  background: #fffbe6;
+}
+
+/* пусто */
+.ior-row__empty {
+  padding: 8px 0;
+  color: #888;
+  font-size: 14px;
+}
