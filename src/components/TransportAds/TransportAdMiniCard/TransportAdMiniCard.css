@@ -5,27 +5,49 @@
   flex-direction: column;
   justify-content: space-between;
 
-  padding: 6px 6px;
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 10px;
-  background: #fff;
+  padding: 16px 6px;
+  border-radius: 3px;
 
-  font-size: 11px;         /* читабельный, но компактный */
+  /* -webkit-box-shadow: 0px 0px 0px 1px rgba(195, 195, 195, 1) inset;
+  -moz-box-shadow: 0px 0px 0px 1px rgba(195, 195, 195, 1) inset;
+  box-shadow: 0px 0px 0px 1px rgba(195, 195, 195, 1) inset; */
+
+  -webkit-box-shadow: 0px 0px 0px 1px rgb(255, 255, 255) inset;
+  -moz-box-shadow: 0px 0px 0px 1px rgb(255, 255, 255) inset;
+  box-shadow: 0px 0px 0px 1px rgb(255, 255, 255) inset;
+
+  background: #f2f2f2 !important;
+
+  font-size: 11px;
+  /* читабельный, но компактный */
   line-height: 1.15;
-  color: #111827;          /* near-black */
+  color: #111827;
+  /* near-black */
 
   /* лёгкая интерактивность */
   transition: transform 0.12s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
+.paper-style {
+  --cut: 18px;
+  clip-path: polygon(0 0,
+      calc(100% - var(--cut)) 0,
+      100% var(--cut),
+      100% 100%,
+      0 100%);
+}
+
 .ta-mini:hover {
-  background: #fffef5;     /* едва заметное подсвечивание */
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+  background: #ffffff !important;
+  /* transform: translateY(-2px); */
 }
 
 .ta-mini:active {
-  transform: translateY(-1px) scale(0.99);
+  /* transform: translateY(-1px) scale(0.99); */
+
+  -webkit-box-shadow: 0px 0px 0px 1px rgb(207, 47, 47) inset;
+  -moz-box-shadow: 0px 0px 0px 1px rgb(205, 62, 62) inset;
+  box-shadow: 0px 0px 0px 1px rgb(174, 36, 36) inset;
 }
 
 /* Строки: в одну линию, с обрезкой */
@@ -37,6 +59,7 @@
 
 /* Дата — чуть приглушённо */
 .ta-mini__date {
-  color: #6b7280; /* gray-500 */
+  color: #6b7280;
+  /* gray-500 */
   font-weight: 500;
 }

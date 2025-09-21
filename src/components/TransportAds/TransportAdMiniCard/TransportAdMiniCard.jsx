@@ -13,26 +13,41 @@ import './TransportAdMiniCard.css';
  *  - width?: число px (по умолчанию 60)
  *  - className?: string
  */
+
+// adId,
+// ownerId,
+// ownerName,
+// ownerPhotoUrl,
+// ownerRating,
+// availabilityDate,
+// departureCity,
+// destinationCity,
+// price,
+// paymentUnit,
+// readyToNegotiate,
+// paymentOptions = [],
+// status,
+// truckId,
+// truckName,
+// truckPhotoUrls = [],
+// transportType,
+// loadingTypes = [],
+// truckWeight,
+// truckHeight,
+// truckWidth,
+// truckDepth,
+
 const TransportAdMiniCard = ({ ad = {}, width = 60, className = '' }) => {
-  const date =
-    ad.date ||
-    ad.availabilityDate ||
-    ''; // например "19.09.2025"
-  const from =
-    ad.from ||
-    ad.departureCity ||
-    '—';
-  const to =
-    ad.to ||
-    ad.destinationCity ||
-    '—';
+  const date = ad.ad.availabilityDate || '';
+  const from = ad.ad.departureCity || '—';
+  const to = ad.ad.destinationCity || '—';
 
   // Заголовок для подсказки при наведении
   const title = `Дата: ${date || '—'}\nОт: ${from || '—'}\nДо: ${to || '—'}`;
 
   return (
     <div
-      className={`ta-mini ${className}`}
+      className={`ta-mini paper-style ${className}`}
       title={title}
       style={{
         width: `${width}px`,
