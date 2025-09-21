@@ -1,4 +1,3 @@
-// src/components/Trucks/Trucks.jsx
 import React, { useContext } from 'react';
 import ProfileSectionCard from '../../common/ProfileSectionCard/ProfileSectionCard';
 import InlineOverlapRow from '../../common/ProfileSectionCard/InlineOverlapRow';
@@ -31,8 +30,8 @@ const TransportAdsBoard = () => {
             itemSize={60}
             itemAspectRatio={1}
             gap={8}
-            getKey={(v) => v.adId}
-            buildTo={(v) => `/vehicles/${v.adId}`}
+            getKey={(v) => v.ad.adId}
+            buildTo={(v) => `/ads/${v.ad.adId}`}
           />
         );
       }}

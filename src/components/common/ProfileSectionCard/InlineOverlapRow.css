@@ -1,17 +1,25 @@
 .ior-row {
   position: relative;
-  overflow: hidden;
-  /* не распираем колонку */
+
+  overflow-x: clip;
+  /* или hidden в фолбэке */
+  overflow-y: visible;
+  /* позволяем подниматься вверх */
+
   min-width: 0;
+}
+
+/* фолбэк для браузеров без overflow: clip */
+@supports not (overflow: clip) {
+  .ior-row { overflow-x: hidden; }
 }
 
 .ior-row__list {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  /* не таблица */
   gap: var(--ior-gap);
-  /* в plain-режиме */
+  overflow: visible; /* на всякий случай */
 }
 
 .ior-row__item {
@@ -71,7 +79,7 @@
   font-weight: 700;
 }
 
-.ior-row__more:hover {
+.ior-row__more:hover { 
   background: #fffbe6;
 }
 
