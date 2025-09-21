@@ -20,7 +20,7 @@ const TransportAdsBoard = () => {
       className="profile-section--fill profile-section--stick-bottom"
       title="Мои объявления о Траспорте"
       subtitle="Здесь будут размещенные вами объявления о наличие Транспорта для перевозки."
-      toList="/vehicles"
+      toList="/my-transport-ads"
       items={myAds}
       emptyText="Пока нет объявлений"
       renderContent={() => {

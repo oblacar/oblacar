@@ -10,6 +10,7 @@ import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
 import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страницы аутентификации
 import NewTransportAd from './pages/Ads/NewTransportAd/NewTransportAd';
 import AdPage from './pages/Ads/AdPage';
+import MyTransportAdsPage from './pages/Ads/MyTransportAdsPage';
 import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 import VehiclePage from './pages/Vehicles/VehiclePage';
 import VehiclesPage from './pages/Vehicles/VehiclesPage';
@@ -77,6 +78,10 @@ const App = () => {
                                                 <Route
                                                     path='/ads/:adId'
                                                     element={<AdPage />}
+                                                />
+                                                <Route
+                                                    path='/my-transport-ads'
+                                                    element={<MyTransportAdsPage />}
                                                 />
                                                 <Route
                                                     path='/dialogs'

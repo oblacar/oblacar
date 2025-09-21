@@ -8,6 +8,9 @@ import UserContext from './UserContext';
 
 const TransportAdContext = createContext();
 
+// порог, когда выгоднее спросить БД, чем фильтровать локально
+const OWNER_FILTER_THRESHOLD = 400; // подстрой по ситуации
+
 export const TransportAdProvider = ({ children }) => {
     // const { user } = useContext(AuthContext);//TODO for relocated on UserContext
     const { userId } = useContext(AuthContext);
@@ -339,6 +342,39 @@ export const TransportAdProvider = ({ children }) => {
 
     //<<<---
 
+    // вспомогалка: превращаем plain-объявления в “расширенные”
+    const extendPlainAds = (plainAds) => {
+        // reviewAds — у вас это массив расширенных { ad, isInReviewAds }
+        const reviewSet = new Set(reviewAds.map(x => x.ad?.adId));
+        return plainAds.map(ad => ({
+            ad, // кладём как { ad, isInReviewAds }
+            isInReviewAds: reviewSet.has(ad.adId),
+        }));
+    };
+
+    /**
+     * “Умный” метод: вернуть объявления по ownerId.
+     * Если локально мало данных — фильтруем `ads`.
+     * Если данных много или адов нет — берём напрямую из БД (индекс ownerId).
+     * @param {string} ownerId
+     * @param {{forceDb?: boolean}} opts
+     * @returns {Promise<Array<{ad: any, isInReviewAds: boolean}>>}
+     */
+    const getAdsByUserId = async (ownerId, opts = {}) => {
+        const { forceDb = false } = opts;
+        if (!ownerId) return [];
+
+        // если уже что-то загружено и данных немного — фильтруем в памяти
+        const hasLocal = Array.isArray(ads) && ads.length > 0;
+        if (!forceDb && hasLocal && ads.length <= OWNER_FILTER_THRESHOLD) {
+            return ads.filter(x => (x?.ad?.ownerId ?? x?.ownerId) === ownerId);
+        }
+
+        // иначе — быстрый путь из БД по индексу
+        const plain = await TransportAdService.getAdsByOwner(ownerId);
+        return extendPlainAds(plain);
+    };
+
     return (
         <TransportAdContext.Provider
             value={{
@@ -358,6 +394,8 @@ export const TransportAdProvider = ({ children }) => {
 
                 photos,
                 uploadPhotos,
+
+                getAdsByUserId,
             }}
         >
             {children}

@@ -197,25 +197,53 @@ const TransportAdService = {
     },
 
     // Метод для поиска объявлений по ownerId
-    searchAdsByOwnerId: async (ownerId) => {
+    // searchAdsByOwnerId: async (ownerId) => {
+    //     try {
+    //         const snapshot = await get(transportAdsRef);
+    //         if (!snapshot.exists()) {
+    //             return [];
+    //         }
+    //         const ads = [];
+    //         snapshot.forEach((childSnapshot) => {
+    //             const adData = childSnapshot.val();
+    //             if (adData.ownerId === ownerId) {
+    //                 ads.push({ id: childSnapshot.key, ...adData }); // Добавляем каждое объявление в массив
+    //             }
+    //         });
+    //         return ads; // Возвращаем отфильтрованные объявления
+    //     } catch (error) {
+    //         console.error('Ошибка при поиске объявлений: ', error);
+    //         throw new Error('Не удалось выполнить поиск. Попробуйте еще раз.');
+    //     }
+    // },
+
+    // Быстрый поиск объявлений по ownerId (через индекс RTDB)
+    getAdsByOwnerId: async (ownerId) => {
         try {
-            const snapshot = await get(transportAdsRef);
-            if (!snapshot.exists()) {
-                return [];
-            }
+            if (!ownerId) return [];
+
+            // убедись, что сверху импортировано:
+            // import { get, query, orderByChild, equalTo } from 'firebase/database';
+            const q = query(transportAdsRef, orderByChild('ownerId'), equalTo(ownerId));
+            const snapshot = await get(q);
+
+            if (!snapshot.exists()) return [];
+
             const ads = [];
             snapshot.forEach((childSnapshot) => {
-                const adData = childSnapshot.val();
-                if (adData.ownerId === ownerId) {
-                    ads.push({ id: childSnapshot.key, ...adData }); // Добавляем каждое объявление в массив
-                }
+                const data = childSnapshot.val() || {};
+                const adId = childSnapshot.key;
+                // нормализуем ключ: гарантируем наличие adId
+                ads.push({ adId, ...data });
             });
-            return ads; // Возвращаем отфильтрованные объявления
+
+            return ads;
         } catch (error) {
-            console.error('Ошибка при поиске объявлений: ', error);
-            throw new Error('Не удалось выполнить поиск. Попробуйте еще раз.');
+            console.error('Ошибка при поиске объявлений по ownerId:', error);
+            throw new Error('Не удалось получить объявления пользователя. Попробуйте ещё раз.');
         }
     },
+
 
     //Метод загрузки одного фото в storage на firebase. Возвращает ссылку
     // Обновленный метод uploadPhoto для обработки base64
