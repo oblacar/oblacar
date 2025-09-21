@@ -4,38 +4,30 @@ import './VehicleAvatar.css';
 import { FaTruck } from 'react-icons/fa';
 
 const VehicleAvatar = ({
-    vehicle = {}, // { truckName, truckPhotoUrls, ... }
-    photoUrl, // опционно — можно явно передать URL
-    size = 64, // диаметр кружка, px
+    vehicle = {},
+    size = 64,
+    title,
     className = '',
-    onClick, // если передан — курсор "pointer"
-    title, // alt/title
+    clickable = true,        // <- управляет курсором и hover/active
 }) => {
-    const src = photoUrl || getFirstPhoto(vehicle?.truckPhotoUrls);
-    const label = title || vehicle?.truckName || 'Машина';
+    const { truckPhotoUrls } = vehicle;
+    const url = firstPhoto(truckPhotoUrls);
 
     return (
         <div
-            className={`vehicle-avatar ${
-                onClick ? 'is-clickable' : ''
-            } ${className}`}
+            className={[
+                'vehicle-avatar',
+                clickable ? 'vehicle-avatar--interactive is-clickable' : '',
+                className
+            ].join(' ')}
             style={{ '--va-size': `${size}px` }}
-            onClick={onClick}
-            title={label}
+            title={title || vehicle.truckName || 'Машина'}
+            tabIndex={clickable ? 0 : -1}
         >
-            {src ? (
-                <img
-                    className='vehicle-avatar__img'
-                    src={src}
-                    alt={label}
-                    loading='lazy'
-                    decoding='async'
-                />
+            {url ? (
+                <img className="vehicle-avatar__img" src={url} alt="" />
             ) : (
-                <FaTruck
-                    className='vehicle-avatar__icon'
-                    aria-label={label}
-                />
+                <FaTruck className="vehicle-avatar__icon" aria-hidden />
             )}
         </div>
     );
@@ -43,22 +35,17 @@ const VehicleAvatar = ({
 
 export default VehicleAvatar;
 
-/* ——— утилита: берём первое фото из массива или объекта ——— */
-function getFirstPhoto(urls) {
-    if (!urls) return null;
-    if (Array.isArray(urls)) return urls[0] || null;
-    if (typeof urls === 'object') {
-        const entries = Object.entries(urls);
-        if (!entries.length) return null;
-        entries.sort((a, b) =>
-            String(a[0]).localeCompare(String(b[0]), undefined, {
-                numeric: true,
-            })
-        );
-        return entries[0][1];
-    }
-    return null;
+// утилита
+function firstPhoto(obj = {}) {
+    if (Array.isArray(obj)) return obj[0] || null;
+    const entries = Object.entries(obj || {});
+    if (!entries.length) return null;
+    entries.sort((a, b) =>
+        String(a[0]).localeCompare(String(b[0]), undefined, { numeric: true })
+    );
+    return entries[0][1] || null;
 }
+
 
 // // 1) По объекту машины
 // <VehicleAvatar vehicle={vehicle} size={72} onClick={() => navigate(`/vehicles/${vehicle.truckId}`)} />

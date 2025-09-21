@@ -1,52 +1,58 @@
 /* src/components/VehicleAvatar/VehicleAvatar.css */
 
 .vehicle-avatar {
-    --va-size: 64px;
-    width: var(--va-size);
-    height: var(--va-size);
-    border-radius: 50%;
-    overflow: hidden;
-    background: #f3f3f3;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    transition: box-shadow 0.18s ease, transform 0.12s ease;
+  --va-size: 64px;
+  width: var(--va-size);
+  height: var(--va-size);
+  border-radius: 50%;
+  overflow: hidden;                 /* форма задаётся здесь → drop-shadow будет круглым */
+  background: #f3f3f3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
 
-    /* box-shadow: 0 0 0 2px #fff */
-    border: 2px white solid;
+  /* белое «кольцо» вокруг фото */
+  border: 2px solid #fff;
+
+  /* анимируем форму/тень, без привязки к ленте */
+  transition: transform .12s ease, filter .15s ease;
+  will-change: transform, filter;
+
+  /* чтобы перекрывать соседей в режиме overlap — поднимем z-index у самого кружка */
+  position: relative;
+  z-index: 1;
 }
 
-.vehicle-avatar:active {
-    -webkit-box-shadow: 0px 0px 0px 2px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 2px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 2px rgba(255, 203, 112, 0.53);
+.vehicle-avatar.is-clickable { cursor: pointer; }
+
+/* Ховер/актив — мягкая тень ПО ФОРМЕ круга (drop-shadow) */
+.vehicle-avatar--interactive:hover {
+  transform: translateY(-2px);
 }
 
-.vehicle-avatar.is-clickable {
-    cursor: pointer;
+.vehicle-avatar--interactive:active {
+  transform: translateY(-1px) scale(.985);
+  box-shadow: 0 0 0 2px rgba(255, 154, 47, .9); /* имитация контура */
 }
 
-.vehicle-avatar.is-clickable:hover {
-    /* box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.18); */
+/* Фокус с клавиатуры — видимая кольцевая рамка */
+.vehicle-avatar--interactive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #ff9a2f;   /* круглая, т.к. border-radius на корне */
 }
 
-.vehicle-avatar.is-clickable:active {
-    transform: scale(0.98);
-}
-
+/* содержимое */
 .vehicle-avatar__img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    /* фото заполняет круг с обрезанием */
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;               /* фото заполняет круг с обрезанием */
 }
 
 .vehicle-avatar__icon {
-    width: 60%;
-    height: 60%;
-    color: #ff7a00;
-    /* можно поменять под тему проекта */
-    opacity: 0.9;
+  width: 60%;
+  height: 60%;
+  color: #ff7a00;
+  opacity: .9;
 }
