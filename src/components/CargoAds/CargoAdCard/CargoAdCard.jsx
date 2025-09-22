@@ -1,66 +1,108 @@
+// src/components/CargoAdCard/CargoAdCard.jsx
 import React, { useMemo } from 'react';
 import './CargoAdCard.css';
 
 /**
- * Карточка объявления о перевозке груза (для персональной страницы).
+ * Карточка объявления о перевозке груза.
  *
- * Ожидаемые поля в ad (плоско или внутри { ad }): 
+ * Ожидаемая схема данных (плоская или в виде { ad }):
  * - adId
- * - createdAt (ISO) или date
- * - route: { from, to }
- * - dates: { pickupDate, deliveryDate } или availabilityDate
- * - cargo: { name, type, weightTons, dims: { h, w, d }, fragile, temperature }
- * - loadingTypes: string[] (либо объект {верхняя:true,...})
- * - price: { value, unit, readyToNegotiate }
- *
- * Пример минимального:
- * { route:{from:'Москва',to:'СПб'}, cargo:{weightTons:10, dims:{h:2,w:2,d:6}}, loadingTypes:['задняя'], price:{value:50000,unit:'руб',readyToNegotiate:true} }
+ * - createdAt | date
+ * - route?: { from, to } | { departureCity, destinationCity }
+ *   либо top-level: departureCity, destinationCity
+ * - availabilityFrom, availabilityTo        ← фиксированные поля дат
+ * - cargo?: {
+ *     name|title, type,
+ *     weightTons|weight,
+ *     dims?: { h, w, d } | (top-level fallbacks: cargoHeight, cargoWidth, cargoDepth),
+ *     fragile?: boolean,
+ *     temperature?: string
+ *   }
+ * - loadingTypes?: string[] | { [k]: true }
+ * - price?: { value, unit, readyToNegotiate }
+ *   либо top-level: price, paymentUnit, readyToNegotiate
  */
 const CargoAdCard = ({ ad = {}, className = '' }) => {
+  // Поддерживаем обёртку расширенных данных { ad: {...} }
   const data = ad?.ad ? ad.ad : ad;
 
   const {
     adId,
     createdAt,
-    date,
+    date, // альтернативное имя даты создания
     route = {},
-    dates = {},
-    availabilityDate,
     cargo = {},
     loadingTypes,
     price = {},
   } = data;
 
+  // --- Дата создания карточки ---
   const created = createdAt || date || null;
   const dateStr = created ? fmtDate(created) : null;
 
-  const from = route.from || route.departureCity || '—';
-  const to   = route.to || route.destinationCity || '—';
+  // --- Маршрут (берём из route или top-level) ---
+  const from =
+    route.from ??
+    route.departureCity ??
+    data.departureCity ??
+    data.from ??
+    '—';
 
-  const pickup = dates.pickupDate || availabilityDate || null;
-  const delivery = dates.deliveryDate || null;
+  const to =
+    route.to ??
+    route.destinationCity ??
+    data.destinationCity ??
+    data.to ??
+    '—';
 
-  const cargoName = cargo.name || cargo.title || '';
-  const cargoType = cargo.type || '';
-  const weight = cargo.weightTons ?? cargo.weight ?? null;
+  // --- Даты перевозки (зафиксированная схема) ---
+  const pickup   = data.availabilityFrom ?? null;
+  const delivery = data.availabilityTo   ?? null;
+
+  // --- О грузе ---
+  const cargoName =
+    cargo.name ??
+    cargo.title ??
+    data.cargoName ??
+    data.cargoTitle ??
+    '';
+
+  const cargoType =
+    cargo.type ??
+    data.cargoType ??
+    '';
+
+  const weight =
+    cargo.weightTons ??
+    cargo.weight ??
+    data.cargoWeightTons ??
+    data.cargoWeight ??
+    data.weightTons ??
+    data.weight ??
+    null;
+
   const dims = cargo.dims || {
-    h: data.truckHeight,
-    w: data.truckWidth,
-    d: data.truckDepth,
+    h: cargo.h ?? data.cargoHeight ?? data.height ?? data.truckHeight,
+    w: cargo.w ?? data.cargoWidth  ?? data.width  ?? data.truckWidth,
+    d: cargo.d ?? data.cargoDepth  ?? data.depth  ?? data.truckDepth,
   };
 
-  const tagsLoading = useMemo(() => normalizeLoadingTypes(loadingTypes), [loadingTypes]);
+  const tagsLoading = useMemo(
+    () => normalizeLoadingTypes(loadingTypes ?? data.loadingTypes),
+    [loadingTypes, data.loadingTypes]
+  );
 
-  const temperature = cargo.temperature; // например "0…+5°C" или null
-  const fragile = !!cargo.fragile;
+  const temperature = cargo.temperature ?? data.temperature ?? null;
+  const fragile = Boolean(cargo.fragile ?? data.fragile);
 
+  // --- Цена ---
   const priceValue = price.value ?? data.price;
   const priceUnit  = price.unit ?? data.paymentUnit ?? 'руб';
-  const bargain    = !!(price.readyToNegotiate ?? data.readyToNegotiate);
+  const bargain    = Boolean(price.readyToNegotiate ?? data.readyToNegotiate);
 
   return (
     <div className={`cargo-card ${className}`}>
-      {/* Верхняя строка: маршрут + даты справа */}
+      {/* Верхняя строка: маршрут + мета (дата создания) */}
       <div className="cargo-card__head">
         <div className="cargo-card__route">
           <div className="cargo-card__cities">
@@ -94,8 +136,8 @@ const CargoAdCard = ({ ad = {}, className = '' }) => {
             <div className="cargo-card__row">
               <span className="cargo-card__label">Груз:</span>
               <span className="cargo-card__value">
-                {cargoName || '—'}
-                {cargoType ? ` · ${cargoType}` : ''}
+                {/* {cargoName || '—'} */}
+                {cargoType ? `${cargoType}` : ''}
               </span>
             </div>
           )}
@@ -107,7 +149,9 @@ const CargoAdCard = ({ ad = {}, className = '' }) => {
 
           <div className="cargo-card__row">
             <span className="cargo-card__label">Габариты (м):</span>
-            <span className="cargo-card__value">{fmtDims(dims?.h, dims?.w, dims?.d)}</span>
+            <span className="cargo-card__value">
+              {fmtDims(dims?.h, dims?.w, dims?.d)}
+            </span>
           </div>
 
           {!!tagsLoading.length && (
@@ -124,7 +168,11 @@ const CargoAdCard = ({ ad = {}, className = '' }) => {
           {(fragile || temperature) && (
             <div className="cargo-card__row cargo-card__row--flags">
               {fragile && <span className="cargo-card__flag">Хрупкий</span>}
-              {temperature && <span className="cargo-card__flag cargo-card__flag--temp">{temperature}</span>}
+              {temperature && (
+                <span className="cargo-card__flag cargo-card__flag--temp">
+                  {temperature}
+                </span>
+              )}
             </div>
           )}
         </div>
@@ -133,9 +181,7 @@ const CargoAdCard = ({ ad = {}, className = '' }) => {
           <div className="cargo-card__price">
             {isFiniteNumber(priceValue) ? (
               <>
-                <div className="cargo-card__price-value">
-                  {fmtPrice(priceValue)}
-                </div>
+                <div className="cargo-card__price-value">{fmtPrice(priceValue)}</div>
                 <div className="cargo-card__price-unit">{priceUnit}</div>
               </>
             ) : (
@@ -146,7 +192,7 @@ const CargoAdCard = ({ ad = {}, className = '' }) => {
         </div>
       </div>
 
-      {/* Нижняя строка: ID или любые доп. метки */}
+      {/* Нижняя строка: ID */}
       {adId && (
         <div className="cargo-card__foot">
           <span className="cargo-card__id">ID: {String(adId)}</span>
@@ -158,24 +204,39 @@ const CargoAdCard = ({ ad = {}, className = '' }) => {
 
 export default CargoAdCard;
 
-/* ==== утилиты ==== */
+/* ===== утилиты ===== */
+
 function normalizeLoadingTypes(val) {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  if (typeof val === 'object') {
-    return Object.keys(val).filter((k) => !!val[k]);
-  }
+  if (typeof val === 'object') return Object.keys(val).filter((k) => !!val[k]);
   return [];
 }
 
 function fmtDate(d) {
-  try {
-    const dt = typeof d === 'string' ? new Date(d) : d;
-    if (Number.isNaN(dt?.getTime())) return '—';
-    return dt.toLocaleDateString('ru-RU');
-  } catch {
-    return '—';
+  if (!d) return '—';
+
+  if (typeof d === 'string') {
+    // dd.MM.yyyy или dd/MM/yyyy — показываем как есть (в RU-формате уже ок)
+    const m = d.match(/^(\d{2})[./](\d{2})[./](\d{4})$/);
+    if (m) return `${m[1]}.${m[2]}.${m[3]}`;
+
+    // ISO-строки / другие — пробуем распарсить
+    const t = Date.parse(d);
+    if (!Number.isNaN(t)) return new Date(t).toLocaleDateString('ru-RU');
+
+    return d; // если формат кастомный — вернём как есть
   }
+
+  if (typeof d === 'number') {
+    return new Date(d).toLocaleDateString('ru-RU');
+  }
+
+  if (d instanceof Date && !Number.isNaN(d.getTime())) {
+    return d.toLocaleDateString('ru-RU');
+  }
+
+  return '—';
 }
 
 function fmtNum(n) {

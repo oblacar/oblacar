@@ -1,0 +1,41 @@
+.cargo-ads-list {
+  width: 100%;
+}
+
+/* Центрируем прелоадер при загрузке */
+.cargo-ads-list__preloader {
+  display: grid;
+  place-items: center;
+  padding: 24px 0;
+}
+
+.cargo-ads-list__error {
+  color: #b91c1c; /* red-700 */
+  padding: 8px 0;
+}
+
+.cargo-ads-list__empty {
+  color: #6b7280; /* gray-500 */
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+/* Вертикальная колонна карточек */
+.cargo-ads-list__column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px;
+}
+
+/* Элемент списка */
+.cargo-ads-list__item {
+  width: 100%;
+}
+
+/* Ссылка-обёртка карточки */
+.cargo-ads-list__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
