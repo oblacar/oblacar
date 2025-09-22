@@ -20,6 +20,7 @@ import CreateTransportAd from '../../components/CreateTransportAd/CreateTranspor
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
+
 import {
     TruckIcon,
     CubeIcon,
@@ -38,6 +39,78 @@ import { FaTruck, FaBox } from 'react-icons/fa';
 import ToggleSearchMode from '../../components/common/ToggleSearchMode/ToggleSearchMode';
 
 import DevVehicleQuickTest from './DevVehicleQuickTest';
+
+import CargoAdCard from '../../components/CargoAds/CargoAdCard/CargoAdCard';
+
+
+// тестовые объявления о Грузе------------------>
+// Простой полноценный пример
+export const myCargoAdObject = {
+  adId: 'CARGO-1737',
+  createdAt: new Date().toISOString(),
+  route: { from: 'Москва', to: 'Санкт-Петербург' },
+  dates: { pickupDate: '2025-09-20', deliveryDate: '2025-09-22' },
+  cargo: {
+    name: 'Электроника',
+    type: 'Паллеты',
+    weightTons: 4.8,
+    dims: { h: 1.8, w: 2.2, d: 6.0 },
+    fragile: true,
+    temperature: '0…+5°C',
+  },
+  loadingTypes: ['задняя', 'боковая'],
+  price: { value: 125000, unit: 'руб', readyToNegotiate: true },
+};
+
+// Вариант с объектом loadingTypes и без габаритов (проверка «заглушек»)
+export const myCargoAdObject2 = {
+  adId: 'CARGO-1738',
+  date: '2025-09-10',
+  route: { from: 'Казань', to: 'Нижний Новгород' },
+  availabilityDate: '2025-09-12',
+  cargo: {
+    name: 'Мебель',
+    weightTons: 10,
+    // dims опущены
+  },
+  loadingTypes: { верхняя: true, задняя: true },
+  price: { value: 80000, unit: 'руб', readyToNegotiate: false },
+};
+
+// Вариант без цены (покажет «Цена не указана»)
+export const myCargoAdObject3 = {
+  adId: 'CARGO-1739',
+  createdAt: '2025-09-05',
+  route: { from: 'Екатеринбург', to: 'Челябинск' },
+  dates: { pickupDate: '2025-09-18' },
+  cargo: {
+    name: 'Металлопрокат',
+    type: 'Длинномер',
+    weightTons: 18.2,
+    dims: { h: 2.5, w: 2.4, d: 13.6 },
+  },
+  loadingTypes: ['верхняя'],
+  // price отсутствует
+};
+
+// Тот же первый объект, но в «расширенной» обёртке (как в твоих контекстах)
+export const myCargoAdExt = {
+  ad: myCargoAdObject,
+  isInReviewAds: false,
+};
+
+/* === Пример использования где-нибудь на странице ===
+import CargoAdCard from '../../components/CargoAdCard/CargoAdCard';
+import { myCargoAdObject, myCargoAdExt } from './testCargoAds';
+
+<div style={{ maxWidth: 860, margin: '0 auto' }}>
+  <CargoAdCard ad={myCargoAdObject} />
+  <div style={{ height: 16 }} />
+  <CargoAdCard ad={myCargoAdExt} />
+</div>
+*/
+// <-----------------------
+
 
 function Home() {
     const { ads } = useContext(TransportAdContext);
@@ -60,6 +133,13 @@ function Home() {
             {/* <div>
                 <DevVehicleQuickTest />
             </div> */}
+
+
+            <div>
+                <CargoAdCard ad={myCargoAdObject} className="card-wrap" />
+            </div>
+
+
 
             <div style={{ padding: '20px' }}>
                 <ToggleSearchMode

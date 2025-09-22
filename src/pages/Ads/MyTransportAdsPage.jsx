@@ -1,4 +1,6 @@
 // pages/MyTransportAdsPage.jsx
+
+//TODO нужно проверить, используется ли такая страница
 import React, { useContext, useEffect, useState } from 'react';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import TransportAdContext from '../../hooks/TransportAdContext';

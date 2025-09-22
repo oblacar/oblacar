@@ -1,0 +1,224 @@
+.cargo-card {
+  --cc-pad: 14px;
+  --cc-gap: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--cc-gap);
+
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 10px;
+  padding: var(--cc-pad);
+
+  transition: box-shadow .15s ease, transform .12s ease, background-color .15s ease;
+}
+
+.cargo-card:hover {
+  background: #fffef5;
+}
+
+.cargo-card:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+}
+
+/* шапка */
+.cargo-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cargo-card__route {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cargo-card__cities {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #111827;
+}
+
+.cargo-card__city {
+  max-width: 18ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cargo-card__arrow {
+  opacity: .7;
+}
+
+.cargo-card__meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* даты справа */
+.cargo-card__dates {
+  display: grid;
+  gap: 4px;
+  text-align: right;
+  min-width: 140px;
+}
+
+.cargo-card__date-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.cargo-card__date-label {
+  color: #6b7280;
+}
+
+/* тело */
+.cargo-card__body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+}
+
+.cargo-card__left {
+  display: grid;
+  gap: 8px;
+}
+
+.cargo-card__row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 20px;
+}
+
+.cargo-card__label {
+  color: #6b7280;
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.cargo-card__value {
+  color: #111827;
+  font-size: 14px;
+}
+
+/* теги «варианты загрузки» */
+.cargo-card__row--tags {
+  align-items: center;
+}
+
+.cargo-card__tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cargo-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+/* флажки (хрупкий/температура) */
+.cargo-card__row--flags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cargo-card__flag {
+  font-size: 12px;
+  background: #fff8f1;
+  color: #9a3412; /* amber-900 */
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.cargo-card__flag--temp {
+  background: #eff6ff;
+  color: #1e40af; /* blue-900 */
+  border-color: #93c5fd;
+}
+
+/* правая колонка — цена */
+.cargo-card__right {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  justify-items: end;
+  min-width: 140px;
+}
+
+.cargo-card__price {
+  text-align: right;
+}
+
+.cargo-card__price-value {
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 800;
+  color: #111827;
+}
+
+.cargo-card__price-unit {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.cargo-card__price-na {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.cargo-card__bargain {
+  font-size: 12px;
+  color: #065f46; /* emerald-900 */
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* подвал */
+.cargo-card__foot {
+  margin-top: -4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(0,0,0,.06);
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.cargo-card__id {
+  letter-spacing: .2px;
+}
+
+/* адаптив */
+@media (max-width: 640px) {
+  .cargo-card__head,
+  .cargo-card__body {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+  .cargo-card__dates,
+  .cargo-card__right {
+    justify-items: start;
+    text-align: left;
+  }
+}

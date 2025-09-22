@@ -15,6 +15,8 @@ import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 import VehiclePage from './pages/Vehicles/VehiclePage';
 import VehiclesPage from './pages/Vehicles/VehiclesPage';
 
+import NewCargoAdPage from './pages/Ads/Cargo/NewCargoAd/NewCargoAdPage';
+
 
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
@@ -70,6 +72,10 @@ const App = () => {
                                                 <Route
                                                     path='/new-tansport-ad'
                                                     element={<NewTransportAd />}
+                                                />
+                                                   <Route
+                                                    path='/new-cargo-ad'
+                                                    element={<NewCargoAdPage />}
                                                 />
                                                 {/* <Route
                                             path='/ads'

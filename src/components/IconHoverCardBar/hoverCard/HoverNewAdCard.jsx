@@ -59,6 +59,15 @@ export const HoverNewAdCard = ({
                                 />
                             </Link>
                             <p>или о Грузе</p>
+                             <Link to='/new-cargo-ad'>
+                                <Button
+                                    type='button'
+                                    size_width='wide'
+                                    size_height='medium'
+                                    children='Груз'
+                                    onClick={handleMouseLeave}
+                                />
+                            </Link>
                         </div>
                     )}
                 </div>
