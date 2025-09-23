@@ -3,10 +3,10 @@ import React, {
     forwardRef,
     useImperativeHandle,
     useMemo,
-    useRef
+    useRef,
 } from 'react';
-// Секция «Транспорт»:
 
+// Секция «Транспорт»:
 const VehicleFormSection = forwardRef(
     (
         {
@@ -29,7 +29,7 @@ const VehicleFormSection = forwardRef(
             truckDepth: '',
         });
 
-        const uploaderRef = useRef(null);   // ← ref на аплоадер
+        const uploaderRef = useRef(null); // ← ref на аплоадер
 
         const allowedLoadingTypes = useMemo(() => {
             const item = truckTypesWithLoading?.find(
@@ -55,8 +55,8 @@ const VehicleFormSection = forwardRef(
             // очистим невалидные варианты загрузки при смене типа
             const nextSelected = (formData.loadingTypes || []).filter((x) =>
                 (
-                    truckTypesWithLoading.find((t) => t.name === value)
-                        ?.loadingTypes || []
+                    truckTypesWithLoading.find((t) => t.name === value)?.loadingTypes ||
+                    []
                 ).includes(x)
             );
             updateFormData({
@@ -102,13 +102,11 @@ const VehicleFormSection = forwardRef(
                     !Array.isArray(formData.loadingTypes) ||
                     formData.loadingTypes.length === 0
                 ) {
-                    newErrors.loadingTypes =
-                        'Выберите хотя бы один вариант загрузки';
+                    newErrors.loadingTypes = 'Выберите хотя бы один вариант загрузки';
                     isValid = false;
                 }
 
-                const pos = (v) =>
-                    v !== '' && !isNaN(Number(v)) && Number(v) > 0;
+                const pos = (v) => v !== '' && !isNaN(Number(v)) && Number(v) > 0;
                 if (!pos(formData.truckWeight)) {
                     newErrors.truckWeight = 'Укажите вес (> 0)';
                     isValid = false;
@@ -138,7 +136,7 @@ const VehicleFormSection = forwardRef(
                 return isValid;
             },
             clearPhotos: () => {
-                uploaderRef.current?.clear?.();   // ← вызов метода аплоадера
+                uploaderRef.current?.clear?.(); // ← вызов метода аплоадера
             },
             // опционально: открыть диалог выбора файлов снаружи
             openPhotoPicker: () => {
@@ -147,174 +145,157 @@ const VehicleFormSection = forwardRef(
         }));
 
         return (
-            <div className='truck-corrector'>
-                <div className='truck-name-photo'>
-                    <div className='truck-name'>
+            <div className="truck-corrector">
+                <div className="truck-name-photo">
+                    <div className="truck-name">
                         <input
-                            type='text'
-                            id='truckName'
-                            name='truckName'
+                            type="text"
+                            id="truckName"
+                            name="truckName"
                             value={formData.truckName || ''}
                             onChange={handleTextChange}
-                            placeholder='Марка машины'
+                            placeholder="Марка машины"
+                            className="create-transport-ad-input"
                         />
                     </div>
                     {AddPhotoButton && (
                         <AddPhotoButton openFileDialog={openFileDialog} />
                     )}
                 </div>
-                {errors.truckName && (
-                    <p className='error-text'>{errors.truckName}</p>
-                )}
+                {errors.truckName && <p className="error-text">{errors.truckName}</p>}
 
                 {MultiTruckPhotoUploader && (
                     <div>
-                        {/* <MultiTruckPhotoUploader
-                            openFileDialog={openFileDialog}
-                            updateFormData={updateFormData}
-                        /> */}
-
                         <MultiTruckPhotoUploader
-                            // value={formData.truckPhotoUrls}    // ← держим в синхронизации
                             updateFormData={updateFormData}
                             openFileDialog={openFileDialog}
-                            ref={uploaderRef}                /* ← передали ref в аплоадер */
+                            ref={uploaderRef} /* ← ref в аплоадер */
                         />
-
                     </div>
                 )}
 
                 {/* Тип */}
-                <p className='new-ad-title without-bottom-margine'>Тип:</p>
+                <p className="new-ad-title without-bottom-margine">Тип:</p>
                 <select
-                    name='transportType'
+                    name="transportType"
                     value={formData.transportType || ''}
                     onChange={handleTransportTypeChange}
-                    className='select-transport-type'
+                    className="select-transport-type"
                 >
-                    <option
-                        value=''
-                        disabled
-                    >
+                    <option value="" disabled>
                         Выберите
                     </option>
                     {truckTypesWithLoading?.map((transport) => (
-                        <option
-                            key={transport.name}
-                            value={transport.name}
-                        >
+                        <option key={transport.name} value={transport.name}>
                             {transport.name}
                         </option>
                     ))}
                 </select>
                 {errors.transportType && (
-                    <p className='error-text'>{errors.transportType}</p>
+                    <p className="error-text">{errors.transportType}</p>
                 )}
 
                 {/* Варианты загрузки */}
-                <p className='new-ad-title without-bottom-margine'>
-                    Вариант загрузки:
-                </p>
+                <p className="new-ad-title without-bottom-margine">Вариант загрузки:</p>
                 {allowedLoadingTypes.map((loadingType) => (
-                    <div
-                        key={loadingType}
-                        className='checkbox-item'
-                    >
-                        <label className='checkbox-label'>
+                    <div key={loadingType} className="checkbox-item">
+                        <label className="checkbox-label">
                             <input
-                                type='checkbox'
+                                type="checkbox"
                                 id={`loadingType-${loadingType}`}
                                 value={loadingType}
-                                className='input-checkbox'
+                                className="input-checkbox create-transport-ad-input create-transport-ad-checkbox"
                                 onChange={handleLoadingTypeToggle}
                                 checked={
                                     Array.isArray(formData.loadingTypes) &&
                                     formData.loadingTypes.includes(loadingType)
                                 }
                             />
-                            <span className='checkbox-title'>
-                                {loadingType}
-                            </span>
+                            <span className="checkbox-title">{loadingType}</span>
                         </label>
                     </div>
                 ))}
                 {errors.loadingTypes && (
-                    <p className='error-text'>{errors.loadingTypes}</p>
+                    <p className="error-text">{errors.loadingTypes}</p>
                 )}
 
                 {/* Габариты */}
-                <div className='truck-capacity'>
-                    <div className='weight-dimension'>
-                        <p className='new-ad-title weight-label'>Вес (т):</p>
+                <div className="truck-capacity">
+                    <div className="weight-dimension">
+                        <p className="new-ad-title weight-label">Вес (т):</p>
                         <input
-                            className='weight-input'
-                            type='number'
-                            name='truckWeight'
+                            className="weight-input create-transport-ad-input"
+                            type="number"
+                            name="truckWeight"
                             value={formData.truckWeight || ''}
                             onChange={handleNumberChange}
-                            placeholder='Введите вес'
-                            min='0'
-                            step='0.01'
+                            placeholder="Введите вес"
+                            min="0"
+                            step="0.01"
                         />
                     </div>
                     {errors.truckWeight && (
-                        <p className='error-text create-transport-ad'>
+                        <p className="error-text create-transport-ad">
                             {errors.truckWeight}
                         </p>
                     )}
 
-                    <p className='new-ad-title without-bottom-margine'>
+                    <p className="new-ad-title without-bottom-margine">
                         Объем (м3) ВхШхГ:
                     </p>
-                    <div className='dimensions'>
-                        <div className='value-dimension'>
-                            <div className='dimension-item'>
+                    <div className="dimensions">
+                        <div className="value-dimension">
+                            <div className="dimension-item">
                                 <input
-                                    type='number'
-                                    name='truckHeight'
+                                    type="number"
+                                    name="truckHeight"
                                     value={formData.truckHeight || ''}
                                     onChange={handleNumberChange}
-                                    placeholder='Высота'
-                                    min='0'
-                                    step='0.1'
+                                    placeholder="Высота"
+                                    min="0"
+                                    step="0.1"
+                                    className="cta-truck-height create-transport-ad-input"
                                 />
                             </div>
-                            <div className='dimension-item'>
+                            <div className="dimension-item">
                                 <input
-                                    type='number'
-                                    name='truckWidth'
+                                    type="number"
+                                    name="truckWidth"
                                     value={formData.truckWidth || ''}
                                     onChange={handleNumberChange}
-                                    placeholder='Ширина'
-                                    min='0'
-                                    step='0.1'
+                                    placeholder="Ширина"
+                                    min="0"
+                                    step="0.1"
+                                    className="cta-truck-width create-transport-ad-input"
                                 />
                             </div>
-                            <div className='dimension-item'>
+                            <div className="dimension-item">
                                 <input
-                                    type='number'
-                                    name='truckDepth'
+                                    type="number"
+                                    name="truckDepth"
                                     value={formData.truckDepth || ''}
                                     onChange={handleNumberChange}
-                                    placeholder='Глубина'
-                                    min='0'
-                                    step='0.1'
+                                    placeholder="Глубина"
+                                    min="0"
+                                    step="0.1"
+                                    className="cta-truck-depth create-transport-ad-input"
                                 />
                             </div>
                         </div>
                     </div>
+
                     {errors.truckHeight && (
-                        <p className='error-text create-transport-ad'>
+                        <p className="error-text create-transport-ad">
                             {errors.truckHeight}
                         </p>
                     )}
                     {errors.truckWidth && (
-                        <p className='error-text create-transport-ad'>
+                        <p className="error-text create-transport-ad">
                             {errors.truckWidth}
                         </p>
                     )}
                     {errors.truckDepth && (
-                        <p className='error-text create-transport-ad'>
+                        <p className="error-text create-transport-ad">
                             {errors.truckDepth}
                         </p>
                     )}

@@ -1,3 +1,4 @@
+// src/components/.../RouteSection.jsx
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -37,8 +38,7 @@ const RouteSection = forwardRef(({ formData, updateFormData }, ref) => {
             const newErrors = {};
 
             if (!formData.availabilityDate) {
-                newErrors.availabilityDate =
-                    'Выберите дату готовности к перевозке';
+                newErrors.availabilityDate = 'Выберите дату готовности к перевозке';
                 isValid = false;
             }
             if (!formData.departureCity) {
@@ -55,56 +55,61 @@ const RouteSection = forwardRef(({ formData, updateFormData }, ref) => {
     }));
 
     return (
-        <div className='new-ad-section'>
-            <p className='new-ad-division-title'>Маршрут</p>
-            <div className='new-ad-card-main-area'>
-                <p className='new-ad-title'>Начало маршрута:</p>
+        <div className="new-ad-section">
+            <p className="new-ad-division-title">Маршрут</p>
+
+            <div className="new-ad-card-main-area">
+                <p className="new-ad-title">Начало маршрута:</p>
                 <p>Когда и где транспорт будет готов к перевозке</p>
-                <div className='new-ad-date'>
+
+                <div className="new-ad-date">
                     <DatePicker
                         selected={
                             formData.availabilityDate
                                 ? new Date(
-                                      formData.availabilityDate
-                                          .split('.')
-                                          .reverse()
-                                          .join('-')
-                                  )
+                                    formData.availabilityDate.split('.').reverse().join('-')
+                                )
                                 : null
                         }
                         onChange={handleDateChange}
-                        dateFormat='dd.MM.yyyy'
-                        placeholderText='Дата'
-                        className='new-ad-date'
+                        dateFormat="dd.MM.yyyy"
+                        placeholderText="Дата"
+                        // добавлен универсальный класс для инпутов формы транспорта
+                        className="new-ad-date create-transport-ad-input"
                     />
                     {errors.availabilityDate && (
-                        <p className='error-text create-transport-ad'>
+                        <p className="error-text create-transport-ad">
                             {errors.availabilityDate}
                         </p>
                     )}
                 </div>
+
                 <CitySearch
                     onCitySelected={handleDepartureCityChange}
-                    inputClassName='new-ad-departure'
-                    placeholder='Пункт отправления'
+                    // добавлен универсальный класс к инпуту поиска города
+                    inputClassName="new-ad-departure create-transport-ad-input"
+                    placeholder="Пункт отправления"
                 />
                 {errors.departureCity && (
-                    <p className='error-text create-transport-ad'>
+                    <p className="error-text create-transport-ad">
                         {errors.departureCity}
                     </p>
                 )}
-                <p className='new-ad-title'>Конец маршрута:</p>
+
+                <p className="new-ad-title">Конец маршрута:</p>
                 <p>
-                    Если Вам не важно куда конкретно доставить груз по России,
-                    ничего не пишите.
+                    Если Вам не важно куда конкретно доставить груз по России, ничего не
+                    пишите.
                 </p>
+
                 <CitySearch
                     onCitySelected={handleDestinationCityChange}
-                    inputClassName='new-ad-destination'
-                    placeholder='Пункт назначения (Россия)'
+                    // добавлен универсальный класс к инпуту поиска города
+                    inputClassName="new-ad-destination create-transport-ad-input"
+                    placeholder="Пункт назначения (Россия)"
                 />
                 {errors.destinationCity && (
-                    <p className='error-text create-transport-ad'>
+                    <p className="error-text create-transport-ad">
                         {errors.destinationCity}
                     </p>
                 )}

@@ -1,360 +1,337 @@
+/* ========== Общая раскладка ========== */
 .new-transport-ad {
-    display: flex;
+  display: flex;
 }
 
 .without-bottom-margine {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
-/*Стилизация демонстрации получившегося нового объявления -->*/
+
+/* ========== Полоса превью (сверху страницы) ========== */
 .new-ad-show {
-    display: flex;
-    justify-content: space-between; /* Размещаем элементы по краям */
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .ad-example {
-    flex: 1; /* Занимает всё доступное пространство */
-    margin-right: 20px; /* Отступ между элементами */
-    margin-left: 5px;
+  flex: 1;
+  margin: 0 20px 0 5px;
 }
 
 .button-submit-ad-div {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
-button {
-    padding: 10px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-/*<---*/
+/* ========== Карточки-разделы формы ========== */
 .new-ad-section {
-    flex: 1;
-    border: 1px rgb(144, 174, 255) solid;
-    /* border: 1px blueviolet solid; */
-    width: 250px;
-    min-height: 450px;
-    margin: 5px;
-    border-radius: 10px;
-    text-align: left; /* Этот элемент будет выравнен по левому краю */
-    display: inline-block;
+  flex: 1;
+  width: 250px;
+  min-height: 450px;
+  margin: 5px;
+  padding: 0;
+  border: 1px solid rgb(144, 174, 255);
+  border-radius: 10px;
+  display: inline-block;
+  text-align: left;
 }
 
 .new-ad-division-title {
-    font-size: 20px;
-    padding: 0;
-    font-weight: 600;
-    padding: 20px 0;
-
-    border-radius: 10px 10px 0 0;
-    background-color: blueviolet;
-    color: #ffffff !important;
-    margin-top: 0px;
-    text-align: center;
+  margin: 0;
+  padding: 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff !important;
+  background-color: blueviolet;
+  border-radius: 10px 10px 0 0;
+  text-align: center;
 }
 
 .new-ad-card-main-area {
-    margin: 10px;
+  margin: 10px;
 }
 
+/* ========== Базовые инпуты/селекты и фокус ========== */
+.create-transport-ad-input,
+.select-transport-type {
+  box-sizing: border-box;
+  height: 40px;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 5px 8px;
+  font-size: 16px;
+  font-family: 'Calibri', sans-serif;
+  outline: none;
+}
+
+.create-transport-ad-input:focus,
+.create-transport-ad-input:focus-visible,
+.select-transport-type:focus,
+.select-transport-type:focus-visible {
+  border-color: #ff9a2f !important;
+  outline: none;
+}
+
+/* усиление специфичности внутри блока транспорта */
+.truck-corrector .create-transport-ad-input:focus,
+.truck-corrector .select-transport-type:focus {
+  border-color: #ff9a2f;
+}
+
+/* ========== Дата и поля городов ========== */
 .new-ad-date {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .new-ad-departure,
 .new-ad-destination,
 .new-ad-date {
-    display: inline-block !important; /* Добавляем, чтобы корректно сбросить центровку */
+  display: inline-block !important;
 }
 
+.new-ad-departure {
+  margin-top: 20px;
+}
+
+/* ========== Текстовые заголовки/лейблы ========== */
 .new-ad-title {
-    font-weight: 600;
-    color: rgb(40, 40, 40) !important;
-}
-
-/* h2 {
-    text-align: center;
-} */
-
-/*Блок чекбоксов*/
-.checkbox-item {
-    width: 100%;
-    height: 20px;
-    margin-bottom: 1px;
-
-    border: 1px solid rgb(255, 255, 255);
-    border-radius: 5px;
-
-    position: relative;
-}
-
-.checkbox-item:hover {
-    background-color: rgb(187, 193, 255);
-}
-
-.checkbox-label {
-    cursor: pointer;
-}
-
-.checkbox-label:hover {
-    background-color: #d1f2ff;
-}
-
-.input-checkbox {
-    /* margin-right: 10px; */
-    width: 20px;
-    /* border: 1px solid red; */
-    height: 15px;
-
-    position: absolute;
-    top: 0;
-    left: 0px;
-}
-
-.checkbox-title {
-    display: inline-flex;
-    font-size: 16px;
-
-    position: absolute;
-    top: 0;
-    left: 30px;
-}
-
-.select-transport-type {
-    width: 100%;
-    height: 30px;
-    cursor: pointer;
-}
-
-/*TransportSection - вес, объем*/
-.truck-capacity {
-    margin: 20px 0; /* Отступ сверху и снизу */
-}
-
-.value-dimension {
-    display: flex; /* Используем flex для размещения в линию */
-}
-
-.dimension-item {
-    flex: 1; /* Каждый элемент занимает равное пространство */
-    margin-right: 0px; /* Отступ между элементами */
-}
-
-.dimension-item:last-child {
-    margin-right: 0; /* Убираем отступ у последнего элемента */
+  font-weight: 600;
+  color: rgb(40, 40, 40) !important;
 }
 
 .label-dimension {
-    display: block; /* Подпись отображается как блок */
-    margin-bottom: 5px; /* Отступ между подписью и полем ввода */
-    text-align: center;
+  display: block;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+/* ========== Чекбоксы ========== */
+.checkbox-item {
+  width: 100%;
+  height: 20px;
+  margin-bottom: 1px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  position: relative;
+}
+
+.checkbox-item:hover {
+  background-color: rgb(187, 193, 255);
+}
+
+.checkbox-label {
+  cursor: pointer;
+}
+
+.checkbox-label:hover {
+  background-color: #d1f2ff;
+}
+
+.input-checkbox {
+  width: 20px;
+  height: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.checkbox-title {
+  display: inline-flex;
+  font-size: 16px;
+  position: absolute;
+  top: 0;
+  left: 30px;
+}
+
+/* ========== Селект типа транспорта ========== */
+.select-transport-type {
+  cursor: pointer;
+}
+
+/* ========== Блок "Вместимость" / Габариты / Вес ========== */
+.truck-capacity {
+  margin: 20px 0;
+}
+
+.value-dimension {
+  display: flex;
+  gap: 0;
+}
+
+.dimension-item {
+  flex: 1;
 }
 
 .weight-dimension {
-    width: 100%;
-
-    display: flex;
-    align-items: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .weight-label {
-    width: 80px;
-
-    font-weight: 600;
-    display: block;
+  width: 80px;
+  font-weight: 600;
+  display: block;
 }
 
-input.weight-input {
-    margin-left: 10px;
-    margin-bottom: 0 !important;
+.weight-input.create-transport-ad-input {
+  margin-left: 10px;
+  margin-bottom: 0 !important;
 }
 
+.cta-truck-height.create-transport-ad-input,
+.cta-truck-width.create-transport-ad-input,
+.cta-truck-depth.create-transport-ad-input {
+  width: 100%;
+}
+
+/* ========== Кнопка "использовать машину" ========== */
 .use-truck {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .use-truck-button {
-    margin-left: auto;
-
-    max-width: 40px;
-    max-height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-
-    transition: color 0.2s ease;
-    border: 1px solid rgb(71, 96, 177);
-
-    border-radius: 5px;
-
-    display: flex;
-    align-items: center;
+  margin-left: auto;
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 40px;
+  max-height: 40px;
+  border: 1px solid rgb(71, 96, 177);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  transition: color .2s ease, background-color .2s ease, box-shadow .2s ease;
 }
 
 .use-truck-btn-icon {
-    display: block;
-    margin: 0 auto;
-    font-size: 18px;
-
-    transition: color 0.4s ease;
-
-    color: rgb(71, 96, 177);
+  display: block;
+  margin: 0 auto;
+  font-size: 18px;
+  color: rgb(71, 96, 177);
+  transition: color .4s ease;
 }
 
 .use-truck-button:hover .use-truck-btn-icon {
-    color: white;
-    cursor: pointer;
+  color: #fff;
+  cursor: pointer;
 }
 
 .use-truck-button:hover {
-    background-color: rgb(71, 96, 177);
-    cursor: pointer;
+  background-color: rgb(71, 96, 177);
+  cursor: pointer;
 }
 
 .use-truck-button:active {
-    -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+  box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
 }
 
 .use-truck-message p {
-    /* display: block; */
-    margin: 0px 10px 0px 0px;
+  margin: 0 10px 0 0;
 }
 
+/* ========== Название ТС + фото (рядом) ========== */
 .truck-name-photo {
-    display: flex; /* Используем flex для размещения элементов в линию */
-    justify-content: space-between; /* Размещаем элементы по краям */
-    align-items: center; /* Выравнивание по центру по вертикали */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .truck-name {
-    flex: 1; /* Занимает всё доступное пространство */
-    margin-right: 10px; /* Отступ между элементами */
-    display: flex;
-    align-items: center;
+  flex: 1;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
 }
 
-.truck-name input {
-    height: 44px;
-    margin: 0px;
-    font-size: 16px;
+.truck-name .create-transport-ad-input {
+  height: 40px;
+  margin: 0;
+  font-size: 16px;
 }
 
-label.label-dimension {
-    display: block; /* Подпись отображается как блок */
-    margin-bottom: 5px; /* Отступ между подписью и полем ввода */
-}
-
+/* ========== Фото (круг) ========== */
 .truck-photo {
-    position: relative; /* Устанавливаем относительное позиционирование */
+  position: relative;
 }
 
 .photo-circle {
-    width: 70px; /* Ширина круга */
-    height: 70px; /* Высота круга */
-    border-radius: 50%; /* Круглая форма */
-    background-color: #ccc; /* Серый цвет фона */
-    display: flex; /* Используем flex для центрирования содержимого */
-    justify-content: center; /* Центрируем по горизонтали */
-    align-items: center; /* Центрируем по вертикали */
-    cursor: pointer; /* Изменяем курсор при наведении */
-    transition: background-color 0.3s; /* Плавный переход цвета */
-    margin-bottom: -20px;
-
-    overflow: hidden;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: -20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color .3s;
 }
 
 .photo-circle:hover {
-    background-color: #bbb; /* Цвет при наведении */
+  background-color: #bbb;
 }
 
 .photo-preview {
-    width: 70px; /* Ширина изображения */
-    height: 70px; /* Высота изображения */
-    border-radius: 50%; /* Круглая форма изображения */
-
-    object-fit: cover; /* Обрезаем изображение до квадрата, заполняя контейнер */
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
 }
-/*PaymentSection*/
 
-/*Блок радиобатанов*/
-
+/* ========== Оплата (радиокнопки и цена) ========== */
 .price-section {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    /* border: #45a049 1px solid; */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.price-section input {
-    /* min-width: 100px; */
-    /* max-width: 150px; */
-    margin-right: 10px;
-    flex: 1;
-    font-size: 16px;
+.price-section .create-transport-ad-input {
+  min-width: 0;
+  max-width: 150px;
+  flex: 1;
+  font-size: 16px;
 }
 
 .price-section .radio-buttons {
-    display: block;
-    /* min-width: 120px; */
-    /* max-width: 200px; */
-    /* border: red 1px solid; */
-    flex: 1;
-    margin: 0;
+  display: block;
+  flex: 1;
+  margin: 0;
 }
 
 .radio-item {
-    width: 100%;
-    height: 20px;
-    margin-bottom: 0px;
-    margin-top: 0px;
-
-    /* border: 1px solid rgb(10, 31, 152); */
-    border-radius: 5px;
-
-    position: relative;
-
-    /* border: 1px black solid; */
+  width: 100%;
+  height: 20px;
+  margin: 0 0 0px 0;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
 }
 
 .radio-item:hover {
-    background-color: rgb(187, 193, 255);
-}
-
-.radio-item {
-    cursor: pointer;
+  background-color: rgb(187, 193, 255);
 }
 
 .input-radio {
-    /* margin-right: 10px; */
-    width: 20px;
-    /* border: 1px solid red; */
-    height: 15px;
-
-    position: absolute;
-    top: 0;
-    left: 0px;
+  width: 20px;
+  height: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .radio-title {
-    display: inline-flex;
-    font-size: 16px;
-
-    position: absolute;
-    top: 0;
-    left: 30px;
+  display: inline-flex;
+  font-size: 16px;
+  position: absolute;
+  top: 0;
+  left: 30px;
 }
 
-/*текст ошибки вввода*/
+/* ========== Ошибки ========== */
 .error-text.create-transport-ad {
-    margin-top: -10px;
+  /* место под индивидуальные правки ошибок этой формы */
 }
