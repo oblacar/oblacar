@@ -1,5 +1,5 @@
 // src/pages/CargoAds/NewCargoAdPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
 import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
 import Button from '../../../../components/common/Button/Button';
@@ -13,9 +13,14 @@ const NewCargoAdPage = () => {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // Нажали «+ Разместить»
-    const handlePlaceClick = () => {
-        // тут позже можно дернуть валидацию формы (ref/контекст)
+    const formRef = useRef(null);
+
+    const handlePlace = async () => {
+        if (!formRef.current?.validate()) return;
+        // const data = formRef.current.getFormData();
+        // TODO: сохранить через сервис/контекст
+        // await cargoAds.create(data)
+        // formRef.current.reset();
         setConfirmOpen(true);
     };
 
@@ -52,7 +57,7 @@ const NewCargoAdPage = () => {
                 <div className='new-cargo-page__actions'>
                     <Button
                         type_btn=''
-                        onClick={handlePlaceClick}
+                        onClick={handlePlace}
                     >
                         + Разместить
                     </Button>
@@ -63,12 +68,7 @@ const NewCargoAdPage = () => {
             <div className='new-cargo-page__subtitle'>Введите данные:</div>
 
             {/* Форма. Если твоя форма поддерживает onDraftChange — превью будет «живым» */}
-            <CreateCargoAdForm
-                layout='columns'
-                onDraftChange={(patch) =>
-                    setDraft((prev) => ({ ...prev, ...patch }))
-                }
-            />
+            <CreateCargoAdForm ref={formRef} />
 
             {/* Диалог подтверждения */}
             {confirmOpen && (
