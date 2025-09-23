@@ -68,6 +68,9 @@
 .accf__textarea,
 .accf__date-input {
     /* width: 100%; */
+
+    box-sizing: border-box;
+    height: 40px;
     min-height: 36px;
     border: 1px solid var(--accf-input-border);
     border-radius: 8px;

@@ -148,7 +148,8 @@
 .cargo-card__flag {
     font-size: 12px;
     background: #fff8f1;
-    color: #9a3412; /* amber-900 */
+    color: #9a3412;
+    /* amber-900 */
     border: 1px solid #fcd34d;
     border-radius: 6px;
     padding: 2px 8px;
@@ -156,7 +157,8 @@
 
 .cargo-card__flag--temp {
     background: #eff6ff;
-    color: #1e40af; /* blue-900 */
+    color: #1e40af;
+    /* blue-900 */
     border-color: #93c5fd;
 }
 
@@ -192,7 +194,8 @@
 
 .cargo-card__bargain {
     font-size: 12px;
-    color: #065f46; /* emerald-900 */
+    color: #065f46;
+    /* emerald-900 */
     background: #ecfdf5;
     border: 1px solid #a7f3d0;
     padding: 2px 8px;
@@ -200,26 +203,149 @@
 }
 
 /* подвал */
+/* ===== FOOT: три зоны ===== */
 .cargo-card__foot {
-    margin-top: 7px;
-    padding-top: 4px;
-    border-top: 1px dashed rgba(0, 0, 0, 0.06);
-    color: #6b7280;
-    font-size: 12px;
-    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
 }
 
+.cargo-card__foot-left {
+    justify-self: start;
+    min-width: 0;
+}
+
+.cargo-card__foot-right {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ID слева */
 .cargo-card__id {
-    letter-spacing: 0.2px;
+    font-size: 12px;
+    color: #6b7280;
+    /* gray-500 */
+}
+
+/* Центр: владелец — мини-профиль */
+.cargo-card__owner {
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.cargo-card__owner-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #e5e7eb;
+    /* gray-200 */
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+}
+
+.cargo-card__owner-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cargo-card__owner-fallback {
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    /* gray-700 */
+}
+
+.cargo-card__owner-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    min-width: 0;
+}
+
+.cargo-card__owner-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #111827;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cargo-card__owner-rating {
+    font-size: 11px;
+    color: #f59e0b;
+    /* amber-500 */
+    letter-spacing: 0.5px;
+}
+
+/* Правые иконки-кнопки */
+.cargo-card__icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    color: #374151;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background-color .15s ease, box-shadow .15s ease, transform .06s ease;
+}
+
+.cargo-card__icon-btn:hover {
+    background: #fffdf3;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.cargo-card__icon-btn:active {
+    transform: translateY(0.5px) scale(0.98);
+}
+
+/* Адаптив: если мало места — допускаем перенос центра на новую строку */
+@media (max-width: 480px) {
+    .cargo-card__foot {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "left right"
+            "owner owner";
+        row-gap: 6px;
+    }
+
+    .cargo-card__foot-left {
+        grid-area: left;
+    }
+
+    .cargo-card__owner {
+        grid-area: owner;
+    }
+
+    .cargo-card__foot-right {
+        grid-area: right;
+    }
 }
 
 /* адаптив */
 @media (max-width: 640px) {
+
     .cargo-card__head,
     .cargo-card__body {
         grid-template-columns: 1fr;
         display: grid;
     }
+
     .cargo-card__dates,
     .cargo-card__right {
         justify-items: start;

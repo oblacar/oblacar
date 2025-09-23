@@ -220,9 +220,83 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
 
             {/* Нижняя строка: ID */}
             {adId && (
-                <div className='cargo-card__foot'>
-                    <span className='cargo-card__id'>ID: {String(adId)}</span>
-                </div>
+
+                <>
+                    {/* Нижняя строка: ID + владелец + действия */}
+                    <div className="cargo-card__foot">
+                        {/* ЛЕВО: ID */}
+                        <div className="cargo-card__foot-left">
+                            {adId ? <span className="cargo-card__id">ID: {String(adId)}</span> : <span className="cargo-card__id"> </span>}
+                        </div>
+
+                        {/* ЦЕНТР: владелец */}
+                        <div className="cargo-card__owner">
+                            {(() => {
+                                const owner = data.owner || {
+                                    id: data.ownerId,
+                                    name: data.ownerName || data.userName,
+                                    avatarUrl: data.ownerAvatar || data.avatarUrl,
+                                    rating: data.ownerRating ?? data.rating,
+                                };
+
+                                const name = owner?.name || 'Без имени';
+                                const avatar = owner?.avatarUrl;
+                                const rating = Number.isFinite(Number(owner?.rating)) ? Number(owner.rating) : null;
+
+                                return (
+                                    <>
+                                        <div className="cargo-card__owner-avatar">
+                                            {avatar ? (
+                                                <img src={avatar} alt={name} />
+                                            ) : (
+                                                <div className="cargo-card__owner-fallback">
+                                                    {String(name).slice(0, 1).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="cargo-card__owner-meta">
+                                            <div className="cargo-card__owner-name" title={name}>{name}</div>
+                                            {rating != null && (
+                                                <div className="cargo-card__owner-rating" aria-label={`Рейтинг ${rating} из 5`}>
+                                                    {renderStars(rating)}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                        </div>
+
+                        {/* ПРАВО: действия */}
+                        <div className="cargo-card__foot-right">
+                            <button
+                                type="button"
+                                className="cargo-card__icon-btn"
+                                title="Добавить в варианты"
+                                aria-label="Добавить в варианты"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    // TODO: вызови тут свой обработчик addToReview(ad)
+                                    console.log('Добавить в варианты:', adId || data);
+                                }}
+                            >
+                                +
+                            </button>
+
+                            {/* примеры под будущие действия — оставим как заглушки
+    <button type="button" className="cargo-card__icon-btn" title="Написать">
+      <FiMessageCircle />
+    </button>
+    <button type="button" className="cargo-card__icon-btn" title="Ещё">
+      <FiMoreHorizontal />
+    </button>
+    */}
+                        </div>
+                    </div>
+
+                </>
+
             )}
         </div>
     );
@@ -293,4 +367,18 @@ function fmtPrice(v) {
 
 function isFiniteNumber(v) {
     return Number.isFinite(Number(v));
+}
+
+function renderStars(value) {
+    const v = Math.max(0, Math.min(5, Number(value)));
+    const full = Math.floor(v);
+    const half = v - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    return (
+        <>
+            {'★'.repeat(full)}
+            {half ? '☆' : ''}
+            {'✩'.repeat(empty)}
+        </>
+    );
 }
