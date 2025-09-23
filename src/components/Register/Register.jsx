@@ -1,19 +1,17 @@
+// src/components/Register/Register.js
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Импортируем Link для навигации
+import { useNavigate } from 'react-router-dom';
 
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import AuthContext from '../../hooks/Authorization/AuthContext'; // Импортируем AuthContext
-import './Register.css'; // Импорт стилей
+import AuthContext from '../../hooks/Authorization/AuthContext';
+import './Register.css';
 import Button from '../common/Button/Button';
 import ErrorText from '../common/ErrorText/ErrorText';
 import Preloader from '../common/Preloader/Preloader';
 
 const Register = () => {
-    const {
-        register,
-        // , erMessage, resetError
-    } = useContext(AuthContext); // Получаем функцию регистрации из контекста
+    const { register } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -21,7 +19,7 @@ const Register = () => {
         setErrorMessage('');
     }, []);
 
-    const navigate = useNavigate(); // Создаем объект навигации
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
@@ -36,9 +34,7 @@ const Register = () => {
             phone: Yup.string().required('Введите телефон'),
             email: Yup.string()
                 .email('Неверный формат электронной почты')
-                .required(
-                    'Электронная почта обязательна - это будет ваш логин.'
-                ),
+                .required('Электронная почта обязательна - это будет ваш логин.'),
             password: Yup.string()
                 .min(6, 'Пароль должен содержать минимум 6 символов')
                 .required('Пароль обязателен'),
@@ -48,133 +44,128 @@ const Register = () => {
         }),
         onSubmit: async (values) => {
             try {
-                setLoading(true); // Запускаем прелоадер
-
-                // Используем функцию регистрации из AuthContext
+                setLoading(true);
                 await register({
                     firstName: values.firstName,
                     phone: values.phone,
                     email: values.email,
                     password: values.password,
                 });
-
                 console.log('Регистрация успешна!');
-
                 navigate('/');
             } catch (error) {
-                setLoading(false); // Скрываем прелоадер после завершения аутентификации
-
+                setLoading(false);
                 console.error('Ошибка регистрации: ' + error.message);
-
                 setErrorMessage(error.message);
             } finally {
-                setLoading(false); // Скрываем прелоадер после завершения аутентификации
+                setLoading(false);
             }
         },
     });
 
     return (
         <>
-            <div className='register-container'>
+            <div className="register-container">
                 <h1>Регистрация пользователя</h1>
 
                 <ErrorText errorMessage={errorMessage} />
 
                 <form onSubmit={formik.handleSubmit}>
                     <div>
-                        <label htmlFor='firstName'>Имя</label>
+                        <label htmlFor="firstName">Имя</label>
                         <input
-                            id='firstName'
-                            name='firstName'
-                            type='text'
+                            id="firstName"
+                            name="firstName"
+                            type="text"
+                            className="register-input"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.firstName}
                         />
                         {formik.touched.firstName && formik.errors.firstName ? (
-                            <div className='error'>
-                                {formik.errors.firstName}
-                            </div>
+                            <div className="error">{formik.errors.firstName}</div>
                         ) : null}
                     </div>
 
                     <div>
-                        <label htmlFor='phone'>Телефон</label>
+                        <label htmlFor="phone">Телефон</label>
                         <input
-                            id='phone'
-                            name='phone'
-                            type='text'
+                            id="phone"
+                            name="phone"
+                            type="text"
+                            className="register-input"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.phone}
                         />
                         {formik.touched.phone && formik.errors.phone ? (
-                            <div className='error'>{formik.errors.phone}</div>
+                            <div className="error">{formik.errors.phone}</div>
                         ) : null}
                     </div>
 
                     <div>
-                        <label htmlFor='email'>Электронная почта</label>
+                        <label htmlFor="email">Электронная почта</label>
                         <input
-                            id='email'
-                            name='email'
-                            type='email'
+                            id="email"
+                            name="email"
+                            type="email"
+                            className="register-input"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.email}
                         />
                         {formik.touched.email && formik.errors.email ? (
-                            <div className='error'>{formik.errors.email}</div>
+                            <div className="error">{formik.errors.email}</div>
                         ) : null}
                     </div>
 
                     <div>
-                        <label htmlFor='password'>Пароль</label>
+                        <label htmlFor="password">Пароль</label>
                         <input
-                            id='password'
-                            name='password'
-                            type='password'
+                            id="password"
+                            name="password"
+                            type="password"
+                            className="register-input"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.password}
                         />
                         {formik.touched.password && formik.errors.password ? (
-                            <div className='error'>
-                                {formik.errors.password}
-                            </div>
+                            <div className="error">{formik.errors.password}</div>
                         ) : null}
                     </div>
 
                     <div>
-                        <label htmlFor='confirmPassword'>
-                            Подтверждение пароля
-                        </label>
+                        <label htmlFor="confirmPassword">Подтверждение пароля</label>
                         <input
-                            id='confirmPassword'
-                            name='confirmPassword'
-                            type='password'
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            className="register-input"
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.confirmPassword}
                         />
-                        {formik.touched.confirmPassword &&
-                        formik.errors.confirmPassword ? (
-                            <div className='error'>
-                                {formik.errors.confirmPassword}
-                            </div>
+                        {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+                            <div className="error">{formik.errors.confirmPassword}</div>
                         ) : null}
                     </div>
+
+                    <div className='register-divider'>
+                    </div>
+                    
                     <Button
-                        type='submit'
-                        size_width='large'
-                        size_height='medium'
-                        children='Зарегистрироваться'
-                    />
+                        type="submit"
+                        size_width="large"
+                        size_height="medium"
+                    >
+                        Зарегистрироваться
+                    </Button>
                 </form>
             </div>
-            {/* Показать прелоадер, если loading = true */}
+
             {loading && (
-                <div className='preloader-register'>
+                <div className="preloader-register">
                     <Preloader />
                 </div>
             )}

@@ -13,6 +13,8 @@
     justify-content: center; /* Центрируем по горизонтали */
     align-items: center; /* Центрируем по вертикали */
     transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
+
+    margin: 0;
 }
 
 /* Эффекты при наведении */

@@ -18,7 +18,9 @@ label {
     margin: 10px 0 5px;
 }
 
-input {
+/* input */
+.login-input {
+    box-sizing: border-box;
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
@@ -36,29 +38,40 @@ input {
 /* Стили для контейнера с флажком */
 /* Стили для линии сверху */
 .remember-me-line {
-    height: 1px; /* Высота линии */
-    background-color: lightgray; /* Цвет линии */
-    margin: 10px 0; /* Отступ сверху и снизу для линии */
+    height: 1px;
+    /* Высота линии */
+    background-color: lightgray;
+    /* Цвет линии */
+    margin: 10px 0;
+    /* Отступ сверху и снизу для линии */
 }
 
 /* Стили для контейнера с флажком */
 .remember-me-container {
-    display: inline-flex; /*Используем flexbox для горизонтального выравнивания*/
+    display: inline-flex;
+    /*Используем flexbox для горизонтального выравнивания*/
 }
 
 /* Стили для checkbox */
 .remember-me-checkbox {
-    margin-right: 8px; /* Отступ справа, чтобы отделить от метки */
-    transform: scale(1.2); /* Увеличиваем размер checkbox */
-    cursor: pointer; /* Изменяем курсор на указатель при наведении */
+    margin-right: 8px;
+    /* Отступ справа, чтобы отделить от метки */
+    transform: scale(1.2);
+    /* Увеличиваем размер checkbox */
+    cursor: pointer;
+    /* Изменяем курсор на указатель при наведении */
 }
 
 /* Стили для метки */
 .remember-me-label {
-    font-size: 16px; /* Размер шрифта для метки */
-    color: #777777; /* Цвет текста метки */
-    cursor: pointer; /* Изменяем курсор на указатель при наведении */
-    white-space: nowrap; /* Предотвращает перенос текста */
+    font-size: 16px;
+    /* Размер шрифта для метки */
+    color: #777777;
+    /* Цвет текста метки */
+    cursor: pointer;
+    /* Изменяем курсор на указатель при наведении */
+    white-space: nowrap;
+    /* Предотвращает перенос текста */
 }
 
 .or-word {
@@ -70,6 +83,7 @@ input {
     color: rgb(13, 110, 253);
     font-weight: 600;
 }
+
 .link-word:hover {
     color: orange;
 }
