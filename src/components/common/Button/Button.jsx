@@ -13,18 +13,23 @@ import './Button.css'; // Импортируйте стили
 
 const Button = ({
     type = 'button',
-    type_btn = '', 
+    type_btn = '',
     size_width = '',
     size_height = 'medium',
     children,
     icon = null, // Новый проп для иконки
     onClick,
+    disabled = false, // ← добавили
+    ariaBusy = false, // ← опционально
 }) => {
     return (
         <button
             type={type}
             className={`button ${type_btn} button-width-${size_width} button-height-${size_height}`}
             onClick={onClick}
+            disabled={disabled} // ← прокинули
+            aria-disabled={disabled || undefined}
+            aria-busy={ariaBusy || undefined}
         >
             {icon && <span className='button-icon'>{icon}</span>}{' '}
             {/* Отображение иконки */}

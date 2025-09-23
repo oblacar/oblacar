@@ -68,6 +68,68 @@
     animation: spin 0.85s linear infinite;
 }
 
+.ncap__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ncap__preview {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.ncap__hint {
+    margin: 8px 0 12px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* результат */
+.ncap__result {
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 10px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+}
+
+.ncap__result--success {
+    background: #ecfdf5; /* зеленоватый фон */
+    border-color: #a7f3d0;
+}
+
+.ncap__result--error {
+    background: #fef2f2; /* красноватый фон */
+    border-color: #fecaca;
+}
+
+.ncap__result-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.ncap__result-text {
+    margin-bottom: 10px;
+}
+
+.ncap__result-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* форма всегда в DOM */
+.ncap__form--disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.ncap__form--hidden {
+    display: none; /* прячем форму только на успехе */
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);

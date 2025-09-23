@@ -4,24 +4,20 @@ import Button from '../../../../components/common/Button/Button';
 import ConfirmationDialog from '../../../../components/common/ConfirmationDialog/ConfirmationDialog';
 import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
 import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
-
 import './NewCargoAdPage.css';
 
 const initialState = {
-    // Маршрут
     departureCity: '',
     destinationCity: '',
-    pickupDate: '', // dd.MM.yyyy
-    deliveryDate: '', // dd.MM.yyyy
-    // Стоимость
+    pickupDate: '',
+    deliveryDate: '',
     price: '',
     paymentUnit: 'руб',
     readyToNegotiate: true,
-    // Груз
     title: '',
     cargoType: '',
     description: '',
-    photos: [], // base64 (позже сервис заменит на URL из Storage)
+    photos: [],
     weightTons: '',
     dimensionsMeters: { height: '', width: '', depth: '' },
     quantity: '',
@@ -35,21 +31,15 @@ const initialState = {
 
 const NewCargoAdPage = () => {
     const formRef = useRef(null);
-
-    // локальный стейт объявления (единый источник правды)
     const [formData, setFormData] = useState(initialState);
+    const updateFormData = (patch) => setFormData((p) => ({ ...p, ...patch }));
 
-    const updateFormData = (patch) =>
-        setFormData((prev) => ({ ...prev, ...patch }));
+    // ui-state: 'idle' | 'confirm' | 'saving' | 'success' | 'error'
+    const [ui, setUi] = useState('idle');
+    const [errorMsg, setErrorMsg] = useState('');
 
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [saving, setSaving] = useState(false);
-
-    // превью собираем из formData
     const previewAd = useMemo(() => {
         const fd = formData;
-        if (!fd) return null;
-
         return {
             adId: '(черновик)',
             departureCity: fd.departureCity,
@@ -69,76 +59,127 @@ const NewCargoAdPage = () => {
     }, [formData]);
 
     const handlePlaceClick = () => {
-        // просим форму провалидировать ТЕКУЩИЙ formData
+        if (ui !== 'idle') return; // ← защита
         if (!formRef.current?.validate()) return;
-        setShowConfirm(true);
+        setUi('confirm');
+    };
+
+    const emulateSave = async () => {
+        setUi('saving');
+
+        // <<< ЭМУЛЯЦИЯ СЕТЕВОГО ЗАПРОСА >>>
+        const SHOULD_SUCCEED = false; // переключи на false чтобы увидеть ошибку
+        setTimeout(() => {
+            if (SHOULD_SUCCEED) {
+                setUi('success');
+            } else {
+                setErrorMsg(
+                    'Не удалось сохранить объявление. Проверьте подключение и попробуйте снова.'
+                );
+                setUi('error');
+            }
+        }, 1200);
+        // <<< /ЭМУЛЯЦИЯ >>>
     };
 
     const handleConfirm = async () => {
-        setShowConfirm(false);
-        setSaving(true);
-        try {
-            const dataToSave = formRef.current?.getFormData?.() ?? formData;
+        setUi('idle'); // скрыть диалог
+        await emulateSave();
+    };
 
-            // TODO: вызвать сервис/контекст для сохранения
-            // await cargoAdsService.create(dataToSave)  или  await ctx.createAd(dataToSave)
+    const handleCancelConfirm = () => setUi('idle');
 
-            // сброс
-            setFormData(initialState);
-            formRef.current?.reset?.(); // чтобы, если внутри формы есть локальные штуки, тоже почистились
-        } catch (e) {
-            console.error('Ошибка сохранения:', e);
-        } finally {
-            setSaving(false);
-        }
+    const handleCreateAnother = () => {
+        // сбрасываем форму и возвращаемся к заполнению
+        setFormData(initialState);
+        formRef.current?.reset?.();
+        setUi('idle');
     };
 
     return (
         <div className='deliveries-container'>
-            <div className='new-cargo-page__title'>
+            <div className='new-cargo-page__title '>
                 Новое объявление о перевозке Груза
             </div>
 
-            {/* превью слева — кнопка справа */}
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 16,
-                    justifyContent: 'space-between',
-                    marginBottom: 12,
-                }}
-            >
-                <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+            {/* верхняя полоса: превью + кнопка */}
+            <div className='ncap__top'>
+                <div className='ncap__preview'>
                     <CargoAdItem ad={previewAd} />
                 </div>
-
-                <Button onClick={handlePlaceClick}>+ Разместить</Button>
+                {ui !== 'success' && (
+                    <Button
+                        onClick={handlePlaceClick}
+                        disabled={
+                            ui === 'saving' ||
+                            ui === 'confirm' ||
+                            ui === 'error'
+                        }
+                    >
+                        + Разместить
+                    </Button>
+                )}
+            </div>
+            {/* Ошибка */}
+            {ui === 'error' && (
+                <div className='ncap__result ncap__result--error'>
+                    <div className='ncap__result-title'>Ошибка</div>
+                    <div className='ncap__result-text'>{errorMsg}</div>
+                    <div className='ncap__result-actions'>
+                        <Button onClick={() => setUi('idle')}>
+                            Попробовать снова
+                        </Button>
+                    </div>
+                </div>
+            )}
+            {/* подсказка под превью */}
+            {ui !== 'success' && (
+                <div className='new-cargo-page__subtitle'>Введите данные:</div>
+            )}
+            {/* ФОРМА — ВСЕГДА в DOM */}
+            <div
+                className={`ncap__form ${
+                    ui === 'saving' ? 'ncap__form--disabled' : ''
+                } ${ui === 'success' ? 'ncap__form--hidden' : ''}`}
+            >
+                <CreateCargoAdForm
+                    ref={formRef}
+                    formData={formData}
+                    updateFormData={updateFormData}
+                />
             </div>
 
-            <div className='new-cargo-page__subtitle'>Введите данные:</div>
-
-            {/* ВАЖНО: передаём форму в «контролируемом» режиме */}
-            <CreateCargoAdForm
-                ref={formRef}
-                formData={formData}
-                updateFormData={updateFormData}
-            />
-
-            {showConfirm && (
+            {/* подтверждение */}
+            {ui === 'confirm' && (
                 <div className='accf__backdrop'>
                     <ConfirmationDialog
                         message='Разместить это объявление?'
                         onConfirm={handleConfirm}
-                        onCancel={() => setShowConfirm(false)}
+                        onCancel={handleCancelConfirm}
                     />
                 </div>
             )}
 
-            {saving && (
+            {/* прелоадер */}
+            {ui === 'saving' && (
                 <div className='accf__saving'>
                     <div className='accf__spinner' />
                     <div className='accf__saving-text'>Сохраняем…</div>
+                </div>
+            )}
+
+            {/* Успех */}
+            {ui === 'success' && (
+                <div className='ncap__result ncap__result--success'>
+                    <div className='ncap__result-title'>
+                        Объявление размещено
+                    </div>
+                    <div className='ncap__result-actions'>
+                        <Button onClick={handleCreateAnother}>
+                            Добавить ещё
+                        </Button>
+                        {/* сюда при желании кнопку ко всем объявлениям */}
+                    </div>
                 </div>
             )}
         </div>
