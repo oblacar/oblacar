@@ -43,7 +43,7 @@ import DevVehicleQuickTest from './DevVehicleQuickTest';
 import CargoAdCard from '../../components/CargoAds/CargoAdCard/CargoAdCard';
 import CargoAdMiniCard from '../../components/CargoAds/CargoAdMiniCard';
 import SeedCargoAdsButton from '../../dev/SeedCargoAdsButton';
-import CargoAdLisT from '../../components/CargoAds/CargoAdList'
+import CargoAdLisT from '../../components/CargoAds/CargoAdsList'
 
 
 // тестовые объявления о Грузе------------------>

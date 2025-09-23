@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import CargoAdCard from './CargoAdCard/CargoAdCard';
+import CargoAdItem from './CargoAdItem';
 import './CargoAdsList.css';
 
 // Если нужен контекст — подключим его; если items передан, контекст не используем.
@@ -67,7 +68,7 @@ const CargoAdsList = ({
         <div className="cargo-ads-list__column">
           {data.map((ad) => {
             const key = ad.adId || `${ad.departureCity}-${ad.destinationCity}-${ad.createdAt}`;
-            const card = <CargoAdCard ad={ad} />;
+            const card = <CargoAdItem ad={ad} />;
 
             return (
               <div className="cargo-ads-list__item" key={key}>
