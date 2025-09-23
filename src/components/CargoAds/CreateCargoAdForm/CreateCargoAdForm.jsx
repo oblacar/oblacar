@@ -187,11 +187,14 @@ const CreateCargoAdForm = forwardRef(
                     <div className='accf__col accf__col--left'>
                         {/* === 1) Маршрут === */}
                         <section className='accf__card'>
-                            <h3 className='accf__section-title'>Маршрут</h3>
+                            <div className='accf__section-title-container'>
+                                <h3 className='accf__section-title'>Маршрут</h3>
+                            </div>
                             <p className='accf__section-hint'>
                                 Когда и где груз готов к перевозке, и куда его
                                 доставить.
                             </p>
+
 
                             <div className='accf__field'>
                                 <label className='accf__label'>
@@ -201,11 +204,11 @@ const CreateCargoAdForm = forwardRef(
                                     selected={
                                         formData.pickupDate
                                             ? new Date(
-                                                  formData.pickupDate
-                                                      .split('.')
-                                                      .reverse()
-                                                      .join('-')
-                                              )
+                                                formData.pickupDate
+                                                    .split('.')
+                                                    .reverse()
+                                                    .join('-')
+                                            )
                                             : null
                                     }
                                     onChange={(date) => {
@@ -285,11 +288,11 @@ const CreateCargoAdForm = forwardRef(
                                     selected={
                                         formData.deliveryDate
                                             ? new Date(
-                                                  formData.deliveryDate
-                                                      .split('.')
-                                                      .reverse()
-                                                      .join('-')
-                                              )
+                                                formData.deliveryDate
+                                                    .split('.')
+                                                    .reverse()
+                                                    .join('-')
+                                            )
                                             : null
                                     }
                                     onChange={(date) => {
@@ -309,7 +312,9 @@ const CreateCargoAdForm = forwardRef(
 
                         {/* === 2) Стоимость === */}
                         <section className='accf__card'>
-                            <h3 className='accf__section-title'>Стоимость</h3>
+                            <div className='accf__section-title-container'>
+                                <h3 className='accf__section-title'>Стоимость</h3>
+                            </div>
 
                             <div className='accf__row accf__row--price'>
                                 <input
@@ -358,7 +363,9 @@ const CreateCargoAdForm = forwardRef(
                     <div className='accf__col accf__col--right'>
                         {/* === 3) Груз === */}
                         <section className='accf__card'>
-                            <h3 className='accf__section-title'>Груз</h3>
+                            <div className='accf__section-title-container'>
+                                <h3 className='accf__section-title'>Груз</h3>
+                            </div>
 
                             <div className='accf__field'>
                                 <label className='accf__label'>
@@ -635,8 +642,8 @@ const CreateCargoAdForm = forwardRef(
                                                 {m === 'ambient'
                                                     ? 'Обычная'
                                                     : m === 'chilled'
-                                                    ? 'Охлажд.'
-                                                    : 'Заморозка'}
+                                                        ? 'Охлажд.'
+                                                        : 'Заморозка'}
                                             </option>
                                         ))}
                                     </select>

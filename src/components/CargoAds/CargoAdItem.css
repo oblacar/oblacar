@@ -7,7 +7,7 @@
     /* gap: var(--cc-gap); */
 
     background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(0, 0, 0, 0.08);
     border-radius: 10px;
     padding: var(--cc-pad);
 
@@ -16,7 +16,8 @@
 }
 
 .cargo-card:hover {
-    background: #fffef5;
+    /* background: #fffef5; */
+    border-color: #f68612;
 }
 
 .cargo-card:active {
