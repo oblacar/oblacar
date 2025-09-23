@@ -154,10 +154,6 @@ const CreateCargoAdForm = ({
 
     return (
         <div className='accf'>
-            <div className='accf__header'>
-                <h2 className='accf__title'>Новое объявление о грузе</h2>
-            </div>
-
             <div
                 className={`accf__grid ${
                     layout === 'columns'

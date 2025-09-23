@@ -14,18 +14,6 @@
   gap: var(--accf-gap);
 }
 
-.accf__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.accf__title {
-  margin: 0 0 4px 0;
-  font-size: 20px;
-  line-height: 1.2;
-  font-weight: 700;
-}
 
 .accf__grid {
   display: grid;
