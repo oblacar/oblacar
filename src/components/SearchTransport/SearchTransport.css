@@ -93,6 +93,7 @@ input.search-input {
 .search-field,
 .departure-city,
 .destination-city {
+    box-sizing: border-box;
     height: 40px;
     padding: 10px;
     border: 1px solid #ccc;
