@@ -5,6 +5,7 @@ import React, {
     forwardRef,
     useImperativeHandle,
 } from 'react';
+
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -17,14 +18,62 @@ import './CreateCargoAdForm.css';
 const CreateCargoAdForm = forwardRef(
     (
         {
-            // внешние опции
+            onSubmit,
             AddPhotoButton = AddPhotoCargo,
             MultiPhotoUploader = MultiTruckPhotoUploader,
+            layout = 'stack',
+            // НОВОЕ: контролируемый режим
+            formData: externalFormData,
+            updateFormData: externalUpdateFormData,
         },
         ref
     ) => {
-        const [formData, setFormData] = useState(getInitialForm());
+        // если внешние пропы не переданы — форма работает как раньше (локальный state)
+        const [innerFormData, setInnerFormData] = useState(() => ({
+            departureCity: '',
+            destinationCity: '',
+            pickupDate: '',
+            deliveryDate: '',
+            price: '',
+            paymentUnit: 'руб',
+            readyToNegotiate: true,
+            title: '',
+            cargoType: '',
+            description: '',
+            photos: [],
+            weightTons: '',
+            dimensionsMeters: { height: '', width: '', depth: '' },
+            quantity: '',
+            packagingType: '',
+            isFragile: false,
+            isStackable: false,
+            adrClass: '',
+            temperature: { mode: 'ambient', minC: '', maxC: '' },
+            preferredLoadingTypes: [],
+        }));
+
+        // единая точка правды: внешние данные или локальные
+        const formData = externalFormData ?? innerFormData;
+
+        const updateFormData = (patch) => {
+            if (externalUpdateFormData) {
+                externalUpdateFormData(patch);
+            } else {
+                setInnerFormData((prev) => ({ ...prev, ...patch }));
+            }
+        };
+
+        const updateDims = (name, value) =>
+            updateFormData({
+                dimensionsMeters: {
+                    ...(formData.dimensionsMeters || {}),
+                    [name]: value,
+                },
+            });
+
         const [errors, setErrors] = useState({});
+        const [showConfirm, setShowConfirm] = useState(false); // можно оставить, если используешь внутри
+        const [saving, setSaving] = useState(false);
 
         const cargoTypes = useMemo(
             () => [
@@ -52,14 +101,14 @@ const CreateCargoAdForm = forwardRef(
         );
         const temperatureModes = ['ambient', 'chilled', 'frozen'];
 
-        const updateFormData = (patch) =>
-            setFormData((prev) => ({ ...prev, ...patch }));
+        // const updateFormData = (patch) =>
+        //     setFormData((prev) => ({ ...prev, ...patch }));
 
-        const updateDims = (name, value) =>
-            setFormData((prev) => ({
-                ...prev,
-                dimensionsMeters: { ...prev.dimensionsMeters, [name]: value },
-            }));
+        // const updateDims = (name, value) =>
+        //     setFormData((prev) => ({
+        //         ...prev,
+        //         dimensionsMeters: { ...prev.dimensionsMeters, [name]: value },
+        //     }));
 
         const toggleLoadingType = (val) => {
             const arr = Array.isArray(formData.preferredLoadingTypes)
@@ -71,11 +120,12 @@ const CreateCargoAdForm = forwardRef(
             updateFormData({ preferredLoadingTypes: arr });
         };
 
+        // главное — используй `formData` и `updateFormData` вместо локальных имён
+
         const validate = () => {
             const e = {};
             const pos = (v) => v !== '' && !isNaN(Number(v)) && Number(v) > 0;
 
-            // Маршрут
             if (!formData.departureCity)
                 e.departureCity = 'Укажите пункт отправления';
             if (!formData.destinationCity)
@@ -83,7 +133,6 @@ const CreateCargoAdForm = forwardRef(
             if (!formData.pickupDate)
                 e.pickupDate = 'Укажите дату готовности к отгрузке';
 
-            // Груз
             if (!formData.title?.trim())
                 e.title = 'Укажите краткое название груза';
             if (!formData.cargoType) e.cargoType = 'Выберите тип груза';
@@ -94,15 +143,40 @@ const CreateCargoAdForm = forwardRef(
             return Object.keys(e).length === 0;
         };
 
-        // Экспортируем наружу методы, чтобы кнопка на странице могла ими пользоваться
+        // Экспортируем методы наружу
         useImperativeHandle(ref, () => ({
             validate,
             getFormData: () => formData,
             reset: () => {
-                setFormData(getInitialForm());
+                const empty = {
+                    departureCity: '',
+                    destinationCity: '',
+                    pickupDate: '',
+                    deliveryDate: '',
+                    price: '',
+                    paymentUnit: 'руб',
+                    readyToNegotiate: true,
+                    title: '',
+                    cargoType: '',
+                    description: '',
+                    photos: [],
+                    weightTons: '',
+                    dimensionsMeters: { height: '', width: '', depth: '' },
+                    quantity: '',
+                    packagingType: '',
+                    isFragile: false,
+                    isStackable: false,
+                    adrClass: '',
+                    temperature: { mode: 'ambient', minC: '', maxC: '' },
+                    preferredLoadingTypes: [],
+                };
+                if (externalUpdateFormData) {
+                    externalUpdateFormData(empty);
+                } else {
+                    setInnerFormData(empty);
+                }
                 setErrors({});
             },
-            setField: (name, value) => updateFormData({ [name]: value }),
         }));
 
         return (

@@ -1,90 +1,144 @@
 // src/pages/CargoAds/NewCargoAdPage.jsx
-import React, { useState, useRef } from 'react';
-import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
-import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
+import React, { useMemo, useRef, useState } from 'react';
 import Button from '../../../../components/common/Button/Button';
 import ConfirmationDialog from '../../../../components/common/ConfirmationDialog/ConfirmationDialog';
+import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
+import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
 
 import './NewCargoAdPage.css';
 
-const NewCargoAdPage = () => {
-    // «черновик» объявления — летит в превью
-    const [draft, setDraft] = useState({});
-    const [confirmOpen, setConfirmOpen] = useState(false);
-    const [saving, setSaving] = useState(false);
+const initialState = {
+    // Маршрут
+    departureCity: '',
+    destinationCity: '',
+    pickupDate: '', // dd.MM.yyyy
+    deliveryDate: '', // dd.MM.yyyy
+    // Стоимость
+    price: '',
+    paymentUnit: 'руб',
+    readyToNegotiate: true,
+    // Груз
+    title: '',
+    cargoType: '',
+    description: '',
+    photos: [], // base64 (позже сервис заменит на URL из Storage)
+    weightTons: '',
+    dimensionsMeters: { height: '', width: '', depth: '' },
+    quantity: '',
+    packagingType: '',
+    isFragile: false,
+    isStackable: false,
+    adrClass: '',
+    temperature: { mode: 'ambient', minC: '', maxC: '' },
+    preferredLoadingTypes: [],
+};
 
+const NewCargoAdPage = () => {
     const formRef = useRef(null);
 
-    const handlePlace = async () => {
+    // локальный стейт объявления (единый источник правды)
+    const [formData, setFormData] = useState(initialState);
+
+    const updateFormData = (patch) =>
+        setFormData((prev) => ({ ...prev, ...patch }));
+
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    // превью собираем из formData
+    const previewAd = useMemo(() => {
+        const fd = formData;
+        if (!fd) return null;
+
+        return {
+            adId: '(черновик)',
+            departureCity: fd.departureCity,
+            destinationCity: fd.destinationCity,
+            pickupDate: fd.pickupDate,
+            deliveryDate: fd.deliveryDate,
+            cargoType: fd.cargoType,
+            cargoWeight: fd.weightTons,
+            cargoHeight: fd.dimensionsMeters?.height,
+            cargoWidth: fd.dimensionsMeters?.width,
+            cargoDepth: fd.dimensionsMeters?.depth,
+            loadingTypes: fd.preferredLoadingTypes,
+            price: fd.price,
+            paymentUnit: fd.paymentUnit,
+            readyToNegotiate: fd.readyToNegotiate,
+        };
+    }, [formData]);
+
+    const handlePlaceClick = () => {
+        // просим форму провалидировать ТЕКУЩИЙ formData
         if (!formRef.current?.validate()) return;
-        // const data = formRef.current.getFormData();
-        // TODO: сохранить через сервис/контекст
-        // await cargoAds.create(data)
-        // formRef.current.reset();
-        setConfirmOpen(true);
+        setShowConfirm(true);
     };
 
-    // Подтвердили размещение
-    const handleConfirmPlace = async () => {
-        setConfirmOpen(false);
+    const handleConfirm = async () => {
+        setShowConfirm(false);
         setSaving(true);
-
         try {
-            // TODO: здесь будет реальный вызов контекста/сервиса:
-            // await cargoAdsCtx.createAd(draft)
-            await new Promise((r) => setTimeout(r, 1000)); // имитация
-            // TODO: показать тост «Объявление размещено», очистить форму/черновик при необходимости
-            console.log('РАЗМЕЩЕНО (заглушка):', draft);
+            const dataToSave = formRef.current?.getFormData?.() ?? formData;
+
+            // TODO: вызвать сервис/контекст для сохранения
+            // await cargoAdsService.create(dataToSave)  или  await ctx.createAd(dataToSave)
+
+            // сброс
+            setFormData(initialState);
+            formRef.current?.reset?.(); // чтобы, если внутри формы есть локальные штуки, тоже почистились
         } catch (e) {
-            console.error(e);
+            console.error('Ошибка сохранения:', e);
         } finally {
             setSaving(false);
         }
     };
 
     return (
-        <div className='new-cargo-page'>
-            {/* Заголовок */}
-            <h1 className='new-cargo-page__title'>
-                Новое объявление на перевозку Груза
-            </h1>
-
-            {/* Полоса: превью слева, кнопка справа */}
-            <div className='new-cargo-page__topbar'>
-                <div className='new-cargo-page__preview'>
-                    <CargoAdItem ad={draft} />
-                </div>
-                <div className='new-cargo-page__actions'>
-                    <Button
-                        type_btn=''
-                        onClick={handlePlace}
-                    >
-                        + Разместить
-                    </Button>
-                </div>
+        <div className='deliveries-container'>
+            <div className='new-cargo-page__title'>
+                Новое объявление о перевозке Груза
             </div>
 
-            {/* Подзаголовок перед формой */}
+            {/* превью слева — кнопка справа */}
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 16,
+                    justifyContent: 'space-between',
+                    marginBottom: 12,
+                }}
+            >
+                <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+                    <CargoAdItem ad={previewAd} />
+                </div>
+
+                <Button onClick={handlePlaceClick}>+ Разместить</Button>
+            </div>
+
             <div className='new-cargo-page__subtitle'>Введите данные:</div>
 
-            {/* Форма. Если твоя форма поддерживает onDraftChange — превью будет «живым» */}
-            <CreateCargoAdForm ref={formRef} />
+            {/* ВАЖНО: передаём форму в «контролируемом» режиме */}
+            <CreateCargoAdForm
+                ref={formRef}
+                formData={formData}
+                updateFormData={updateFormData}
+            />
 
-            {/* Диалог подтверждения */}
-            {confirmOpen && (
-                <div className='confirmation-backdrop'>
+            {showConfirm && (
+                <div className='accf__backdrop'>
                     <ConfirmationDialog
-                        message='Разместить объявление?'
-                        onConfirm={handleConfirmPlace}
-                        onCancel={() => setConfirmOpen(false)}
+                        message='Разместить это объявление?'
+                        onConfirm={handleConfirm}
+                        onCancel={() => setShowConfirm(false)}
                     />
                 </div>
             )}
 
-            {/* Индикатор сохранения */}
             {saving && (
-                <div className='saving-overlay'>
-                    <div className='spinner' />
+                <div className='accf__saving'>
+                    <div className='accf__spinner' />
+                    <div className='accf__saving-text'>Сохраняем…</div>
                 </div>
             )}
         </div>

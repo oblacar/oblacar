@@ -6,6 +6,7 @@
 
 .new-cargo-page__title {
     margin: 0;
+    margin-bottom: 20px;
     font-size: 24px;
     font-weight: 700;
     text-align: left;
@@ -31,6 +32,7 @@
 .new-cargo-page__subtitle {
     font-weight: 600;
     margin-top: 4px;
+    margin-bottom: 20px;
     font-size: 20px;
 }
 
