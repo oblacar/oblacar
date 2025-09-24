@@ -46,19 +46,23 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #e96d26;
+    font-size: 20px;
 }
 .cargo-card__arrow {
     opacity: 0.75;
+    color: #747187;
 }
 
 .cargo-card__meta {
     font-size: 12px;
-    color: #6b7280;
+    color: #b2b8c4;
+    /* margin-left: 20px; */
 }
 
 .cargo-card__body {
     display: grid;
-    gap: 6px;
+    /* gap: 6px; */
 }
 .cargo-card__row {
     display: flex;
@@ -106,7 +110,7 @@
 
 .cargo-card__dates {
     display: grid;
-    gap: 6px;
+    /* gap: 6px; */
     text-align: right;
     width: 100%;
 }
@@ -117,17 +121,24 @@
     align-items: baseline;
 }
 .cargo-card__date-label {
-    color: #6b7280;
+    /* color: #6b7280; */
+    color: #b2b8c4;
     font-size: 13px;
 }
 .cargo-card__date-value {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
-    color: #111827;
+    color: #363636;
+}
+.cargo-card__date-delivery {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 400;
 }
 
 .cargo-card__price {
     text-align: right;
+    margin-top: 10px;
 }
 .cargo-card__price-value {
     font-size: 22px;

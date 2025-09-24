@@ -141,16 +141,14 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
                 {/* ЛЕВЫЙ СТОЛБЕЦ */}
                 <div className='cargo-card__leftcol'>
                     <div className='cargo-card__cities'>
-                        <span className='cargo-card__city'>{from || 'От'}</span>
+                        <span className='cargo-card__city'>{from || '-'}</span>
                         <span className='cargo-card__arrow'>→</span>
-                        <span className='cargo-card__city'>{to || 'До'}</span>
+                        <span className='cargo-card__city'>{to || '-'}</span>
                     </div>
 
-                    {dateStr && (
-                        <div className='cargo-card__meta'>
-                            создано: {dateStr}
-                        </div>
-                    )}
+                    <div className='cargo-card__meta'>
+                        Дата объявления: {dateStr ? { dateStr } : '-'}
+                    </div>
 
                     <div className='cargo-card__body'>
                         <div className='cargo-card__row'>
@@ -199,26 +197,23 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
                 {/* ПРАВЫЙ СТОЛБЕЦ */}
                 <div className='cargo-card__right'>
                     <div className='cargo-card__dates'>
-                        {pickup && (
-                            <div className='cargo-card__date-row'>
-                                <span className='cargo-card__date-label'>
-                                    Забор:
-                                </span>
-                                <span className='cargo-card__date-value'>
-                                    {fmtDate(pickup)}
-                                </span>
-                            </div>
-                        )}
-                        {delivery && (
-                            <div className='cargo-card__date-row'>
-                                <span className='cargo-card__date-label'>
-                                    Доставка:
-                                </span>
-                                <span className='cargo-card__date-value'>
-                                    {fmtDate(delivery)}
-                                </span>
-                            </div>
-                        )}
+                        <div className='cargo-card__date-row'>
+                            <span className='cargo-card__date-label'>
+                                Загрузка
+                            </span>
+                            <span className='cargo-card__date-value cargo-card__date-pickup'>
+                                {pickup ? fmtDate(pickup) : '-'}
+                            </span>
+                        </div>
+
+                        <div className='cargo-card__date-row'>
+                            <span className='cargo-card__date-label'>
+                                Доставка до
+                            </span>
+                            <span className='cargo-card__date-value cargo-card__date-delivery'>
+                                {delivery ? fmtDate(delivery) : '-'}
+                            </span>
+                        </div>
                     </div>
 
                     <div className='cargo-card__price'>
@@ -238,11 +233,7 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
                         )}
                     </div>
 
-                    {bargain && (
-                        <div className='cargo-card__bargain'>
-                            готов обсудить
-                        </div>
-                    )}
+                    {bargain && <div className='cargo-card__bargain'>торг</div>}
                 </div>
             </div>
 
