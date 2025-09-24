@@ -7,6 +7,10 @@ import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
 import './NewCargoAdPage.css';
 
 const initialState = {
+    ownerId: '',
+    ownerName: '',
+    ownerPhotoUrl: '',
+    ownerRating: '',
     createdAt: new Date().toISOString(),
     departureCity: '',
     destinationCity: '',
@@ -53,16 +57,42 @@ const NewCargoAdPage = () => {
         formData.availabilityTo,
     ]);
 
+    // const previewAd = useMemo(() => {
+    //     const fd = formData;
+    //     return {
+    //         adId: '(черновик)',
+    //         createdAt: fd.createdAt || new Date().toISOString(),
+    //         departureCity: fd.departureCity,
+    //         destinationCity: fd.destinationCity,
+    //         pickupDate: fd.pickupDate,
+    //         deliveryDate: fd.deliveryDate,
+    //         cargoType: fd.cargoType,
+    //         cargoWeight: fd.weightTons,
+    //         cargoHeight: fd.dimensionsMeters?.height,
+    //         cargoWidth: fd.dimensionsMeters?.width,
+    //         cargoDepth: fd.dimensionsMeters?.depth,
+    //         loadingTypes: fd.preferredLoadingTypes,
+    //         price: fd.price,
+    //         paymentUnit: fd.paymentUnit,
+    //         readyToNegotiate: fd.readyToNegotiate,
+    //         title: fd.title,
+    //         ownerId: fd.ownerId,
+    //         ownerName: fd.ownerName,
+    //         ownerAvatar: fd.ownerPhotoUrl,   // CargoAdItem читает ownerAvatar/ownerAvatarUrl
+    //         ownerRating: fd.ownerRating,
+    //     };
+    // }, [formData]);
+
     const previewAd = useMemo(() => {
         const fd = formData;
         return {
-            adId: '(черновик)',
-            createdAt: fd.createdAt || new Date().toISOString(),
+            // маршрут/даты/груз/цена — как у тебя
             departureCity: fd.departureCity,
             destinationCity: fd.destinationCity,
-            pickupDate: fd.pickupDate,
-            deliveryDate: fd.deliveryDate,
+            availabilityFrom: fd.pickupDate || fd.availabilityFrom,
+            availabilityTo: fd.deliveryDate || fd.availabilityTo,
             cargoType: fd.cargoType,
+            cargoName: fd.title,
             cargoWeight: fd.weightTons,
             cargoHeight: fd.dimensionsMeters?.height,
             cargoWidth: fd.dimensionsMeters?.width,
@@ -71,9 +101,18 @@ const NewCargoAdPage = () => {
             price: fd.price,
             paymentUnit: fd.paymentUnit,
             readyToNegotiate: fd.readyToNegotiate,
-            title: fd.title,
+
+            // мета
+            createdAt: fd.createdAt,
+
+            // владелец
+            ownerId: fd.ownerId,
+            ownerName: fd.ownerName,
+            ownerAvatar: fd.ownerPhotoUrl,
+            ownerRating: fd.ownerRating,
         };
     }, [formData]);
+
 
     useEffect(() => {
         console.log('[NewCargoAdPage] previewAd:', formData);

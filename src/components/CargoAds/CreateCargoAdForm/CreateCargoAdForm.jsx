@@ -5,6 +5,8 @@ import React, {
     forwardRef,
     useImperativeHandle,
     useRef,
+    useEffect,
+    useContext,
 } from 'react';
 
 import DatePicker from 'react-datepicker';
@@ -12,32 +14,33 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import CitySearch from '../../common/CitySearch/CitySearch';
 
-// import MultiTruckPhotoUploader from '../../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
-// import AddPhotoCargo from '../../common/AddPhotoButton/AddPhotoButton';
-
-import DefaultAddPhotoButton from '../../common/AddPhotoButton/AddPhotoButton';
-import DefaultMultiPhotoUploader from '../../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
-
 import PackagingMultiSelect from '../PackagingPicker/PackagingMultiSelect';
 import { PACKAGING_OPTIONS } from '../../../constants/cargoPackagingOptions';
 
 import './CreateCargoAdForm.css';
+import UserContext from '../../../hooks/UserContext';
 
 const CreateCargoAdForm = forwardRef(
     (
         {
-            onSubmit,
-            AddPhotoButton = DefaultAddPhotoButton,
-            MultiPhotoUploader = DefaultMultiPhotoUploader,
-            layout = 'stack',
-            // НОВОЕ: контролируемый режим
+            // onSubmit,
+            // onSubmit — коллбэк, который форма может вызывать при сохранении (передать наружу собранные данные). В текущей версии мы сохраняем из страницы (через ref.validate() + getFormData()), поэтому onSubmit не используется. Оставлен «на будущее/совместимость». Можно смело убрать, если не планируешь вызывать submit из самой формы.
+            // layout = 'stack',
+            // layout = 'stack' — настройка раскладки. Раньше управлял видом (stack/columns). В актуальной разметке мы жёстко используем двухколоночный грид (accf__grid--2col), т.е. layout сейчас не влияет. Либо удаляй проп, либо верни логику, например:
             formData: externalFormData,
             updateFormData: externalUpdateFormData,
         },
         ref
     ) => {
+        const { user: profile, isUserLoaded } = useContext(UserContext) || {};
+
         // если внешние пропы не переданы — форма работает как раньше (локальный state)
         const [innerFormData, setInnerFormData] = useState(() => ({
+            createdAt: '',
+            ownerId: '',
+            ownerName: '',
+            ownerPhotoUrl: '',
+            ownerRating: '',
             departureCity: '',
             destinationCity: '',
             pickupDate: '',
@@ -60,16 +63,30 @@ const CreateCargoAdForm = forwardRef(
             preferredLoadingTypes: [],
         }));
 
-        // единая точка правды: внешние данные или локальные
+        // ЕДИНАЯ точка правды — до useEffect!
         const formData = externalFormData ?? innerFormData;
-
         const updateFormData = (patch) => {
-            if (externalUpdateFormData) {
-                externalUpdateFormData(patch);
-            } else {
-                setInnerFormData((prev) => ({ ...prev, ...patch }));
-            }
+            if (externalUpdateFormData) externalUpdateFormData(patch);
+            else setInnerFormData(prev => ({ ...prev, ...patch }));
         };
+
+        useEffect(() => {
+            if (!isUserLoaded || !profile) return;
+            const today = new Date().toLocaleDateString('ru-RU');
+            // формируем патч только для пустых полей
+            const patch = {};
+            if (!formData.createdAt) patch.createdAt = today;
+            if (!formData.ownerId && profile.userId)
+                patch.ownerId = profile.userId;
+            if (!formData.ownerName && (profile.userName || profile.userEmail))
+                patch.ownerName = profile.userName || profile.userEmail || 'Пользователь';
+            if (!formData.ownerPhotoUrl && profile.userPhoto)
+                patch.ownerPhotoUrl = profile.userPhoto;
+            if (Object.keys(patch).length > 0) {
+                updateFormData(patch); // это обновит либо внешний стейт, либо локальный
+            }
+            // завязка на profile и нужные поля из formData; так мы избегаем лишних перерендеров
+        }, [isUserLoaded, profile, formData.createdAt, formData.ownerId, formData.ownerName, formData.ownerPhotoUrl]);
 
         const updateDims = (name, value) =>
             updateFormData({
