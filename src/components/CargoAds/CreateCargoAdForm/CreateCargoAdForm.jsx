@@ -4,14 +4,19 @@ import React, {
     useState,
     forwardRef,
     useImperativeHandle,
+    useRef,
 } from 'react';
 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import CitySearch from '../../common/CitySearch/CitySearch';
-import MultiTruckPhotoUploader from '../../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
-import AddPhotoCargo from '../../common/AddPhotoButton/AddPhotoButton';
+
+// import MultiTruckPhotoUploader from '../../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
+// import AddPhotoCargo from '../../common/AddPhotoButton/AddPhotoButton';
+
+import DefaultAddPhotoButton from '../../common/AddPhotoButton/AddPhotoButton';
+import DefaultMultiPhotoUploader from '../../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
 
 import PackagingMultiSelect from '../PackagingPicker/PackagingMultiSelect';
 import { PACKAGING_OPTIONS } from '../../../constants/cargoPackagingOptions';
@@ -22,8 +27,8 @@ const CreateCargoAdForm = forwardRef(
     (
         {
             onSubmit,
-            AddPhotoButton = AddPhotoCargo,
-            MultiPhotoUploader = MultiTruckPhotoUploader,
+            AddPhotoButton = DefaultAddPhotoButton,
+            MultiPhotoUploader = DefaultMultiPhotoUploader,
             layout = 'stack',
             // НОВОЕ: контролируемый режим
             formData: externalFormData,
@@ -182,6 +187,54 @@ const CreateCargoAdForm = forwardRef(
             },
         }));
 
+        // Фото загрузка:
+        const fileInputRef = useRef(null);
+
+        // ограничители (можно подкрутить)
+        const MAX_FILES = 12;
+        const MAX_SIZE_MB = 8;
+
+        // конвертация File -> dataURL
+        const fileToDataURL = (file) =>
+            new Promise((resolve, reject) => {
+                const fr = new FileReader();
+                fr.onload = () => resolve(fr.result);
+                fr.onerror = reject;
+                fr.readAsDataURL(file);
+            });
+
+        const handlePickFilesClick = () => fileInputRef.current?.click();
+
+        const handleFilesSelected = async (e) => {
+            const files = Array.from(e.target.files || []);
+            if (!files.length) return;
+
+            // отсекаем лишнее и большие файлы
+            const existing = Array.isArray(formData.photos) ? formData.photos : [];
+            const room = Math.max(MAX_FILES - existing.length, 0);
+            const picked = files.slice(0, room).filter(f => (f.size / 1024 / 1024) <= MAX_SIZE_MB);
+
+            if (picked.length === 0) return;
+
+            // читаем в dataURL
+            const dataUrls = await Promise.all(picked.map(file => fileToDataURL(file)));
+
+            const next = [
+                ...existing,
+                ...dataUrls.map((src) => ({ id: crypto.randomUUID?.() || String(Math.random()), src }))
+            ];
+
+            updateFormData({ photos: next });
+            // сбрасываем input, чтобы повторно выбирать те же файлы при желании
+            e.target.value = '';
+        };
+
+        const removePhoto = (id) => {
+            const arr = Array.isArray(formData.photos) ? formData.photos : [];
+            updateFormData({ photos: arr.filter(p => p.id !== id) });
+        };
+
+
         return (
             <div className='accf'>
                 {/* ДВЕ КОЛОНКИ: левая (1/3) = Маршрут + Стоимость, правая (2/3) = Груз */}
@@ -206,11 +259,11 @@ const CreateCargoAdForm = forwardRef(
                                     selected={
                                         formData.pickupDate
                                             ? new Date(
-                                                  formData.pickupDate
-                                                      .split('.')
-                                                      .reverse()
-                                                      .join('-')
-                                              )
+                                                formData.pickupDate
+                                                    .split('.')
+                                                    .reverse()
+                                                    .join('-')
+                                            )
                                             : null
                                     }
                                     onChange={(date) => {
@@ -291,11 +344,11 @@ const CreateCargoAdForm = forwardRef(
                                     selected={
                                         formData.deliveryDate
                                             ? new Date(
-                                                  formData.deliveryDate
-                                                      .split('.')
-                                                      .reverse()
-                                                      .join('-')
-                                              )
+                                                formData.deliveryDate
+                                                    .split('.')
+                                                    .reverse()
+                                                    .join('-')
+                                            )
                                             : null
                                     }
                                     onChange={(date) => {
@@ -452,7 +505,7 @@ const CreateCargoAdForm = forwardRef(
                                 />
                             </div>
 
-                            {AddPhotoButton && (
+                            {/* {AddPhotoButton && (
                                 <div
                                     className='accf__row'
                                     style={{ alignItems: 'center' }}
@@ -488,7 +541,54 @@ const CreateCargoAdForm = forwardRef(
                                         updateFormData({ photos });
                                     }}
                                 />
-                            )}
+                            )} */}
+
+                            <div className="accf__field">
+                                <label className="accf__label">Фотографии груза</label>
+
+                                <div className="accf__photos">
+                                    <button
+                                        type="button"
+                                        className="accf__photo-add"
+                                        onClick={handlePickFilesClick}
+                                    >
+                                        + Добавить фото
+                                    </button>
+
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={handleFilesSelected}
+                                        className="accf__file-input"
+                                    />
+
+                                    {Array.isArray(formData.photos) && formData.photos.length > 0 && (
+                                        <div className="accf__thumbs">
+                                            {formData.photos.map(p => (
+                                                <div className="accf__thumb" key={p.id}>
+                                                    <img src={p.src} alt="cargo" />
+                                                    <button
+                                                        type="button"
+                                                        className="accf__thumb-del"
+                                                        onClick={() => removePhoto(p.id)}
+                                                        aria-label="Удалить фото"
+                                                        title="Удалить"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="accf__hint">
+                                        до {MAX_FILES} фото, не более {MAX_SIZE_MB} МБ каждое
+                                    </div>
+                                </div>
+                            </div>
+
 
                             <div className='accf__field'>
                                 <label className='accf__label'>Вес, т</label>
@@ -665,8 +765,8 @@ const CreateCargoAdForm = forwardRef(
                                                 {m === 'ambient'
                                                     ? 'Обычная'
                                                     : m === 'chilled'
-                                                    ? 'Охлажд.'
-                                                    : 'Заморозка'}
+                                                        ? 'Охлажд.'
+                                                        : 'Заморозка'}
                                             </option>
                                         ))}
                                     </select>

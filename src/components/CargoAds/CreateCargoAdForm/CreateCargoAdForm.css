@@ -325,3 +325,76 @@
         /* в одну колонку на узких экранах */
     }
 }
+
+/* загрузка фото */
+.accf__file-input {
+    display: none;
+}
+
+.accf__photos {
+    display: grid;
+    gap: 8px;
+}
+
+.accf__photo-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    transition: background-color .15s, box-shadow .15s;
+}
+
+.accf__photo-add:hover {
+    background: #fffdf3;
+}
+
+.accf__thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 10px;
+}
+
+.accf__thumb {
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    background: #f9fafb;
+}
+
+.accf__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.accf__thumb-del {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, .08);
+    background: #fff;
+    cursor: pointer;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    transition: transform .08s ease, background-color .15s;
+}
+
+.accf__thumb-del:hover {
+    background: #fff3ec;
+}
+
+.accf__thumb-del:active {
+    transform: scale(.94);
+}
