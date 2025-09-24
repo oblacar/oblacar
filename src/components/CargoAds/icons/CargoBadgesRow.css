@@ -1,17 +1,31 @@
-.cargo-badges {
-    display: flex;
+.cbr {
+    display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
 }
 
-.cargo-badge {
+.cbr__badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 999px;
     background: #f9fafb;
-    color: #374151;
+    border: 1px solid rgba(0, 0, 0, .06);
+    color: #111827;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.cbr__icon {
+    display: inline-block;
+}
+
+.cbr__text {
+    font-weight: 600;
+}
+
+/* маленький бейдж для “+N” */
+.cbr__badge .cbr__text:only-child {
+    font-weight: 700;
 }

@@ -86,23 +86,33 @@ const NewCargoAdPage = () => {
     const previewAd = useMemo(() => {
         const fd = formData;
         return {
-            // маршрут/даты/груз/цена — как у тебя
+            // маршрут + даты
             departureCity: fd.departureCity,
             destinationCity: fd.destinationCity,
-            availabilityFrom: fd.pickupDate || fd.availabilityFrom,
-            availabilityTo: fd.deliveryDate || fd.availabilityTo,
-            cargoType: fd.cargoType,
-            cargoName: fd.title,
-            cargoWeight: fd.weightTons,
-            cargoHeight: fd.dimensionsMeters?.height,
-            cargoWidth: fd.dimensionsMeters?.width,
-            cargoDepth: fd.dimensionsMeters?.depth,
-            loadingTypes: fd.preferredLoadingTypes,
+            availabilityFrom: fd.pickupDate,
+            availabilityTo: fd.deliveryDate,
+
+            // цена
             price: fd.price,
             paymentUnit: fd.paymentUnit,
             readyToNegotiate: fd.readyToNegotiate,
 
-            // мета
+            // груз
+            cargoType: fd.cargoType,
+            title: fd.title,                // если показываешь короткое название
+            weightTons: fd.weightTons,
+            cargoHeight: fd.dimensionsMeters?.height,
+            cargoWidth: fd.dimensionsMeters?.width,
+            cargoDepth: fd.dimensionsMeters?.depth,
+
+            // НУЖНО ДЛЯ БЕЙДЖЕЙ:
+            packagingTypes: fd.packagingTypes ?? [], // массив ключей
+            isFragile: fd.isFragile,
+            isStackable: fd.isStackable,
+            temperature: fd.temperature,            // { mode: 'ambient'|'chilled'|'frozen', ... }
+            adrClass: fd.adrClass,
+
+            // (не обязательно, но ок)
             createdAt: fd.createdAt,
 
             // владелец
@@ -112,7 +122,6 @@ const NewCargoAdPage = () => {
             ownerRating: fd.ownerRating,
         };
     }, [formData]);
-
 
     useEffect(() => {
         console.log('[NewCargoAdPage] previewAd:', formData);
@@ -168,7 +177,7 @@ const NewCargoAdPage = () => {
             {/* верхняя полоса: превью + кнопка */}
             <div className='ncap__top'>
                 <div className='ncap__preview'>
-                    <CargoAdItem ad={previewAd} />
+                    <CargoAdItem ad={previewAd} ableHover={false} />
                 </div>
                 {ui !== 'success' && (
                     <Button

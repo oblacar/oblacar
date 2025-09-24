@@ -36,7 +36,7 @@ import './CargoAdItem.css';
  * - price.{value,unit,readyToNegotiate} | top-level: price, paymentUnit, readyToNegotiate
  * - owner / ownerId / ownerName / ownerAvatar / rating
  */
-const CargoAdItem = ({ ad = {}, className = '' }) => {
+const CargoAdItem = ({ ad = {}, className = '', ableHover = true }) => {
     const data = ad?.ad ? ad.ad : ad;
 
     const {
@@ -134,8 +134,14 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
         ? Number(owner.rating)
         : null;
 
+    const rootClass = [
+        'cargo-card',
+        className,
+        !ableHover ? 'cargo-card--nohover' : ''
+    ].filter(Boolean).join(' ');
+
     return (
-        <div className={`cargo-card ${className}`}>
+        <div className={rootClass}>
             {/* ВЕРХ: 2 колонки — слева контент, справа даты+цена */}
             <div className='cargo-card__head'>
                 {/* ЛЕВЫЙ СТОЛБЕЦ */}
