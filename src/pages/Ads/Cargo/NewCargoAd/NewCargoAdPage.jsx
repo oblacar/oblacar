@@ -7,6 +7,7 @@ import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
 import './NewCargoAdPage.css';
 
 const initialState = {
+    createdAt: new Date().toISOString(),
     departureCity: '',
     destinationCity: '',
     pickupDate: '',
@@ -56,6 +57,7 @@ const NewCargoAdPage = () => {
         const fd = formData;
         return {
             adId: '(черновик)',
+            createdAt: fd.createdAt || new Date().toISOString(),
             departureCity: fd.departureCity,
             destinationCity: fd.destinationCity,
             pickupDate: fd.pickupDate,
@@ -109,7 +111,10 @@ const NewCargoAdPage = () => {
 
     const handleCreateAnother = () => {
         // сбрасываем форму и возвращаемся к заполнению
-        setFormData(initialState);
+        setFormData({
+            ...initialState,
+            createdAt: new Date().toISOString(),
+        });
         formRef.current?.reset?.();
         setUi('idle');
     };
@@ -156,9 +161,8 @@ const NewCargoAdPage = () => {
             )}
             {/* ФОРМА — ВСЕГДА в DOM */}
             <div
-                className={`ncap__form ${
-                    ui === 'saving' ? 'ncap__form--disabled' : ''
-                } ${ui === 'success' ? 'ncap__form--hidden' : ''}`}
+                className={`ncap__form ${ui === 'saving' ? 'ncap__form--disabled' : ''
+                    } ${ui === 'success' ? 'ncap__form--hidden' : ''}`}
             >
                 <CreateCargoAdForm
                     ref={formRef}

@@ -147,7 +147,7 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
                     </div>
 
                     <div className='cargo-card__meta'>
-                        Дата объявления: {dateStr ? { dateStr } : '-'}
+                        Дата объявления: {String(dateStr) ? String(dateStr) : '-'}
                     </div>
 
                     <div className='cargo-card__body'>
