@@ -1,5 +1,5 @@
 // src/pages/CargoAds/NewCargoAdPage.jsx
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import Button from '../../../../components/common/Button/Button';
 import ConfirmationDialog from '../../../../components/common/ConfirmationDialog/ConfirmationDialog';
 import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
@@ -38,6 +38,20 @@ const NewCargoAdPage = () => {
     const [ui, setUi] = useState('idle');
     const [errorMsg, setErrorMsg] = useState('');
 
+    useEffect(() => {
+        console.log('[NewCargoAdPage] formData dates:', {
+            pickupDate: formData.pickupDate,
+            availabilityFrom: formData.availabilityFrom,
+            deliveryDate: formData.deliveryDate,
+            availabilityTo: formData.availabilityTo,
+        });
+    }, [
+        formData.pickupDate,
+        formData.availabilityFrom,
+        formData.deliveryDate,
+        formData.availabilityTo,
+    ]);
+
     const previewAd = useMemo(() => {
         const fd = formData;
         return {
@@ -56,6 +70,10 @@ const NewCargoAdPage = () => {
             paymentUnit: fd.paymentUnit,
             readyToNegotiate: fd.readyToNegotiate,
         };
+    }, [formData]);
+
+    useEffect(() => {
+        console.log('[NewCargoAdPage] previewAd:', formData);
     }, [formData]);
 
     const handlePlaceClick = () => {

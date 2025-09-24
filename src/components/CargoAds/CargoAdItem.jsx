@@ -1,46 +1,60 @@
-// src/components/CargoAdCard/CargoAdCard.jsx
+// src/components/CargoAds/CargoAdItem.jsx
 import React, { useMemo } from 'react';
+// import {
+//     FaCouch,
+//     FaAppleAlt,
+//     FaBoxOpen,
+//     FaFlask,
+//     FaIndustry,
+//     FaTools,
+//     FaLaptop,
+//     FaTint,
+//     FaCubes,
+//     FaCube,
+//     FaShoppingBag,
+//     FaOilCan,
+//     FaSnowflake,
+//     FaThermometerHalf,
+//     FaLayerGroup,
+//     FaWineGlass,
+// } from 'react-icons/fa';
+
+import CargoBadgesRow from './icons/CargoBadgesRow';
+
 import './CargoAdItem.css';
 
 /**
- * Карточка объявления о перевозке груза.
+ * Карточка объявления о перевозке груза (элемент списка).
  *
- * Ожидаемая схема данных (плоская или в виде { ad }):
- * - adId
- * - createdAt | date
- * - route?: { from, to } | { departureCity, destinationCity }
- *   либо top-level: departureCity, destinationCity
- * - availabilityFrom, availabilityTo        ← фиксированные поля дат
- * - cargo?: {
- *     name|title, type,
- *     weightTons|weight,
- *     dims?: { h, w, d } | (top-level fallbacks: cargoHeight, cargoWidth, cargoDepth),
- *     fragile?: boolean,
- *     temperature?: string
- *   }
- * - loadingTypes?: string[] | { [k]: true }
- * - price?: { value, unit, readyToNegotiate }
- *   либо top-level: price, paymentUnit, readyToNegotiate
+ * Поддерживаем плоские и { ad } структуры.
+ * Ключевые поля:
+ * - route.{from,to} | top-level: departureCity, destinationCity
+ * - availabilityFrom, availabilityTo (даты)
+ * - cargo.{name|title,type,weightTons|weight,dims{h,w,d},fragile,temperature}
+ * - packagingTypes?: string[] (ключи мультиселекта)
+ * - loadingTypes?: array|object
+ * - price.{value,unit,readyToNegotiate} | top-level: price, paymentUnit, readyToNegotiate
+ * - owner / ownerId / ownerName / ownerAvatar / rating
  */
 const CargoAdItem = ({ ad = {}, className = '' }) => {
-    // Поддерживаем обёртку расширенных данных { ad: {...} }
     const data = ad?.ad ? ad.ad : ad;
 
     const {
         adId,
         createdAt,
-        date, // альтернативное имя даты создания
+        date,
         route = {},
         cargo = {},
         loadingTypes,
+        packagingTypes = data.packagingTypes || [],
         price = {},
     } = data;
 
-    // --- Дата создания карточки ---
+    // дата создания
     const created = createdAt || date || null;
     const dateStr = created ? fmtDate(created) : null;
 
-    // --- Маршрут (берём из route или top-level) ---
+    // маршрут
     const from =
         route.from ??
         route.departureCity ??
@@ -55,11 +69,20 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
         data.to ??
         '—';
 
-    // --- Даты перевозки (зафиксированная схема) ---
-    const pickup = data.availabilityFrom ?? null;
-    const delivery = data.availabilityTo ?? null;
+    // даты перевозки
+    const pickup =
+        data.availabilityFrom ??
+        data.pickupDate ??
+        data.dates?.pickupDate ??
+        null;
 
-    // --- О грузе ---
+    const delivery =
+        data.availabilityTo ??
+        data.deliveryDate ??
+        data.dates?.deliveryDate ??
+        null;
+
+    // груз
     const cargoName =
         cargo.name ?? cargo.title ?? data.cargoName ?? data.cargoTitle ?? '';
 
@@ -85,115 +108,119 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
         [loadingTypes, data.loadingTypes]
     );
 
-    const temperature = cargo.temperature ?? data.temperature ?? null;
+    const temperature = cargo.temperature ?? data.temperature ?? null; // строка типа "0…+5°C" — оставим как флаг наличия
+    const temperatureMode =
+        (data.temperature?.mode ?? cargo.temperature?.mode) ||
+        data.temperatureMode ||
+        null; // 'ambient'|'chilled'|'frozen' (если есть)
     const fragile = Boolean(cargo.fragile ?? data.fragile);
+    const isStackable = Boolean(data.isStackable ?? cargo.isStackable);
 
-    // --- Цена ---
+    // цена
     const priceValue = price.value ?? data.price;
     const priceUnit = price.unit ?? data.paymentUnit ?? 'руб';
     const bargain = Boolean(price.readyToNegotiate ?? data.readyToNegotiate);
 
+    // владелец
+    const owner = data.owner || {
+        id: data.ownerId,
+        name: data.ownerName || data.userName,
+        avatarUrl: data.ownerAvatar || data.avatarUrl,
+        rating: data.ownerRating ?? data.rating,
+    };
+    const ownerName = owner?.name || 'Без имени';
+    const ownerAvatar = owner?.avatarUrl || null;
+    const ownerRating = isFiniteNumber(owner?.rating)
+        ? Number(owner.rating)
+        : null;
+
     return (
         <div className={`cargo-card ${className}`}>
-            {/* Верхняя строка: маршрут + мета (дата создания) */}
+            {/* ВЕРХ: 2 колонки — слева контент, справа даты+цена */}
             <div className='cargo-card__head'>
-                <div className='cargo-card__route'>
+                {/* ЛЕВЫЙ СТОЛБЕЦ */}
+                <div className='cargo-card__leftcol'>
                     <div className='cargo-card__cities'>
-                        <span className='cargo-card__city'>{from}</span>
+                        <span className='cargo-card__city'>{from || 'От'}</span>
                         <span className='cargo-card__arrow'>→</span>
-                        <span className='cargo-card__city'>{to}</span>
+                        <span className='cargo-card__city'>{to || 'До'}</span>
                     </div>
+
                     {dateStr && (
                         <div className='cargo-card__meta'>
                             создано: {dateStr}
                         </div>
                     )}
-                </div>
 
-                <div className='cargo-card__dates'>
-                    {pickup && (
-                        <div className='cargo-card__date-row'>
-                            <span className='cargo-card__date-label'>
-                                Забор:
-                            </span>
-                            <span className='cargo-card__date-value'>
-                                {fmtDate(pickup)}
-                            </span>
-                        </div>
-                    )}
-                    {delivery && (
-                        <div className='cargo-card__date-row'>
-                            <span className='cargo-card__date-label'>
-                                Доставка:
-                            </span>
-                            <span className='cargo-card__date-value'>
-                                {fmtDate(delivery)}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Средняя часть: о грузе */}
-            <div className='cargo-card__body'>
-                <div className='cargo-card__left'>
-                    {(cargoName || cargoType) && (
+                    <div className='cargo-card__body'>
                         <div className='cargo-card__row'>
                             <span className='cargo-card__label'>Груз:</span>
                             <span className='cargo-card__value'>
-                                {/* {cargoName || '—'} */}
-                                {cargoType ? `${cargoType}` : ''}
+                                {cargoName || '—'}
                             </span>
                         </div>
-                    )}
 
-                    <div className='cargo-card__row'>
-                        <span className='cargo-card__label'>Вес (т):</span>
-                        <span className='cargo-card__value'>
-                            {fmtNum(weight)}
-                        </span>
-                    </div>
-
-                    <div className='cargo-card__row'>
-                        <span className='cargo-card__label'>Габариты (м):</span>
-                        <span className='cargo-card__value'>
-                            {fmtDims(dims?.h, dims?.w, dims?.d)}
-                        </span>
-                    </div>
-
-                    {!!tagsLoading.length && (
-                        <div className='cargo-card__row cargo-card__row--tags'>
-                            <span className='cargo-card__label'>Загрузка:</span>
-                            <span className='cargo-card__tags'>
-                                {tagsLoading.map((t) => (
-                                    <span
-                                        key={t}
-                                        className='cargo-card__tag'
-                                    >
-                                        {t}
-                                    </span>
-                                ))}
+                        <div className='cargo-card__row'>
+                            <span className='cargo-card__label'>Вес:</span>
+                            <span className='cargo-card__value'>
+                                {isFiniteNumber(weight)
+                                    ? `${fmtNum(weight)} т`
+                                    : '—'}
                             </span>
                         </div>
-                    )}
 
-                    {(fragile || temperature) && (
-                        <div className='cargo-card__row cargo-card__row--flags'>
-                            {fragile && (
-                                <span className='cargo-card__flag'>
-                                    Хрупкий
-                                </span>
-                            )}
-                            {temperature && (
-                                <span className='cargo-card__flag cargo-card__flag--temp'>
-                                    {temperature}
-                                </span>
-                            )}
+                        <div className='cargo-card__row'>
+                            <span className='cargo-card__label'>Габариты:</span>
+                            <span className='cargo-card__value'>
+                                {fmtDims(dims?.h, dims?.w, dims?.d)} м
+                            </span>
                         </div>
-                    )}
+
+                        {!!tagsLoading.length && (
+                            <div className='cargo-card__row cargo-card__row--tags'>
+                                <span className='cargo-card__label'>
+                                    Загрузка:
+                                </span>
+                                <span className='cargo-card__tags'>
+                                    {tagsLoading.map((t) => (
+                                        <span
+                                            key={t}
+                                            className='cargo-card__tag'
+                                        >
+                                            {t}
+                                        </span>
+                                    ))}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
+                {/* ПРАВЫЙ СТОЛБЕЦ */}
                 <div className='cargo-card__right'>
+                    <div className='cargo-card__dates'>
+                        {pickup && (
+                            <div className='cargo-card__date-row'>
+                                <span className='cargo-card__date-label'>
+                                    Забор:
+                                </span>
+                                <span className='cargo-card__date-value'>
+                                    {fmtDate(pickup)}
+                                </span>
+                            </div>
+                        )}
+                        {delivery && (
+                            <div className='cargo-card__date-row'>
+                                <span className='cargo-card__date-label'>
+                                    Доставка:
+                                </span>
+                                <span className='cargo-card__date-value'>
+                                    {fmtDate(delivery)}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
                     <div className='cargo-card__price'>
                         {isFiniteNumber(priceValue) ? (
                             <>
@@ -210,6 +237,7 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
                             </div>
                         )}
                     </div>
+
                     {bargain && (
                         <div className='cargo-card__bargain'>
                             готов обсудить
@@ -218,93 +246,70 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
                 </div>
             </div>
 
-            {/* Нижняя строка: ID */}
-            {adId && (
+            {/* НИЗ: бейджи + владелец + действие */}
+            <div className='cargo-card__foot'>
+                <div className='cargo-card__foot-left'>
+                    <CargoBadgesRow
+                        ad={ad}
+                        size={16}
+                        gap={6}
+                    />
+                </div>
 
-                <>
-                    {/* Нижняя строка: ID + владелец + действия */}
-                    <div className="cargo-card__foot">
-                        {/* ЛЕВО: ID */}
-                        <div className="cargo-card__foot-left">
-                            {adId ? <span className="cargo-card__id">ID: {String(adId)}</span> : <span className="cargo-card__id"> </span>}
-                        </div>
-
-                        {/* ЦЕНТР: владелец */}
-                        <div className="cargo-card__owner">
-                            {(() => {
-                                const owner = data.owner || {
-                                    id: data.ownerId,
-                                    name: data.ownerName || data.userName,
-                                    avatarUrl: data.ownerAvatar || data.avatarUrl,
-                                    rating: data.ownerRating ?? data.rating,
-                                };
-
-                                const name = owner?.name || 'Без имени';
-                                const avatar = owner?.avatarUrl;
-                                const rating = Number.isFinite(Number(owner?.rating)) ? Number(owner.rating) : null;
-
-                                return (
-                                    <>
-                                        <div className="cargo-card__owner-avatar">
-                                            {avatar ? (
-                                                <img src={avatar} alt={name} />
-                                            ) : (
-                                                <div className="cargo-card__owner-fallback">
-                                                    {String(name).slice(0, 1).toUpperCase()}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="cargo-card__owner-meta">
-                                            <div className="cargo-card__owner-name" title={name}>{name}</div>
-                                            {rating != null && (
-                                                <div className="cargo-card__owner-rating" aria-label={`Рейтинг ${rating} из 5`}>
-                                                    {renderStars(rating)}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
-                                );
-                            })()}
-                        </div>
-
-                        {/* ПРАВО: действия */}
-                        <div className="cargo-card__foot-right">
-                            <button
-                                type="button"
-                                className="cargo-card__icon-btn"
-                                title="Добавить в варианты"
-                                aria-label="Добавить в варианты"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    // TODO: вызови тут свой обработчик addToReview(ad)
-                                    console.log('Добавить в варианты:', adId || data);
-                                }}
-                            >
-                                +
-                            </button>
-
-                            {/* примеры под будущие действия — оставим как заглушки
-    <button type="button" className="cargo-card__icon-btn" title="Написать">
-      <FiMessageCircle />
-    </button>
-    <button type="button" className="cargo-card__icon-btn" title="Ещё">
-      <FiMoreHorizontal />
-    </button>
-    */}
-                        </div>
+                <div className='cargo-card__owner'>
+                    <div className='cargo-card__owner-avatar'>
+                        {ownerAvatar ? (
+                            <img
+                                src={ownerAvatar}
+                                alt={ownerName}
+                            />
+                        ) : (
+                            <div className='cargo-card__owner-fallback'>
+                                {String(ownerName).slice(0, 1).toUpperCase()}
+                            </div>
+                        )}
                     </div>
+                    <div className='cargo-card__owner-meta'>
+                        <div
+                            className='cargo-card__owner-name'
+                            title={ownerName}
+                        >
+                            {ownerName}
+                        </div>
+                        {ownerRating != null && (
+                            <div
+                                className='cargo-card__owner-rating'
+                                aria-label={`Рейтинг ${ownerRating} из 5`}
+                            >
+                                {renderStars(ownerRating)}
+                            </div>
+                        )}
+                    </div>
+                </div>
 
-                </>
-
-            )}
+                <div className='cargo-card__foot-right'>
+                    <button
+                        type='button'
+                        className='cargo-card__icon-btn'
+                        title='Добавить в варианты'
+                        aria-label='Добавить в варианты'
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            console.log('Добавить в варианты:', adId || data);
+                        }}
+                    >
+                        +
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
 
 export default CargoAdItem;
 
-/* ===== утилиты ===== */
+/* ===== УТИЛИТЫ ===== */
 
 function normalizeLoadingTypes(val) {
     if (!val) return [];
@@ -316,27 +321,16 @@ function normalizeLoadingTypes(val) {
 
 function fmtDate(d) {
     if (!d) return '—';
-
     if (typeof d === 'string') {
-        // dd.MM.yyyy или dd/MM/yyyy — показываем как есть (в RU-формате уже ок)
         const m = d.match(/^(\d{2})[./](\d{2})[./](\d{4})$/);
         if (m) return `${m[1]}.${m[2]}.${m[3]}`;
-
-        // ISO-строки / другие — пробуем распарсить
         const t = Date.parse(d);
         if (!Number.isNaN(t)) return new Date(t).toLocaleDateString('ru-RU');
-
-        return d; // если формат кастомный — вернём как есть
+        return d;
     }
-
-    if (typeof d === 'number') {
-        return new Date(d).toLocaleDateString('ru-RU');
-    }
-
-    if (d instanceof Date && !Number.isNaN(d.getTime())) {
+    if (typeof d === 'number') return new Date(d).toLocaleDateString('ru-RU');
+    if (d instanceof Date && !Number.isNaN(d.getTime()))
         return d.toLocaleDateString('ru-RU');
-    }
-
     return '—';
 }
 

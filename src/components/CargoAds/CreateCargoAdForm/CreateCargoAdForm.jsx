@@ -219,6 +219,7 @@ const CreateCargoAdForm = forwardRef(
                                             : '';
                                         updateFormData({
                                             pickupDate: formatted,
+                                            availabilityFrom: formatted, // ← добавь это
                                         });
                                         setErrors((p) => ({
                                             ...p,
@@ -303,6 +304,7 @@ const CreateCargoAdForm = forwardRef(
                                             : '';
                                         updateFormData({
                                             deliveryDate: formatted,
+                                            availabilityTo: formatted, // ← и это
                                         });
                                     }}
                                     dateFormat='dd.MM.yyyy'
@@ -570,7 +572,7 @@ const CreateCargoAdForm = forwardRef(
                                     }
                                     className='accf__input'
                                 />
-                               
+
                                 {/* <input
                                     type='text'
                                     placeholder='Тип упаковки (паллеты, коробки...)'
@@ -584,7 +586,6 @@ const CreateCargoAdForm = forwardRef(
                                 /> */}
                             </div>
                             <div className='accf__row accf__row--wrap'>
-                               
                                 <div className='accf__field'>
                                     <label className='accf__label'>
                                         Тип упаковки
@@ -599,7 +600,6 @@ const CreateCargoAdForm = forwardRef(
                                         placeholder='Выбрать упаковку'
                                     />
                                 </div>
-                    
                             </div>
 
                             <div className='accf__row accf__row--wrap'>
