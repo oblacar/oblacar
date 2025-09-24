@@ -157,7 +157,7 @@
 }
 
 .cargo-card__date-value {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: #363636;
 }
@@ -174,14 +174,14 @@
 }
 
 .cargo-card__price-value {
-    font-size: 22px;
+    font-size: 32px;
     line-height: 1;
     font-weight: 900;
     color: #111827;
 }
 
 .cargo-card__price-unit {
-    font-size: 12px;
+    font-size: 16px;
     color: #6b7280;
     font-weight: 600;
 }
@@ -203,12 +203,18 @@
 /* ПОДВАЛ */
 .cargo-card__foot {
     display: grid;
-    grid-template-columns: 50% 25% 25%;
+    grid-template-columns: 60% 25% 15%;
     align-items: center;
     gap: 8px;
-    padding-top: 10px;
-    margin-top: 10px;
-    border-top: 1px dashed rgba(0, 0, 0, .08);
+    padding-top: 3px;
+    padding-bottom: 3px;
+    /* margin-top: 5px; */
+    /* border-top: 1px dashed rgba(0, 0, 0, .08); */
+    /* background-color: rgba(0, 0, 0, 0.08); */
+    background-color: rgba(0, 0, 0, 0.04);
+    margin: 5px -14px -14px -14px;
+    border-radius: 0px 0px 10px 10px;
+
 }
 
 /* Левый столбец — прижат влево */
@@ -228,13 +234,14 @@
 }
 
 .cargo-card__owner-avatar {
-    width: 24px;
-    height: 24px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     overflow: hidden;
     background: #e5e7eb;
     display: grid;
     place-items: center;
+    border: 1px solid white;
 }
 
 .cargo-card__owner-avatar img {
@@ -258,8 +265,8 @@
 }
 
 .cargo-card__owner-name {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
     color: #111827;
     max-width: 160px;
     white-space: nowrap;

@@ -689,18 +689,6 @@ const CreateCargoAdForm = forwardRef(
                                     }
                                     className='accf__input'
                                 />
-
-                                {/* <input
-                                    type='text'
-                                    placeholder='Тип упаковки (паллеты, коробки...)'
-                                    value={formData.packagingType}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            packagingType: e.target.value,
-                                        })
-                                    }
-                                    className='accf__input'
-                                /> */}
                             </div>
                             <div className='accf__row accf__row--wrap'>
                                 <div className='accf__field'>
