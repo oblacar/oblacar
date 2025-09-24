@@ -20,7 +20,6 @@ import CreateTransportAd from '../../components/CreateTransportAd/CreateTranspor
 import SearchTransport from '../../components/SearchTransport/SearchTransport';
 import TransportAdsList from '../../components/TransportAds/TransportAdsList';
 
-
 import {
     TruckIcon,
     CubeIcon,
@@ -43,9 +42,12 @@ import DevVehicleQuickTest from './DevVehicleQuickTest';
 import CargoAdCard from '../../components/CargoAds/CargoAdCard/CargoAdCard';
 import CargoAdMiniCard from '../../components/CargoAds/CargoAdMiniCard';
 import SeedCargoAdsButton from '../../dev/SeedCargoAdsButton';
-import CargoAdLisT from '../../components/CargoAds/CargoAdsList'
+import CargoAdLisT from '../../components/CargoAds/CargoAdsList';
 
 import DebugFaIcons from '../../components/CargoAds/icons/DebugFaIcons';
+import { PackagingPicker } from '../../components/CargoAds/PackagingPicker/PackagingPicker';
+import PackagingMultiSelect from '../../components/CargoAds/PackagingPicker/PackagingMultiSelect';
+import { PACKAGING_OPTIONS } from '../../constants/cargoPackagingOptions';
 
 // тестовые объявления о Грузе------------------>
 // Простой полноценный пример
@@ -115,7 +117,6 @@ import { myCargoAdObject, myCargoAdExt } from './testCargoAds';
 */
 // <-----------------------
 
-
 function Home() {
     const { ads } = useContext(TransportAdContext);
     const [isCarSearch, setIsCarSearch] = useState(true);
@@ -138,8 +139,6 @@ function Home() {
                 <DevVehicleQuickTest />
             </div> */}
             {/* <SeedCargoAdsButton /> */}
-
-
             {/* <div>
                 <CargoAdMiniCard ad={myCargoAdObject} />
                 </div>
@@ -147,13 +146,20 @@ function Home() {
                 <div>
                 <CargoAdCard ad={myCargoAdObject} className="card-wrap" />
                 </div> */}
-
-
-
             <DebugFaIcons />;
-
-
-
+            <PackagingPicker />
+            <div className='accf__field'>
+                <label className='accf__label'>Тип упаковки</label>
+                <PackagingMultiSelect
+                    options={PACKAGING_OPTIONS}
+                    // value={formData.packagingTypes ?? []}
+                    onChange={(next) =>
+                        // updateFormData({ packagingTypes: next })
+                        console.log(next)
+                    }
+                    placeholder='Выбрать упаковку'
+                />
+            </div>
             <div style={{ padding: '20px' }}>
                 <ToggleSearchMode
                     firstOption={{
@@ -168,16 +174,10 @@ function Home() {
                     onToggle={handleToggle}
                 />
             </div>
-
             {/* <ChatInterface /> */}
             <div className={styles.container}>
                 <SearchTransport />
-                {isSelectFirst ? (
-                    <TransportAdsList />
-                ) : (
-                    <CargoAdLisT />
-                )
-                }
+                {isSelectFirst ? <TransportAdsList /> : <CargoAdLisT />}
             </div>
         </>
     );

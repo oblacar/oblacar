@@ -13,6 +13,9 @@ import CitySearch from '../../common/CitySearch/CitySearch';
 import MultiTruckPhotoUploader from '../../MultiTruckPhotoUploader/MultiTruckPhotoUploader';
 import AddPhotoCargo from '../../common/AddPhotoButton/AddPhotoButton';
 
+import PackagingMultiSelect from '../PackagingPicker/PackagingMultiSelect';
+import { PACKAGING_OPTIONS } from '../../../constants/cargoPackagingOptions';
+
 import './CreateCargoAdForm.css';
 
 const CreateCargoAdForm = forwardRef(
@@ -195,7 +198,6 @@ const CreateCargoAdForm = forwardRef(
                                 доставить.
                             </p>
 
-
                             <div className='accf__field'>
                                 <label className='accf__label'>
                                     Дата готовности к отгрузке
@@ -204,11 +206,11 @@ const CreateCargoAdForm = forwardRef(
                                     selected={
                                         formData.pickupDate
                                             ? new Date(
-                                                formData.pickupDate
-                                                    .split('.')
-                                                    .reverse()
-                                                    .join('-')
-                                            )
+                                                  formData.pickupDate
+                                                      .split('.')
+                                                      .reverse()
+                                                      .join('-')
+                                              )
                                             : null
                                     }
                                     onChange={(date) => {
@@ -288,11 +290,11 @@ const CreateCargoAdForm = forwardRef(
                                     selected={
                                         formData.deliveryDate
                                             ? new Date(
-                                                formData.deliveryDate
-                                                    .split('.')
-                                                    .reverse()
-                                                    .join('-')
-                                            )
+                                                  formData.deliveryDate
+                                                      .split('.')
+                                                      .reverse()
+                                                      .join('-')
+                                              )
                                             : null
                                     }
                                     onChange={(date) => {
@@ -313,7 +315,9 @@ const CreateCargoAdForm = forwardRef(
                         {/* === 2) Стоимость === */}
                         <section className='accf__card'>
                             <div className='accf__section-title-container'>
-                                <h3 className='accf__section-title'>Стоимость</h3>
+                                <h3 className='accf__section-title'>
+                                    Стоимость
+                                </h3>
                             </div>
 
                             <div className='accf__row accf__row--price'>
@@ -566,7 +570,8 @@ const CreateCargoAdForm = forwardRef(
                                     }
                                     className='accf__input'
                                 />
-                                <input
+                               
+                                {/* <input
                                     type='text'
                                     placeholder='Тип упаковки (паллеты, коробки...)'
                                     value={formData.packagingType}
@@ -576,7 +581,25 @@ const CreateCargoAdForm = forwardRef(
                                         })
                                     }
                                     className='accf__input'
-                                />
+                                /> */}
+                            </div>
+                            <div className='accf__row accf__row--wrap'>
+                               
+                                <div className='accf__field'>
+                                    <label className='accf__label'>
+                                        Тип упаковки
+                                    </label>
+                                    <PackagingMultiSelect
+                                        options={PACKAGING_OPTIONS}
+                                        // value={formData.packagingTypes ?? []}
+                                        onChange={(next) =>
+                                            // updateFormData({ packagingTypes: next })
+                                            console.log(next)
+                                        }
+                                        placeholder='Выбрать упаковку'
+                                    />
+                                </div>
+                    
                             </div>
 
                             <div className='accf__row accf__row--wrap'>
@@ -642,8 +665,8 @@ const CreateCargoAdForm = forwardRef(
                                                 {m === 'ambient'
                                                     ? 'Обычная'
                                                     : m === 'chilled'
-                                                        ? 'Охлажд.'
-                                                        : 'Заморозка'}
+                                                    ? 'Охлажд.'
+                                                    : 'Заморозка'}
                                             </option>
                                         ))}
                                     </select>

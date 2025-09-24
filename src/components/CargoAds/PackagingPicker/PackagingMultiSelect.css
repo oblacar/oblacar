@@ -1,0 +1,130 @@
+/* src/components/common/PackagingMultiSelect/PackagingMultiSelect.css */
+.pmulti {
+    position: relative;
+    max-width: 100%;
+}
+
+.pmulti__control {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 6px 34px 6px 10px;
+    gap: 6px;
+    cursor: pointer;
+    justify-content: space-between;
+}
+
+.pmulti__control:focus-visible {
+    outline: none;
+    border-color: #ff9a2f;
+}
+
+.pmulti__placeholder {
+    color: #9ca3af;
+}
+
+.pmulti__tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pmulti__tag {
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: #f3f4f6;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.pmulti__tag--more {
+    background: #fff7ed;
+    border: 1px dashed #f59e0b;
+}
+
+.pmulti__chev {
+    position: absolute;
+    right: 10px;
+    pointer-events: none;
+    color: #6b7280;
+}
+
+.pmulti__menu {
+    position: absolute;
+    z-index: 10;
+    margin-top: 6px;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+}
+
+.pmulti__search {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.pmulti__search-input {
+    flex: 1 1 auto;
+    min-height: 36px;
+}
+
+.pmulti__clear {
+    border: 0;
+    background: #fff7ed;
+    color: #9a4a00;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pmulti__clear:hover {
+    background: #ffedd5;
+}
+
+.pmulti__list {
+    max-height: 260px;
+    overflow: auto;
+    padding: 6px 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.pmulti__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pmulti__option:hover {
+    background: #f9fafb;
+}
+
+.pmulti__option-label {
+    font-size: 14px;
+}
+
+.pmulti__empty {
+    padding: 16px;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* гармония с твоими фокус-стилями */
+.pmulti .create-transport-ad-input:focus {
+    border-color: #ff9a2f;
+}
