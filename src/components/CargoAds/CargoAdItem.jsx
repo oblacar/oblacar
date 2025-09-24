@@ -84,7 +84,7 @@ const CargoAdItem = ({ ad = {}, className = '' }) => {
 
     // груз
     const cargoName =
-        cargo.name ?? cargo.title ?? data.cargoName ?? data.cargoTitle ?? '';
+        data.title ?? '';
 
     const cargoType = cargo.type ?? data.cargoType ?? '';
 

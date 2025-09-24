@@ -71,6 +71,7 @@ const NewCargoAdPage = () => {
             price: fd.price,
             paymentUnit: fd.paymentUnit,
             readyToNegotiate: fd.readyToNegotiate,
+            title: fd.title,
         };
     }, [formData]);
 
