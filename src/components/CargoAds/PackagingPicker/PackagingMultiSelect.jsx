@@ -58,66 +58,48 @@ const PackagingMultiSelect = ({
 
     return (
         <div
-            className={`pmulti ${open ? 'pmulti--open' : ''}`}
+            className={`pkgms ${open ? 'pkgms--open' : ''}`}
             ref={rootRef}
         >
             <button
-                type='button'
-                className='pmulti__control create-transport-ad-input'
-                onClick={() => setOpen((v) => !v)}
+                type="button"
+                className="pkgms__control"   // ← УБРАЛ create-transport-ad-input
+                onClick={() => setOpen(v => !v)}
                 aria-expanded={open}
             >
                 {selected.length === 0 ? (
-                    <span className='pmulti__placeholder'>{placeholder}</span>
+                    <span className="pkgms__placeholder">{placeholder}</span>
                 ) : (
-                    <div className='pmulti__tags'>
-                        {visibleTags.map((o) => (
-                            <span
-                                key={o.key}
-                                className='pmulti__tag'
-                            >
-                                {o.label}
-                            </span>
+                    <div className="pkgms__tags">
+                        {visibleTags.map(o => (
+                            <span key={o.key} className="pkgms__tag">{o.label}</span>
                         ))}
-                        {hiddenCount > 0 && (
-                            <span className='pmulti__tag pmulti__tag--more'>
-                                +{hiddenCount}
-                            </span>
-                        )}
+                        {hiddenCount > 0 && <span className="pkgms__tag pkgms__tag--more">+{hiddenCount}</span>}
                     </div>
                 )}
-                <span
-                    className='pmulti__chev'
-                    aria-hidden
-                >
-                    ▾
-                </span>
+                <span className="pkgms__chev" aria-hidden>▾</span>
             </button>
 
             {open && (
-                <div className='pmulti__menu'>
-                    <div className='pmulti__search'>
+                <div className="pkgms__menu" role="listbox" aria-multiselectable="true">
+                    <div className="pkgms__search">
                         <input
                             ref={inputRef}
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
-                            placeholder='Поиск…'
-                            className='pmulti__search-input create-transport-ad-input'
+                            placeholder="Поиск…"
+                            className="pkgms__search-input"   // ← без внешних классов
                         />
                         {value.length > 0 && (
-                            <button
-                                type='button'
-                                className='pmulti__clear'
-                                onClick={clearAll}
-                            >
+                            <button type="button" className="pkgms__clear" onClick={clearAll}>
                                 Сбросить
                             </button>
                         )}
                     </div>
 
-                    <div className='pmulti__list'>
+                    <div className='pkgms__list'>
                         {filtered.length === 0 ? (
-                            <div className='pmulti__empty'>
+                            <div className='pkgms__empty'>
                                 Ничего не найдено
                             </div>
                         ) : (
@@ -126,7 +108,7 @@ const PackagingMultiSelect = ({
                                 return (
                                     <label
                                         key={o.key}
-                                        className='pmulti__option'
+                                        className='pkgms__option'
                                     >
                                         <input
                                             className='create-transport-ad-checkbox'
@@ -134,7 +116,7 @@ const PackagingMultiSelect = ({
                                             checked={checked}
                                             onChange={() => toggle(o.key)}
                                         />
-                                        <span className='pmulti__option-label'>
+                                        <span className='pkgms__option-label'>
                                             {o.label}
                                         </span>
                                     </label>

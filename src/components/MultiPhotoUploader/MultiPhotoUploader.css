@@ -4,7 +4,7 @@
     align-items: center;
 }
 
-button {
+.multi-photo-uploader-btn {
     margin: 5px;
 }
 
@@ -13,9 +13,11 @@ button {
     flex-wrap: nowrap;
     gap: 10px;
     margin-top: 10px;
-    overflow-x: auto; /* Горизонтальная прокрутка для большого числа фото */
+    overflow-x: auto;
+    /* Горизонтальная прокрутка для большого числа фото */
     padding: 5px;
-    max-width: 100%; /* Ограничиваем ширину */
+    max-width: 100%;
+    /* Ограничиваем ширину */
 }
 
 .multi-photo-preview-image {

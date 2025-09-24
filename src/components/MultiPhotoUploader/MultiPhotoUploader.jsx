@@ -27,12 +27,15 @@ const MultiPhotoUploader = () => {
             />
             <button
                 onClick={() => document.getElementById('file-upload').click()}
+                className='multi-photo-uploader-btn'
             >
                 Выбрать фото
             </button>
             <button
                 onClick={handleUpload}
                 disabled={!selectedPhotos.length}
+                className='multi-photo-uploader-btn'
+
             >
                 Загрузить
             </button>

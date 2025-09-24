@@ -1,10 +1,13 @@
 /* src/components/common/PackagingMultiSelect/PackagingMultiSelect.css */
-.pmulti {
+/* src/components/common/PackagingMultiSelect/PackagingMultiSelect.css */
+
+.pkgms {
     position: relative;
     max-width: 100%;
 }
 
-.pmulti__control {
+/* Контрол */
+.pkgms__control {
     width: 100%;
     min-height: 40px;
     border: 1px solid #d1d5db;
@@ -18,22 +21,24 @@
     justify-content: space-between;
 }
 
-.pmulti__control:focus-visible {
+.pkgms__control:focus,
+.pkgms__control:focus-visible {
     outline: none;
     border-color: #ff9a2f;
+    box-shadow: 0 0 0 2px rgba(255, 154, 47, .15);
 }
 
-.pmulti__placeholder {
+.pkgms__placeholder {
     color: #9ca3af;
 }
 
-.pmulti__tags {
+.pkgms__tags {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
 }
 
-.pmulti__tag {
+.pkgms__tag {
     font-size: 12px;
     border-radius: 999px;
     padding: 2px 8px;
@@ -42,19 +47,20 @@
     white-space: nowrap;
 }
 
-.pmulti__tag--more {
+.pkgms__tag--more {
     background: #fff7ed;
     border: 1px dashed #f59e0b;
 }
 
-.pmulti__chev {
+.pkgms__chev {
     position: absolute;
     right: 10px;
     pointer-events: none;
     color: #6b7280;
 }
 
-.pmulti__menu {
+/* Меню */
+.pkgms__menu {
     position: absolute;
     z-index: 10;
     margin-top: 6px;
@@ -66,7 +72,8 @@
     overflow: hidden;
 }
 
-.pmulti__search {
+/* Поиск */
+.pkgms__search {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -74,12 +81,26 @@
     border-bottom: 1px solid #f3f4f6;
 }
 
-.pmulti__search-input {
+.pkgms__search-input {
     flex: 1 1 auto;
     min-height: 36px;
+    width: 100%;
+    border: 1px solid #c8d0e0;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    color: #111827;
 }
 
-.pmulti__clear {
+.pkgms__search-input:focus,
+.pkgms__search-input:focus-visible {
+    border-color: #5b8def;
+    box-shadow: 0 0 0 2px rgba(91, 141, 239, .15);
+}
+
+.pkgms__clear {
     border: 0;
     background: #fff7ed;
     color: #9a4a00;
@@ -88,11 +109,12 @@
     cursor: pointer;
 }
 
-.pmulti__clear:hover {
+.pkgms__clear:hover {
     background: #ffedd5;
 }
 
-.pmulti__list {
+/* Список */
+.pkgms__list {
     max-height: 260px;
     overflow: auto;
     padding: 6px 8px;
@@ -101,7 +123,7 @@
     gap: 4px;
 }
 
-.pmulti__option {
+.pkgms__option {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -110,21 +132,22 @@
     cursor: pointer;
 }
 
-.pmulti__option:hover {
+.pkgms__option:hover {
     background: #f9fafb;
 }
 
-.pmulti__option-label {
+.pkgms__option-label {
     font-size: 14px;
 }
 
-.pmulti__empty {
+.pkgms__empty {
     padding: 16px;
     color: #6b7280;
     text-align: center;
 }
 
+
 /* гармония с твоими фокус-стилями */
-.pmulti .create-transport-ad-input:focus {
+.pkgms:focus {
     border-color: #ff9a2f;
 }

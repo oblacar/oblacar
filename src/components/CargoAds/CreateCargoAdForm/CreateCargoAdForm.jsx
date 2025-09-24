@@ -592,10 +592,10 @@ const CreateCargoAdForm = forwardRef(
                                     </label>
                                     <PackagingMultiSelect
                                         options={PACKAGING_OPTIONS}
-                                        // value={formData.packagingTypes ?? []}
+                                        value={formData.packagingTypes ?? []}
                                         onChange={(next) =>
-                                            // updateFormData({ packagingTypes: next })
-                                            console.log(next)
+                                            updateFormData({ packagingTypes: next })
+                                            // console.log(next)
                                         }
                                         placeholder='Выбрать упаковку'
                                     />
