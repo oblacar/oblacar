@@ -1,0 +1,6 @@
+/* например: src/components/CargoAds/CargoAdCard/CargoAdCard.css */
+.cargo-card__type-icon {
+  opacity: .9;
+  vertical-align: -2px; /* чуть сместить вниз */
+  margin-right: 6px;
+}

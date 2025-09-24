@@ -45,6 +45,7 @@ import CargoAdMiniCard from '../../components/CargoAds/CargoAdMiniCard';
 import SeedCargoAdsButton from '../../dev/SeedCargoAdsButton';
 import CargoAdLisT from '../../components/CargoAds/CargoAdsList'
 
+import DebugFaIcons from '../../components/CargoAds/icons/DebugFaIcons';
 
 // тестовые объявления о Грузе------------------>
 // Простой полноценный пример
@@ -146,6 +147,10 @@ function Home() {
                 <div>
                 <CargoAdCard ad={myCargoAdObject} className="card-wrap" />
                 </div> */}
+
+
+
+            <DebugFaIcons />;
 
 
 
