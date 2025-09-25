@@ -74,16 +74,39 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, classNa
         pallet: { icon: FaVoteYea, label: 'Паллеты' },
         box: { icon: FaBoxOpen, label: 'Коробки' },
         crate: { icon: FaCube, label: 'Ящик' },
+
         bag: { icon: FaShoppingBag, label: 'Мешки' },
         bigbag: { icon: FaShoppingBag, label: 'Биг-бэг' },
-        drum: { icon: FaOilCan, label: 'Бочка' },
-        barrel: { icon: FaOilCan, label: 'Бочка' },
-        roll: { icon: FaLayerGroup, label: 'Рулоны' },
         bale: { icon: FaLayerGroup, label: 'Тюки' },
+
+        drum: { icon: FaOilCan, label: 'Бочка' },
         ibc: { icon: FaFlask, label: 'IBC' },
+        roll: { icon: FaLayerGroup, label: 'Рулоны' },
+
         container: { icon: FaCube, label: 'Контейнер' },
-        sack: { icon: FaShoppingBag, label: 'Мешки' },
+
+        long: { icon: FaShoppingBag, label: 'Длинномер (трубы/профиль)' },
+        loose: { icon: FaShoppingBag, label: 'Навалом' },
+        piece: { icon: FaShoppingBag, label: 'Штучный/без упаковки' },
     };
+
+
+    //     { key: 'pallet', label: 'Паллеты' },
+    //     { key: 'box', label: 'Коробки/гофрокороба' },
+    //     { key: 'crate', label: 'Ящики' },
+
+    //     { key: 'bag', label: 'Мешки' },
+    //     { key: 'bigbag', label: 'Биг-бэги (МКР)' },
+    //     { key: 'bale', label: 'Тюки' },
+
+    //     { key: 'drum', label: 'Бочки' },
+    //     { key: 'ibc', label: 'IBC-кубы' },
+
+    //     { key: 'roll', label: 'Рулоны' },
+
+    //     { key: 'long', label: 'Длинномер (трубы/профиль)' },
+    //     { key: 'loose', label: 'Навалом' },
+    //     { key: 'piece', label: 'Штучный/без упаковки' },
 
     const badges = useMemo(() => {
         const out = [];
