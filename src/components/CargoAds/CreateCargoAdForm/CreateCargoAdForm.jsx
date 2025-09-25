@@ -636,7 +636,7 @@ const CreateCargoAdForm = forwardRef(
 
                             <div className='accf__field'>
                                 <label className='accf__label'>
-                                    Габариты одного места (м) В×Ш×Г
+                                    Общие габариты (м) В×Ш×Г
                                 </label>
                                 <div className='accf__row accf__row--dims'>
                                     <input
@@ -675,10 +675,13 @@ const CreateCargoAdForm = forwardRef(
                                 </div>
                             </div>
 
-                            <div className='accf__row accf__row--wrap'>
+                            <div className='accf-break-line accf__row accf__row--wrap'>
+                                <label className='accf__label'>
+                                    Количество мест
+                                </label>
                                 <input
                                     type='number'
-                                    placeholder='Количество мест (опц.)'
+                                    placeholder='Количество мест'
                                     min='0'
                                     step='1'
                                     value={formData.quantity}

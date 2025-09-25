@@ -104,6 +104,7 @@ const NewCargoAdPage = () => {
             cargoHeight: fd.dimensionsMeters?.height,
             cargoWidth: fd.dimensionsMeters?.width,
             cargoDepth: fd.dimensionsMeters?.depth,
+            loadingTypes: fd.preferredLoadingTypes,
 
             // НУЖНО ДЛЯ БЕЙДЖЕЙ:
             packagingTypes: fd.packagingTypes ?? [], // массив ключей

@@ -1,39 +1,48 @@
 import React, { useMemo } from 'react';
 import {
-    FaCouch,
-    FaAppleAlt,
+    // типы грузов
+    FaHammer,        // строительные материалы
+    FaCouch,         // мебель
+    FaAppleAlt,      // продукты
+    FaTshirt,      // промтовары
+    FaCubes,         // насыпной
+    FaOilCan,          // наливной
+    FaRadiation,     // ADR
+    FaLaptop,        // электроника
+    FaSnowplow,       // оборудование (более надёжно, чем FaWhmcs)
+    FaShapes,       // прочее / fallback
     FaBoxOpen,
-    FaFlask,
-    FaIndustry,
-    FaTools,
-    FaLaptop,
-    FaTint,
-    FaCubes,
-    FaCube,
-    FaShoppingBag,
-    FaOilCan,
-    FaSnowflake,
-    FaThermometerHalf,
-    FaLayerGroup,
-    FaWineGlass,
-    FaExclamationTriangle,
+
+    // упаковки
+    FaCube,          // ящик / контейнер
+    FaShoppingBag,   // мешки / биг-бэг
+    FaTint,        // бочки / drum
+    FaLayerGroup,    // рулоны / тюки
+    FaFlask,         // IBC
+
+    // флаги
+    FaWineGlass,     // fragile
+    FaSnowflake,     // frozen
+    FaThermometerHalf, // chilled
+    FaExclamationTriangle, // ADR badge
+
+    FaVoteYea,
 } from 'react-icons/fa';
 
 import './CargoBadgesRow.css';
 
 /**
- * Ряд иконок-условий груза.
+ * Ряд иконок условий груза.
  * props:
  *  - ad: объект объявления (плоский или {ad})
- *  - size?: number — размер иконок (по умолчанию 16)
- *  - gap?: number  — отступ между бейджами (по умолчанию 6)
- *  - maxPackaging?: number — сколько упаковок показывать (по умолчанию 2)
+ *  - size?: number (px) — размер иконок (по умолчанию 16)
+ *  - gap?: number (px)  — отступ между бейджами (по умолчанию 6)
+ *  - maxPackaging?: number — сколько упаковок показать (по умолчанию 4)
  */
-const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4 }) => {
+const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, className = '' }) => {
     const data = ad?.ad ? ad.ad : ad;
 
-    // --- вытаскиваем данные из объявления ---
-    const cargoType = data.cargo?.type ?? data.cargoType ?? null;
+    const cargoType = (data.cargo?.type ?? data.cargoType ?? '').toLowerCase();
     const packaging = Array.isArray(data.packagingTypes) ? data.packagingTypes : [];
     const isFragile = Boolean(data.isFragile ?? data.cargo?.fragile);
     const isStackable = Boolean(data.isStackable ?? data.cargo?.isStackable);
@@ -46,22 +55,23 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4 }) => {
 
     const adrClass = data.adrClass ?? data.cargo?.adrClass ?? '';
 
-    // --- словари иконок ---
+    // Иконки для типа груза
     const cargoTypeIconMap = {
+        'строительные материалы': FaHammer,
         'мебель': FaCouch,
         'продукты': FaAppleAlt,
-        'промтовары': FaIndustry,
-        'строительные материалы': FaTools,
-        'наливной': FaTint,
+        'промтовары': FaTshirt,
         'насыпной': FaCubes,
-        'ADR': FaFlask,
+        'наливной': FaOilCan,
+        'adr': FaRadiation,
         'электроника': FaLaptop,
-        'прочее': FaBoxOpen,
+        'оборудование': FaSnowplow,
+        'прочее': FaShapes,
     };
 
-    // ключи должны совпадать с ключами из PACKAGING_OPTIONS
+    // Иконки для упаковки (ключи должны совпадать с PACKAGING_OPTIONS.key)
     const packagingIconMap = {
-        pallet: { icon: FaCubes, label: 'Паллеты' },
+        pallet: { icon: FaVoteYea, label: 'Паллеты' },
         box: { icon: FaBoxOpen, label: 'Коробки' },
         crate: { icon: FaCube, label: 'Ящик' },
         bag: { icon: FaShoppingBag, label: 'Мешки' },
@@ -78,17 +88,13 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4 }) => {
     const badges = useMemo(() => {
         const out = [];
 
-        // тип груза
+        // Тип груза
         if (cargoType) {
-            const Icon = cargoTypeIconMap[cargoType?.toLowerCase?.()] || FaBoxOpen;
-            out.push({
-                key: 'cargoType',
-                title: `Тип груза: ${cargoType}`,
-                icon: Icon,
-            });
+            const TypeIcon = cargoTypeIconMap[cargoType] || FaBoxOpen;
+            out.push({ key: 'cargoType', title: `Тип груза: ${cargoType}`, icon: TypeIcon });
         }
 
-        // упаковка (до maxPackaging)
+        // Упаковка (до maxPackaging)
         if (packaging.length > 0) {
             const shown = packaging.slice(0, maxPackaging);
             shown.forEach((key, idx) => {
@@ -100,56 +106,18 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4 }) => {
                 });
             });
             const rest = packaging.length - shown.length;
-            if (rest > 0) {
-                out.push({
-                    key: 'pkg_more',
-                    title: `Ещё упаковок: ${rest}`,
-                    text: `+${rest}`,
-                });
-            }
+            if (rest > 0) out.push({ key: 'pkg_more', title: `Ещё упаковок: ${rest}`, text: `+${rest}` });
         }
 
-        // хрупкий
-        if (isFragile) {
-            out.push({
-                key: 'fragile',
-                title: 'Хрупкий груз',
-                icon: FaWineGlass,
-            });
-        }
+        // Флаги
+        if (isFragile) out.push({ key: 'fragile', title: 'Хрупкий груз', icon: FaWineGlass });
+        if (isStackable) out.push({ key: 'stackable', title: 'Штабелируемый', icon: FaLayerGroup });
 
-        // штабелируемый
-        if (isStackable) {
-            out.push({
-                key: 'stackable',
-                title: 'Штабелируемый',
-                icon: FaLayerGroup,
-            });
-        }
+        if (tempMode === 'chilled') out.push({ key: 'temp_chilled', title: 'Охлаждение', icon: FaThermometerHalf });
+        if (tempMode === 'frozen') out.push({ key: 'temp_frozen', title: 'Заморозка', icon: FaSnowflake });
 
-        // температура
-        if (tempMode === 'chilled') {
-            out.push({
-                key: 'temp_chilled',
-                title: 'Охлаждение',
-                icon: FaThermometerHalf,
-            });
-        } else if (tempMode === 'frozen') {
-            out.push({
-                key: 'temp_frozen',
-                title: 'Заморозка',
-                icon: FaSnowflake,
-            });
-        }
-
-        // ADR (опасный груз)
         if (adrClass && String(adrClass).trim()) {
-            out.push({
-                key: 'adr',
-                title: `ADR класс: ${adrClass}`,
-                icon: FaExclamationTriangle,
-                text: String(adrClass),
-            });
+            out.push({ key: 'adr', title: `ADR класс: ${adrClass}`, icon: FaExclamationTriangle, text: String(adrClass) });
         }
 
         return out;
@@ -158,12 +126,15 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4 }) => {
     if (badges.length === 0) return null;
 
     return (
-        <div className="cbr" style={{ gap }}>
+        <div
+            className={`cbr ${className}`}
+            style={{ gap, fontSize: size }}  // ← размер & отступы управляются пропсами
+        >
             {badges.map((b) => {
                 const Icon = b.icon;
                 return (
                     <span key={b.key} className="cbr__badge" title={b.title} aria-label={b.title}>
-                        {Icon ? <Icon className="cbr__icon" size={size} /> : null}
+                        {Icon ? <Icon className="cbr__icon" /> : null}
                         {b.text ? <span className="cbr__text">{b.text}</span> : null}
                     </span>
                 );

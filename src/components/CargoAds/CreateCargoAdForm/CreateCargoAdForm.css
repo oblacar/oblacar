@@ -21,6 +21,10 @@
     gap: var(--accf-gap);
 }
 
+.accf-break-line{
+    padding-top: 10px;
+}
+
 /* одна колонка по умолчанию */
 .accf__grid--stack {
     grid-template-columns: minmax(0, 1fr);
