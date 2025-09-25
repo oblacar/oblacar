@@ -522,44 +522,6 @@ const CreateCargoAdForm = forwardRef(
                                 />
                             </div>
 
-                            {/* {AddPhotoButton && (
-                                <div
-                                    className='accf__row'
-                                    style={{ alignItems: 'center' }}
-                                >
-                                    <AddPhotoButton
-                                        openFileDialog={() =>
-                                            document
-                                                .getElementById(
-                                                    'accf-file-upload'
-                                                )
-                                                ?.click()
-                                        }
-                                    />
-                                    <span className='accf__hint'>
-                                        Добавьте фотографии груза
-                                    </span>
-                                </div>
-                            )}
-
-                            {MultiPhotoUploader && (
-                                <MultiPhotoUploader
-                                    openFileDialog={() =>
-                                        document
-                                            .getElementById('accf-file-upload')
-                                            ?.click()
-                                    }
-                                    updateFormData={({ truckPhotoUrls }) => {
-                                        const photos = Array.isArray(
-                                            truckPhotoUrls
-                                        )
-                                            ? truckPhotoUrls
-                                            : [];
-                                        updateFormData({ photos });
-                                    }}
-                                />
-                            )} */}
-
                             <div className="accf__field">
                                 <label className="accf__label">Фотографии груза</label>
 
@@ -710,7 +672,7 @@ const CreateCargoAdForm = forwardRef(
                                 </div>
                             </div>
 
-                            <div className='accf__row accf__row--wrap'>
+                            <div className='accf-break-line accf__row accf__row--wrap'>
                                 <label className='accf__checkbox'>
                                     <input
                                         type='checkbox'

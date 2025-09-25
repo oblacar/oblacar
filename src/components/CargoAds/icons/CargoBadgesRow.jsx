@@ -15,10 +15,13 @@ import {
 
     // упаковки
     FaCube,          // ящик / контейнер
-    FaShoppingBag,   // мешки / биг-бэг
+    FaEgg,   // мешки / биг-бэг
+    FaCircle, //bigbag
     FaTint,        // бочки / drum
     FaLayerGroup,    // рулоны / тюки
     FaFlask,         // IBC
+
+    FaShoppingBag,
 
     // флаги
     FaWineGlass,     // fragile
@@ -75,8 +78,8 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, classNa
         box: { icon: FaBoxOpen, label: 'Коробки' },
         crate: { icon: FaCube, label: 'Ящик' },
 
-        bag: { icon: FaShoppingBag, label: 'Мешки' },
-        bigbag: { icon: FaShoppingBag, label: 'Биг-бэг' },
+        bag: { icon: FaEgg, label: 'Мешки' },
+        bigbag: { icon: FaCircle, label: 'Биг-бэг' },
         bale: { icon: FaLayerGroup, label: 'Тюки' },
 
         drum: { icon: FaOilCan, label: 'Бочка' },
