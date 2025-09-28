@@ -1,4 +1,17 @@
 import React, { useMemo } from 'react';
+
+import { ReactComponent as BigbagIcon } from '../../../assets/icons/bigbag.svg';
+import { ReactComponent as PalletIcon } from '../../../assets/icons/pallet.svg';
+import { ReactComponent as IBCIcon } from '../../../assets/icons/ibc.svg';
+import { ReactComponent as RollIcon } from '../../../assets/icons/roll.svg';
+import { ReactComponent as BagIcon } from '../../../assets/icons/bag.svg';
+import { ReactComponent as BarrelIcon } from '../../../assets/icons/barrel.svg';
+import { ReactComponent as PipesIcon } from '../../../assets/icons/pipes.svg';
+import { ReactComponent as BaleIcon } from '../../../assets/icons/bale.svg';
+import { ReactComponent as ContainerIcon } from '../../../assets/icons/container.svg';
+import { ReactComponent as BuildingMaterialsIcon } from '../../../assets/icons/building_materials.svg';
+import { ReactComponent as BulkgMaterialsIcon } from '../../../assets/icons/bulk_material.svg';
+
 import {
     // типы грузов
     FaHammer,        // строительные материалы
@@ -30,6 +43,7 @@ import {
     FaExclamationTriangle, // ADR badge
 
     FaVoteYea,
+    FaCodepen,
 } from 'react-icons/fa';
 
 import './CargoBadgesRow.css';
@@ -60,11 +74,11 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, classNa
 
     // Иконки для типа груза
     const cargoTypeIconMap = {
-        'строительные материалы': FaHammer,
+        'строительные материалы': BuildingMaterialsIcon,//FaHammer,
         'мебель': FaCouch,
         'продукты': FaAppleAlt,
         'промтовары': FaTshirt,
-        'насыпной': FaCubes,
+        'насыпной': BulkgMaterialsIcon,
         'наливной': FaOilCan,
         'adr': FaRadiation,
         'электроника': FaLaptop,
@@ -74,23 +88,28 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, classNa
 
     // Иконки для упаковки (ключи должны совпадать с PACKAGING_OPTIONS.key)
     const packagingIconMap = {
-        pallet: { icon: FaVoteYea, label: 'Паллеты' },
+        // pallet: { icon: FaVoteYea, label: 'Паллеты' },
+        pallet: { icon: PalletIcon, label: 'Паллеты' },
+
+
         box: { icon: FaBoxOpen, label: 'Коробки' },
         crate: { icon: FaCube, label: 'Ящик' },
 
-        bag: { icon: FaEgg, label: 'Мешки' },
-        bigbag: { icon: FaCircle, label: 'Биг-бэг' },
-        bale: { icon: FaLayerGroup, label: 'Тюки' },
+        bag: { icon: BagIcon, label: 'Мешки' },
+        bigbag: { icon: BigbagIcon, label: 'Биг-бэг' },
+        bale: { icon: BaleIcon, label: 'Тюки' },
 
-        drum: { icon: FaOilCan, label: 'Бочка' },
-        ibc: { icon: FaFlask, label: 'IBC' },
-        roll: { icon: FaLayerGroup, label: 'Рулоны' },
+        drum: { icon: BarrelIcon, label: 'Бочка' },
+        // ibc: { icon: FaFlask, label: 'IBC' },
+        ibc: { icon: IBCIcon, label: 'IBC' },
 
-        container: { icon: FaCube, label: 'Контейнер' },
+        roll: { icon: RollIcon, label: 'Рулоны' },
 
-        long: { icon: FaShoppingBag, label: 'Длинномер (трубы/профиль)' },
-        loose: { icon: FaShoppingBag, label: 'Навалом' },
-        piece: { icon: FaShoppingBag, label: 'Штучный/без упаковки' },
+        container: { icon: ContainerIcon, label: 'Контейнер' },
+
+        long: { icon: PipesIcon, label: 'Длинномер (трубы/профиль)' },
+        loose: { icon: FaCubes, label: 'Навалом' },
+        piece: { icon: FaCodepen, label: 'Штучный/без упаковки' },
     };
 
 
@@ -170,3 +189,8 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, classNa
 };
 
 export default CargoBadgesRow;
+
+export function Example() {
+    return <BigbagIcon width={20} height={20} />;
+}
+
