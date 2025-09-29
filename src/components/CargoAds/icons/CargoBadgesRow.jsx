@@ -1,5 +1,7 @@
+// src/components/CargoAds/icons/CargoBadgesRow.jsx
 import React, { useMemo } from 'react';
 
+// SVG-иконки (твои файлы)
 import { ReactComponent as BigbagIcon } from '../../../assets/icons/bigbag.svg';
 import { ReactComponent as PalletIcon } from '../../../assets/icons/pallet.svg';
 import { ReactComponent as IBCIcon } from '../../../assets/icons/ibc.svg';
@@ -12,51 +14,35 @@ import { ReactComponent as ContainerIcon } from '../../../assets/icons/container
 import { ReactComponent as BuildingMaterialsIcon } from '../../../assets/icons/building_materials.svg';
 import { ReactComponent as BulkgMaterialsIcon } from '../../../assets/icons/bulk_material.svg';
 
+// Font Awesome (только нужные)
 import {
-    // типы грузов
-    FaHammer,        // строительные материалы
-    FaCouch,         // мебель
-    FaAppleAlt,      // продукты
-    FaTshirt,      // промтовары
-    FaCubes,         // насыпной
-    FaOilCan,          // наливной
-    FaRadiation,     // ADR
-    FaLaptop,        // электроника
-    FaSnowplow,       // оборудование (более надёжно, чем FaWhmcs)
-    FaShapes,       // прочее / fallback
-    FaBoxOpen,
-
-    // упаковки
-    FaCube,          // ящик / контейнер
-    FaEgg,   // мешки / биг-бэг
-    FaCircle, //bigbag
-    FaTint,        // бочки / drum
-    FaLayerGroup,    // рулоны / тюки
-    FaFlask,         // IBC
-
-    FaShoppingBag,
-
-    // флаги
-    FaWineGlass,     // fragile
-    FaSnowflake,     // frozen
-    FaThermometerHalf, // chilled
-    FaExclamationTriangle, // ADR badge
-
-    FaVoteYea,
-    FaCodepen,
+    FaCouch, FaAppleAlt, FaTshirt, FaCubes, FaFaucet, FaRadiation,
+    FaLaptop, FaSnowplow, FaShapes, FaBoxOpen, FaCube,
+    FaLayerGroup, FaWineGlass, FaSnowflake, FaThermometerHalf,
+    FaExclamationTriangle, FaCodepen,
 } from 'react-icons/fa';
 
 import './CargoBadgesRow.css';
 
 /**
- * Ряд иконок условий груза.
+ * Ряд иконок условий груза с группировкой.
+ *
  * props:
  *  - ad: объект объявления (плоский или {ad})
- *  - size?: number (px) — размер иконок (по умолчанию 16)
- *  - gap?: number (px)  — отступ между бейджами (по умолчанию 6)
- *  - maxPackaging?: number — сколько упаковок показать (по умолчанию 4)
+ *  - size?: number (px)   – размер иконок (по умолчанию 16)
+ *  - gap?: number (px)    – отступ между бейджами внутри группы (по умолчанию 6)
+ *  - groupGap?: number    – отступ между группами (по умолчанию 12)
+ *  - maxPackaging?: number – сколько упаковок показать (по умолчанию 4)
+ *  - className?: string
  */
-const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, className = '' }) => {
+const CargoBadgesRow = ({
+    ad = {},
+    size = 16,
+    gap = 6,
+    groupGap = 12,
+    maxPackaging = 4,
+    className = '',
+}) => {
     const data = ad?.ad ? ad.ad : ad;
 
     const cargoType = (data.cargo?.type ?? data.cargoType ?? '').toLowerCase();
@@ -74,123 +60,106 @@ const CargoBadgesRow = ({ ad = {}, size = 16, gap = 6, maxPackaging = 4, classNa
 
     // Иконки для типа груза
     const cargoTypeIconMap = {
-        'строительные материалы': BuildingMaterialsIcon,//FaHammer,
+        'строительные материалы': BuildingMaterialsIcon,
         'мебель': FaCouch,
         'продукты': FaAppleAlt,
         'промтовары': FaTshirt,
         'насыпной': BulkgMaterialsIcon,
-        'наливной': FaOilCan,
+        'наливной': FaFaucet,
         'adr': FaRadiation,
         'электроника': FaLaptop,
         'оборудование': FaSnowplow,
         'прочее': FaShapes,
     };
 
-    // Иконки для упаковки (ключи должны совпадать с PACKAGING_OPTIONS.key)
+    // Иконки упаковок (ключи = твоим PACKAGING_OPTIONS.key)
     const packagingIconMap = {
-        // pallet: { icon: FaVoteYea, label: 'Паллеты' },
         pallet: { icon: PalletIcon, label: 'Паллеты' },
-
-
         box: { icon: FaBoxOpen, label: 'Коробки' },
-        crate: { icon: FaCube, label: 'Ящик' },
-
+        crate: { icon: FaCube, label: 'Ящики' },
         bag: { icon: BagIcon, label: 'Мешки' },
         bigbag: { icon: BigbagIcon, label: 'Биг-бэг' },
         bale: { icon: BaleIcon, label: 'Тюки' },
-
-        drum: { icon: BarrelIcon, label: 'Бочка' },
-        // ibc: { icon: FaFlask, label: 'IBC' },
+        drum: { icon: BarrelIcon, label: 'Бочки' },
         ibc: { icon: IBCIcon, label: 'IBC' },
-
         roll: { icon: RollIcon, label: 'Рулоны' },
-
         container: { icon: ContainerIcon, label: 'Контейнер' },
-
-        long: { icon: PipesIcon, label: 'Длинномер (трубы/профиль)' },
+        long: { icon: PipesIcon, label: 'Длинномер' },
         loose: { icon: FaCubes, label: 'Навалом' },
-        piece: { icon: FaCodepen, label: 'Штучный/без упаковки' },
+        piece: { icon: FaCodepen, label: 'Штучный' },
     };
 
+    // Группы бейджей
+    const { grpType, grpPack, grpFlags, grpTemp } = useMemo(() => {
+        const grpType = [];
+        const grpPack = [];
+        const grpFlags = [];
+        const grpTemp = [];
 
-    //     { key: 'pallet', label: 'Паллеты' },
-    //     { key: 'box', label: 'Коробки/гофрокороба' },
-    //     { key: 'crate', label: 'Ящики' },
-
-    //     { key: 'bag', label: 'Мешки' },
-    //     { key: 'bigbag', label: 'Биг-бэги (МКР)' },
-    //     { key: 'bale', label: 'Тюки' },
-
-    //     { key: 'drum', label: 'Бочки' },
-    //     { key: 'ibc', label: 'IBC-кубы' },
-
-    //     { key: 'roll', label: 'Рулоны' },
-
-    //     { key: 'long', label: 'Длинномер (трубы/профиль)' },
-    //     { key: 'loose', label: 'Навалом' },
-    //     { key: 'piece', label: 'Штучный/без упаковки' },
-
-    const badges = useMemo(() => {
-        const out = [];
-
-        // Тип груза
         if (cargoType) {
             const TypeIcon = cargoTypeIconMap[cargoType] || FaBoxOpen;
-            out.push({ key: 'cargoType', title: `Тип груза: ${cargoType}`, icon: TypeIcon });
+            grpType.push({ key: 'cargoType', title: `Тип груза: ${cargoType}`, icon: TypeIcon });
         }
 
-        // Упаковка (до maxPackaging)
         if (packaging.length > 0) {
             const shown = packaging.slice(0, maxPackaging);
             shown.forEach((key, idx) => {
                 const meta = packagingIconMap[key] || { icon: FaBoxOpen, label: key };
-                out.push({
+                grpPack.push({
                     key: `pkg_${idx}_${key}`,
                     title: `Упаковка: ${meta.label}`,
                     icon: meta.icon,
                 });
             });
             const rest = packaging.length - shown.length;
-            if (rest > 0) out.push({ key: 'pkg_more', title: `Ещё упаковок: ${rest}`, text: `+${rest}` });
+            if (rest > 0) grpPack.push({ key: 'pkg_more', title: `Ещё упаковок: ${rest}`, text: `+${rest}` });
         }
 
-        // Флаги
-        if (isFragile) out.push({ key: 'fragile', title: 'Хрупкий груз', icon: FaWineGlass });
-        if (isStackable) out.push({ key: 'stackable', title: 'Штабелируемый', icon: FaLayerGroup });
-
-        if (tempMode === 'chilled') out.push({ key: 'temp_chilled', title: 'Охлаждение', icon: FaThermometerHalf });
-        if (tempMode === 'frozen') out.push({ key: 'temp_frozen', title: 'Заморозка', icon: FaSnowflake });
-
+        if (isFragile) grpFlags.push({ key: 'fragile', title: 'Хрупкий груз', icon: FaWineGlass });
+        if (isStackable) grpFlags.push({ key: 'stackable', title: 'Штабелируемый', icon: FaLayerGroup });
         if (adrClass && String(adrClass).trim()) {
-            out.push({ key: 'adr', title: `ADR класс: ${adrClass}`, icon: FaExclamationTriangle, text: String(adrClass) });
+            grpFlags.push({ key: 'adr', title: `ADR класс: ${adrClass}`, icon: FaExclamationTriangle, text: String(adrClass) });
         }
 
-        return out;
+        if (tempMode === 'chilled') grpTemp.push({ key: 'temp_chilled', title: 'Охлаждение', icon: FaThermometerHalf });
+        if (tempMode === 'frozen') grpTemp.push({ key: 'temp_frozen', title: 'Заморозка', icon: FaSnowflake });
+
+        return { grpType, grpPack, grpFlags, grpTemp };
     }, [cargoType, packaging, isFragile, isStackable, tempMode, adrClass, maxPackaging]);
 
-    if (badges.length === 0) return null;
+    const renderGroup = (items, mod) =>
+        items.length ? (
+            <div className={`cbr__group cbr__group--${mod}`}>
+                {items.map((b) => {
+                    const Icon = b.icon;
+                    return (
+                        <span key={b.key} className="cbr__badge" title={b.title} aria-label={b.title}>
+                            {Icon ? <Icon className="cbr__icon" /> : null}
+                            {b.text ? <span className="cbr__text">{b.text}</span> : null}
+                        </span>
+                    );
+                })}
+            </div>
+        ) : null;
+
+    // Ничего не рисуем, если вообще пусто
+    if (![grpType, grpPack, grpFlags, grpTemp].some(g => g.length)) return null;
 
     return (
         <div
             className={`cbr ${className}`}
-            style={{ gap, fontSize: size }}  // ← размер & отступы управляются пропсами
+            style={{
+                '--cbr-size': `${size}px`,
+                '--cbr-gap': `${gap}px`,
+                '--cbr-group-gap': `${groupGap}px`,
+            }}
         >
-            {badges.map((b) => {
-                const Icon = b.icon;
-                return (
-                    <span key={b.key} className="cbr__badge" title={b.title} aria-label={b.title}>
-                        {Icon ? <Icon className="cbr__icon" /> : null}
-                        {b.text ? <span className="cbr__text">{b.text}</span> : null}
-                    </span>
-                );
-            })}
+            {renderGroup(grpType, 'type')}
+            {renderGroup(grpPack, 'pack')}
+            {renderGroup(grpFlags, 'flags')}
+            {renderGroup(grpTemp, 'temp')}
         </div>
     );
 };
 
 export default CargoBadgesRow;
-
-export function Example() {
-    return <BigbagIcon width={20} height={20} />;
-}
-

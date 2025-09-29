@@ -1,37 +1,77 @@
+/* src/components/CargoAds/icons/CargoBadgesRow.css */
+
 .cbr {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    margin-left: 16px;
-    gap: 12px;
+    gap: var(--cbr-group-gap, 12px);
+    /* расстояние между группами */
+    margin-left: 20px;
 }
 
+/* каждая группа — свой flex-контейнер */
+.cbr__group {
+    display: flex;
+    align-items: center;
+    gap: var(--cbr-gap, 6px);
+    /* расстояние между бейджами в группе */
+}
+
+/* бейдж (иконка + доп. текст) */
 .cbr__badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 3px 0px;
-    /* border-radius: 999px; */
-    /* background: #f9fafb; */
-    /* border: 1px solid rgba(0, 0, 0, .06); */
-    color: #7b7a7c;
-    /* font-size: 22px; */
+    gap: 4px;
     line-height: 1;
+    color: var(--cbr-color, #374151);
 }
 
+/* иконка подстраивается под размер */
 .cbr__icon {
-    display: inline-block;
-    width: 22px;
-    height: 22px;
+    width: var(--cbr-size, 16px);
+    height: var(--cbr-size, 16px);
+    flex: 0 0 auto;
+    color: currentColor;
+    /* для react-icons */
+    fill: currentColor;
+    /* для SVG */
 }
 
+/* компактный текст (+N, ADR класс) */
 .cbr__text {
-    font-weight: 500;
-    font-size: 16px;
-    margin: 4px 0px 14px -8px;
+    font-size: calc(var(--cbr-size, 16px) * 0.82);
+    font-weight: 600;
 }
 
-/* маленький бейдж для “+N” */
-.cbr__badge .cbr__text:only-child {
-    font-weight: 700;
+
+.cbr__group--flags .cbr__text {
+    margin-left: -5px;
+    margin-top: -7px;
 }
+
+/* ===== базовые раскраски по группам (меняй как хочешь) ===== */
+.cbr__group--type {
+    --cbr-color: #8f939b;
+}
+
+/* почти чёрный */
+.cbr__group--pack {
+    --cbr-color: #6d7787;
+}
+
+/* gray-700 */
+.cbr__group--flags {
+    --cbr-color: #b38f82;
+}
+
+/* amber-900 (предупреждения) */
+.cbr__group--temp {
+    --cbr-color: #7892e8;
+}
+
+/* blue-900 (температура) */
+
+/* опционально — «пилюли» под группы
+.cbr__group { padding: 2px 6px; border-radius: 999px; }
+.cbr__group--flags { background: #fff7ed; } 
+.cbr__group--temp  { background: #eff6ff; }
+*/
