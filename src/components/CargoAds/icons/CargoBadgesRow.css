@@ -27,8 +27,12 @@
 
 /* иконка подстраивается под размер */
 .cbr__icon {
-    width: var(--cbr-size, 16px);
-    height: var(--cbr-size, 16px);
+    /* width: var(--cbr-size, 16px);
+    height: var(--cbr-size, 16px); */
+
+    width: 22px;
+    height: 22px;
+
     flex: 0 0 auto;
     color: currentColor;
     /* для react-icons */
@@ -50,7 +54,7 @@
 
 /* ===== базовые раскраски по группам (меняй как хочешь) ===== */
 .cbr__group--type {
-    --cbr-color: #8f939b;
+    --cbr-color: #393a3c;
 }
 
 /* почти чёрный */
@@ -65,7 +69,7 @@
 
 /* amber-900 (предупреждения) */
 .cbr__group--temp {
-    --cbr-color: #7892e8;
+    --cbr-color: #6072ae;
 }
 
 /* blue-900 (температура) */

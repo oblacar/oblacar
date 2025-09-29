@@ -37,7 +37,7 @@ import './CargoBadgesRow.css';
  */
 const CargoBadgesRow = ({
     ad = {},
-    size = 16,
+    size = 22,
     gap = 6,
     groupGap = 12,
     maxPackaging = 4,
