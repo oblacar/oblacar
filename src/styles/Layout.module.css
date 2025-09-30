@@ -10,26 +10,30 @@
 .container {
     display: flex;
     flex: 1;
-    justify-content: center; /* центрируем общий блок */
+    justify-content: center;
+    /* центрируем общий блок */
     align-items: stretch;
-    gap: 16px; /* зазор между колонками */
-    padding-inline: 16px; /* «поля» у краёв экрана */
+    gap: 16px;
+    /* зазор между колонками */
+    padding-inline: 16px;
+    /* «поля» у краёв экрана */
     background-color: white;
 }
 
 /* Боковые панели: по умолчанию ~20% и «управляются» переменной */
 .sidebar {
-    --sb-w: 20%;
+    /* --sb-w: 20%; */
     flex: 0 0 var(--sb-w);
     max-width: 360px;
-    min-width: 220px; /* не даём стать слишком узкими */
+    /* min-width: 220px; не даём стать слишком узкими */
     padding: 20px;
     /* background: #fafafa;  при необходимости */
 }
 
 /* Центральная колонка: растягивается между сайдбарами */
 .content {
-    flex: 1 1 720px; /* базовая ширина + возможность сжиматься/расти */
+    flex: 1 1 720px;
+    /* базовая ширина + возможность сжиматься/расти */
     width: auto;
     max-width: 1200px;
     background: white;
@@ -42,9 +46,10 @@
 /* Очень широкие — почти без изменений, но можно слегка уменьшить сайдбар */
 @media (max-width: 1440px) {
     .sidebar {
-        --sb-w: 18%;
-        min-width: 210px;
+        /* --sb-w: 18%; */
+        /* min-width: 210px; */
     }
+
     .content {
         max-width: 1120px;
     }
@@ -53,10 +58,11 @@
 /* Средние десктопы — сайдбар поуAlreadyже */
 @media (max-width: 1280px) {
     .sidebar {
-        --sb-w: 16%;
-        min-width: 200px;
+        /* --sb-w: 16%; */
+        /* min-width: 200px; */
         padding: 16px;
     }
+
     .content {
         max-width: 1000px;
     }
@@ -65,10 +71,11 @@
 /* Узкие десктопы/большие планшеты — ещё уже */
 @media (max-width: 1100px) {
     .sidebar {
-        --sb-w: 14%;
-        min-width: 180px;
+        /* --sb-w: 14%; */
+        /* min-width: 180px; */
         padding: 14px;
     }
+
     .content {
         max-width: 920px;
     }
@@ -79,13 +86,17 @@
     .sidebar {
         display: none;
     }
+
     .container {
-        gap: 0; /* без «зазора», раз колонок стало меньше */
+        gap: 0;
+        /* без «зазора», раз колонок стало меньше */
         padding-inline: 12px;
         justify-content: center;
     }
+
     .content {
-        max-width: 940px; /* центральная чуть расширяется */
+        max-width: 940px;
+        /* центральная чуть расширяется */
         padding: 16px;
     }
 }
@@ -97,6 +108,7 @@
         border-radius: 0;
         max-width: 100%;
     }
+
     .container {
         padding-inline: 0;
     }
