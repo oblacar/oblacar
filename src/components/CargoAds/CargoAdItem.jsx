@@ -98,9 +98,9 @@ const CargoAdItem = ({ ad = {}, className = '', ableHover = true }) => {
         null;
 
     const dims = cargo.dims || {
-        h: cargo.h ?? data.cargoHeight ?? data.height ?? data.truckHeight,
-        w: cargo.w ?? data.cargoWidth ?? data.width ?? data.truckWidth,
-        d: cargo.d ?? data.cargoDepth ?? data.depth ?? data.truckDepth,
+        h: cargo.h ?? data.cargoHeight ?? data.dimensionsMeters.height ?? data.truckHeight,
+        w: cargo.w ?? data.cargoWidth ?? data.dimensionsMeters.width ?? data.truckWidth,
+        d: cargo.d ?? data.cargoDepth ?? data.dimensionsMeters.depth ?? data.truckDepth,
     };
 
     const tagsLoading = useMemo(

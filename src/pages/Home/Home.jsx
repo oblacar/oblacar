@@ -44,6 +44,8 @@ import CargoAdMiniCard from '../../components/CargoAds/CargoAdMiniCard';
 import SeedCargoAdsButton from '../../dev/SeedCargoAdsButton';
 import CargoAdLisT from '../../components/CargoAds/CargoAdsList';
 
+import AdminCargoSeeder from "../../seed/AdminCargoSeeder";
+
 // тестовые объявления о Грузе------------------>
 // Простой полноценный пример
 export const myCargoAdObject = {
@@ -131,7 +133,12 @@ function Home() {
                 <div>
                 <CargoAdCard ad={myCargoAdObject} className="card-wrap" />
                 </div> */}
-           
+
+            {/* <div style={{ padding: 24 }}>
+                <h2>Админ-инструменты</h2>
+                <AdminCargoSeeder />
+            </div> */}
+
             <div style={{ padding: '20px' }}>
                 <ToggleSearchMode
                     firstOption={{
