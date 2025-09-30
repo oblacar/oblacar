@@ -1,23 +1,44 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+// src/hooks/CargoAdsContext.jsx
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
+
+// ⚠️ проверь путь/имя файла сервиса!
 import CargoAdService from '../services/CargoAdService';
-import AuthContext from './Authorization/AuthContext'; // у тебя тут лежит userId
+
+import AuthContext from './Authorization/AuthContext'; // даёт userId (или аналог)
+import UserContext from './UserContext';               // даёт профиль юзера (name/photo/rating и т.п.)
 
 const CargoAdsContext = createContext(null);
 
 export const CargoAdsProvider = ({ children }) => {
-  const { userId } = useContext(AuthContext) || {};
+  // из AuthContext обычно берём id авторизованного юзера
+  const auth = useContext(AuthContext) || {};
+  const authUserId =
+    auth.userId ??
+    auth.user?.userId ??
+    auth.currentUser?.uid ??
+    null;
 
-  const [ads, setAds] = useState([]);        // массив { adId, ... }
+  // из UserContext берём «профиль» (то, что показываем в UI)
+  const { user: profile } = useContext(UserContext) || {};
+
+  const [ads, setAds] = useState([]);        // массив нормализованных { adId, ... }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // начальная загрузка
   useEffect(() => {
     let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
+    (async () => {
       try {
+        setLoading(true);
+        setError(null);
         const list = await CargoAdService.getAll();
         if (!mounted) return;
         setAds(list);
@@ -27,16 +48,14 @@ export const CargoAdsProvider = ({ children }) => {
       } finally {
         if (mounted) setLoading(false);
       }
-    };
-    load();
+    })();
     return () => { mounted = false; };
   }, []);
 
-  // методы
-  const refresh = async () => {
-    setLoading(true);
-    setError(null);
+  const refresh = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(null);
       const list = await CargoAdService.getAll();
       setAds(list);
     } catch (e) {
@@ -44,12 +63,19 @@ export const CargoAdsProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const addAd = async (data) => {
+  const addAd = useCallback(async (data) => {
     try {
-      // подставим ownerId, если не передали
-      const payload = data?.ownerId ? data : { ...data, ownerId: userId || null };
+      // мягко подставляем автора из контекстов, если не передали
+      const payload = {
+        ...data,
+        ownerId: data?.ownerId ?? authUserId ?? profile?.userId ?? null,
+        ownerName: data?.ownerName ?? profile?.userName ?? profile?.userEmail ?? 'Пользователь',
+        ownerPhotoUrl: data?.ownerPhotoUrl ?? profile?.userPhoto ?? '',
+        ownerRating: data?.ownerRating ?? profile?.userRating ?? '', // если есть рейтинг в профиле
+      };
+
       const created = await CargoAdService.create(payload);
       setAds((prev) => [created, ...prev]);
       return created;
@@ -57,26 +83,26 @@ export const CargoAdsProvider = ({ children }) => {
       setError(e?.message || String(e));
       throw e;
     }
-  };
+  }, [authUserId, profile]);
 
-  const updateAd = async (adId, patch) => {
+  const updateAd = useCallback(async (adId, patch) => {
     try {
       const saved = await CargoAdService.updateById(adId, patch);
       setAds((prev) => {
         const i = prev.findIndex((x) => String(x.adId) === String(adId));
         if (i === -1) return prev;
-        const copy = [...prev];
-        copy[i] = saved;
-        return copy;
+        const next = prev.slice();
+        next[i] = saved;
+        return next;
       });
       return saved;
     } catch (e) {
       setError(e?.message || String(e));
       throw e;
     }
-  };
+  }, []);
 
-  const deleteAd = async (adId) => {
+  const deleteAd = useCallback(async (adId) => {
     try {
       await CargoAdService.deleteById(adId);
       setAds((prev) => prev.filter((x) => String(x.adId) !== String(adId)));
@@ -85,25 +111,24 @@ export const CargoAdsProvider = ({ children }) => {
       setError(e?.message || String(e));
       throw e;
     }
-  };
+  }, []);
 
-  // Вспомогательные выборки (удобно для досок/страниц)
-  const getByOwner = (owner) =>
-    ads.filter((ad) => String(ad.ownerId || '') === String(owner || ''));
+  // Вспомогательные выборки
+  const getByOwner = useCallback((ownerId) => {
+    const oid = String(ownerId ?? '');
+    return ads.filter((ad) => String(ad.ownerId ?? '') === oid);
+  }, [ads]);
 
-  const value = useMemo(
-    () => ({
-      ads,
-      loading,
-      error,
-      refresh,
-      addAd,
-      updateAd,
-      deleteAd,
-      getByOwner,
-    }),
-    [ads, loading, error]
-  );
+  const value = useMemo(() => ({
+    ads,
+    loading,
+    error,
+    refresh,
+    addAd,
+    updateAd,
+    deleteAd,
+    getByOwner,
+  }), [ads, loading, error, refresh, addAd, updateAd, deleteAd, getByOwner]);
 
   return (
     <CargoAdsContext.Provider value={value}>
