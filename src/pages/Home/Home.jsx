@@ -44,11 +44,6 @@ import CargoAdMiniCard from '../../components/CargoAds/CargoAdMiniCard';
 import SeedCargoAdsButton from '../../dev/SeedCargoAdsButton';
 import CargoAdLisT from '../../components/CargoAds/CargoAdsList';
 
-import DebugFaIcons from '../../components/CargoAds/icons/DebugFaIcons';
-import { PackagingPicker } from '../../components/CargoAds/PackagingPicker/PackagingPicker';
-import PackagingMultiSelect from '../../components/CargoAds/PackagingPicker/PackagingMultiSelect';
-import { PACKAGING_OPTIONS } from '../../constants/cargoPackagingOptions';
-
 // тестовые объявления о Грузе------------------>
 // Простой полноценный пример
 export const myCargoAdObject = {
@@ -105,17 +100,7 @@ export const myCargoAdExt = {
     isInReviewAds: false,
 };
 
-/* === Пример использования где-нибудь на странице ===
-import CargoAdCard from '../../components/CargoAdCard/CargoAdCard';
-import { myCargoAdObject, myCargoAdExt } from './testCargoAds';
 
-<div style={{ maxWidth: 860, margin: '0 auto' }}>
-  <CargoAdCard ad={myCargoAdObject} />
-  <div style={{ height: 16 }} />
-  <CargoAdCard ad={myCargoAdExt} />
-</div>
-*/
-// <-----------------------
 
 function Home() {
     const { ads } = useContext(TransportAdContext);
@@ -146,20 +131,7 @@ function Home() {
                 <div>
                 <CargoAdCard ad={myCargoAdObject} className="card-wrap" />
                 </div> */}
-            <DebugFaIcons />;
-            <PackagingPicker />
-            <div className='accf__field'>
-                <label className='accf__label'>Тип упаковки</label>
-                <PackagingMultiSelect
-                    options={PACKAGING_OPTIONS}
-                    // value={formData.packagingTypes ?? []}
-                    onChange={(next) =>
-                        // updateFormData({ packagingTypes: next })
-                        console.log(next)
-                    }
-                    placeholder='Выбрать упаковку'
-                />
-            </div>
+           
             <div style={{ padding: '20px' }}>
                 <ToggleSearchMode
                     firstOption={{
