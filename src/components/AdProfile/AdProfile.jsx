@@ -6,7 +6,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 
-import PersonalTransportAdProfile from './PersonalTransportAdProfile';
+import PersonalAdProfile from './PersonalAdProfile';
 import OtherTransportAdProfile from './OtherTransportAdProfile';
 import AdEditMenu from '../AdEditMenu/AdEditMenu';
 
@@ -41,7 +41,7 @@ const AdProfile = ({ ad }) => {
                 </div> */}
                 {/* TODO сделать панель для свого объявления */}
                 {isAuthenticated && isUserLoaded && ownerId === user.userId ? (
-                    <PersonalTransportAdProfile ad={ad} />
+                    <PersonalAdProfile ad={ad} />
                 ) : (
                     <OtherTransportAdProfile ad={ad} />
                 )}

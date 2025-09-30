@@ -1,6 +1,6 @@
-// src/components/PersonalTransportAdProfile/PersonalTransportAdProfile.jsx
+// src/components/PersonalAdProfile/PersonalAdProfile.jsx
 import React, { useState, useEffect } from 'react';
-import styles from './PersonalTransportAdProfile.module.css';
+import styles from './PersonalAdProfile.module.css';
 
 import IncomingRequestsList from './IncomingRequestsList';
 import ToggleSearchMode from '../common/ToggleSearchMode/ToggleSearchMode';
@@ -12,7 +12,7 @@ import { InboxArrowDownIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 // НОВОЕ:
 import PersonalTransportAdDetails from './PersonalTransportAdDetails';
 
-const PersonalTransportAdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
+const PersonalAdProfile = ({ ad, onSendRequest, onMessage, userType }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSelectFirst, setIsSelectFirst] = useState(true);
 
@@ -71,4 +71,4 @@ const PersonalTransportAdProfile = ({ ad, onSendRequest, onMessage, userType }) 
     );
 };
 
-export default PersonalTransportAdProfile;
+export default PersonalAdProfile;
