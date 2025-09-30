@@ -1,5 +1,9 @@
 .cargo-ads-list {
   width: 100%;
+
+  max-width: 740px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Центрируем прелоадер при загрузке */
@@ -10,12 +14,14 @@
 }
 
 .cargo-ads-list__error {
-  color: #b91c1c; /* red-700 */
+  color: #b91c1c;
+  /* red-700 */
   padding: 8px 0;
 }
 
 .cargo-ads-list__empty {
-  color: #6b7280; /* gray-500 */
+  color: #6b7280;
+  /* gray-500 */
   padding: 8px 0;
   font-size: 14px;
 }
