@@ -29,18 +29,12 @@ import './CargoBadgesRow.css';
  *
  * props:
  *  - ad: объект объявления (плоский или {ad})
- *  - size?: number (px)   – размер иконок (по умолчанию 16)
- *  - gap?: number (px)    – отступ между бейджами внутри группы (по умолчанию 6)
- *  - groupGap?: number    – отступ между группами (по умолчанию 12)
- *  - maxPackaging?: number – сколько упаковок показать (по умолчанию 4)
+ *  - maxPackaging?: number – сколько упаковок показать (по умолчанию 6)
  *  - className?: string
  */
 const CargoBadgesRow = ({
     ad = {},
-    size = 22,
-    gap = 6,
-    groupGap = 12,
-    maxPackaging = 4,
+    maxPackaging = 6,
     className = '',
 }) => {
     const data = ad?.ad ? ad.ad : ad;
@@ -148,11 +142,6 @@ const CargoBadgesRow = ({
     return (
         <div
             className={`cbr ${className}`}
-            style={{
-                '--cbr-size': `${size}px`,
-                '--cbr-gap': `${gap}px`,
-                '--cbr-group-gap': `${groupGap}px`,
-            }}
         >
             {renderGroup(grpType, 'type')}
             {renderGroup(grpPack, 'pack')}

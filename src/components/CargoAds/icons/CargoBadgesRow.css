@@ -1,9 +1,26 @@
 /* src/components/CargoAds/icons/CargoBadgesRow.css */
+/* defaults */
+.cbr {
+    --cbr-size: 22px;
+    --cbr-gap: 6px;
+    --cbr-group-gap: 12px;
+}
+
+.cbr__group {
+}
+
+.cbr {
+}
+
+.cbr__icon {
+}
+
 
 .cbr {
     display: flex;
     align-items: center;
-    gap: var(--cbr-group-gap, 12px);
+    gap: var(--cbr-group-gap);
+    /* gap: var(--cbr-group-gap, 12px); */
     /* расстояние между группами */
     margin-left: 20px;
 }
@@ -12,7 +29,8 @@
 .cbr__group {
     display: flex;
     align-items: center;
-    gap: var(--cbr-gap, 6px);
+    /* gap: var(--cbr-gap, 6px); */
+    gap: var(--cbr-gap);
     /* расстояние между бейджами в группе */
 }
 
@@ -29,9 +47,11 @@
 .cbr__icon {
     /* width: var(--cbr-size, 16px);
     height: var(--cbr-size, 16px); */
-
-    width: 22px;
-    height: 22px;
+    width: var(--cbr-size);
+    height: var(--cbr-size);
+    
+    /* width: 22px;
+    height: 22px; */
 
     flex: 0 0 auto;
     color: currentColor;
