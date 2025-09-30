@@ -13,6 +13,7 @@ import { ReactComponent as BaleIcon } from '../../../assets/icons/bale.svg';
 import { ReactComponent as ContainerIcon } from '../../../assets/icons/container.svg';
 import { ReactComponent as BuildingMaterialsIcon } from '../../../assets/icons/building_materials.svg';
 import { ReactComponent as BulkgMaterialsIcon } from '../../../assets/icons/bulk_material.svg';
+import { ReactComponent as EquipmentIcon } from '../../../assets/icons/equipment.svg';
 
 // Font Awesome (только нужные)
 import {
@@ -62,7 +63,7 @@ const CargoBadgesRow = ({
         'наливной': FaFaucet,
         'adr': FaRadiation,
         'электроника': FaLaptop,
-        'оборудование': FaSnowplow,
+        'оборудование': EquipmentIcon,
         'прочее': FaShapes,
     };
 
