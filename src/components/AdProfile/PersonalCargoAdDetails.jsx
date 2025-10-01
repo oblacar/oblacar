@@ -1,6 +1,6 @@
 // src/components/CargoAd/PersonalCargoAdDetails.jsx
 import React from 'react';
-import styles from '../PersonalTransportAdProfile/PersonalTransportAdProfile.module.css';
+import styles from './PersonalAdProfile.module.css';
 
 import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
 import {

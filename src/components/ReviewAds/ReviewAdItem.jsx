@@ -62,7 +62,7 @@ const ReviewAdItem = ({ ad, isActive = true, removeReviewAd }) => {
             {/* Оборачиваем в Link, только если объявление активно */}
             {isLinkEnabled ? (
                 <Link
-                    to={`/ads/${adId}`}
+                    to={`/transport-ads/${adId}?type='transport'`}
                     className='review-ad-item-link'
                 >
                     {AdContent}

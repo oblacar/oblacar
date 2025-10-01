@@ -4,7 +4,7 @@ import TransportAdContext from '../../hooks/TransportAdContext';
 
 import AdProfile from '../../components/AdProfile/AdProfile';
 
-const AdPage = () => {
+const AdPage = (adType) => {
     const { adId } = useParams();
     const { getAdById } = useContext(TransportAdContext);
 
@@ -14,7 +14,7 @@ const AdPage = () => {
 
     return (
         <div>
-            <AdProfile ad={ad.ad} />
+            <AdProfile adType={adType} ad={ad.ad} />
         </div>
     );
 };

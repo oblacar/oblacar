@@ -196,7 +196,7 @@ const TransportAdItem = ({
                 )}
 
                 {/* <div className='row'> */}
-                <Link to={`/ads/${adId}`}>
+                <Link to={`/transport-ads/${adId}?type='transport'`}>
                     <div className='upper-ad-row'>
                         <div className='departure-location-date'>
                             <div className='availability-date'>

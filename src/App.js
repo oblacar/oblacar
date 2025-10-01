@@ -85,7 +85,15 @@ const App = () => {
                                             /> */}
                                                     <Route
                                                         path='/ads/:adId'
-                                                        element={<AdPage />}
+                                                        element={<AdPage/>}
+                                                    />
+                                                     <Route
+                                                        path='/transport-ads/:adId'
+                                                        element={<AdPage/>}
+                                                    />
+                                                     <Route
+                                                        path='/cargo-ads/:adId'
+                                                        element={<AdPage/>}
                                                     />
                                                     <Route
                                                         path='/my-transport-ads'

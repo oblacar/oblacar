@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 // import './AdProfile.css';
 
+import { useSearchParams } from 'react-router-dom';
+
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 
@@ -14,6 +16,9 @@ const AdProfile = ({ ad }) => {
     const { isAuthenticated } = useContext(AuthContext);
     const { user, isUserLoaded } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
+    
+    const [sp] = useSearchParams();
+    const adType = sp.get('type'); // "cargo" | "transport"
 
     useEffect(() => {
         if (ad) {
@@ -41,7 +46,7 @@ const AdProfile = ({ ad }) => {
                 </div> */}
                 {/* TODO сделать панель для свого объявления */}
                 {isAuthenticated && isUserLoaded && ownerId === user.userId ? (
-                    <PersonalAdProfile ad={ad} />
+                    <PersonalAdProfile adType={adType} ad={ad} />
                 ) : (
                     <OtherTransportAdProfile ad={ad} />
                 )}
