@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 // import './AdProfile.css';
 
-import { useSearchParams } from 'react-router-dom';
+// import { useSearchParams } from 'react-router-dom';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
@@ -12,13 +12,13 @@ import PersonalAdProfile from './PersonalAdProfile';
 import OtherTransportAdProfile from './OtherTransportAdProfile';
 import AdEditMenu from '../AdEditMenu/AdEditMenu';
 
-const AdProfile = ({ ad }) => {
+const AdProfile = ({ adType, ad }) => {
     const { isAuthenticated } = useContext(AuthContext);
     const { user, isUserLoaded } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
     
-    const [sp] = useSearchParams();
-    const adType = sp.get('type'); // "cargo" | "transport"
+    // const [sp] = useSearchParams();
+    // const adType = sp.get('type'); // "cargo" | "transport"
 
     useEffect(() => {
         if (ad) {

@@ -75,7 +75,7 @@ const CargoAdsList = ({
                 {clickable ? (
                   <Link
                     className="cargo-ads-list__link"
-                    to={`${linkBase}/${ad.adId}`}
+                    to={`${linkBase}/${ad.adId}?type='cargo'`}
                     title={ad.cargoTitle || 'Объявление'}
                   >
                     {card}

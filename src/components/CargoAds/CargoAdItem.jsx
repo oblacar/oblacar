@@ -124,12 +124,12 @@ const CargoAdItem = ({ ad = {}, className = '', ableHover = true }) => {
     // владелец
     const owner = data.owner || {
         id: data.ownerId,
-        name: data.ownerName || data.userName,
-        avatarUrl: data.ownerAvatar || data.avatarUrl,
-        rating: data.ownerRating ?? data.rating,
+        name: data.ownerName || data.userName||data.owner.name,
+        avatarUrl: data.ownerAvatar || data.avatarUrl||data.owner.photoUrl,
+        rating: data.owner.rating ?? data.rating,
     };
     const ownerName = owner?.name || 'Без имени';
-    const ownerAvatar = owner?.avatarUrl || null;
+    const ownerAvatar = owner?.photoUrl || null;
     const ownerRating = isFiniteNumber(owner?.rating)
         ? Number(owner.rating)
         : null;
