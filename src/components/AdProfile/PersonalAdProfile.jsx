@@ -80,7 +80,7 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                         />
                     </div>
 
-                    {isSelectFirst ? (
+                    {/* {isSelectFirst ? (
                         <>
                             <strong>Запросы на перевозку</strong>
                             <IncomingRequestsList adId={adId} />
@@ -90,7 +90,7 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                             <strong>Переписка по Вашему объявлению.</strong>
                             <ChatInterface adId={adId} />
                         </>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>

@@ -115,8 +115,7 @@ export const CargoAdsProvider = ({ children }) => {
   const getById = useCallback(
     (id) => {
       if (id == null) return null;
-      const found = ads.find((a) => String(a.adId) === String(id));
-      return found || null;
+      return (Array.isArray(ads) ? ads : []).find(a => String(a.adId) === String(id)) || null;
     },
     [ads]
   );
@@ -138,9 +137,10 @@ export const CargoAdsProvider = ({ children }) => {
     deleteAd,
 
     getById,
+    getAdById: getById,
 
     getByOwner,
-  }), [ads, loading, error, refresh, addAd, updateAd, deleteAd, getByOwner]);
+  }), [ads, loading, error, refresh, addAd, updateAd, deleteAd, getByOwner, getById]);
 
   return (
     <CargoAdsContext.Provider value={value}>

@@ -383,6 +383,7 @@ export const TransportAdProvider = ({ children }) => {
                 error,
                 addAd,
                 getAdById,
+                getById: getAdById,
 
                 updateAd,
                 deleteAd,

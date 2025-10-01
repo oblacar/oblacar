@@ -28,6 +28,8 @@ const AdProfile = ({ adType, ad }) => {
     const { isAuthenticated } = useContext(AuthContext) || {};
     const { user, isUserLoaded } = useContext(UserContext) || {};
 
+    console.log('adType: ' + { adType });
+
     // единая «data» для всей разметки
     const data = useMemo(() => unwrapAd(ad), [ad]);
 
