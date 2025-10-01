@@ -63,9 +63,9 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                         {/* ОПИСАНИЕ ТРАНСПОРТА */}
                         { }
 
-                        {adType = 'transport' ?
-                            <PersonalTransportAdDetails ad={ad} /> : 
-                            (adType = 'cargo' ? <PersonalCargoAdDetails ad={ad} /> : null)}
+                        {adType === 'transport' ?
+                            (<PersonalTransportAdDetails ad={ad} />) :
+                            (adType === 'cargo' ? <PersonalCargoAdDetails ad={ad} /> : null)}
                     </div>
                 </div>
 

@@ -8,7 +8,6 @@ import React, {
   useCallback,
 } from 'react';
 
-// ⚠️ проверь путь/имя файла сервиса!
 import CargoAdService from '../services/CargoAdService';
 
 import AuthContext from './Authorization/AuthContext'; // даёт userId (или аналог)
@@ -113,6 +112,16 @@ export const CargoAdsProvider = ({ children }) => {
     }
   }, []);
 
+  const getById = useCallback(
+    (id) => {
+      if (id == null) return null;
+      const found = ads.find((a) => String(a.adId) === String(id));
+      return found || null;
+    },
+    [ads]
+  );
+
+
   // Вспомогательные выборки
   const getByOwner = useCallback((ownerId) => {
     const oid = String(ownerId ?? '');
@@ -127,6 +136,9 @@ export const CargoAdsProvider = ({ children }) => {
     addAd,
     updateAd,
     deleteAd,
+
+    getById,
+
     getByOwner,
   }), [ads, loading, error, refresh, addAd, updateAd, deleteAd, getByOwner]);
 

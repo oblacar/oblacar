@@ -1,57 +1,58 @@
 // src/components/AdProfile/AdProfile.js
-
-import React, { useState, useEffect, useContext } from 'react';
-// import './AdProfile.css';
-
-// import { useSearchParams } from 'react-router-dom';
-
+import React, { useContext, useMemo } from 'react';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 
 import PersonalAdProfile from './PersonalAdProfile';
 import OtherTransportAdProfile from './OtherTransportAdProfile';
-import AdEditMenu from '../AdEditMenu/AdEditMenu';
+
+// аккуратно разворачиваем вложенные { ad: { ... } }
+function unwrapAd(input) {
+    let out = input ?? {};
+    let hops = 0;
+    while (
+        out &&
+        typeof out === 'object' &&
+        'ad' in out &&
+        out.ad &&
+        typeof out.ad === 'object' &&
+        hops < 5
+    ) {
+        out = out.ad;
+        hops++;
+    }
+    return out;
+}
 
 const AdProfile = ({ adType, ad }) => {
-    const { isAuthenticated } = useContext(AuthContext);
-    const { user, isUserLoaded } = useContext(UserContext);
-    const [isLoading, setIsLoading] = useState(true);
-    
-    // const [sp] = useSearchParams();
-    // const adType = sp.get('type'); // "cargo" | "transport"
+    const { isAuthenticated } = useContext(AuthContext) || {};
+    const { user, isUserLoaded } = useContext(UserContext) || {};
 
-    useEffect(() => {
-        if (ad) {
-            setIsLoading(false);
-        }
-    }, [ad]);
+    // единая «data» для всей разметки
+    const data = useMemo(() => unwrapAd(ad), [ad]);
 
-    if (isLoading) {
-        return <div className='loading'>Загрузка объявления...</div>;
+    // нормализуем ownerId (или из корня, или из owner.id)
+    const ownerId = data?.owner?.id ?? data?.ownerId ?? null;
+
+    // Если данных ещё нет — показываем скелет/лоадер
+    if (!data || Object.keys(data).length === 0) {
+        return <div className="loading">Загрузка объявления...</div>;
     }
 
-    const { ownerId } = ad;
+    const isOwnAd =
+        Boolean(isAuthenticated && isUserLoaded) &&
+        String(ownerId || '') === String(user?.userId || '');
 
     return (
-        <>
-            <div>
-                {/* <div
-                    style={{
-                        padding: '50px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <AdEditMenu />
-                </div> */}
-                {/* TODO сделать панель для свого объявления */}
-                {isAuthenticated && isUserLoaded && ownerId === user.userId ? (
-                    <PersonalAdProfile adType={adType} ad={ad} />
-                ) : (
-                    <OtherTransportAdProfile ad={ad} />
-                )}
-            </div>
-        </>
+        <div>
+            {isOwnAd ? (
+                <PersonalAdProfile adType={adType} ad={data} />
+            ) : (
+                // если у тебя есть «другой» профиль и для груза тоже — лучше передать adType,
+                // чтобы внутри он тоже мог отличать, что рендерить
+                <OtherTransportAdProfile adType={adType} ad={data} />
+            )}
+        </div>
     );
 };
 
