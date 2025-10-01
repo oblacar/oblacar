@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import './OtherAdProfile.css'; // можно переименовать позже в общий css
+import './OtherAdProfile.css';
 
 import ConversationContext from '../../hooks/ConversationContext';
 import UserContext from '../../hooks/UserContext';
@@ -19,7 +19,6 @@ import OtherCargoAdDetails from './OtherCargoAdDetails';
 import { FaEnvelope } from 'react-icons/fa';
 
 const OtherAdProfile = ({ adType, ad }) => {
-  // нормализуем (если вдруг приходит {ad: {...}})
   const data = ad?.ad && typeof ad.ad === 'object' ? ad.ad : ad;
 
   const { currentConversation, setCurrentConversationState, isConversationsLoaded } =
@@ -38,7 +37,7 @@ const OtherAdProfile = ({ adType, ad }) => {
   const [isModalBackShow, setIsModalBackShow] = useState(false);
   const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
-  // ТОЛЬКО для транспорта:
+  // только для транспорта
   const [cargoDescription, setCargoDescription] = useState('');
   const [adRequestStatus, setAdRequestStatus] = useState('none');
   const [adTransportationRequest, setAdTransportationRequest] = useState(null);
@@ -56,20 +55,19 @@ const OtherAdProfile = ({ adType, ad }) => {
     ownerPhotoUrl,
     ownerRating,
 
-    // ТРАНСПОРТ
+    // транспорт
     availabilityDate,
     departureCity,
     destinationCity,
     price,
     paymentUnit,
 
-    // ГРУЗ
+    // груз
     pickupDate,
     deliveryDate,
     title,
   } = data || {};
 
-  // ===== ТОЛЬКО для транспорта: подтягиваем статусы запроса =====
   useEffect(() => {
     if (adType !== 'transport' || !adTransportationRequests || !adId) return;
     const atr = getAdTransportationRequestByAdId(adId);
@@ -85,10 +83,8 @@ const OtherAdProfile = ({ adType, ad }) => {
     setIsTransportationRequestSending(false);
   }, [adTransportationRequests, adType, adId, getAdTransportationRequestByAdId]);
 
-  // ===== Чат: привязка разговора после загрузки =====
   useEffect(() => {
     if (!isConversationsLoaded || !isChatBoxOpen || !data) return;
-    // порядок аргументов: (adId, currentUserId, otherUserId)
     setCurrentConversationState(adId, user?.userId, ownerId);
     setIsModalBackShow(false);
   }, [isConversationsLoaded, isChatBoxOpen, adId, user?.userId, ownerId, setCurrentConversationState]);
@@ -101,13 +97,10 @@ const OtherAdProfile = ({ adType, ad }) => {
     return <div className="loading">Загрузка объявления...</div>;
   }
 
-  // ====== Обработчики (чат) ======
   const handleStartChat = () => {
     setIsLoadingConversation(true);
     setIsChatBoxOpen(true);
-    if (!isConversationsLoaded) {
-      setIsModalBackShow(true);
-    }
+    if (!isConversationsLoaded) setIsModalBackShow(true);
   };
 
   const handleCloseModalBack = () => {
@@ -115,7 +108,6 @@ const OtherAdProfile = ({ adType, ad }) => {
     setIsChatBoxOpen(false);
   };
 
-  // ====== Обработчики (запросы транспорта) ======
   const handleSendRequest = async () => {
     if (adType !== 'transport') return;
     if (!cargoDescription.trim()) return;
@@ -152,7 +144,6 @@ const OtherAdProfile = ({ adType, ad }) => {
     try {
       await sendTransportationRequest(adData, request);
       setCargoDescription('');
-      // статус подтянется из контекста по эффекту выше
     } catch (e) {
       console.error('Failed to send request:', e);
       setIsTransportationRequestSending(false);
@@ -177,12 +168,10 @@ const OtherAdProfile = ({ adType, ad }) => {
     }
   };
 
-  // ====== Что показываем слева (описание) ======
   const Details = adType === 'cargo' ? OtherCargoAdDetails : OtherTransportAdDetails;
 
-  // ====== Что показываем справа (карточка автора + действия) ======
   const RightPanel = () => (
-    <div className="transport-ad-profile-owner-data">
+    <div className="other-ad-profile-owner-data">
       <UserSmallCard
         photoUrl={ownerPhotoUrl}
         rating={ownerRating}
@@ -191,9 +180,8 @@ const OtherAdProfile = ({ adType, ad }) => {
         isLoading={false}
       />
 
-      {/* ПАНЕЛЬ ЗАПРОСОВ (только для транспорта) */}
       {adType === 'transport' ? (
-        <div className="transport-ad-profile-owner-send-request">
+        <div className="other-ad-profile-owner-send-request">
           {!isTransportationRequestSending &&
             (adRequestStatus === 'none' || adRequestStatus === '' ? (
               <>
@@ -220,14 +208,13 @@ const OtherAdProfile = ({ adType, ad }) => {
             ))}
 
           {isTransportationRequestSending && (
-            <div className="transport-ad-profile-send-request-preloader">
+            <div className="other-ad-profile-send-request-preloader">
               <Preloader />
             </div>
           )}
         </div>
       ) : (
-        // Заглушка для ГРУЗА (позже добавим собственные запросы)
-        <div className="transport-ad-profile-owner-send-request">
+        <div className="other-ad-profile-owner-send-request">
           <strong>Свяжитесь с автором объявления о грузе.</strong>
           <div style={{ marginTop: 8 }}>
             <Button type="button" children="Написать сообщение" onClick={handleStartChat} />
@@ -239,8 +226,8 @@ const OtherAdProfile = ({ adType, ad }) => {
 
   return (
     <>
-      <div className="transport-ad-profile">
-        <div className="transport-ad-profile-main-data">
+      <div className="other-ad-profile">
+        <div className="other-ad-profile-main-data">
           <Details ad={data} />
         </div>
 
@@ -253,20 +240,20 @@ const OtherAdProfile = ({ adType, ad }) => {
           adData={
             adType === 'transport'
               ? {
-                  adId,
-                  availabilityDate,
-                  departureCity,
-                  destinationCity,
-                  priceAndPaymentUnit: formatNumber(String(price)) + ' ' + (paymentUnit || ''),
-                }
+                adId,
+                availabilityDate,
+                departureCity,
+                destinationCity,
+                priceAndPaymentUnit: formatNumber(String(price)) + ' ' + (paymentUnit || ''),
+              }
               : {
-                  adId,
-                  availabilityDate: pickupDate,
-                  departureCity,
-                  destinationCity,
-                  priceAndPaymentUnit: '', // для груза пока нет цены-ставки
-                  title: title || '',
-                }
+                adId,
+                availabilityDate: pickupDate,
+                departureCity,
+                destinationCity,
+                priceAndPaymentUnit: '',
+                title: title || '',
+              }
           }
           chatPartnerName={ownerName}
           chatPartnerPhoto={ownerPhotoUrl}

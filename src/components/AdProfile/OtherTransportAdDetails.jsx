@@ -36,7 +36,9 @@ const OtherTransportAdDetails = ({ ad }) => {
 
     const truckWeightValue = () => {
         const vol = Number(truckHeight) * Number(truckWidth) * Number(truckDepth);
-        const volStr = vol ? `${cutNumber(vol)}м³ (${Number(truckHeight)}×${Number(truckWidth)}×${Number(truckDepth)}м)` : '';
+        const volStr = vol
+            ? `${cutNumber(vol)}м³ (${Number(truckHeight)}×${Number(truckWidth)}×${Number(truckDepth)}м)`
+            : '';
         const weightStr = truckWeight ? `${Number(truckWeight)}т` : '';
         const join = [weightStr, volStr].filter(Boolean).join(', ');
         return join || '—';
@@ -44,39 +46,39 @@ const OtherTransportAdDetails = ({ ad }) => {
 
     return (
         <>
-            <div className="transport-ad-profile-truck-photo-area">
+            <div className="other-ad-profile-truck-photo-area">
                 <PhotoCarousel photos={truckPhotoUrls} />
             </div>
 
-            <div className="transport-ad-profile-rout-date-price">
-                <div className="transport-ad-profile-rout-date-price-row">
+            <div className="other-ad-profile-rout-date-price">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Доступен: </strong>{availabilityDate || '—'}
                 </div>
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Откуда: </strong>{departureCity || '—'}
                 </div>
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Куда: </strong>{destinationCity || '—'}
                 </div>
 
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Цена: </strong>{price ? `${formatNumber(String(price))} ${paymentUnit || ''}` : '—'}
                 </div>
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Условия: </strong>{paymentOptionsItem()}
                 </div>
 
-                <div className="transport-ad-profile-truck">
-                    <div className="transport-ad-profile-truck-row">
+                <div className="other-ad-profile-truck">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Марка: </strong>{truckName || '—'}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Тип: </strong>{transportType || '—'}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Параметры: </strong>{truckWeightValue()}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Загрузка: </strong>{loadingTypesItem()}
                     </div>
                 </div>

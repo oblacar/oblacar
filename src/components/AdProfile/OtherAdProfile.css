@@ -1,107 +1,83 @@
-/*Профиль транспортного объявления*/
-.transport-ad-profile {
+/* Профиль чужого объявления */
+.other-ad-profile {
     border: 1px solid rgb(231, 231, 231);
     padding: 10px;
     border-radius: 5px;
-    /* background-color: #fcfcfc; */
 }
 
-.transport-ad-profile-main-data {
+.other-ad-profile-main-data {
     display: flex;
 }
 
-.transport-ad-profile-rout-date-price {
-    /* border: 1px solid rgb(175, 175, 175); */
+.other-ad-profile-rout-date-price {
     min-width: 300px;
     width: 100%;
     text-align: start;
     font-size: 18px;
-    /* color: #383839; */
-    /* background-color: white; */
     border-radius: 10px;
     margin-left: 20px;
     padding: 10px;
-
-    /* -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-    -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2); */
-}
-.transport-ad-profile-date {
-    /* border: 1px solid rgb(13, 132, 7); */
 }
 
-.transport-ad-profile-departure-city {
-    /* border: 1px solid rgb(165, 54, 93); */
-}
-.transport-ad-profile-destination-city {
-    /* border: 1px solid rgb(165, 54, 93); */
-}
+.other-ad-profile-date {}
 
-.transport-ad-profile-price {
-    /* border: 1px solid rgb(4, 93, 111); */
-}
+.other-ad-profile-departure-city {}
 
-.transport-ad-profile-rout-date-price-row strong,
-.transport-ad-profile-truck-row strong {
+.other-ad-profile-destination-city {}
+
+.other-ad-profile-price {}
+
+.other-ad-profile-rout-date-price-row strong,
+.other-ad-profile-truck-row strong {
     width: 80px;
     display: inline-block;
     color: rgb(241, 134, 68);
     font-size: 16px;
-    /* font-weight: 500; */
-}
-.transport-ad-profile-rout-date-price-row {
-    margin: 5px 10px;
-    /* font-weight: 600; */
 }
 
-/*Данные об автомобиле*/
-.transport-ad-profile-truck {
+.other-ad-profile-rout-date-price-row {
+    margin: 5px 10px;
+}
+
+/* Данные об автомобиле / параметры */
+.other-ad-profile-truck {
     margin-top: 50px;
 }
 
-.transport-ad-profile-truck-row {
+.other-ad-profile-truck-row {
     margin: 5px 10px;
 }
 
-.transport-ad-profile-truck-name {
+.other-ad-profile-truck-name {
     font-weight: 600;
     font-size: 24px;
 }
-.transport-ad-profile-truck-type {
-    /* border: 1px solid rgb(8, 196, 42); */
-}
-.transport-ad-profile-truck-weight-value {
-    /* border: 1px solid rgb(8, 196, 42); */
-}
-.transport-ad-profile-truck-loadings {
-    /* border: 1px solid rgb(8, 196, 42); */
-}
 
-/*Фото зона*/
-.transport-ad-profile-truck-photo-area {
-    /* display: flex;
-    flex-direction: column;
-    align-items: center; */
-}
+.other-ad-profile-truck-type {}
 
-/*Информация о пользователе*/
-.transport-ad-profile-owner-data {
+.other-ad-profile-truck-weight-value {}
+
+.other-ad-profile-truck-loadings {}
+
+/* Фото зона */
+.other-ad-profile-truck-photo-area {}
+
+/* Информация о пользователе */
+.other-ad-profile-owner-data {
     display: flex;
-
     border: 1px solid rgb(202, 202, 202);
     margin-top: 20px;
     border-radius: 10px;
     padding: 10px;
-    gap: 20px; /* Расстояние между фото и блоком запроса */
-    align-items: stretch; /* Растягиваем элементы по высоте */
-
+    gap: 20px;
+    align-items: stretch;
     -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
     -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
     box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
 }
 
-/* Блок с фото и именем пользователя */
-.transport-ad-profile-user-data {
+/* Блок с фото и именем пользователя (если где-то используется) */
+.other-ad-profile-user-data {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -110,87 +86,77 @@
     color: rgb(53, 53, 53);
 }
 
-/*Пользователь*/
-/*Фото с рейтингом*/
-.transport-ad-profile-user-photo-rating {
+/* Пользователь: фото/рейтинг — если необходимо дальше */
+.other-ad-profile-user-photo-rating {
     width: 100px;
     height: 100px;
     position: relative;
 }
 
-.transport-ad-profile-user-rating {
+.other-ad-profile-user-rating {
     position: absolute;
-
     right: -10px;
     bottom: -5px;
-
     font-size: 14px;
     font-weight: 600;
     color: rgb(255, 145, 0);
 }
 
-.transport-ad-profile-user-photo {
+.other-ad-profile-user-photo {
     border: 1px solid rgb(238, 237, 237);
-
     min-height: 100px;
     min-width: 100px;
     max-width: 100px;
     max-height: 100px;
-
     background-color: #ffffff;
     font-size: 20px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     color: #d9d9d9;
     border-radius: 50%;
-    overflow: hidden; /* Скрываем лишнее, если изображение больше круга */
+    overflow: hidden;
 }
 
-.transport-ad-profile-photo-car-owner {
+.other-ad-profile-photo-car-owner {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Обеспечиваем обрезку изображения, чтобы оно заполнило круг */
+    object-fit: cover;
 }
 
-.transport-ad-profile-user-name {
+.other-ad-profile-user-name {
     font-size: 16px;
     font-weight: 600;
     margin: 5px;
 }
 
-.transport-ad-profile-user-btn-message {
-    flex-shrink: 0; /* Запрещаем кнопке сжиматься */
+.other-ad-profile-user-btn-message {
+    flex-shrink: 0;
 }
+
 /* Блок отправки запроса */
-.transport-ad-profile-owner-send-request {
-    flex-grow: 1; /* Занимаем оставшееся пространство */
+.other-ad-profile-owner-send-request {
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     padding: 10px;
-
-    /* background-color: #6abbf8; */
-    /* background-color: rgb(209, 241, 255); */
     background-color: rgb(241, 240, 240);
     border-radius: 10px;
 }
 
 /* Текст запроса */
-.transport-ad-profile-owner-send-request strong {
+.other-ad-profile-owner-send-request strong {
     font-weight: bold;
     color: #293049;
     display: block;
     margin-bottom: 8px;
-
     text-align: center;
 }
 
 /* Многострочное поле */
-.transport-ad-profile-owner-send-request textarea {
-    resize: none; /* Запрещаем изменение размера */
-    flex-grow: 1; /* Растягиваем на всю высоту */
+.other-ad-profile-owner-send-request textarea {
+    resize: none;
+    flex-grow: 1;
     min-height: 100px;
     margin-bottom: 10px;
     padding: 8px;
@@ -200,37 +166,31 @@
 }
 
 /* Кнопка отправки */
-.transport-ad-profile-owner-send-request button {
-    align-self: flex-end; /* Прижимаем кнопку к правому краю */
+.other-ad-profile-owner-send-request button {
+    align-self: flex-end;
 }
 
-/*<<<---*/
-/*Прелоадер*/
-.transport-ad-profile-send-request-preloader {
+/* Прелоадер */
+.other-ad-profile-send-request-preloader {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
-    position: relative; /* Убедимся, что дочерние элементы позиционируются относительно этого элемента */
-    background-color: rgba(
-        255,
-        255,
-        255,
-        0.8
-    ); /* Дополнительный полупрозрачный фон (опционально) */
-    z-index: 10; /* Убедимся, что прелоадер поверх других элементов */
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
 }
 
-.transport-ad-profile-send-request-preloader > * {
-    position: absolute; /* Центрируем дочерний элемент (прелоадер) */
+.other-ad-profile-send-request-preloader>* {
+    position: absolute;
 }
 
 .preloader-container {
     height: 100px;
     display: flex;
-    flex-direction: column; /* Размещаем элементы вертикально */
-    justify-content: center; /* Центрируем по вертикали */
-    align-items: center; /* Центрируем по горизонтали */
-    text-align: center; /* Центрируем текст */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }

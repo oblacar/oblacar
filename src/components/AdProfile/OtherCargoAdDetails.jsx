@@ -53,71 +53,71 @@ const OtherCargoAdDetails = ({ ad }) => {
 
     return (
         <>
-            <div className="transport-ad-profile-truck-photo-area">
-                {/* используем тот же карусельный блок для консистентности */}
+            <div className="other-ad-profile-truck-photo-area">
+                {/* та же карусель для консистентности */}
                 <HorizontalPhotoCarousel photos={photos} />
             </div>
 
-            <div className="transport-ad-profile-rout-date-price">
-                <div className="transport-ad-profile-rout-date-price-row">
+            <div className="other-ad-profile-rout-date-price">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Название: </strong>{title || '—'}
                 </div>
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Тип груза: </strong>{cargoType || '—'}
                 </div>
 
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Готов к отгрузке: </strong>{pickupDate || '—'}
                 </div>
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Желаемая доставка: </strong>{deliveryDate || '—'}
                 </div>
 
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Откуда: </strong>{departureCity || '—'}
                 </div>
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Куда: </strong>{destinationCity || '—'}
                 </div>
 
-                <div className="transport-ad-profile-rout-date-price-row">
+                <div className="other-ad-profile-rout-date-price-row">
                     <strong>Оценка цены: </strong>
                     {price ? `${formatNumber(String(price))} ${paymentUnit || ''}` : '—'}
                     {readyToNegotiate ? ' (торг)' : ''}
                 </div>
 
-                <div className="transport-ad-profile-truck">
-                    <div className="transport-ad-profile-truck-row">
+                <div className="other-ad-profile-truck">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Вес, т: </strong>{weightTons || '—'}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Габариты (В×Ш×Г): </strong>{dims}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Кол-во мест: </strong>{quantity || '—'}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Упаковка: </strong>{pack}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Загрузка: </strong>{loadings}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Температура: </strong>{tempLabel}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Хрупкий: </strong>{isFragile ? 'да' : 'нет'}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>Штабелируемый: </strong>{isStackable ? 'да' : 'нет'}
                     </div>
-                    <div className="transport-ad-profile-truck-row">
+                    <div className="other-ad-profile-truck-row">
                         <strong>ADR: </strong>{adrClass || '—'}
                     </div>
                 </div>
 
                 {description?.trim() ? (
-                    <div className="transport-ad-profile-rout-date-price-row" style={{ marginTop: 8 }}>
+                    <div className="other-ad-profile-rout-date-price-row" style={{ marginTop: 8 }}>
                         <strong>Описание: </strong>{description}
                     </div>
                 ) : null}
