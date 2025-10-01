@@ -4,7 +4,7 @@ import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 
 import PersonalAdProfile from './PersonalAdProfile';
-import OtherTransportAdProfile from './OtherTransportAdProfile';
+import OtherAdProfile from './OtherAdProfile';
 
 // аккуратно разворачиваем вложенные { ad: { ... } }
 function unwrapAd(input) {
@@ -52,7 +52,7 @@ const AdProfile = ({ adType, ad }) => {
             ) : (
                 // если у тебя есть «другой» профиль и для груза тоже — лучше передать adType,
                 // чтобы внутри он тоже мог отличать, что рендерить
-                <OtherTransportAdProfile adType={adType} ad={data} />
+                <OtherAdProfile adType={adType} ad={data} />
             )}
         </div>
     );
