@@ -2,7 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './PersonalAdProfile.module.css';
 
-import IncomingRequestsList from './IncomingRequestsList';
+import TransportIncomingRequestsList from './TransportIncomingRequestsList';
+import CargoIncomingRequestsList from './CargoIncomingRequestsList';
+
 import ToggleSearchMode from '../common/ToggleSearchMode/ToggleSearchMode';
 import ChatInterface from '../ChatInterface/ChatInterface';
 import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
@@ -80,17 +82,30 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                         />
                     </div>
 
-                    {/* {isSelectFirst ? (
+                    {isSelectFirst ? (
                         <>
-                            <strong>Запросы на перевозку</strong>
-                            <IncomingRequestsList adId={adId} />
+                            {adType === 'transport' && (
+                                <>
+                                    <strong>Запросы на перевозку</strong>
+                                    <TransportIncomingRequestsList adId={adId} />
+                                </>
+                            )}
+
+                            {adType === 'cargo' && (
+                                <>
+                                    <strong>Запросы по грузу</strong>
+                                    <CargoIncomingRequestsList adId={adId} />
+                                </>
+                            )}
                         </>
                     ) : (
                         <>
                             <strong>Переписка по Вашему объявлению.</strong>
                             <ChatInterface adId={adId} />
                         </>
-                    )} */}
+                    )}
+
+
                 </div>
             </div>
         </div>

@@ -12,7 +12,7 @@ import { formatNumber } from '../../utils/helper';
 import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
 import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
 
-const IncomingRequestsList = ({ adId }) => {
+const TransportIncomingRequestsList = ({ adId }) => {
     const {
         adsTransportationRequests,
         getAdTransportationRequestsByAdId,
@@ -161,4 +161,4 @@ const IncomingRequestsList = ({ adId }) => {
     );
 };
 
-export default IncomingRequestsList;
+export default TransportIncomingRequestsList;
