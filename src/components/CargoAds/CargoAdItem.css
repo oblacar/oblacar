@@ -7,6 +7,7 @@
     border-radius: 12px;
     padding: var(--cc-pad);
     transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+    position: relative;
 }
 
 .cargo-card:hover {

@@ -68,7 +68,7 @@ const CargoAdsList = ({
         <div className="cargo-ads-list__column">
           {data.map((ad) => {
             const key = ad.adId || `${ad.departureCity}-${ad.destinationCity}-${ad.createdAt}`;
-            const card = <CargoAdItem ad={ad} ableHover = {true} isActive = {true} />;
+            const card = <CargoAdItem ad={ad} ableHover={true} isActive={true} />;
 
             return (
               <div className="cargo-ads-list__item" key={key}>
@@ -76,7 +76,7 @@ const CargoAdsList = ({
                   <Link
                     className="cargo-ads-list__link"
                     to={`${linkBase}/${ad.adId}?type='cargo'`}
-                    title={ad.cargoTitle || 'Объявление'}
+                  // title={ad.cargoTitle || 'Объявление'}
                   >
                     {card}
                   </Link>

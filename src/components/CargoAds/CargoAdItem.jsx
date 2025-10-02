@@ -5,6 +5,10 @@ import CargoAdsContext from '../../hooks/CargoAdsContext';
 import ToggleIconButtonPlus from '../common/ToggleIconButtonPlus/ToggleIconButtonPlus'; // если нужно — проверь путь
 import './CargoAdItem.css';
 
+import {
+    FaCheck,
+} from 'react-icons/fa';
+
 /**
  * Карточка объявления о перевозке груза (элемент списка).
  *
@@ -78,43 +82,6 @@ const CargoAdItem = ({
         e.preventDefault();
         e.stopPropagation();
     };
-
-    // const handleToggle = useCallback(
-    //     async (nextAdded) => {
-    //         try {
-    //             // синхронизируем локальную подсветку мгновенно
-    //             setIsSelectedAdItem(Boolean(nextAdded));
-
-    //             if (nextAdded) {
-    //                 // добавить в "Варианты"
-    //                 if (typeof addReviewAd === 'function') {
-    //                     await addReviewAd(extAd);
-    //                 }
-    //             } else {
-    //                 // удалить из "Вариантов"
-    //                 if (typeof removeReviewAd === 'function') {
-    //                     await removeReviewAd(extAd);
-    //                 }
-    //             }
-    //         } catch (e) {
-    //             console.error('Review toggle error:', e);
-    //             // на всякий случай откатим локальную подсветку
-    //             setIsSelectedAdItem(isInReview);
-    //         }
-    //     },
-    //     [addReviewAd, removeReviewAd, extAd, isInReview]
-    // );
-
-    // const handleMouseEnterReviewAdsAdd = useCallback(() => {
-    //     // можно показать превью-состояние; пока просто не делаем ничего
-    // }, []);
-
-    // const handleMouseLeaveReviewAdsAdd = useCallback(() => {
-    //     // вернуть к фактическому состоянию из контекста
-    //     setIsSelectedAdItem(isInReview);
-    // }, [isInReview]);
-
-    // === остальная разметка ===
 
     // дата создания
     const created = createdAt || date || null;
@@ -226,6 +193,15 @@ const CargoAdItem = ({
             onMouseEnter={() => setIsSelectedAdItem(true)}
             onMouseLeave={() => setIsSelectedAdItem(false)}
         >
+            {isInReviewAds ? (
+                <>
+                    <div className={`ad-item-show-in-review`}>
+                        <FaCheck />
+                    </div>
+                </>
+            ) : (
+                ''
+            )}
 
             {/* ВЕРХ: 2 колонки — слева контент, справа даты+цена */}
             <div className="cargo-card__head">
