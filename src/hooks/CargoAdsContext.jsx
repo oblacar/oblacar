@@ -9,14 +9,15 @@ import React, {
 } from 'react';
 
 import CargoAdService from '../services/CargoAdService';
+import UserReviewAdService from '../services/UserReviewAdService';
 
-import AuthContext from './Authorization/AuthContext'; // даёт userId (или аналог)
-import UserContext from './UserContext';               // даёт профиль юзера (name/photo/rating и т.п.)
+import AuthContext from './Authorization/AuthContext';
+import UserContext from './UserContext';
 
 const CargoAdsContext = createContext(null);
 
 export const CargoAdsProvider = ({ children }) => {
-  // из AuthContext обычно берём id авторизованного юзера
+  // --- auth/profile ---
   const auth = useContext(AuthContext) || {};
   const authUserId =
     auth.userId ??
@@ -24,14 +25,19 @@ export const CargoAdsProvider = ({ children }) => {
     auth.currentUser?.uid ??
     null;
 
-  // из UserContext берём «профиль» (то, что показываем в UI)
   const { user: profile } = useContext(UserContext) || {};
 
+  // --- cargo ads list ---
   const [ads, setAds] = useState([]);        // массив нормализованных { adId, ... }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // начальная загрузка
+  // --- reviewed (избранные/отобранные) cargo ad ids для текущего пользователя ---
+  const [reviewedIds, setReviewedIds] = useState([]);   // string[]
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState(null);
+
+  // ====== загрузка объявлений ======
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -72,7 +78,7 @@ export const CargoAdsProvider = ({ children }) => {
         ownerId: data?.ownerId ?? authUserId ?? profile?.userId ?? null,
         ownerName: data?.ownerName ?? profile?.userName ?? profile?.userEmail ?? 'Пользователь',
         ownerPhotoUrl: data?.ownerPhotoUrl ?? profile?.userPhoto ?? '',
-        ownerRating: data?.ownerRating ?? profile?.userRating ?? '', // если есть рейтинг в профиле
+        ownerRating: data?.ownerRating ?? profile?.userRating ?? '',
       };
 
       const created = await CargoAdService.create(payload);
@@ -105,6 +111,8 @@ export const CargoAdsProvider = ({ children }) => {
     try {
       await CargoAdService.deleteById(adId);
       setAds((prev) => prev.filter((x) => String(x.adId) !== String(adId)));
+      // если удаляем объявление — уберём его id и из reviewed локально
+      setReviewedIds((prev) => prev.filter((id) => String(id) !== String(adId)));
       return true;
     } catch (e) {
       setError(e?.message || String(e));
@@ -120,14 +128,78 @@ export const CargoAdsProvider = ({ children }) => {
     [ads]
   );
 
-
-  // Вспомогательные выборки
+  // Вспомогательная выборка
   const getByOwner = useCallback((ownerId) => {
     const oid = String(ownerId ?? '');
     return ads.filter((ad) => String(ad.ownerId ?? '') === oid);
   }, [ads]);
 
+  // ====== REVIEWED (избранные) для cargo ======
+
+  // начальная загрузка/перезагрузка при смене пользователя
+  const loadReviewed = useCallback(async () => {
+    if (!authUserId) {
+      setReviewedIds([]);
+      return;
+    }
+    try {
+      setReviewLoading(true);
+      setReviewError(null);
+      const ids = await UserReviewAdService.getUserReviewAds(authUserId, 'cargo');
+      setReviewedIds(Array.isArray(ids) ? ids : []);
+    } catch (e) {
+      setReviewError(e?.message || String(e));
+    } finally {
+      setReviewLoading(false);
+    }
+  }, [authUserId]);
+
+  useEffect(() => {
+    // грузим избранное, когда появляется/меняется юзер
+    loadReviewed();
+  }, [loadReviewed]);
+
+  // пометить объявление как «в отобранных»
+  const addReviewAd = useCallback(async (adId) => {
+    if (!authUserId || !adId) return;
+    // оптимистично
+    setReviewedIds((prev) => (prev.includes(adId) ? prev : [...prev, adId]));
+    try {
+      await UserReviewAdService.addReviewAd(authUserId, adId, 'cargo');
+    } catch (e) {
+      // откат при ошибке
+      setReviewedIds((prev) => prev.filter((id) => id !== adId));
+      throw e;
+    }
+  }, [authUserId]);
+
+  // убрать из «отобранных»
+  const removeReviewAd = useCallback(async (adId) => {
+    if (!authUserId || !adId) return;
+    // оптимистично
+    setReviewedIds((prev) => prev.filter((id) => id !== adId));
+    try {
+      await UserReviewAdService.removeReviewAd(authUserId, adId, 'cargo');
+    } catch (e) {
+      // откат при ошибке
+      setReviewedIds((prev) => (prev.includes(adId) ? prev : [...prev, adId]));
+      throw e;
+    }
+  }, [authUserId]);
+
+  const toggleReviewAd = useCallback(async (adId) => {
+    if (!authUserId || !adId) return;
+    const isAdded = reviewedIds.includes(adId);
+    return isAdded ? removeReviewAd(adId) : addReviewAd(adId);
+  }, [authUserId, reviewedIds, addReviewAd, removeReviewAd]);
+
+  const isReviewed = useCallback((adId) => {
+    return reviewedIds.includes(String(adId));
+  }, [reviewedIds]);
+
+  // ====== value ======
   const value = useMemo(() => ({
+    // объявления
     ads,
     loading,
     error,
@@ -138,9 +210,23 @@ export const CargoAdsProvider = ({ children }) => {
 
     getById,
     getAdById: getById,
-
     getByOwner,
-  }), [ads, loading, error, refresh, addAd, updateAd, deleteAd, getByOwner, getById]);
+
+    // reviewed cargo
+    reviewedIds,
+    reviewLoading,
+    reviewError,
+    loadReviewed,
+    addReviewAd,
+    removeReviewAd,
+    toggleReviewAd,
+    isReviewed,
+  }), [
+    ads, loading, error, refresh, addAd, updateAd, deleteAd,
+    getById, getByOwner,
+    reviewedIds, reviewLoading, reviewError,
+    loadReviewed, addReviewAd, removeReviewAd, toggleReviewAd, isReviewed
+  ]);
 
   return (
     <CargoAdsContext.Provider value={value}>

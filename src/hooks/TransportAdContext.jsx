@@ -1,5 +1,13 @@
 // src/hooks/TransportAd/TransportAdContext.js
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    useCallback,
+    useMemo,
+} from 'react';
+
 import TransportAdService from '../services/TransportAdService';
 import UserReviewAdService from '../services/UserReviewAdService';
 
@@ -8,406 +16,405 @@ import UserContext from './UserContext';
 
 const TransportAdContext = createContext();
 
-// порог, когда выгоднее спросить БД, чем фильтровать локально
-const OWNER_FILTER_THRESHOLD = 400; // подстрой по ситуации
+// при больших объёмах выгоднее читать из БД по индексу, чем фильтровать в памяти
+const OWNER_FILTER_THRESHOLD = 400;
 
 export const TransportAdProvider = ({ children }) => {
-    // const { user } = useContext(AuthContext);//TODO for relocated on UserContext
-    const { userId } = useContext(AuthContext);
-    const { user, isUserLoaded } = useContext(UserContext);
+    const { userId: authUserId } = useContext(AuthContext) || {};
+    const { user, isUserLoaded } = useContext(UserContext) || {};
 
-    //стейт расширенных объявлений
+    // Расширённые объявления: [{ ad: {...}, isInReviewAds: boolean }]
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Список «вариантов» в том же расширенном формате
     const [reviewAds, setReviewAds] = useState([]);
 
-    // Догрузка удаленных объявлений в список Вариантов:
-    const fetchRemainingReviewAds = async (remainingReviewAds, foundAds) => {
-        for (const adId of remainingReviewAds) {
-            try {
-                const adData = await TransportAdService.getAdById(adId);
+    // ===================== Утилиты =====================
 
-                if (adData) {
-                    const newExtAd = {
-                        ad: adData, // Сохраняем объявление
-                        isInReviewAds: true,
-                    };
+    // Проверка: уже расширенная структура или только plain ad
+    const isExtendedAd = (x) =>
+        x && typeof x === 'object' && 'isInReviewAds' in x && 'ad' in x;
 
-                    foundAds.push(newExtAd); // Добавляем объявление в переданный массив
+    // Делает из plain-объявлений расширенные с пометкой «в вариантах»
+    const extendPlainAds = useCallback(
+        (plainAds, reviewIds = []) => {
+            const reviewSet = new Set(reviewIds.map(String));
+            return (Array.isArray(plainAds) ? plainAds : []).map((ad) => ({
+                ad,
+                isInReviewAds: reviewSet.has(String(ad.adId)),
+            }));
+        },
+        []
+    );
 
-                    // Удаляем adId из Set
-                    remainingReviewAds.delete(adId);
-                } else {
-                    console.log(
-                        'Объявление не найдено или было удалено. id:',
-                        adId
-                    );
-                }
-            } catch (error) {
-                console.error(
-                    `Ошибка при получении объявления с id ${adId}:`,
-                    error
-                );
-            }
-        }
-    };
-
-    // загрузка объявлений после получения базы отмеченных объявлений:
-    //Оптимизированный метод сверки объявлений с отмеченными
-
-    async function processAds(ads, reviewAds) {
-        let remainingReviewAds = new Set(reviewAds);
-        const enhancedAds = []; // Массив для расширенных объявлений
-        const foundAds = []; // Массив для найденных отмеченных объявлений
-
-        const isAdsStructure = (ad) => {
-            const requiredKeys = ['isInReviewAds']; // Здесь перечислите нужные ключи
-
-            return requiredKeys.every((key) => ad.hasOwnProperty(key));
-        };
-        const isAdsExtended = isAdsStructure(ads[0]);
-
-        for (let ad of ads) {
-            let newExtAd;
-
-            if (isAdsExtended) {
-                newExtAd = ad;
-
-                newExtAd = {
-                    ...ad,
-                    isInReviewAds: false,
-                };
-            } else {
-                newExtAd = {
-                    ad,
-                    isInReviewAds: false,
-                };
-            }
-
-            if (remainingReviewAds.size > 0) {
-                const isInReviewAds = remainingReviewAds.has(newExtAd.ad.adId);
-
-                if (isInReviewAds) {
-                    newExtAd.isInReviewAds = true;
-
-                    foundAds.push(newExtAd);
-                    remainingReviewAds.delete(newExtAd.ad.adId);
-                }
-            }
-
-            // Добавляем расширенное объявление
-            enhancedAds.push(newExtAd);
-        }
-
-        await fetchRemainingReviewAds(remainingReviewAds, foundAds);
-
-        return {
-            enhancedAds,
-            foundAds,
-        };
-    }
-
-    useEffect(() => {
-        if (
-            !localStorage.getItem('authToken') &&
-            !localStorage.getItem('authEmail')
-        ) {
-            // Обновляем все объявления, чтобы сбросить isInReviewAds
-            setAds((ads) =>
-                ads.map((ad) => ({
-                    ...ad, // Копируем объявление
-                    isInReviewAds: false, // Сбрасываем статус
-                }))
+    // Выгружает отсутствующие в ads «вариантные» объявления по их id,
+    // чтобы список reviewAds был полным даже для удалённых из общего фида ad'ов
+    const fetchMissingReviewAds = useCallback(
+        async (reviewIds, alreadyInAdsExtended) => {
+            const existingSet = new Set(
+                alreadyInAdsExtended.map((x) => String(x.ad?.adId))
             );
+            const result = [...alreadyInAdsExtended];
 
-            // Очищаем список вариантов
-            setReviewAds([]);
-            return;
-        }
-
-        if (!isUserLoaded) return;
-
-        const fetchInitialData = async () => {
-            setLoading(true);
-
-            try {
-                // Загружаем reviewAds и сохраняем
-                // const initialReviewAds = await TransportAdService.getReviewAds(
-                //     userId
-                // );
-                const initialReviewAds = await UserReviewAdService.getUserReviewAds(userId, 'transport');
-
-                // Преобразуем initialReviewAds в массив ключей
-                const reviewAdsArray = initialReviewAds
-                    ? Object.keys(initialReviewAds)
-                    : [];
-
-                if (ads.length === 0) {
-                    const adsData = await TransportAdService.getAllAds();
-
-                    // Назначаем каждому объявлению статус isInReviewAds на основе reviewAds
-                    // enhancedAds = markReviewAds(adsData, reviewAdsArray);
-                    const { enhancedAds, foundAds } = await processAds(
-                        adsData,
-                        reviewAdsArray
-                    );
-
-                    setAds(enhancedAds);
-                    setReviewAds(foundAds);
-                } else {
-                    // enhancedAds = markReviewAds(ads, reviewAdsArray);
-                    const { enhancedAds, foundAds } = await processAds(
-                        ads,
-                        reviewAdsArray
-                    );
-
-                    console.log('without exit');
-
-                    setAds(enhancedAds);
-                    setReviewAds(foundAds);
-                }
-            } catch (err) {
-                console.error('Ошибка при загрузке данных:', err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInitialData();
-    }, [user, isUserLoaded]);
-
-    //Выгружаем всю база и оборачиваем при начале сессии
-    useEffect(() => {
-        if (
-            !localStorage.getItem('authToken') &&
-            !localStorage.getItem('authEmail')
-        ) {
-            const fetchAds = async () => {
-                setLoading(true);
-
+            for (const id of reviewIds) {
+                const sid = String(id);
+                if (existingSet.has(sid)) continue;
                 try {
-                    const data = await TransportAdService.getAllAds();
-
-                    setAds(
-                        data.map((ad) => ({
-                            ad, // оригинальное объявление
-                            isInReviewAds: false, // по умолчанию не в "Вариантах". Позже пропишем проверку, когда сделаем коллекции
-                        }))
-                    );
-                } catch (err) {
-                    setError(err.message);
-                } finally {
-                    setLoading(false);
+                    const adData = await TransportAdService.getAdById(sid);
+                    if (adData) {
+                        result.push({ ad: adData, isInReviewAds: true });
+                    }
+                } catch (e) {
+                    console.warn('Не удалось получить объявление по id:', sid, e);
                 }
-            };
+            }
+            return result;
+        },
+        []
+    );
 
-            fetchAds();
+    // Пересчитывает reviewAds на основе текущих ads и массива reviewIds
+    const rebuildReviewAdsFrom = useCallback(
+        async (reviewIds) => {
+            const inAds = (Array.isArray(ads) ? ads : []).filter((x) =>
+                reviewIds.includes(String(x?.ad?.adId))
+            );
+            const completed = await fetchMissingReviewAds(reviewIds, inAds);
+            setReviewAds(completed);
+        },
+        [ads, fetchMissingReviewAds]
+    );
+
+    // ===================== Стартовая загрузка =====================
+
+    // 1) «Гостевой» фид: если нет авторизации — просто грузим все объявления без вариантов
+    useEffect(() => {
+        const noAuth =
+            !localStorage.getItem('authToken') && !localStorage.getItem('authEmail');
+
+        if (!noAuth) return;
+
+        let cancelled = false;
+
+        (async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const data = await TransportAdService.getAllAds();
+                if (cancelled) return;
+                setAds(
+                    (Array.isArray(data) ? data : []).map((ad) => ({
+                        ad,
+                        isInReviewAds: false,
+                    }))
+                );
+                setReviewAds([]); // для гостей пусто
+            } catch (e) {
+                if (!cancelled) setError(e?.message || String(e));
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    // 2) Авторизованный сценарий: ждём профиль и грузим и фид, и избранные
+    useEffect(() => {
+        const hasAuth =
+            localStorage.getItem('authToken') || localStorage.getItem('authEmail');
+        if (!hasAuth) return;
+        if (!isUserLoaded) return; // ждём профиль
+
+        let cancelled = false;
+
+        (async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const [allAds, reviewIdsRaw] = await Promise.all([
+                    TransportAdService.getAllAds(),
+                    // ВАЖНО: сервис возвращает МАССИВ adId
+                    UserReviewAdService.getUserReviewAds(authUserId, 'transport'),
+                ]);
+
+                const reviewIds = Array.isArray(reviewIdsRaw) ? reviewIdsRaw : [];
+                if (cancelled) return;
+
+                // размечаем общий фид
+                const extended = extendPlainAds(allAds, reviewIds);
+                setAds(extended);
+
+                // собираем полную «корзину вариантов»
+                const inReview = extended.filter((x) =>
+                    reviewIds.includes(String(x.ad.adId))
+                );
+                const completed = await fetchMissingReviewAds(reviewIds, inReview);
+                if (cancelled) return;
+                setReviewAds(completed);
+            } catch (e) {
+                if (!cancelled) setError(e?.message || String(e));
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [
+        authUserId,
+        isUserLoaded,
+        extendPlainAds,
+        fetchMissingReviewAds,
+    ]);
+
+    // ===================== API: CRUD объявлений =====================
+
+    const addAd = useCallback(async (adData) => {
+        try {
+            // допускаем как plain ad, так и уже расширенный объект
+            const isExt = isExtendedAd(adData);
+            const toSave = isExt ? adData.ad : adData;
+            const created = await TransportAdService.createAd(toSave);
+
+            const createdExt = { ad: created, isInReviewAds: false };
+            setAds((prev) => [...prev, createdExt]);
+            return true;
+        } catch (err) {
+            setError(err?.message || String(err));
+            return false;
         }
     }, []);
 
-    // Прямая выгрузка в объявление без расширения
-    // useEffect(() => {
-    //     const fetchAds = async () => {
-    //         setLoading(true);
+    const getAdById = useCallback(
+        (adId) => (Array.isArray(ads) ? ads : []).find((x) => x?.ad?.adId === adId),
+        [ads]
+    );
 
-    //         try {
-    //             const data = await TransportAdService.getAllAds();
+    const updateAd = useCallback(async (adId, patch) => {
+        // при необходимости допиши
+        console.warn('updateAd не реализован');
+    }, []);
 
-    //             setAds(data);
-    //         } catch (err) {
-    //             setError(err.message);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+    const deleteAd = useCallback(async (adId) => {
+        // при необходимости допиши
+        console.warn('deleteAd не реализован');
+    }, []);
 
-    //     fetchAds();
-    // }, []);
+    // ===================== API: Работа с «Вариантами» =====================
 
-    // выгрузка из тестового файла --->>>
-    // useEffect(() => {
-    //     const loadAds = async () => {
-    //         try {
-    //             const adsData = await TransportAdService.getTestAds(); // Получаем данные из сервиса
-    //             setAds(adsData);
-    //         } catch (err) {
-    //             setError(err);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     loadAds();
-    // }, []);
-    //<<<---
-
-    // Функции для добавления, обновления и удаления объявлений/ возвращаем положительно
-    const addAd = async (adData) => {
-        try {
-            const isAdsStructure = (adData) => {
-                const requiredKeys = ['isInReviewAds'];
-                return requiredKeys.every((key) => adData[key] !== undefined);
-            };
-
-            if (isAdsStructure(adData)) {
-                const newAd = await TransportAdService.createAd(adData.ad);
-
-                setAds((prevAds) => [...prevAds, newAd]);
-            } else {
-                const newAd = await TransportAdService.createAd(adData);
-
-                setAds((prevAds) => [
-                    ...prevAds,
-                    { ad: newAd, isInReviewAds: false },
-                ]);
+    const loadReviewAds = useCallback(
+        async (userIdOverride) => {
+            const uid = userIdOverride || authUserId;
+            if (!uid) {
+                setReviewAds([]);
+                return;
             }
+            try {
+                const reviewIds = await UserReviewAdService.getUserReviewAds(
+                    uid,
+                    'transport'
+                );
+                await rebuildReviewAdsFrom(
+                    (Array.isArray(reviewIds) ? reviewIds : []).map(String)
+                );
 
-            return true;
-        } catch (err) {
-            setError(err.message);
-
-            return false;
-        }
-    };
-
-    // Метод для поиска объявления по ID
-    const getAdById = (adId) => {
-        return ads.find((ad) => ad.ad.adId === adId);
-    };
-
-    const updateAd = async (adId, updatedData) => {
-        // Реализуйте логику обновления
-    };
-
-    const deleteAd = async (adId) => {
-        // Реализуйте логику удаления
-    };
-
-    //ReviewAds methods --->>>
-    const loadReviewAds = async (userId) => {
-        const ads = await UserReviewAdService.getUserReviewAds(userId, 'transport');
-        setReviewAds(ads);
-    };
-
-    const addReviewAd = async (extAd) => {
-        try {
-            // Проверяем, есть ли уже объявление в списке
-            if (!reviewAds.some((ad) => ad.ad.adId === extAd.ad.adId)) {
-                extAd.isInReviewAds = true;
-
-                setReviewAds((prev) => [...prev, extAd]);
-
-                // Обновляем данные в Firebase для текущего пользователя
-                const adId = extAd.ad.adId;
-
-                await UserReviewAdService.addReviewAd(userId, adId, 'transport');
+                // Также обновим флажки в основном фиде
+                setAds((prev) => {
+                    const setIds = new Set(
+                        (Array.isArray(reviewIds) ? reviewIds : []).map(String)
+                    );
+                    return (Array.isArray(prev) ? prev : []).map((x) => ({
+                        ...x,
+                        isInReviewAds: setIds.has(String(x?.ad?.adId)),
+                    }));
+                });
+            } catch (e) {
+                console.error('loadReviewAds error:', e);
             }
-        } catch (err) {
-            setError(err.message);
-        }
-    };
+        },
+        [authUserId, rebuildReviewAdsFrom]
+    );
 
-    const removeReviewAd = async (extAd) => {
-        try {
-            extAd.isInReviewAds = false;
+    const addReviewAd = useCallback(
+        async (extAd) => {
+            // API для совместимости (ожидает расширенный объект)
+            const adId = String(extAd?.ad?.adId);
+            if (!authUserId || !adId) return;
 
+            // оптимистично: ставим флаг в фиде
+            setAds((prev) =>
+                (Array.isArray(prev) ? prev : []).map((x) =>
+                    String(x?.ad?.adId) === adId ? { ...x, isInReviewAds: true } : x
+                )
+            );
+
+            // и добавляем в список «вариантов», если его там ещё нет
+            setReviewAds((prev) => {
+                const exists = (Array.isArray(prev) ? prev : []).some(
+                    (x) => String(x?.ad?.adId) === adId
+                );
+                if (exists) return prev;
+                return [...(prev || []), { ad: extAd.ad, isInReviewAds: true }];
+            });
+
+            try {
+                await UserReviewAdService.addReviewAd(authUserId, adId, 'transport');
+            } catch (e) {
+                // откат при ошибке
+                setAds((prev) =>
+                    (Array.isArray(prev) ? prev : []).map((x) =>
+                        String(x?.ad?.adId) === adId ? { ...x, isInReviewAds: false } : x
+                    )
+                );
+                setReviewAds((prev) =>
+                    (Array.isArray(prev) ? prev : []).filter(
+                        (x) => String(x?.ad?.adId) !== adId
+                    )
+                );
+                setError(e?.message || String(e));
+            }
+        },
+        [authUserId]
+    );
+
+    const removeReviewAd = useCallback(
+        async (extAd) => {
+            const adId = String(extAd?.ad?.adId);
+            if (!authUserId || !adId) return;
+
+            // оптимистично: снимаем флаг и убираем из списка
+            setAds((prev) =>
+                (Array.isArray(prev) ? prev : []).map((x) =>
+                    String(x?.ad?.adId) === adId ? { ...x, isInReviewAds: false } : x
+                )
+            );
             setReviewAds((prev) =>
-                prev.filter((ad) => ad.ad.adId !== extAd.ad.adId)
+                (Array.isArray(prev) ? prev : []).filter(
+                    (x) => String(x?.ad?.adId) !== adId
+                )
             );
 
-            const adId = extAd.ad.adId;
+            try {
+                await UserReviewAdService.removeReviewAd(authUserId, adId, 'transport');
+            } catch (e) {
+                // откат
+                setAds((prev) =>
+                    (Array.isArray(prev) ? prev : []).map((x) =>
+                        String(x?.ad?.adId) === adId ? { ...x, isInReviewAds: true } : x
+                    )
+                );
+                setReviewAds((prev) => [...(prev || []), { ad: extAd.ad, isInReviewAds: true }]);
+                setError(e?.message || String(e));
+            }
+        },
+        [authUserId]
+    );
 
-            await UserReviewAdService.removeReviewAd(userId, adId, 'transport');
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-    //<<<---
+    // Вспомогалки для UI: можно ли быстро подсветить сердечко/кнопку
+    const isReviewed = useCallback(
+        (adId) =>
+            (Array.isArray(reviewAds) ? reviewAds : []).some(
+                (x) => String(x?.ad?.adId) === String(adId)
+            ),
+        [reviewAds]
+    );
 
-    //Метод работы с загрузкой фото группой--->>>
+    // ===================== Поиск по владельцу =====================
+
+    const getAdsByUserId = useCallback(
+        async (ownerId, opts = {}) => {
+            const { forceDb = false } = opts;
+            if (!ownerId) return [];
+
+            const hasLocal = Array.isArray(ads) && ads.length > 0;
+            if (!forceDb && hasLocal && ads.length <= OWNER_FILTER_THRESHOLD) {
+                return ads.filter(
+                    (x) => (x?.ad?.ownerId ?? x?.ownerId) === String(ownerId)
+                );
+            }
+
+            // быстрый путь из БД по индексу ownerId
+            const plain = await TransportAdService.getAdsByOwner(ownerId);
+            // разметим по текущим reviewAds
+            const reviewIds = (Array.isArray(reviewAds) ? reviewAds : []).map(
+                (x) => String(x?.ad?.adId)
+            );
+            return extendPlainAds(plain, reviewIds);
+        },
+        [ads, reviewAds, extendPlainAds]
+    );
+
+    // ===================== Фото-пакет (как было) =====================
+
     const [photos, setPhotos] = useState([]);
-
-    const uploadPhotos = async (selectedPhotos) => {
+    const uploadPhotos = useCallback(async (selectedPhotos) => {
         try {
-            const uploadedPhotoUrls = await TransportAdService.uploadPhotoSet(
-                selectedPhotos
-            );
-            setPhotos((prevPhotos) => [...prevPhotos, ...uploadedPhotoUrls]);
-        } catch (error) {
-            console.error('Ошибка при загрузке фото:', error);
+            const uploaded = await TransportAdService.uploadPhotoSet(selectedPhotos);
+            setPhotos((prev) => [...prev, ...(uploaded || [])]);
+        } catch (e) {
+            console.error('Ошибка при загрузке фото:', e);
         }
-    };
+    }, []);
 
-    //<<<---
+    // ===================== value =====================
 
-    // вспомогалка: превращаем plain-объявления в “расширенные”
-    const extendPlainAds = (plainAds) => {
-        // reviewAds — у вас это массив расширенных { ad, isInReviewAds }
-        const reviewSet = new Set(reviewAds.map(x => x.ad?.adId));
-        return plainAds.map(ad => ({
-            ad, // кладём как { ad, isInReviewAds }
-            isInReviewAds: reviewSet.has(ad.adId),
-        }));
-    };
+    const value = useMemo(
+        () => ({
+            ads,
+            loading,
+            error,
 
-    /**
-     * “Умный” метод: вернуть объявления по ownerId.
-     * Если локально мало данных — фильтруем `ads`.
-     * Если данных много или адов нет — берём напрямую из БД (индекс ownerId).
-     * @param {string} ownerId
-     * @param {{forceDb?: boolean}} opts
-     * @returns {Promise<Array<{ad: any, isInReviewAds: boolean}>>}
-     */
-    const getAdsByUserId = async (ownerId, opts = {}) => {
-        const { forceDb = false } = opts;
-        if (!ownerId) return [];
+            addAd,
+            getAdById,
+            getById: getAdById, // алиас
 
-        // если уже что-то загружено и данных немного — фильтруем в памяти
-        const hasLocal = Array.isArray(ads) && ads.length > 0;
-        if (!forceDb && hasLocal && ads.length <= OWNER_FILTER_THRESHOLD) {
-            return ads.filter(x => (x?.ad?.ownerId ?? x?.ownerId) === ownerId);
-        }
+            updateAd,
+            deleteAd,
 
-        // иначе — быстрый путь из БД по индексу
-        const plain = await TransportAdService.getAdsByOwner(ownerId);
-        return extendPlainAds(plain);
-    };
+            // избранные/варианты
+            reviewAds,
+            loadReviewAds,
+            addReviewAd,
+            removeReviewAd,
+            isReviewed,
+
+            photos,
+            uploadPhotos,
+
+            getAdsByUserId,
+        }),
+        [
+            ads,
+            loading,
+            error,
+            addAd,
+            getAdById,
+            updateAd,
+            deleteAd,
+            reviewAds,
+            loadReviewAds,
+            addReviewAd,
+            removeReviewAd,
+            isReviewed,
+            photos,
+            uploadPhotos,
+            getAdsByUserId,
+        ]
+    );
 
     return (
-        <TransportAdContext.Provider
-            value={{
-                ads,
-                loading,
-                error,
-                addAd,
-                getAdById,
-                getById: getAdById,
-
-                updateAd,
-                deleteAd,
-
-                reviewAds,
-                loadReviewAds,
-                addReviewAd,
-                removeReviewAd,
-
-                photos,
-                uploadPhotos,
-
-                getAdsByUserId,
-            }}
-        >
+        <TransportAdContext.Provider value={value}>
             {children}
         </TransportAdContext.Provider>
     );
 };
 
-// Экспортируем контекст
-export const useTransportAdContext = () => {
-    return useContext(TransportAdContext);
-};
+export const useTransportAdContext = () => useContext(TransportAdContext);
 
 export default TransportAdContext;
