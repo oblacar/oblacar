@@ -66,33 +66,6 @@ const TransportAdItem = ({
     //добавление фото прямо из списка объявлений:
     const [onReviewAdsAdd, setOnReviewAdsAdd] = useState(false);
 
-    //блок для редактирования фото объявления из списка представления-->>
-    // const { user } = useContext(AuthContext);
-    // const [selectedPhoto, setSelectedPhoto] = useState(null);
-
-    // const handleFileChange = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //         const reader = new FileReader();
-    //         reader.onloadend = () => {
-    //             setSelectedPhoto(reader.result);
-    //             // Здесь можно также обновить состояние контекста или родительского компонента
-    //             // updateFormData({ truckPhotoUrl: reader.result });
-    //         };
-
-    //         reader.readAsDataURL(file);
-
-    //         ad.truckPhotoUrl = file; // Прямое изменение объекта, вы можете использовать метод, если он у вас есть
-
-    //         console.log(ad);
-    //     }
-    // };
-
-    // const handleClick = () => {
-    //     document.getElementById(`fileInput-${adId}`).click(); // Программный клик по скрытому инпуту
-    // };
-    //<----
-
     useEffect(() => {
         if (truckWidth && truckHeight && truckDepth) {
             const tempWidth = Number(truckWidth);

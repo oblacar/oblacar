@@ -68,7 +68,7 @@ const CargoAdsList = ({
         <div className="cargo-ads-list__column">
           {data.map((ad) => {
             const key = ad.adId || `${ad.departureCity}-${ad.destinationCity}-${ad.createdAt}`;
-            const card = <CargoAdItem ad={ad} />;
+            const card = <CargoAdItem ad={ad} ableHover = {true} isActive = {true} />;
 
             return (
               <div className="cargo-ads-list__item" key={key}>
