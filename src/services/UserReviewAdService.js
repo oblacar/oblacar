@@ -12,7 +12,7 @@ const PATH = (userId, adType) => `userReviewAds/${userId}/${adType}`;
  * @param {'transport'|'cargo'} [adType='transport']
  */
 const addReviewAd = async (userId, adId, adType = 'transport') => {
-    if (!userId || !adId) throw new Error('addReviewAd: userId, adId и adType обязательны');
+    if (!userId || !adId) throw new Error('addReviewAd: userId, adId иобязательны');
     const nodeRef = ref(db, PATH(userId, adType));
     await update(nodeRef, { [adId]: true });
 };

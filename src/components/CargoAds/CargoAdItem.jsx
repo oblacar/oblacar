@@ -1,6 +1,8 @@
 // src/components/CargoAds/CargoAdItem.jsx
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext, useState, useCallback } from 'react';
 import CargoBadgesRow from './icons/CargoBadgesRow';
+import CargoAdsContext from '../../hooks/CargoAdsContext';
+import ToggleIconButtonPlus from '../common/ToggleIconButtonPlus/ToggleIconButtonPlus'; // если нужно — проверь путь
 import './CargoAdItem.css';
 
 /**
@@ -24,8 +26,95 @@ const CargoAdItem = ({
         route = {},
         cargo = {},
         loadingTypes,
-        price = {}, // если в data есть price-объект — он сюда попадёт
+        price = {},
     } = data || {};
+
+    // === CONTEXT: работа с "Вариантами" (review) ===
+    const { addReviewAd, removeReviewAd, reviewAds, isReviewed } =
+        useContext(CargoAdsContext) || {};
+
+    // объявление может быть уже "расширенным"
+    const isExtended = ad && typeof ad.isInReviewAds === 'boolean' && ad.ad;
+    const extAd = isExtended ? ad : { ad: data, isInReviewAds: false };
+
+    // определяем, находится ли объявление в "Вариантах"
+    const isInReviewFromAd = isExtended ? Boolean(ad.isInReviewAds) : false;
+    const isInReviewFromCtx = useMemo(() => {
+        if (!Array.isArray(reviewAds)) return false;
+        const set = new Set(reviewAds.map((x) => x?.ad?.adId));
+        return set.has(adId);
+    }, [reviewAds, adId]);
+
+    const isInReview = isInReviewFromAd || isInReviewFromCtx;
+
+    // локальная подсветка кнопки (как у тебя в транспортном итеме)
+    const [isSelectedAdItem, setIsSelectedAdItem] = useState(isInReview);
+
+    // hover на самом тоггле — чтобы можно было визуально отключать кликабельность карточки, если используете такой класс
+    const [onReviewAdsAdd, setOnReviewAdsAdd] = useState(false);
+
+    // id объявления
+    const adKey = String(data?.adId ?? adId ?? data?.id ?? '');
+
+    // уже в отобранных?
+    const isInReviewAds = isReviewed ? isReviewed(adKey) : false;
+
+    // hover-обработчики для тоггла (как в транспорте)
+    const handleMouseEnterReviewAdsAdd = () => setOnReviewAdsAdd(true);
+    const handleMouseLeaveReviewAdsAdd = () => setOnReviewAdsAdd(false);
+
+    // обработчик тоггла
+    const handleToggle = useCallback((willBeAdded) => {
+        if (!adKey) return;
+        if (willBeAdded) {
+            addReviewAd?.(adKey);
+        } else {
+            removeReviewAd?.(adKey);
+        }
+    }, [adKey, addReviewAd, removeReviewAd]);
+
+    // «щит» от навигации: гасим события
+    const stopNav = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    // const handleToggle = useCallback(
+    //     async (nextAdded) => {
+    //         try {
+    //             // синхронизируем локальную подсветку мгновенно
+    //             setIsSelectedAdItem(Boolean(nextAdded));
+
+    //             if (nextAdded) {
+    //                 // добавить в "Варианты"
+    //                 if (typeof addReviewAd === 'function') {
+    //                     await addReviewAd(extAd);
+    //                 }
+    //             } else {
+    //                 // удалить из "Вариантов"
+    //                 if (typeof removeReviewAd === 'function') {
+    //                     await removeReviewAd(extAd);
+    //                 }
+    //             }
+    //         } catch (e) {
+    //             console.error('Review toggle error:', e);
+    //             // на всякий случай откатим локальную подсветку
+    //             setIsSelectedAdItem(isInReview);
+    //         }
+    //     },
+    //     [addReviewAd, removeReviewAd, extAd, isInReview]
+    // );
+
+    // const handleMouseEnterReviewAdsAdd = useCallback(() => {
+    //     // можно показать превью-состояние; пока просто не делаем ничего
+    // }, []);
+
+    // const handleMouseLeaveReviewAdsAdd = useCallback(() => {
+    //     // вернуть к фактическому состоянию из контекста
+    //     setIsSelectedAdItem(isInReview);
+    // }, [isInReview]);
+
+    // === остальная разметка ===
 
     // дата создания
     const created = createdAt || date || null;
@@ -48,24 +137,13 @@ const CargoAdItem = ({
 
     // даты перевозки
     const pickup =
-        data?.availabilityFrom ??
-        data?.pickupDate ??
-        data?.dates?.pickupDate ??
-        null;
+        data?.availabilityFrom ?? data?.pickupDate ?? data?.dates?.pickupDate ?? null;
 
     const delivery =
-        data?.availabilityTo ??
-        data?.deliveryDate ??
-        data?.dates?.deliveryDate ??
-        null;
+        data?.availabilityTo ?? data?.deliveryDate ?? data?.dates?.deliveryDate ?? null;
 
     // груз
-    const cargoName =
-        data?.title ??
-        cargo?.name ??
-        data?.cargoName ??
-        '—';
-
+    const cargoName = data?.title ?? cargo?.name ?? data?.cargoName ?? '—';
     const cargoType = cargo?.type ?? data?.cargoType ?? '';
 
     const weight =
@@ -77,11 +155,24 @@ const CargoAdItem = ({
         data?.weight ??
         null;
 
-    const dims = cargo?.dims || {
-        h: cargo?.h ?? data?.cargoHeight ?? data?.dimensionsMeters?.height ?? data?.truckHeight,
-        w: cargo?.w ?? data?.cargoWidth ?? data?.dimensionsMeters?.width ?? data?.truckWidth,
-        d: cargo?.d ?? data?.cargoDepth ?? data?.dimensionsMeters?.depth ?? data?.truckDepth,
-    };
+    const dims =
+        cargo?.dims || {
+            h:
+                cargo?.h ??
+                data?.cargoHeight ??
+                data?.dimensionsMeters?.height ??
+                data?.truckHeight,
+            w:
+                cargo?.w ??
+                data?.cargoWidth ??
+                data?.dimensionsMeters?.width ??
+                data?.truckWidth,
+            d:
+                cargo?.d ??
+                data?.cargoDepth ??
+                data?.dimensionsMeters?.depth ??
+                data?.truckDepth,
+        };
 
     const tagsLoading = useMemo(
         () => normalizeLoadingTypes(loadingTypes ?? data?.loadingTypes),
@@ -96,48 +187,46 @@ const CargoAdItem = ({
     const fragile = Boolean(cargo?.fragile ?? data?.fragile);
     const isStackable = Boolean(data?.isStackable ?? cargo?.isStackable);
 
-    // цена (price может быть объектом либо плоским значением в data.price)
+    // цена
     const priceValue = isFiniteNumber(price?.value) ? price.value : data?.price;
     const priceUnit = price?.unit ?? data?.paymentUnit ?? 'руб';
     const bargain = Boolean(price?.readyToNegotiate ?? data?.readyToNegotiate);
 
-    // владелец — без небезопасных обращений
+    // владелец
     const ownerRaw = data?.owner || {};
     const owner = {
         id: data?.ownerId ?? ownerRaw?.id ?? null,
-        name:
-            data?.ownerName ??
-            data?.userName ??
-            ownerRaw?.name ??
-            'Без имени',
-        // фото в data может называться по-разному, поддержим оба
+        name: data?.ownerName ?? data?.userName ?? ownerRaw?.name ?? 'Без имени',
         photoUrl:
             ownerRaw?.photoUrl ??
             data?.ownerPhotoUrl ??
             data?.ownerAvatar ??
             data?.avatarUrl ??
             null,
-        rating:
-            isFiniteNumber(ownerRaw?.rating) ? Number(ownerRaw.rating)
-                : isFiniteNumber(data?.ownerRating) ? Number(data.ownerRating)
-                    : isFiniteNumber(data?.rating) ? Number(data.rating)
-                        : null,
+        rating: isFiniteNumber(ownerRaw?.rating)
+            ? Number(ownerRaw.rating)
+            : isFiniteNumber(data?.ownerRating)
+                ? Number(data.ownerRating)
+                : isFiniteNumber(data?.rating)
+                    ? Number(data.rating)
+                    : null,
     };
 
     const ownerName = owner.name;
     const ownerAvatar = owner.photoUrl;
     const ownerRating = owner.rating;
 
-    const rootClass = [
-        'cargo-card',
-        className,
-        !ableHover ? 'cargo-card--nohover' : '',
-    ]
+    const rootClass = ['cargo-card', className, !ableHover ? 'cargo-card--nohover' : '']
         .filter(Boolean)
         .join(' ');
 
     return (
-        <div className={rootClass}>
+        <div
+            className={rootClass}
+            onMouseEnter={() => setIsSelectedAdItem(true)}
+            onMouseLeave={() => setIsSelectedAdItem(false)}
+        >
+
             {/* ВЕРХ: 2 колонки — слева контент, справа даты+цена */}
             <div className="cargo-card__head">
                 {/* ЛЕВЫЙ СТОЛБЕЦ */}
@@ -215,9 +304,7 @@ const CargoAdItem = ({
                     <div className="cargo-card__price">
                         {isFiniteNumber(priceValue) ? (
                             <>
-                                <div className="cargo-card__price-value">
-                                    {fmtPrice(priceValue)}
-                                </div>
+                                <div className="cargo-card__price-value">{fmtPrice(priceValue)}</div>
                                 <div className="cargo-card__price-unit">{priceUnit}</div>
                             </>
                         ) : (
@@ -262,22 +349,31 @@ const CargoAdItem = ({
 
                 <div className="cargo-card__foot-right">
                     {isActive ? (
-                        // TODO: вернуть иконку-добавление в «Варианты», когда будут переданы
-                        // onToggle/isInReviewAds/и т.п. Сейчас безопасный плейсхолдер:
-                        <button
-                            type="button"
-                            className={`cargo-card__icon-btn ${isViewMode ? 'view-mode' : ''}`}
-                            title="Действие"
-                            aria-label="Действие"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                // заглушка
-                            }}
-                        >
-                            +
-                        </button>
+                        <div className={`container-icon-add-review-cargo-ad ${isViewMode ? 'view-mode' : ''}`}>
+                            <div
+                                onMouseEnter={handleMouseEnterReviewAdsAdd}
+                                onMouseLeave={handleMouseLeaveReviewAdsAdd}
+
+                                // ГАСИМ СОБЫТИЯ, чтобы клик по тогглу не «пробивал» до карточки/Link
+                                onMouseDown={stopNav}
+                                onClick={stopNav}
+                                onTouchStart={stopNav}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') stopNav(e);
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                aria-label="Добавить в варианты"
+                            >
+                                <ToggleIconButtonPlus
+                                    onToggle={handleToggle}
+                                    initialAdded={isInReviewAds}
+                                    isColored={isSelectedAdItem}
+                                />
+                            </div>
+                        </div>
                     ) : null}
+
                 </div>
             </div>
         </div>
