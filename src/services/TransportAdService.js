@@ -340,59 +340,59 @@ const TransportAdService = {
     //<<<----------------
 
     //ReviewAds methods--->>>
-    addReviewAd: async (userId, adId) => {
-        const userReviewAdsRef = databaseRef(
-            db,
-            `userReviewAds/${userId}/reviewAds`
-        );
+    // addReviewAd: async (userId, adId) => {
+    //     const userReviewAdsRef = databaseRef(
+    //         db,
+    //         `userReviewAds/${userId}/reviewAds`
+    //     );
 
-        await userReviewAdsRef.transaction((currentAds) => {
-            if (currentAds) {
-                // Если объявления уже есть, добавляем новый adId
-                if (!currentAds.includes(adId)) {
-                    return [...currentAds, adId];
-                }
-            } else {
-                // Если нет, создаем новый массив
-                return [adId];
-            }
-            return currentAds;
-        });
-    },
+    //     await userReviewAdsRef.transaction((currentAds) => {
+    //         if (currentAds) {
+    //             // Если объявления уже есть, добавляем новый adId
+    //             if (!currentAds.includes(adId)) {
+    //                 return [...currentAds, adId];
+    //             }
+    //         } else {
+    //             // Если нет, создаем новый массив
+    //             return [adId];
+    //         }
+    //         return currentAds;
+    //     });
+    // },
 
-    removeReviewAd: async (userId, adId) => {
-        const userReviewAdsRef = databaseRef(
-            db,
-            `userReviewAds/${userId}/reviewAds`
-        );
+    // removeReviewAd: async (userId, adId) => {
+    //     const userReviewAdsRef = databaseRef(
+    //         db,
+    //         `userReviewAds/${userId}/reviewAds`
+    //     );
 
-        await userReviewAdsRef.transaction((currentAds) => {
-            if (currentAds) {
-                // Удаляем adId из массива
-                return currentAds.filter((id) => id !== adId);
-            }
-            return [];
-        });
-    },
+    //     await userReviewAdsRef.transaction((currentAds) => {
+    //         if (currentAds) {
+    //             // Удаляем adId из массива
+    //             return currentAds.filter((id) => id !== adId);
+    //         }
+    //         return [];
+    //     });
+    // },
 
-    getReviewAds: async (userId) => {
-        try {
-            const reviewAdsRef = databaseRef(
-                db,
-                `userReviewAds/${userId}/reviewAds`
-            ); // Обращаемся к нужному пути
+    // getReviewAds: async (userId) => {
+    //     try {
+    //         const reviewAdsRef = databaseRef(
+    //             db,
+    //             `userReviewAds/${userId}/reviewAds`
+    //         ); // Обращаемся к нужному пути
 
-            const snapshot = await get(reviewAdsRef);
-            if (snapshot.exists()) {
-                return snapshot.val(); // Вернет массив ID объявлений из базы
-            } else {
-                return []; // Если данных нет, возвращаем пустой массив
-            }
-        } catch (error) {
-            console.error('Ошибка при получении userReviewAds:', error);
-            throw error;
-        }
-    },
+    //         const snapshot = await get(reviewAdsRef);
+    //         if (snapshot.exists()) {
+    //             return snapshot.val(); // Вернет массив ID объявлений из базы
+    //         } else {
+    //             return []; // Если данных нет, возвращаем пустой массив
+    //         }
+    //     } catch (error) {
+    //         console.error('Ошибка при получении userReviewAds:', error);
+    //         throw error;
+    //     }
+    // },
     //<<<---
 
     //Метод для загрузки фото группой, возвращает массив ссылок, которые будет передавать объекту--->>>

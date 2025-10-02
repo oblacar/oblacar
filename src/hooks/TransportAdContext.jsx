@@ -134,9 +134,10 @@ export const TransportAdProvider = ({ children }) => {
 
             try {
                 // Загружаем reviewAds и сохраняем
-                const initialReviewAds = await TransportAdService.getReviewAds(
-                    userId
-                );
+                // const initialReviewAds = await TransportAdService.getReviewAds(
+                //     userId
+                // );
+                const initialReviewAds = await UserReviewAdService.getUserReviewAds(userId, 'transport');
 
                 // Преобразуем initialReviewAds в массив ключей
                 const reviewAdsArray = initialReviewAds
@@ -287,7 +288,7 @@ export const TransportAdProvider = ({ children }) => {
 
     //ReviewAds methods --->>>
     const loadReviewAds = async (userId) => {
-        const ads = await UserReviewAdService.getUserReviewAds(userId);
+        const ads = await UserReviewAdService.getUserReviewAds(userId, 'transport');
         setReviewAds(ads);
     };
 
@@ -302,7 +303,7 @@ export const TransportAdProvider = ({ children }) => {
                 // Обновляем данные в Firebase для текущего пользователя
                 const adId = extAd.ad.adId;
 
-                await UserReviewAdService.addReviewAd(userId, adId);
+                await UserReviewAdService.addReviewAd(userId, adId, 'transport');
             }
         } catch (err) {
             setError(err.message);
@@ -319,7 +320,7 @@ export const TransportAdProvider = ({ children }) => {
 
             const adId = extAd.ad.adId;
 
-            await UserReviewAdService.removeReviewAd(userId, adId);
+            await UserReviewAdService.removeReviewAd(userId, adId, 'transport');
         } catch (err) {
             setError(err.message);
         }
