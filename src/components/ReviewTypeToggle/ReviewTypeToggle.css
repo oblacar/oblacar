@@ -1,0 +1,64 @@
+/* src/components/ReviewTypeToggle/ReviewTypeToggle.css */
+.rtt {
+    display: inline-block;
+}
+
+.rtt-track {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    width: 250px;
+    /* можно настроить */
+    height: 20px;
+    /* background: #f2f3f5; */
+    border-radius: 999px;
+    padding: 4px;
+    /* box-shadow: inset 0 1px 2px rgba(0, 0, 0, .06); */
+}
+
+.rtt-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    width: calc(50% - 4px);
+    border-radius: 999px;
+    background: rgb(255, 145, 0);
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, .12); */
+    transition: transform .18s ease-in-out;
+}
+
+.rtt-thumb.left {
+    transform: translateX(0%);
+}
+
+.rtt-thumb.right {
+    transform: translateX(100%);
+}
+
+.rtt-option {
+    position: relative;
+    z-index: 1;
+    border: 0;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(255, 145, 0);
+    /* gray-500 */
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.rtt-option.active {
+    color: #ffffff;
+    /* gray-900 */
+    font-weight: 400;
+}
+
+.rtt-option:focus-visible {
+    outline: 2px solid #3b82f6;
+    /* focus ring */
+    outline-offset: 2px;
+    border-radius: 10px;
+}

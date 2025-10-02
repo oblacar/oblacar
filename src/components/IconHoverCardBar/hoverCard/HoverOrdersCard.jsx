@@ -5,7 +5,7 @@ import './hoverCard.css'; // Создайте файл стилей HoverCard.cs
 // import AuthContext from '../../../hooks/Authorization/AuthContext';
 import UserContext from '../../../hooks/UserContext';
 
-import { PrevieReviewAdsList } from '../../ReviewAds/PreviewReviewAdsList';
+import PreviewReviewAdsList from '../../ReviewAds/PreviewReviewAdsList';
 
 export const HoverOrdersCard = ({
     isHoveredIcon,
@@ -26,9 +26,8 @@ export const HoverOrdersCard = ({
     };
     return (
         <div
-            className={`hover-card ${
-                isHoveredIcon || isHoveredCard ? 'visible' : ''
-            }`}
+            className={`hover-card ${isHoveredIcon || isHoveredCard ? 'visible' : ''
+                }`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             style={setTopLeftHover(iconCoordinates, windowWidth)}
@@ -36,7 +35,7 @@ export const HoverOrdersCard = ({
             <div className='hover-card-content '>
                 <p className='hover-card-title'>Варианты</p>
                 {isUserLoaded ? (
-                    <PrevieReviewAdsList />
+                    <PreviewReviewAdsList />
                 ) : (
                     <p>
                         Войдите в систему, что бы иметь возможность работать с
