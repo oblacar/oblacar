@@ -1,55 +1,49 @@
-// import { useContext } from 'react';
-// import TransportAdContext from '../../hooks/TransportAdContext';
-
-// import './PreviewReviewAdsList.css';
-// import ReviewAdItem from './ReviewAdItem';
-
-// export const PrevieReviewAdsList = () => {
-//     const { reviewAds, removeReviewAd } = useContext(TransportAdContext);
-
-//     return (
-//         <div className='preview-review-ads-list'>
-//             {reviewAds.length === 0 ? (
-//                 <span>Отмеченные объявления отсутсвуют.</span>
-//             ) : (
-//                 reviewAds.map((ad, index) => (
-//                     <div key={index}>
-//                         <ReviewAdItem
-//                             ad={ad}
-//                             removeReviewAd={removeReviewAd}
-//                             isActive={ad.ad.status === 'active'}
-//                         />
-//                     </div>
-//                 ))
-//             )}
-//         </div>
-//     );
-// };
-
 // src/components/PreviewReviewAdsList/PreviewReviewAdsPanel.jsx
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState, useCallback } from 'react';
 
 import TransportAdContext from '../../hooks/TransportAdContext';
 import CargoAdsContext from '../../hooks/CargoAdsContext';
 import ReviewTypeToggle from '../ReviewTypeToggle/ReviewTypeToggle';
-import ReviewAdItem from './ReviewAdItem'; // для транспорта
-import CargoAdItem from '../CargoAds/CargoAdItem'; // или свой компактный item
+import ReviewAdItem from './ReviewAdItem';
 import './PreviewReviewAdsList.css';
 
 const PreviewReviewAdsList = () => {
-    const { reviewAds: transportReviewAds, removeReviewAd: removeTransportReview } = useContext(TransportAdContext);
-    const { ads: cargoAds, reviewedIds: cargoReviewedIds, removeReviewAd: removeCargoReview } = useContext(CargoAdsContext);
+    const {
+        reviewAds: transportReviewAds,
+        removeReviewAd: removeTransportReview,
+    } = useContext(TransportAdContext);
 
-    // строим массив объявлений груза по отмеченным id
+    const {
+        ads: cargoAds,
+        reviewedIds: cargoReviewedIds,
+        removeReviewAd: removeCargoReview,
+    } = useContext(CargoAdsContext);
+
+    // соберём объекты объявлений груза по отмеченным id
     const cargoReviewAds = useMemo(() => {
         const ids = new Set((cargoReviewedIds || []).map(String));
-        return (cargoAds || []).filter(a => ids.has(String(a?.adId)));
+        return (cargoAds || []).filter((a) => ids.has(String(a?.adId)));
     }, [cargoAds, cargoReviewedIds]);
 
     const [tab, setTab] = useState('transport'); // 'transport' | 'cargo'
 
+    // единый обработчик удаления для карточки (ReviewAdItem зовёт removeReviewAd(ad, adType))
+    const handleRemove = useCallback(
+        (adOrData, adType) => {
+            if (adType === 'cargo') {
+                const id = String(adOrData?.adId ?? adOrData); // поддержим как объект, так и id
+                if (id) removeCargoReview(id);
+                return;
+            }
+            // transport путь — как раньше (передаём объект объявления)
+            removeTransportReview(adOrData);
+        },
+        [removeCargoReview, removeTransportReview]
+    );
+
     const isEmpty =
-        tab === 'transport' ? (transportReviewAds?.length ?? 0) === 0
+        tab === 'transport'
+            ? (transportReviewAds?.length ?? 0) === 0
             : (cargoReviewAds?.length ?? 0) === 0;
 
     return (
@@ -66,23 +60,21 @@ const PreviewReviewAdsList = () => {
                         <div key={ad?.ad?.adId || idx}>
                             <ReviewAdItem
                                 ad={ad}
-                                removeReviewAd={removeTransportReview}
+                                adType="transport"
                                 isActive={ad?.ad?.status === 'active'}
+                                removeReviewAd={handleRemove}
                             />
                         </div>
                     ))
                 ) : (
                     cargoReviewAds.map((ad, idx) => (
                         <div key={ad?.adId || idx}>
-                            {/* можно сделать компактный вариант карточки, здесь – базовый */}
-                            <CargoAdItem
+                            <ReviewAdItem
                                 ad={ad}
-                                isViewMode
+                                adType="cargo"
                                 isActive={ad?.status === 'active'}
+                                removeReviewAd={handleRemove}
                             />
-                            {/* Кнопку «убрать из выбранных» можно показать рядом:
-                  <button onClick={() => removeCargoReview(ad.adId)}>Убрать</button>
-              */}
                         </div>
                     ))
                 )}

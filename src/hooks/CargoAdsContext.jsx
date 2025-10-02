@@ -175,44 +175,74 @@ export const CargoAdsProvider = ({ children }) => {
 
   const addReviewAd = useCallback(
     async (adId) => {
-      const id = String(adId);
+      const id = String(adId ?? '');
       if (!id) return;
       if (!authUserId) {
         console.warn('[CargoAdsProvider] addReviewAd: no authUserId, skipped');
         return;
       }
-      await UserReviewAdService.addReviewAd(authUserId, id, 'cargo');
+
+      // оптимистично добавляем локально
       setReviewedIds((prev) => {
         const list = Array.isArray(prev) ? prev : [];
         return list.includes(id) ? list : [id, ...list];
       });
+
+      try {
+        await UserReviewAdService.addReviewAd(authUserId, id, 'cargo');
+      } catch (e) {
+        // откат локально
+        setReviewedIds((prev) =>
+          Array.isArray(prev) ? prev.filter((x) => x !== id) : []
+        );
+        setReviewError(e?.message || String(e));
+        throw e;
+      }
     },
     [authUserId]
   );
 
   const removeReviewAd = useCallback(
     async (adId) => {
-      const id = String(adId);
+      const id = String(adId ?? '');
       if (!id) return;
       if (!authUserId) {
         console.warn('[CargoAdsProvider] removeReviewAd: no authUserId, skipped');
         return;
       }
-      await UserReviewAdService.removeReviewAd(authUserId, id, 'cargo');
-      setReviewedIds((prev) => (Array.isArray(prev) ? prev.filter((x) => x !== id) : []));
+
+      // оптимистично удаляем локально
+      setReviewedIds((prev) =>
+        Array.isArray(prev) ? prev.filter((x) => x !== id) : []
+      );
+
+      try {
+        await UserReviewAdService.removeReviewAd(authUserId, id, 'cargo');
+      } catch (e) {
+        // откат локально (вернём id назад)
+        setReviewedIds((prev) => {
+          const list = Array.isArray(prev) ? prev : [];
+          return list.includes(id) ? list : [id, ...list];
+        });
+        setReviewError(e?.message || String(e));
+        throw e;
+      }
     },
     [authUserId]
   );
 
   const toggleReviewAd = useCallback(
     async (adId) => {
-      const id = String(adId);
+      const id = String(adId ?? '');
       if (!id || !authUserId) return;
-      const isAdded = reviewedIds.includes(id);
-      return isAdded ? removeReviewAd(id) : addReviewAd(id);
+      if (reviewedIds.includes(id)) {
+        return removeReviewAd(id);
+      }
+      return addReviewAd(id);
     },
     [authUserId, reviewedIds, addReviewAd, removeReviewAd]
   );
+
 
   const isReviewed = useCallback(
     (adId) => reviewedIds.includes(String(adId)),
