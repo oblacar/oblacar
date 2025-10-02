@@ -1,5 +1,6 @@
 import React from 'react';
 import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
+import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
 import { formatNumber } from '../../utils/helper';
 
 const OtherCargoAdDetails = ({ ad }) => {
@@ -53,9 +54,11 @@ const OtherCargoAdDetails = ({ ad }) => {
 
     return (
         <>
+            {/* <div className="other-ad-profile-truck-photo-area">
+                                <HorizontalPhotoCarousel photos={photos} />
+            </div> */}
             <div className="other-ad-profile-truck-photo-area">
-                {/* та же карусель для консистентности */}
-                <HorizontalPhotoCarousel photos={photos} />
+                <PhotoCarousel photos={photos} />
             </div>
 
             <div className="other-ad-profile-rout-date-price">

@@ -1,3 +1,4 @@
+// src/components/AdProfile/OtherAdProfile.jsx
 import React, { useContext, useEffect, useState } from 'react';
 import './OtherAdProfile.css';
 
@@ -19,6 +20,7 @@ import OtherCargoAdDetails from './OtherCargoAdDetails';
 import { FaEnvelope } from 'react-icons/fa';
 
 const OtherAdProfile = ({ adType, ad }) => {
+  // нормализуем вход: иногда приходит { ad: {...} }
   const data = ad?.ad && typeof ad.ad === 'object' ? ad.ad : ad;
 
   const { currentConversation, setCurrentConversationState, isConversationsLoaded } =
@@ -37,7 +39,7 @@ const OtherAdProfile = ({ adType, ad }) => {
   const [isModalBackShow, setIsModalBackShow] = useState(false);
   const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
-  // только для транспорта
+  // только для транспорта (панель «отправить запрос»)
   const [cargoDescription, setCargoDescription] = useState('');
   const [adRequestStatus, setAdRequestStatus] = useState('none');
   const [adTransportationRequest, setAdTransportationRequest] = useState(null);
@@ -48,26 +50,45 @@ const OtherAdProfile = ({ adType, ad }) => {
     if (data) setIsLoading(false);
   }, [data]);
 
-  const {
-    adId,
-    ownerId,
-    ownerName,
-    ownerPhotoUrl,
-    ownerRating,
+  // ===== НОРМАЛИЗАЦИЯ ПОЛЕЙ ПОД ОБЩИЙ ИНТЕРФЕЙС =====
+  // 1) владелец
+  const owner =
+    adType === 'cargo'
+      ? {
+        id: data?.owner?.id ?? data?.ownerId ?? null,
+        name: data?.owner?.name ?? data?.ownerName ?? 'Пользователь',
+        photoUrl: data?.owner?.photoUrl ?? data?.ownerPhotoUrl ?? '',
+        rating: data?.owner?.rating ?? data?.ownerRating ?? '',
+      }
+      : {
+        id: data?.ownerId ?? null,
+        name: data?.ownerName ?? 'Пользователь',
+        photoUrl: data?.ownerPhotoUrl ?? '',
+        rating: data?.ownerRating ?? '',
+      };
 
-    // транспорт
-    availabilityDate,
-    departureCity,
-    destinationCity,
-    price,
-    paymentUnit,
+  // 2) маршруты/даты/цены — разные названия в cargo/transport
+  const adId = data?.adId ?? null;
 
-    // груз
-    pickupDate,
-    deliveryDate,
-    title,
-  } = data || {};
+  const availabilityDate =
+    adType === 'transport' ? data?.availabilityDate ?? '' : data?.pickupDate ?? '';
 
+  const routeFrom =
+    adType === 'transport' ? data?.departureCity ?? '' : data?.departureCity ?? '';
+  const routeTo =
+    adType === 'transport' ? data?.destinationCity ?? '' : data?.destinationCity ?? '';
+
+  const price = data?.price ?? '';
+  const paymentUnit = data?.paymentUnit ?? '';
+
+  // для ChatBox заголовка у груза пригодится
+  const title = adType === 'cargo' ? data?.title ?? '' : '';
+
+  // (доп. поля, если нужны ниже)
+  const pickupDate = adType === 'cargo' ? data?.pickupDate ?? '' : '';
+  const deliveryDate = adType === 'cargo' ? data?.deliveryDate ?? '' : '';
+
+  // ===== СТАТУСЫ ЗАПРОСОВ (ТОЛЬКО ДЛЯ ТРАНСПОРТА) =====
   useEffect(() => {
     if (adType !== 'transport' || !adTransportationRequests || !adId) return;
     const atr = getAdTransportationRequestByAdId(adId);
@@ -83,11 +104,13 @@ const OtherAdProfile = ({ adType, ad }) => {
     setIsTransportationRequestSending(false);
   }, [adTransportationRequests, adType, adId, getAdTransportationRequestByAdId]);
 
+  // ===== ЧАТ ПРИВЯЗКА =====
   useEffect(() => {
     if (!isConversationsLoaded || !isChatBoxOpen || !data) return;
-    setCurrentConversationState(adId, user?.userId, ownerId);
+    // порядок: (adId, currentUserId, otherUserId)
+    setCurrentConversationState(adId, user?.userId, owner.id);
     setIsModalBackShow(false);
-  }, [isConversationsLoaded, isChatBoxOpen, adId, user?.userId, ownerId, setCurrentConversationState]);
+  }, [isConversationsLoaded, isChatBoxOpen, adId, user?.userId, owner.id, setCurrentConversationState]);
 
   useEffect(() => {
     setIsLoadingConversation(false);
@@ -97,17 +120,18 @@ const OtherAdProfile = ({ adType, ad }) => {
     return <div className="loading">Загрузка объявления...</div>;
   }
 
+  // ===== Обработчики (чат) =====
   const handleStartChat = () => {
     setIsLoadingConversation(true);
     setIsChatBoxOpen(true);
     if (!isConversationsLoaded) setIsModalBackShow(true);
   };
-
   const handleCloseModalBack = () => {
     setIsModalBackShow(false);
     setIsChatBoxOpen(false);
   };
 
+  // ===== Обработчики (заявка перевозчику — ТОЛЬКО ТРАНСПОРТ) =====
   const handleSendRequest = async () => {
     if (adType !== 'transport') return;
     if (!cargoDescription.trim()) return;
@@ -116,15 +140,15 @@ const OtherAdProfile = ({ adType, ad }) => {
 
     const adData = {
       adId,
-      locationFrom: departureCity,
-      locationTo: destinationCity,
+      locationFrom: routeFrom,
+      locationTo: routeTo,
       date: availabilityDate,
       price,
       paymentUnit,
       owner: {
-        id: ownerId,
-        name: ownerName,
-        photoUrl: ownerPhotoUrl,
+        id: owner.id,
+        name: owner.name,
+        photoUrl: owner.photoUrl,
         contact: '—',
       },
     };
@@ -152,30 +176,30 @@ const OtherAdProfile = ({ adType, ad }) => {
 
   const handleCancelRequest = async () => {
     try {
-      await cancelTransportationRequest(adId, user.userId, ownerId, requestId);
+      await cancelTransportationRequest(adId, user.userId, owner.id, requestId);
       setAdRequestStatus('cancelled');
     } catch (e) {
       console.error('Failed to cancel request:', e);
     }
   };
-
   const handleRestartRequest = async () => {
     try {
-      await restartTransportationRequest(adId, user.userId, ownerId, requestId);
+      await restartTransportationRequest(adId, user.userId, owner.id, requestId);
       setAdRequestStatus('none');
     } catch (e) {
       console.error('Failed to restart request:', e);
     }
   };
 
+  // какой блок описания слева
   const Details = adType === 'cargo' ? OtherCargoAdDetails : OtherTransportAdDetails;
 
   const RightPanel = () => (
     <div className="other-ad-profile-owner-data">
       <UserSmallCard
-        photoUrl={ownerPhotoUrl}
-        rating={ownerRating}
-        name={ownerName}
+        photoUrl={owner.photoUrl}
+        rating={owner.rating}
+        name={owner.name}
         onMessageClick={handleStartChat}
         isLoading={false}
       />
@@ -242,27 +266,27 @@ const OtherAdProfile = ({ adType, ad }) => {
               ? {
                 adId,
                 availabilityDate,
-                departureCity,
-                destinationCity,
+                departureCity: routeFrom,
+                destinationCity: routeTo,
                 priceAndPaymentUnit: formatNumber(String(price)) + ' ' + (paymentUnit || ''),
               }
               : {
                 adId,
                 availabilityDate: pickupDate,
-                departureCity,
-                destinationCity,
-                priceAndPaymentUnit: '',
+                departureCity: routeFrom,
+                destinationCity: routeTo,
+                priceAndPaymentUnit: '', // у груза пока без ставки
                 title: title || '',
               }
           }
-          chatPartnerName={ownerName}
-          chatPartnerPhoto={ownerPhotoUrl}
-          chatPartnerId={ownerId}
+          chatPartnerName={owner.name}
+          chatPartnerPhoto={owner.photoUrl}
+          chatPartnerId={owner.id}
         />
       )}
 
       {isModalBackShow && (
-        <ModalBackdrop children={<ConversationLoadingInfo />} onClose={handleCloseModalBack} />
+        <ModalBackdrop children={<ConversationLoadingInfo />} onClose={() => setIsModalBackShow(false)} />
       )}
     </>
   );
