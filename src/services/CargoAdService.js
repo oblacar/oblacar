@@ -13,28 +13,28 @@ import { db } from '../firebase';
 
 const cargoAdsRef = ref(db, 'cargoAds');
 
-// === NEW: строим патч для миграции автора ===
+/* =============== МИГРАЦИЯ АВТОРА (BUILD PATCH) =============== */
+/** Формирует patch для перевода легаси-полей автора в owner{} */
 function buildOwnerMigrationPatch(raw = {}) {
   const patch = {};
   let changed = false;
 
-  // Текущее состояние
   const ownerObj = raw.owner && typeof raw.owner === 'object' ? { ...raw.owner } : {};
 
-  // Источники
+  // Топ-левел
   const ownerIdTop = raw.ownerId ?? null;
   const ownerNameTop = raw.ownerName ?? null;
   const ownerPhotoTop = raw.ownerPhotoUrl ?? null;
   const ownerRatingTop = raw.ownerRating ?? null;
 
-  // Текущее внутри owner
+  // Внутри owner
   const ownerIdObj = ownerObj.id ?? null;
   const ownerNameObj = ownerObj.name ?? null;
   const ownerPhotoObj = ownerObj.photoUrl ?? null;
-  const ownerAvatarObj = ownerObj.avatarUrl ?? null; // лишнее, хотим убрать
+  const ownerAvatarObj = ownerObj.avatarUrl ?? null;
   const ownerRatingObj = ownerObj.rating ?? null;
 
-  // Целевые значения
+  // Цель
   const targetOwner = {
     id: ownerIdObj ?? ownerIdTop ?? null,
     name: ownerNameObj ?? ownerNameTop ?? null,
@@ -42,8 +42,6 @@ function buildOwnerMigrationPatch(raw = {}) {
     rating: ownerRatingObj ?? ownerRatingTop ?? null,
   };
 
-  // Если что-то меняется — запишем owner целиком (merge-ом)
-  // Записываем только те, что != текущих
   const ownerPatch = {};
   if (targetOwner.id !== ownerIdObj) { ownerPatch.id = targetOwner.id; changed = true; }
   if (targetOwner.name !== ownerNameObj) { ownerPatch.name = targetOwner.name; changed = true; }
@@ -54,18 +52,18 @@ function buildOwnerMigrationPatch(raw = {}) {
     patch['owner'] = { ...(patch['owner'] || {}), ...ownerPatch };
   }
 
-  // Удаления верхнеуровневых легаси-ключей (явно через null)
+  // Удаляем легаси-поля на верхнем уровне
   if ('ownerName' in raw) { patch['ownerName'] = null; changed = true; }
   if ('ownerPhotoUrl' in raw) { patch['ownerPhotoUrl'] = null; changed = true; }
   if ('ownerRating' in raw) { patch['ownerRating'] = null; changed = true; }
 
-  // Удаление legacy owner.avatarUrl, если был
+  // Удаляем legacy avatarUrl внутри owner
   if ('owner' in raw && raw.owner && 'avatarUrl' in raw.owner) {
     patch['owner/avatarUrl'] = null;
     changed = true;
   }
 
-  // Гарантируем соответствие ownerId и owner.id (ownerId оставляем топ-левел, но синхронизируем)
+  // Синхронизируем ownerId топ-левел с owner.id
   if (targetOwner.id != null && ownerIdTop !== targetOwner.id) {
     patch['ownerId'] = targetOwner.id;
     changed = true;
@@ -75,8 +73,7 @@ function buildOwnerMigrationPatch(raw = {}) {
 }
 
 /* ===================== ХЕЛПЕРЫ ===================== */
-
-// 1) Миграция автора ПОСЛЕ чтения из БД
+/** Миграция в объекте после чтения снапшота (для возврата «чистых» данных) */
 function migrateOwnerInSnapshot(raw = {}) {
   const ad = { ...raw };
   let changed = false;
@@ -97,7 +94,7 @@ function migrateOwnerInSnapshot(raw = {}) {
   if ('ownerPhotoUrl' in ad) { delete ad.ownerPhotoUrl; changed = true; }
   if ('ownerRating' in ad) { delete ad.ownerRating; changed = true; }
 
-  // (опц.) migrate preferredLoadingTypes: объект -> массив
+  // объект -> массив для preferredLoadingTypes (опционально)
   if (ad.preferredLoadingTypes && !Array.isArray(ad.preferredLoadingTypes) && typeof ad.preferredLoadingTypes === 'object') {
     ad.preferredLoadingTypes = Object.keys(ad.preferredLoadingTypes).filter(k => !!ad.preferredLoadingTypes[k]);
     changed = true;
@@ -106,7 +103,7 @@ function migrateOwnerInSnapshot(raw = {}) {
   return { ad, changed };
 }
 
-// 2) Нормализация автора ПЕРЕД записью в БД
+/** Нормализуем автора перед записью: переносим легаси в owner, чистим легаси-ключи */
 function normalizeOwnerForWrite(payload = {}) {
   const p = { ...payload };
 
@@ -127,14 +124,14 @@ function normalizeOwnerForWrite(payload = {}) {
   return p;
 }
 
-// 3) Общая нормализация перед записью
+/** Общая нормализация перед записью */
 function normalizeForDb(ad = {}) {
   let copy = { ...ad };
 
-  // Свести легаси-поля автора к owner + подчистить
+  // Автор
   copy = normalizeOwnerForWrite(copy);
 
-  // Гарантируем owner.id == ownerId (если есть)
+  // Синхронизация owner.id <-> ownerId
   if (copy.owner && copy.owner.id == null && copy.ownerId != null) {
     copy.owner = { ...copy.owner, id: copy.ownerId };
   }
@@ -142,7 +139,7 @@ function normalizeForDb(ad = {}) {
     copy.ownerId = copy.owner.id;
   }
 
-  // массив -> объект для preferredLoadingTypes
+  // preferredLoadingTypes: массив -> объект-баннер
   if (Array.isArray(copy.preferredLoadingTypes)) {
     const map = {};
     copy.preferredLoadingTypes.forEach((k) => { if (k) map[k] = true; });
@@ -152,11 +149,9 @@ function normalizeForDb(ad = {}) {
   return copy;
 }
 
-
 /* ===================== МЕТОДЫ ===================== */
 
-// Прочитать все + авто-миграция автора
-// getAll
+/** Прочитать все объявления + авто-миграция автора в БД */
 async function getAll() {
   const snap = await get(cargoAdsRef);
   if (!snap.exists()) return [];
@@ -173,12 +168,11 @@ async function getAll() {
     if (changed) {
       const adRef = child(cargoAdsRef, key);
       updates.push(update(adRef, patch));
-      // смержим raw с тем, что применим (для возврата «уже мигрированного» объекта)
+
       const merged = {
         ...raw,
-        owner: { ...(raw.owner || {}), ...(patch.owner || {}) }
+        owner: { ...(raw.owner || {}), ...(patch.owner || {}) },
       };
-      // применим null-удаления в локальном merged
       if ('ownerName' in patch) delete merged.ownerName;
       if ('ownerPhotoUrl' in patch) delete merged.ownerPhotoUrl;
       if ('ownerRating' in patch) delete merged.ownerRating;
@@ -191,13 +185,11 @@ async function getAll() {
     }
   });
 
-  try { await Promise.all(updates); } catch (_) { }
+  try { await Promise.all(updates); } catch (_) { /* игнорируем ошибки миграции */ }
   return result;
 }
 
-
-// Получить по id + авто-миграция автора
-// getById
+/** Прочитать по id + авто-миграция автора в БД */
 async function getById(adId) {
   if (!adId) return null;
   const adRef = child(cargoAdsRef, adId);
@@ -208,10 +200,10 @@ async function getById(adId) {
   const { patch, changed } = buildOwnerMigrationPatch(raw);
 
   if (changed) {
-    try { await update(adRef, patch); } catch (_) { }
+    try { await update(adRef, patch); } catch (_) { /* игнор */ }
     const merged = {
       ...raw,
-      owner: { ...(raw.owner || {}), ...(patch.owner || {}) }
+      owner: { ...(raw.owner || {}), ...(patch.owner || {}) },
     };
     if ('ownerName' in patch) delete merged.ownerName;
     if ('ownerPhotoUrl' in patch) delete merged.ownerPhotoUrl;
@@ -225,8 +217,7 @@ async function getById(adId) {
   return { adId, ...raw };
 }
 
-
-// Создать
+/** Создать объявление */
 async function create(adData = {}) {
   const newRef = push(cargoAdsRef);
   const payload = normalizeForDb({
@@ -240,7 +231,7 @@ async function create(adData = {}) {
   return { adId: newRef.key, ...snap.val() };
 }
 
-// Обновить
+/** Обновить объявление (partial update) */
 async function updateById(adId, patch = {}) {
   if (!adId) throw new Error('updateById: adId is required');
   const adRef = child(cargoAdsRef, adId);
@@ -253,12 +244,45 @@ async function updateById(adId, patch = {}) {
   return { adId, ...snap.val() };
 }
 
-// Удалить
+/** Жёстко удалить объявление (обычно — только админам) */
 async function deleteById(adId) {
   if (!adId) throw new Error('deleteById: adId is required');
   const adRef = child(cargoAdsRef, adId);
   await remove(adRef);
   return true;
+}
+
+/* ============ СТАТУСЫ (закрыть/архивировать/активировать) ============ */
+/** Базовый сеттер статуса; extra — дополнительные поля (причины и т.п.) */
+async function setStatusById(adId, status, extra = {}) {
+  if (!adId || !status) throw new Error('setStatusById: adId и status обязательны');
+  const adRef = child(cargoAdsRef, adId);
+
+  const patch = normalizeForDb({
+    status,
+    updatedAt: serverTimestamp(),
+    ...extra,
+  });
+
+  await update(adRef, patch);
+  const snap = await get(adRef);
+  if (!snap.exists()) throw new Error('Объявление не найдено');
+  return { adId, ...snap.val() };
+}
+
+/** Закрыть объявление (доставлено) */
+async function closeById(adId, reason) {
+  return setStatusById(adId, 'completed', { closedReason: reason ?? '' });
+}
+
+/** Архивировать объявление */
+async function archiveById(adId, reason) {
+  return setStatusById(adId, 'archived', { archivedReason: reason ?? '' });
+}
+
+/** Снова сделать активным */
+async function reopenById(adId) {
+  return setStatusById(adId, 'active', { closedReason: '', archivedReason: '' });
 }
 
 const CargoAdService = {
@@ -267,6 +291,12 @@ const CargoAdService = {
   create,
   updateById,
   deleteById,
+
+  // статусные операции
+  setStatusById,
+  closeById,
+  archiveById,
+  reopenById,
 };
 
 export default CargoAdService;
