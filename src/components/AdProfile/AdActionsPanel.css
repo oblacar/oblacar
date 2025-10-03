@@ -1,0 +1,79 @@
+/* Контейнер: иконки справа */
+.ad-actions-panel {
+    display: flex;
+    gap: 12px;
+    padding: 0 0 12px 0;
+    align-items: center;
+    justify-content: flex-end;
+    /* прижать вправо */
+    flex-wrap: wrap;
+}
+
+/* Текстовые кнопки (если где-то остались) — отключаем украшательства */
+.ad-actions-btn {
+    all: unset;
+    /* сброс */
+    display: none;
+    /* не показываем текстовые версии */
+}
+
+/* ИКОНКИ-КНОПКИ (Link и button выглядят одинаково) */
+.ad-actions-icon-btn {
+    all: unset;
+    /* жесткий сброс браузерных стилей */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    /* под размер иконки */
+    height: 19px;
+    cursor: pointer;
+    text-decoration: none;
+    /* для <Link> */
+    color: inherit;
+}
+
+/* Базовый цвет иконок */
+.icon-24 {
+    width: 24px;
+    height: 24px;
+    color: #6b7280;
+    /* gray-500 */
+    transition: color .15s ease;
+}
+
+/* Ховер — СИНИЙ для обычных действий */
+.ad-actions-icon-btn:hover .icon-24 {
+    color: #2563eb;
+    /* blue-600 */
+}
+
+/* Ховер — КРАСНЫЙ для кнопки удаления/архива */
+.ad-actions-icon-btn.danger:hover .icon-24 {
+    color: #ef4444;
+    /* red-500 */
+}
+
+/* Состояние disabled / busy */
+.ad-actions-icon-btn[aria-disabled="true"],
+.ad-actions-icon-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Фокус — аккуратный, без рамок вокруг контейнера */
+.ad-actions-icon-btn:focus-visible .icon-24 {
+    outline: none;
+    color: #1d4ed8;
+    /* blue-700 для доступности */
+}
+
+/* На всякий: убрать любые фоны/границы, если тянут глобальные стили */
+.ad-actions-icon-btn,
+.ad-actions-icon-btn:hover,
+.ad-actions-icon-btn:focus {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}

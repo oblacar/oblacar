@@ -37,7 +37,7 @@ export const CargoAdsProvider = ({ children }) => {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState(null);
 
-  /* ============ LOAD ADS ============ */
+  /* ============ LOAD ADS (список) ============ */
   useEffect(() => {
     let mounted = true;
 
@@ -45,7 +45,7 @@ export const CargoAdsProvider = ({ children }) => {
       try {
         setLoading(true);
         setError(null);
-        const list = await CargoAdService.getAll(); // должен вернуть массив объявлений
+        const list = await CargoAdService.getAll(); // вернуть массив объявлений
         if (!mounted) return;
         setAds(Array.isArray(list) ? list : []);
       } catch (e) {
@@ -56,11 +56,10 @@ export const CargoAdsProvider = ({ children }) => {
       }
     })();
 
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
+  // Перезагрузка списка
   const refresh = useCallback(async () => {
     try {
       setLoading(true);
@@ -74,7 +73,9 @@ export const CargoAdsProvider = ({ children }) => {
     }
   }, []);
 
-  /* ============ CRUD ============ */
+  /* ============ CRUD ДЛЯ ОБЪЯВЛЕНИЙ ============ */
+
+  // Создать объявление (подставляем автора из контекста при необходимости)
   const addAd = useCallback(
     async (data) => {
       try {
@@ -101,6 +102,7 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId, profile]
   );
 
+  // Обновить объявление по id (патчем)
   const updateAd = useCallback(async (adId, patch) => {
     try {
       const saved = await CargoAdService.updateById(adId, patch);
@@ -118,11 +120,12 @@ export const CargoAdsProvider = ({ children }) => {
     }
   }, []);
 
+  // Полное удаление (обычно не показываем обычным юзерам)
   const deleteAd = useCallback(async (adId) => {
     try {
       await CargoAdService.deleteById(adId);
       setAds((prev) => (Array.isArray(prev) ? prev.filter((x) => String(x.adId) !== String(adId)) : []));
-      // удаляем локально из избранного, если было
+      // подчистить локальный избранный список
       setReviewedIds((prev) => prev.filter((id) => String(id) !== String(adId)));
       return true;
     } catch (e) {
@@ -132,6 +135,8 @@ export const CargoAdsProvider = ({ children }) => {
   }, []);
 
   /* ============ SELECTORS ============ */
+
+  // Получить объявление по id из локального стейта
   const getById = useCallback(
     (id) => {
       if (id == null) return null;
@@ -141,6 +146,7 @@ export const CargoAdsProvider = ({ children }) => {
     [ads]
   );
 
+  // Получить все объявления по владельцу
   const getByOwner = useCallback(
     (ownerId) => {
       const list = Array.isArray(ads) ? ads : [];
@@ -150,7 +156,9 @@ export const CargoAdsProvider = ({ children }) => {
     [ads]
   );
 
-  /* ============ REVIEWED (отобранные) CARGO ============ */
+  /* ============ REVIEWED (отобранные) ДЛЯ CARGO ============ */
+
+  // Загрузить список id избранных объявлений текущего юзера
   const loadReviewed = useCallback(async () => {
     if (!authUserId) {
       setReviewedIds([]);
@@ -168,11 +176,12 @@ export const CargoAdsProvider = ({ children }) => {
     }
   }, [authUserId]);
 
-  // грузим/перегружаем избранное при смене пользователя
+  // Обновляем избранное при смене пользователя
   useEffect(() => {
     loadReviewed();
   }, [loadReviewed]);
 
+  // Добавить в избранное (оптимистично — сразу в стейт, при ошибке откат)
   const addReviewAd = useCallback(
     async (adId) => {
       const id = String(adId ?? '');
@@ -182,16 +191,17 @@ export const CargoAdsProvider = ({ children }) => {
         return;
       }
 
-      // оптимистично добавляем локально
+      // локально
       setReviewedIds((prev) => {
         const list = Array.isArray(prev) ? prev : [];
         return list.includes(id) ? list : [id, ...list];
       });
 
+      // в БД
       try {
         await UserReviewAdService.addReviewAd(authUserId, id, 'cargo');
       } catch (e) {
-        // откат локально
+        // откат
         setReviewedIds((prev) =>
           Array.isArray(prev) ? prev.filter((x) => x !== id) : []
         );
@@ -202,6 +212,7 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId]
   );
 
+  // Удалить из избранного (оптимистично — сразу из стейта, при ошибке вернуть)
   const removeReviewAd = useCallback(
     async (adId) => {
       const id = String(adId ?? '');
@@ -211,15 +222,16 @@ export const CargoAdsProvider = ({ children }) => {
         return;
       }
 
-      // оптимистично удаляем локально
+      // локально
       setReviewedIds((prev) =>
         Array.isArray(prev) ? prev.filter((x) => x !== id) : []
       );
 
+      // в БД
       try {
         await UserReviewAdService.removeReviewAd(authUserId, id, 'cargo');
       } catch (e) {
-        // откат локально (вернём id назад)
+        // откат — добавить id назад
         setReviewedIds((prev) => {
           const list = Array.isArray(prev) ? prev : [];
           return list.includes(id) ? list : [id, ...list];
@@ -231,6 +243,7 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId]
   );
 
+  // Переключить избранное (добавить/удалить)
   const toggleReviewAd = useCallback(
     async (adId) => {
       const id = String(adId ?? '');
@@ -243,13 +256,93 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId, reviewedIds, addReviewAd, removeReviewAd]
   );
 
-
+  // Проверить — объявление в избранном?
   const isReviewed = useCallback(
     (adId) => reviewedIds.includes(String(adId)),
     [reviewedIds]
   );
 
-  /* ============ VALUE ============ */
+  /* ============ STATUS OPS (закрыть / архив / открыть снова) ============ */
+
+  // Закрыть объявление (status -> 'completed'), reason опционально
+  const closeAd = useCallback(async (adId, reason) => {
+    // оптимистичный апдейт локально
+    setAds((prev) => {
+      const list = Array.isArray(prev) ? prev.slice() : [];
+      const idx = list.findIndex((a) => String(a.adId) === String(adId));
+      if (idx === -1) return list;
+      list[idx] = { ...list[idx], status: 'completed', closedReason: reason ?? '' };
+      return list;
+    });
+    try {
+      const saved = await CargoAdService.closeById(adId, reason);
+      // синхронизация с ответом
+      setAds((prev) => {
+        const list = Array.isArray(prev) ? prev.slice() : [];
+        const idx = list.findIndex((a) => String(a.adId) === String(adId));
+        if (idx === -1) return list;
+        list[idx] = saved;
+        return list;
+      });
+      return saved;
+    } catch (e) {
+      // откат через refresh — самый простой и надёжный вариант
+      await refresh();
+      throw e;
+    }
+  }, [refresh]);
+
+  // Архивировать объявление (status -> 'archived'), reason опционально
+  const archiveAd = useCallback(async (adId, reason) => {
+    setAds((prev) => {
+      const list = Array.isArray(prev) ? prev.slice() : [];
+      const idx = list.findIndex((a) => String(a.adId) === String(adId));
+      if (idx === -1) return list;
+      list[idx] = { ...list[idx], status: 'archived', archivedReason: reason ?? '' };
+      return list;
+    });
+    try {
+      const saved = await CargoAdService.archiveById(adId, reason);
+      setAds((prev) => {
+        const list = Array.isArray(prev) ? prev.slice() : [];
+        const idx = list.findIndex((a) => String(a.adId) === String(adId));
+        if (idx === -1) return list;
+        list[idx] = saved;
+        return list;
+      });
+      return saved;
+    } catch (e) {
+      await refresh();
+      throw e;
+    }
+  }, [refresh]);
+
+  // Снова открыть объявление (status -> 'active')
+  const reopenAd = useCallback(async (adId) => {
+    setAds((prev) => {
+      const list = Array.isArray(prev) ? prev.slice() : [];
+      const idx = list.findIndex((a) => String(a.adId) === String(adId));
+      if (idx === -1) return list;
+      list[idx] = { ...list[idx], status: 'active', closedReason: '', archivedReason: '' };
+      return list;
+    });
+    try {
+      const saved = await CargoAdService.reopenById(adId);
+      setAds((prev) => {
+        const list = Array.isArray(prev) ? prev.slice() : [];
+        const idx = list.findIndex((a) => String(a.adId) === String(adId));
+        if (idx === -1) return list;
+        list[idx] = saved;
+        return list;
+      });
+      return saved;
+    } catch (e) {
+      await refresh();
+      throw e;
+    }
+  }, [refresh]);
+
+  /* ============ VALUE (публичный API контекста) ============ */
   const value = useMemo(
     () => ({
       // ads
@@ -274,12 +367,18 @@ export const CargoAdsProvider = ({ children }) => {
       removeReviewAd,
       toggleReviewAd,
       isReviewed,
+
+      // status ops
+      closeAd,
+      archiveAd,
+      reopenAd,
     }),
     [
       ads, loading, error, refresh, addAd, updateAd, deleteAd,
       getById, getByOwner,
       reviewedIds, reviewLoading, reviewError,
       loadReviewed, addReviewAd, removeReviewAd, toggleReviewAd, isReviewed,
+      closeAd, archiveAd, reopenAd,
     ]
   );
 

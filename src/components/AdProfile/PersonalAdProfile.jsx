@@ -8,20 +8,13 @@ import CargoIncomingRequestsList from './CargoIncomingRequestsList';
 import ToggleSearchMode from '../common/ToggleSearchMode/ToggleSearchMode';
 import ChatInterface from '../ChatInterface/ChatInterface';
 import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
-
 import { InboxArrowDownIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 
-// Детали для транспорта (у тебя уже есть)
 import PersonalTransportAdDetails from './PersonalTransportAdDetails';
-// Детали для груза (мы только что сделали)
 import PersonalCargoAdDetails from './PersonalCargoAdDetails';
 
+import AdActionsPanel from './AdActionsPanel';
 
-/**
- * Универсальный профиль объявления.
- * Явно укажи adType: "transport" | "cargo".
- * Все прочие пропсы прокидываются в целевой компонент как есть.
- */
 const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSelectFirst, setIsSelectFirst] = useState(true);
@@ -38,20 +31,6 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
 
     const { adId } = ad;
 
-    //       switch (adType) {
-    //     case 'transport':
-    //       return <PersonalTransportAdDetails ad={ad} {...rest} />;
-
-    //     case 'cargo':
-    //       return <PersonalCargoAdDetails ad={ad} {...rest} />;
-
-    //     default:
-    //       return <div style={{ padding: 12, color: '#b91c1c' }}>
-    //         Неизвестный adType: {String(adType)}
-    //       </div>;
-    //   }
-    // };
-
     return (
         <div className={styles.fakePage}>
             <div className={styles.pageContainer}>
@@ -62,12 +41,15 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                             <HorizontalPhotoCarousel photos={ad.truckPhotoUrls || []} />
                         </div>
 
-                        {/* ОПИСАНИЕ ТРАНСПОРТА */}
-                        { }
+                        {/* ВСТАВКА ПАНЕЛИ ПОД КАРУСЕЛЬЮ */}
+                        <AdActionsPanel adType={adType} ad={ad} />
 
-                        {adType === 'transport' ?
-                            (<PersonalTransportAdDetails ad={ad} />) :
-                            (adType === 'cargo' ? <PersonalCargoAdDetails ad={ad} /> : null)}
+                        {/* Детали */}
+                        {adType === 'transport'
+                            ? <PersonalTransportAdDetails ad={ad} />
+                            : adType === 'cargo'
+                                ? <PersonalCargoAdDetails ad={ad} />
+                                : null}
                     </div>
                 </div>
 
@@ -90,7 +72,6 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                                     <TransportIncomingRequestsList adId={adId} />
                                 </>
                             )}
-
                             {adType === 'cargo' && (
                                 <>
                                     <strong>Запросы по грузу</strong>
@@ -104,8 +85,6 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                             <ChatInterface adId={adId} />
                         </>
                     )}
-
-
                 </div>
             </div>
         </div>

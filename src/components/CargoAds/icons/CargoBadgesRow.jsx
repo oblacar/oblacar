@@ -20,7 +20,7 @@ import {
     FaCouch, FaAppleAlt, FaTshirt, FaCubes, FaFaucet, FaRadiation,
     FaLaptop, FaSnowplow, FaShapes, FaBoxOpen, FaCube,
     FaLayerGroup, FaWineGlass, FaSnowflake, FaThermometerHalf,
-    FaExclamationTriangle, FaCodepen,
+    FaExclamationTriangle, FaCodepen, FaBox,
 } from 'react-icons/fa';
 
 import './CargoBadgesRow.css';
@@ -70,7 +70,7 @@ const CargoBadgesRow = ({
     // Иконки упаковок (ключи = твоим PACKAGING_OPTIONS.key)
     const packagingIconMap = {
         pallet: { icon: PalletIcon, label: 'Паллеты' },
-        box: { icon: FaBoxOpen, label: 'Коробки' },
+        box: { icon: FaBox, label: 'Коробки' },
         crate: { icon: FaCube, label: 'Ящики' },
         bag: { icon: BagIcon, label: 'Мешки' },
         bigbag: { icon: BigbagIcon, label: 'Биг-бэг' },
