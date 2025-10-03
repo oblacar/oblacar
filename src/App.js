@@ -11,6 +11,7 @@ import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страниц
 import NewTransportAd from './pages/Ads/NewTransportAd/NewTransportAd';
 import AdPage from './pages/Ads/AdPage';
 import MyTransportAdsPage from './pages/Ads/MyTransportAdsPage';
+import EditCargoAdPage from './pages/Ads/Cargo/CargoAdEditPage/EditCargoAdPage';
 import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 import VehiclePage from './pages/Vehicles/VehiclePage';
 import VehiclesPage from './pages/Vehicles/VehiclesPage';
@@ -102,6 +103,9 @@ const App = () => {
                                                             path='/my-transport-ads'
                                                             element={<MyTransportAdsPage />}
                                                         />
+                                                        <Route
+                                                            path="/cargo-ads/:adId/edit"
+                                                            element={<EditCargoAdPage />} />
                                                         <Route
                                                             path='/dialogs'
                                                             element={

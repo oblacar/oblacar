@@ -1,0 +1,393 @@
+// src/pages/CargoAds/EditCargoAdPage.jsx
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+
+import Button from '../../../../components/common/Button/Button';
+import ConfirmationDialog from '../../../../components/common/ConfirmationDialog/ConfirmationDialog';
+import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
+import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
+
+import CargoAdsContext from '../../../../hooks/CargoAdsContext';
+import '../NewCargoAd/NewCargoAdPage.css'; // переиспользуем стили от страницы создания
+
+// форма ожидает такой shape — берём ваш initialState как ориентир
+const emptyForm = {
+    ownerId: '',
+    ownerName: '',
+    ownerPhotoUrl: '',
+    ownerRating: '',
+    createdAt: new Date().toISOString(),
+
+    departureCity: '',
+    destinationCity: '',
+
+    pickupDate: '',     // = availabilityFrom
+    deliveryDate: '',   // = availabilityTo
+
+    price: '',
+    paymentUnit: 'руб',
+    readyToNegotiate: true,
+
+    title: '',
+    cargoType: '',
+    description: '',
+    photos: [],
+
+    weightTons: '',
+    dimensionsMeters: { height: '', width: '', depth: '' },
+
+    quantity: '',
+    packagingType: '',
+    packagingTypes: [],
+
+    isFragile: false,
+    isStackable: false,
+    adrClass: '',
+    temperature: { mode: 'ambient', minC: '', maxC: '' },
+
+    preferredLoadingTypes: [],
+};
+
+/** маппинг: объявление -> значения формы */
+function adToForm(ad = {}) {
+    const route = ad.route || {};
+
+    // цена может быть либо числом, либо объектом {value, unit}
+    const priceValue = (ad?.price && typeof ad.price === 'object')
+        ? (ad.price.value ?? '')
+        : (ad.price ?? '');
+
+    const paymentUnit = ad?.price?.unit ?? ad?.paymentUnit ?? 'руб';
+
+    // габариты/вес
+    const weightTons =
+        ad?.cargo?.weightTons ??
+        ad?.weightTons ??
+        ad?.cargoWeightTons ??
+        '';
+
+    const height =
+        ad?.cargo?.dims?.h ??
+        ad?.cargoHeight ??
+        ad?.dimensionsMeters?.height ??
+        '';
+
+    const width =
+        ad?.cargo?.dims?.w ??
+        ad?.cargoWidth ??
+        ad?.dimensionsMeters?.width ??
+        '';
+
+    const depth =
+        ad?.cargo?.dims?.d ??
+        ad?.cargoDepth ??
+        ad?.dimensionsMeters?.depth ??
+        '';
+
+    // preferredLoadingTypes в БД может быть объектом — преобразуем к массиву
+    let preferredLoadingTypes = [];
+    const plt = ad.preferredLoadingTypes ?? ad.loadingTypes;
+    if (Array.isArray(plt)) preferredLoadingTypes = plt;
+    else if (plt && typeof plt === 'object') {
+        preferredLoadingTypes = Object.keys(plt).filter(k => !!plt[k]);
+    }
+
+    return {
+        ...emptyForm,
+        ownerId: ad.ownerId ?? ad.owner?.id ?? '',
+        ownerName: ad.ownerName ?? ad.owner?.name ?? '',
+        ownerPhotoUrl: ad.ownerPhotoUrl ?? ad.owner?.photoUrl ?? '',
+        ownerRating: ad.ownerRating ?? ad.owner?.rating ?? '',
+
+        createdAt: ad.createdAt || new Date().toISOString(),
+
+        // маршрут
+        departureCity:
+            route.from ??
+            route.departureCity ??
+            ad.departureCity ??
+            ad.from ??
+            '',
+        destinationCity:
+            route.to ??
+            route.destinationCity ??
+            ad.destinationCity ??
+            ad.to ??
+            '',
+
+        // даты (форма использует pickup/delivery)
+        pickupDate:
+            ad.availabilityFrom ??
+            ad.pickupDate ??
+            ad?.dates?.pickupDate ??
+            '',
+        deliveryDate:
+            ad.availabilityTo ??
+            ad.deliveryDate ??
+            ad?.dates?.deliveryDate ??
+            '',
+
+        // деньги
+        price: priceValue ?? '',
+        paymentUnit,
+        readyToNegotiate: !!(ad.readyToNegotiate ?? ad?.price?.readyToNegotiate),
+
+        // описание груза
+        title: ad.title ?? ad?.cargo?.name ?? '',
+        cargoType: ad.cargoType ?? ad?.cargo?.type ?? '',
+        description: ad.description ?? '',
+
+        photos: ad.photos ?? [],
+
+        weightTons,
+        dimensionsMeters: {
+            height: height ?? '',
+            width: width ?? '',
+            depth: depth ?? '',
+        },
+
+        quantity: ad.quantity ?? '',
+        packagingType: ad.packagingType ?? '',
+        packagingTypes: ad.packagingTypes ?? [],
+
+        isFragile: !!(ad.isFragile ?? ad?.cargo?.fragile),
+        isStackable: !!(ad.isStackable ?? ad?.cargo?.isStackable),
+
+        adrClass: ad.adrClass ?? '',
+
+        temperature: ad.temperature ?? ad?.cargo?.temperature ?? { mode: 'ambient', minC: '', maxC: '' },
+
+        preferredLoadingTypes,
+    };
+}
+
+/** маппинг: значения формы -> patch к объявлению */
+function formToPatch(fd) {
+    // приводим цену к объекту (сервис всё равно нормализует)
+    const priceValue = fd.price === '' ? null : Number(fd.price);
+
+    return {
+        title: fd.title || null,
+        description: fd.description || null,
+
+        // маршрут
+        route: {
+            from: fd.departureCity || null,
+            to: fd.destinationCity || null,
+        },
+
+        // даты (в сервисе оставляем availability*)
+        availabilityFrom: fd.pickupDate || null,
+        availabilityTo: fd.deliveryDate || null,
+
+        // деньги
+        price: {
+            value: Number.isFinite(priceValue) ? priceValue : null,
+            unit: fd.paymentUnit || 'руб',
+            readyToNegotiate: !!fd.readyToNegotiate,
+        },
+
+        // груз
+        cargoType: fd.cargoType || null,
+
+        // габариты/вес в плоском варианте — сервис при чтении/записи мигрирует
+        weightTons: fd.weightTons ? Number(fd.weightTons) : null,
+        dimensionsMeters: {
+            height: fd.dimensionsMeters?.height || null,
+            width: fd.dimensionsMeters?.width || null,
+            depth: fd.dimensionsMeters?.depth || null,
+        },
+
+        quantity: fd.quantity || null,
+        packagingType: fd.packagingType || null,
+        packagingTypes: Array.isArray(fd.packagingTypes) ? fd.packagingTypes : [],
+
+        isFragile: !!fd.isFragile,
+        isStackable: !!fd.isStackable,
+        adrClass: fd.adrClass || null,
+
+        temperature: fd.temperature || null,
+
+        // loading types — пусть сервис сам нормализует объект/массив
+        preferredLoadingTypes: fd.preferredLoadingTypes || [],
+        loadingTypes: fd.preferredLoadingTypes || [],
+
+        updatedAt: new Date().toISOString(),
+    };
+}
+
+const EditCargoAdPage = () => {
+    const { adId } = useParams();
+    const navigate = useNavigate();
+
+    const {
+        getById, updateAd, refresh, loading, error
+    } = useContext(CargoAdsContext);
+
+    const ad = useMemo(() => getById(adId), [getById, adId]);
+
+    const formRef = useRef(null);
+    const [formData, setFormData] = useState(emptyForm);
+    const updateFormData = (patch) => setFormData((p) => ({ ...p, ...patch }));
+
+    // ui: 'idle' | 'confirm' | 'saving' | 'error'
+    const [ui, setUi] = useState('idle');
+    const [errorMsg, setErrorMsg] = useState('');
+
+    // заполняем форму начальными значениями, когда получили ad
+    useEffect(() => {
+        if (ad) setFormData(adToForm(ad));
+    }, [ad]);
+
+    // превью карточки (как в NewCargoAdPage)
+    const previewAd = useMemo(() => {
+        const fd = formData;
+        return {
+            departureCity: fd.departureCity,
+            destinationCity: fd.destinationCity,
+            availabilityFrom: fd.pickupDate,
+            availabilityTo: fd.deliveryDate,
+
+            price: fd.price,
+            paymentUnit: fd.paymentUnit,
+            readyToNegotiate: fd.readyToNegotiate,
+
+            cargoType: fd.cargoType,
+            title: fd.title,
+            weightTons: fd.weightTons,
+            cargoHeight: fd.dimensionsMeters?.height,
+            cargoWidth: fd.dimensionsMeters?.width,
+            cargoDepth: fd.dimensionsMeters?.depth,
+            loadingTypes: fd.preferredLoadingTypes,
+
+            packagingTypes: fd.packagingTypes ?? [],
+            isFragile: fd.isFragile,
+            isStackable: fd.isStackable,
+            temperature: fd.temperature,
+            adrClass: fd.adrClass,
+
+            createdAt: fd.createdAt,
+
+            ownerId: fd.ownerId,
+            ownerName: fd.ownerName,
+            ownerAvatar: fd.ownerPhotoUrl,
+            ownerRating: fd.ownerRating,
+        };
+    }, [formData]);
+
+    const handleSaveClick = () => {
+        if (ui !== 'idle') return;
+        if (!formRef.current?.validate()) return;
+        setUi('confirm');
+    };
+
+    const handleConfirmSave = async () => {
+        if (!adId) return;
+        setUi('saving');
+        try {
+            const patch = formToPatch(formData);
+            await updateAd(adId, patch);
+
+            // гарантируем свежие данные во всех местах, где идёт чтение напрямую
+            await refresh();
+
+            // после сохранения — уходим на профиль объявления
+            navigate(`/cargo-ads/${adId}`);
+        } catch (e) {
+            setErrorMsg(e?.message || 'Не удалось сохранить изменения.');
+            setUi('error');
+        }
+    };
+
+    const handleCancelConfirm = () => setUi('idle');
+
+    if (loading && !ad) {
+        return <div className="deliveries-container">Загружаем объявление…</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="deliveries-container" style={{ color: '#b91c1c' }}>
+                Ошибка: {String(error)}
+            </div>
+        );
+    }
+
+    if (!ad) {
+        return (
+            <div className="deliveries-container">
+                <div>Объявление не найдено.</div>
+                <div style={{ marginTop: 12 }}>
+                    <Link to="/my-ads">← к моим объявлениям</Link>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="deliveries-container">
+            <div className="new-cargo-page__title">
+                Редактирование объявления о перевозке Груза
+            </div>
+
+            {/* верхняя полоса: превью + кнопки управления */}
+            <div className="ncap__top">
+                <div className="ncap__preview">
+                    <CargoAdItem ad={previewAd} ableHover={false} />
+                </div>
+
+                {/* Кнопки «Сохранить» и «Вернуться» */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                    <Button onClick={handleSaveClick}>Сохранить</Button>
+                    <Button onClick={() => navigate(`/cargo-ads/${adId}`)} variant="secondary">
+                        Вернуться
+                    </Button>
+                </div>
+            </div>
+
+            {/* Ошибка сохранения */}
+            {ui === 'error' && (
+                <div className="ncap__result ncap__result--error">
+                    <div className="ncap__result-title">Ошибка</div>
+                    <div className="ncap__result-text">{errorMsg}</div>
+                    <div className="ncap__result-actions">
+                        <Button onClick={() => setUi('idle')}>Продолжить редактирование</Button>
+                    </div>
+                </div>
+            )}
+
+            {/* подсказка под превью */}
+            <div className="new-cargo-page__subtitle">Измените необходимые данные:</div>
+
+            {/* ФОРМА */}
+            <div className={`ncap__form ${ui === 'saving' ? 'ncap__form--disabled' : ''}`}>
+                <CreateCargoAdForm
+                    ref={formRef}
+                    formData={formData}
+                    updateFormData={updateFormData}
+                />
+            </div>
+
+            {/* подтверждение */}
+            {ui === 'confirm' && (
+                <div className="accf__backdrop">
+                    <ConfirmationDialog
+                        message="Сохранить изменения в объявлении?"
+                        onConfirm={handleConfirmSave}
+                        onCancel={handleCancelConfirm}
+                    />
+                </div>
+            )}
+
+            {/* прелоадер */}
+            {ui === 'saving' && (
+                <div className="accf__saving">
+                    <div className="accf__spinner" />
+                    <div className="accf__saving-text">Сохраняем…</div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default EditCargoAdPage;

@@ -35,7 +35,7 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
                 close: cargoCtx?.closeAd,
                 archive: cargoCtx?.archiveAd,
                 reopen: cargoCtx?.reopenAd,
-                editTo: '/', // временно ведём на home
+                editTo: adId ? `/cargo-ads/${adId}/edit` : '/cargo-ads',
             };
         }
         // transport

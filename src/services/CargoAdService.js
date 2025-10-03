@@ -13,6 +13,21 @@ import { db } from '../firebase';
 
 const cargoAdsRef = ref(db, 'cargoAds');
 
+/* ===================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===================== */
+// массив -> объект { key: true }
+function arrToMap(arr) {
+  const map = {};
+  (Array.isArray(arr) ? arr : []).forEach((k) => {
+    if (k != null && k !== '') map[String(k)] = true;
+  });
+  return map;
+}
+// объект { key: true } -> массив ['key', ...]
+function mapToArr(obj) {
+  if (!obj || typeof obj !== 'object') return [];
+  return Object.keys(obj).filter((k) => !!obj[k]);
+}
+
 /* =============== МИГРАЦИЯ АВТОРА (BUILD PATCH) =============== */
 /** Формирует patch для перевода легаси-полей автора в owner{} */
 function buildOwnerMigrationPatch(raw = {}) {
@@ -31,10 +46,10 @@ function buildOwnerMigrationPatch(raw = {}) {
   const ownerIdObj = ownerObj.id ?? null;
   const ownerNameObj = ownerObj.name ?? null;
   const ownerPhotoObj = ownerObj.photoUrl ?? null;
-  const ownerAvatarObj = ownerObj.avatarUrl ?? null;
+  const ownerAvatarObj = ownerObj.avatarUrl ?? null; // legacy
   const ownerRatingObj = ownerObj.rating ?? null;
 
-  // Цель
+  // Целевые значения
   const targetOwner = {
     id: ownerIdObj ?? ownerIdTop ?? null,
     name: ownerNameObj ?? ownerNameTop ?? null,
@@ -42,6 +57,7 @@ function buildOwnerMigrationPatch(raw = {}) {
     rating: ownerRatingObj ?? ownerRatingTop ?? null,
   };
 
+  // Собираем patch внутрь owner
   const ownerPatch = {};
   if (targetOwner.id !== ownerIdObj) { ownerPatch.id = targetOwner.id; changed = true; }
   if (targetOwner.name !== ownerNameObj) { ownerPatch.name = targetOwner.name; changed = true; }
@@ -63,7 +79,7 @@ function buildOwnerMigrationPatch(raw = {}) {
     changed = true;
   }
 
-  // Синхронизируем ownerId топ-левел с owner.id
+  // Синхронизация ownerId на верхнем уровне
   if (targetOwner.id != null && ownerIdTop !== targetOwner.id) {
     patch['ownerId'] = targetOwner.id;
     changed = true;
@@ -72,37 +88,32 @@ function buildOwnerMigrationPatch(raw = {}) {
   return { patch, changed };
 }
 
-/* ===================== ХЕЛПЕРЫ ===================== */
-/** Миграция в объекте после чтения снапшота (для возврата «чистых» данных) */
-function migrateOwnerInSnapshot(raw = {}) {
-  const ad = { ...raw };
+/* =============== МИГРАЦИЯ МУЛЬТИСЕЛЕКТОВ (BUILD PATCH) =============== */
+/** Формирует patch для перевода массивов мультиселекта в map-объекты */
+function buildMultiSelectMigrationPatch(raw = {}) {
+  const patch = {};
   let changed = false;
 
-  const legacy = {
-    name: ad.ownerName,
-    photoUrl: ad.ownerPhotoUrl,
-    rating: ad.ownerRating,
-  };
-
-  if (!ad.owner) ad.owner = {};
-
-  if (legacy.name != null && ad.owner.name == null) { ad.owner.name = legacy.name; changed = true; }
-  if (legacy.photoUrl != null && ad.owner.photoUrl == null) { ad.owner.photoUrl = legacy.photoUrl; changed = true; }
-  if (legacy.rating != null && ad.owner.rating == null) { ad.owner.rating = legacy.rating; changed = true; }
-
-  if ('ownerName' in ad) { delete ad.ownerName; changed = true; }
-  if ('ownerPhotoUrl' in ad) { delete ad.ownerPhotoUrl; changed = true; }
-  if ('ownerRating' in ad) { delete ad.ownerRating; changed = true; }
-
-  // объект -> массив для preferredLoadingTypes (опционально)
-  if (ad.preferredLoadingTypes && !Array.isArray(ad.preferredLoadingTypes) && typeof ad.preferredLoadingTypes === 'object') {
-    ad.preferredLoadingTypes = Object.keys(ad.preferredLoadingTypes).filter(k => !!ad.preferredLoadingTypes[k]);
+  // preferredLoadingTypes: [] -> {key:true}
+  if (Array.isArray(raw.preferredLoadingTypes)) {
+    patch['preferredLoadingTypes'] = arrToMap(raw.preferredLoadingTypes);
+    changed = true;
+  }
+  // packagingTypes: [] -> {key:true}
+  if (Array.isArray(raw.packagingTypes)) {
+    patch['packagingTypes'] = arrToMap(raw.packagingTypes);
+    changed = true;
+  }
+  // (на случай, если где-то попадались массивы)
+  if (Array.isArray(raw.loadingTypes)) {
+    patch['loadingTypes'] = arrToMap(raw.loadingTypes);
     changed = true;
   }
 
-  return { ad, changed };
+  return { patch, changed };
 }
 
+/* ===================== НОРМАЛИЗАЦИЯ ПЕРЕД ЗАПИСЬЮ ===================== */
 /** Нормализуем автора перед записью: переносим легаси в owner, чистим легаси-ключи */
 function normalizeOwnerForWrite(payload = {}) {
   const p = { ...payload };
@@ -116,7 +127,7 @@ function normalizeOwnerForWrite(payload = {}) {
   if (legacyPhoto != null && p.owner.photoUrl == null) p.owner.photoUrl = legacyPhoto;
   if (legacyRating != null && p.owner.rating == null) p.owner.rating = legacyRating;
 
-  // подчистим легаси-ключи (null в update() = удалить поле)
+  // подчистка легаси-ключей (null в update() удалит поле)
   p.ownerName = null;
   p.ownerPhotoUrl = null;
   p.ownerRating = null;
@@ -124,7 +135,7 @@ function normalizeOwnerForWrite(payload = {}) {
   return p;
 }
 
-/** Общая нормализация перед записью */
+/** Общая нормализация payload перед записью в БД */
 function normalizeForDb(ad = {}) {
   let copy = { ...ad };
 
@@ -139,19 +150,36 @@ function normalizeForDb(ad = {}) {
     copy.ownerId = copy.owner.id;
   }
 
-  // preferredLoadingTypes: массив -> объект-баннер
+  // === МУЛЬТИСЕЛЕКТЫ: UI может прислать массивы — в БД храним map ===
   if (Array.isArray(copy.preferredLoadingTypes)) {
-    const map = {};
-    copy.preferredLoadingTypes.forEach((k) => { if (k) map[k] = true; });
-    copy.preferredLoadingTypes = map;
+    copy.preferredLoadingTypes = arrToMap(copy.preferredLoadingTypes);
+  }
+  if (Array.isArray(copy.packagingTypes)) {
+    copy.packagingTypes = arrToMap(copy.packagingTypes);
+  }
+  if (Array.isArray(copy.loadingTypes)) {
+    copy.loadingTypes = arrToMap(copy.loadingTypes);
   }
 
   return copy;
 }
 
+/* ===================== ПРИВЕДЕНИЕ К ФОРМАТУ UI ===================== */
+/** Конвертирует поля из формата БД (map) в формат UI (array) */
+function toClientArrays(raw = {}) {
+  const ad = { ...raw };
+
+  ad.preferredLoadingTypes = mapToArr(raw.preferredLoadingTypes ?? raw.preferred_loading_types);
+  ad.packagingTypes = mapToArr(raw.packagingTypes);
+  // Если UI где-то ожидает loadingTypes как массив — тоже вернём массив
+  ad.loadingTypes = Array.isArray(raw.loadingTypes) ? raw.loadingTypes : mapToArr(raw.loadingTypes);
+
+  return ad;
+}
+
 /* ===================== МЕТОДЫ ===================== */
 
-/** Прочитать все объявления + авто-миграция автора в БД */
+/** Прочитать все объявления + авто-миграция (автор + мультиселекты). Наружу — массивы. */
 async function getAll() {
   const snap = await get(cargoAdsRef);
   if (!snap.exists()) return [];
@@ -163,14 +191,19 @@ async function getAll() {
     const key = childSnap.key;
     const raw = childSnap.val();
 
-    const { patch, changed } = buildOwnerMigrationPatch(raw);
+    // собираем общий patch (автор + мультиселекты)
+    const { patch: ownerPatch, changed: ownerChanged } = buildOwnerMigrationPatch(raw);
+    const { patch: msPatch, changed: msChanged } = buildMultiSelectMigrationPatch(raw);
+    const patch = { ...ownerPatch, ...msPatch };
+    const needUpdate = ownerChanged || msChanged;
 
-    if (changed) {
+    if (needUpdate) {
       const adRef = child(cargoAdsRef, key);
-      updates.push(update(adRef, patch));
+      updates.push(update(adRef, patch).catch(() => { }));
 
       const merged = {
         ...raw,
+        ...(patch || {}),
         owner: { ...(raw.owner || {}), ...(patch.owner || {}) },
       };
       if ('ownerName' in patch) delete merged.ownerName;
@@ -179,9 +212,9 @@ async function getAll() {
       if ('owner/avatarUrl' in patch && merged.owner) delete merged.owner.avatarUrl;
       if ('ownerId' in patch) merged.ownerId = patch.ownerId;
 
-      result.push({ adId: key, ...merged });
+      result.push({ adId: key, ...toClientArrays(merged) });
     } else {
-      result.push({ adId: key, ...raw });
+      result.push({ adId: key, ...toClientArrays(raw) });
     }
   });
 
@@ -189,7 +222,7 @@ async function getAll() {
   return result;
 }
 
-/** Прочитать по id + авто-миграция автора в БД */
+/** Прочитать по id + авто-миграция. Наружу — массивы. */
 async function getById(adId) {
   if (!adId) return null;
   const adRef = child(cargoAdsRef, adId);
@@ -197,12 +230,18 @@ async function getById(adId) {
   if (!snap.exists()) return null;
 
   const raw = snap.val();
-  const { patch, changed } = buildOwnerMigrationPatch(raw);
 
-  if (changed) {
-    try { await update(adRef, patch); } catch (_) { /* игнор */ }
+  const { patch: ownerPatch, changed: ownerChanged } = buildOwnerMigrationPatch(raw);
+  const { patch: msPatch, changed: msChanged } = buildMultiSelectMigrationPatch(raw);
+  const patch = { ...ownerPatch, ...msPatch };
+  const needUpdate = ownerChanged || msChanged;
+
+  if (needUpdate) {
+    try { await update(adRef, patch); } catch (_) { /* ignore */ }
+
     const merged = {
       ...raw,
+      ...(patch || {}),
       owner: { ...(raw.owner || {}), ...(patch.owner || {}) },
     };
     if ('ownerName' in patch) delete merged.ownerName;
@@ -211,13 +250,13 @@ async function getById(adId) {
     if ('owner/avatarUrl' in patch && merged.owner) delete merged.owner.avatarUrl;
     if ('ownerId' in patch) merged.ownerId = patch.ownerId;
 
-    return { adId, ...merged };
+    return { adId, ...toClientArrays(merged) };
   }
 
-  return { adId, ...raw };
+  return { adId, ...toClientArrays(raw) };
 }
 
-/** Создать объявление */
+/** Создать объявление (в БД — map'ы, наружу — массивы) */
 async function create(adData = {}) {
   const newRef = push(cargoAdsRef);
   const payload = normalizeForDb({
@@ -228,10 +267,11 @@ async function create(adData = {}) {
   });
   await set(newRef, payload);
   const snap = await get(newRef);
-  return { adId: newRef.key, ...snap.val() };
+  const raw = snap.val() || {};
+  return { adId: newRef.key, ...toClientArrays(raw) };
 }
 
-/** Обновить объявление (partial update) */
+/** Обновить объявление (partial update). В БД — map'ы, наружу — массивы. */
 async function updateById(adId, patch = {}) {
   if (!adId) throw new Error('updateById: adId is required');
   const adRef = child(cargoAdsRef, adId);
@@ -241,7 +281,8 @@ async function updateById(adId, patch = {}) {
   });
   await update(adRef, payload);
   const snap = await get(adRef);
-  return { adId, ...snap.val() };
+  const raw = snap.val() || {};
+  return { adId, ...toClientArrays(raw) };
 }
 
 /** Жёстко удалить объявление (обычно — только админам) */
@@ -267,15 +308,16 @@ async function setStatusById(adId, status, extra = {}) {
   await update(adRef, patch);
   const snap = await get(adRef);
   if (!snap.exists()) throw new Error('Объявление не найдено');
-  return { adId, ...snap.val() };
+  const raw = snap.val() || {};
+  return { adId, ...toClientArrays(raw) };
 }
 
-/** Закрыть объявление (доставлено) */
+/** Закрыть объявление (доставлено/завершено) */
 async function closeById(adId, reason) {
   return setStatusById(adId, 'completed', { closedReason: reason ?? '' });
 }
 
-/** Архивировать объявление */
+/** Архивировать (скрыть) объявление */
 async function archiveById(adId, reason) {
   return setStatusById(adId, 'archived', { archivedReason: reason ?? '' });
 }
