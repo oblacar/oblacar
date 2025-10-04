@@ -53,7 +53,7 @@ const emptyForm = {
 function adToForm(ad = {}) {
     const route = ad.route || {};
 
-    // --- ЦЕНА: читаем плоско, но с защитой от старого формата {value, unit, readyToNegotiate}
+    // --- ЦЕНА (плоско, с защитой на старый формат)
     const priceValue = (typeof ad.price === 'number')
         ? ad.price
         : (ad && typeof ad.price === 'object')
@@ -100,6 +100,14 @@ function adToForm(ad = {}) {
     else if (plt && typeof plt === 'object') {
         preferredLoadingTypes = Object.keys(plt).filter(k => !!plt[k]);
     }
+
+    // ФОТО: сервис отдаёт [{id,url}] -> форма ждёт [{id,src}]
+    const photos = Array.isArray(ad.photos)
+        ? ad.photos.map(p => {
+            if (typeof p === 'string') return { id: p, src: p };
+            return { id: p?.id ?? String(Math.random()), src: p?.src ?? p?.url ?? '' };
+        }).filter(p => !!p.src)
+        : [];
 
     const form = {
         ...emptyForm,
@@ -148,7 +156,8 @@ function adToForm(ad = {}) {
         cargoType: ad.cargoType ?? ad?.cargo?.type ?? '',
         description: ad.description ?? '',
 
-        photos: ad.photos ?? [],
+        // 👇 сюда кладём уже {id,src}
+        photos,
 
         weightTons,
         dimensionsMeters: {
@@ -183,6 +192,17 @@ function adToForm(ad = {}) {
 function formToPatch(fd) {
     const priceNum = (fd.price === '' || fd.price == null) ? null : Number(fd.price);
 
+    // ФОТО: форма держит [{id,src}] -> в БД пишем [{id,url}]
+    const photosForDb = Array.isArray(fd.photos)
+        ? fd.photos
+            .map(p => {
+                const url = p?.url ?? p?.src ?? (typeof p === 'string' ? p : '');
+                const id = p?.id ?? String(Math.random());
+                return url ? { id, url } : null;
+            })
+            .filter(Boolean)
+        : [];
+
     return {
         title: fd.title || null,
         description: fd.description || null,
@@ -193,7 +213,7 @@ function formToPatch(fd) {
             to: fd.destinationCity || null,
         },
 
-        // даты (канон — availability*)
+        // даты (канон — availability* — сервис склеит availabilityDate)
         availabilityFrom: fd.pickupDate || null,
         availabilityTo: fd.deliveryDate || null,
 
@@ -226,6 +246,9 @@ function formToPatch(fd) {
         // loading types — сервис сам нормализует в map
         preferredLoadingTypes: fd.preferredLoadingTypes || [],
         loadingTypes: fd.preferredLoadingTypes || [],
+
+        // 👇 отдаём сервису массив {id,url}; он уже сам превратит в map
+        photos: photosForDb,
 
         updatedAt: new Date().toISOString(),
     };

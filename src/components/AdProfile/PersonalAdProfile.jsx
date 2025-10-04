@@ -31,6 +31,28 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
 
     const { adId } = ad;
 
+    // где-нибудь рядом (утилитка)
+    const getAdPhotoUrls = (ad = {}) => {
+        // 1) для объявлений по транспорту
+        if (Array.isArray(ad.truckPhotoUrls) && ad.truckPhotoUrls.length) return ad.truckPhotoUrls;
+
+        // 2) если photos — массив строк или объектов {id,url}
+        if (Array.isArray(ad.photos)) {
+            return ad.photos
+                .map(p => typeof p === 'string' ? p : p?.url || p?.src || '')
+                .filter(Boolean);
+        }
+
+        // 3) если photos — map {id: {url}}
+        if (ad.photos && typeof ad.photos === 'object') {
+            return Object.values(ad.photos)
+                .map(p => p?.url || '')
+                .filter(Boolean);
+        }
+
+        return [];
+    };
+
     return (
         <div className={styles.fakePage}>
             <div className={styles.pageContainer}>
@@ -38,7 +60,7 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                 <div className={styles.transportAdProfile}>
                     <div className={styles.adContainer}>
                         <div className={styles.photoArea}>
-                            <HorizontalPhotoCarousel photos={ad.truckPhotoUrls || []} />
+                            <HorizontalPhotoCarousel photos={getAdPhotoUrls(ad)} />
                         </div>
 
                         {/* ВСТАВКА ПАНЕЛИ ПОД КАРУСЕЛЬЮ */}

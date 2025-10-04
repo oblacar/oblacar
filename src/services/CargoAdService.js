@@ -9,7 +9,8 @@ import {
   remove,
   serverTimestamp,
 } from 'firebase/database';
-import { db } from '../firebase';
+import { db, storage } from '../firebase'; // 👈 нужен storage
+import { ref as storageRef, deleteObject } from 'firebase/storage'; // 👈 для удаления файлов
 
 const cargoAdsRef = ref(db, 'cargoAds');
 
@@ -28,7 +29,7 @@ function mapToArr(obj) {
   return Object.keys(obj).filter((k) => !!obj[k]);
 }
 
-// photos: Array<{id,url}> -> Map { id: {url} }
+// photos: Array<{id,url|src}> -> Map { id: {url} }
 function photosArrToMap(arr) {
   const out = {};
   (Array.isArray(arr) ? arr : []).forEach((p) => {
@@ -41,14 +42,37 @@ function photosArrToMap(arr) {
 // photos: Map { id: {url} } -> Array<{id,url}>
 function photosMapToArr(obj) {
   if (!obj || typeof obj !== 'object') return [];
-  return Object.keys(obj).map((id) => {
-    const url = obj[id]?.url || '';
-    return url ? { id, url } : null;
-  }).filter(Boolean);
+  return Object.keys(obj)
+    .map((id) => {
+      const url = obj[id]?.url || '';
+      return url ? { id, url } : null;
+    })
+    .filter(Boolean);
+}
+
+// Универсально достаём список URL из любого формата photos
+function extractPhotoUrls(any) {
+  if (!any) return [];
+  if (Array.isArray(any)) {
+    // [{id,url}] | [{id,src}] | ["https://..."]
+    return any
+      .map((p) => (typeof p === 'string' ? p : (p?.url || p?.src || '')))
+      .filter(Boolean);
+  }
+  if (typeof any === 'object') {
+    // map { id: {url} }
+    return Object.values(any)
+      .map((v) => v?.url || '')
+      .filter(Boolean);
+  }
+  return [];
 }
 
 function genId() {
-  return (globalThis.crypto?.randomUUID?.() ?? `p_${Math.random().toString(36).slice(2)}`);
+  return (
+    globalThis.crypto?.randomUUID?.() ??
+    `p_${Math.random().toString(36).slice(2)}`
+  );
 }
 
 /** Локальная миграция автора в объекте после чтения (без записи в БД) */
@@ -64,8 +88,10 @@ function migrateOwnerInSnapshot(raw = {}) {
   if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
 
   if (legacy.name != null && ad.owner.name == null) ad.owner.name = legacy.name;
-  if (legacy.photoUrl != null && ad.owner.photoUrl == null) ad.owner.photoUrl = legacy.photoUrl;
-  if (legacy.rating != null && ad.owner.rating == null) ad.owner.rating = legacy.rating;
+  if (legacy.photoUrl != null && ad.owner.photoUrl == null)
+    ad.owner.photoUrl = legacy.photoUrl;
+  if (legacy.rating != null && ad.owner.rating == null)
+    ad.owner.rating = legacy.rating;
 
   if ('ownerName' in ad) delete ad.ownerName;
   if ('ownerPhotoUrl' in ad) delete ad.ownerPhotoUrl;
@@ -74,7 +100,12 @@ function migrateOwnerInSnapshot(raw = {}) {
   return { ad, changed: true };
 }
 
-/** Приведение объявления к формату UI: автор + фото-алиасы + массивы мультиселектов + photos(array) + availabilityDate->(pickup/delivery) */
+/** Приведение объявления к формату UI:
+ *  - автор + фото-алиасы
+ *  - мультиселекты в массивы
+ *  - photos(map) -> photos(array)
+ *  - availabilityDate -> pickup/delivery (для UI)
+ */
 function sanitizeAdForRead(raw = {}) {
   // 1) локально переносим легаси в owner
   const { ad } = migrateOwnerInSnapshot(raw);
@@ -82,7 +113,7 @@ function sanitizeAdForRead(raw = {}) {
   // 2) гарантируем owner-объект
   if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
 
-  // 3) name/photo — берём из всех возможных источников
+  // 3) name/photo
   const resolvedName =
     ad.owner?.name ??
     ad.ownerName ??
@@ -102,10 +133,9 @@ function sanitizeAdForRead(raw = {}) {
 
   if (resolvedPhoto) {
     ad.owner.photoUrl = ad.owner.photoUrl ?? resolvedPhoto;
-    // поддержка старых мест, если где-то ещё читается:
     ad.ownerAvatar = ad.ownerAvatar ?? resolvedPhoto;
     ad.ownerAvatarUrl = ad.ownerAvatarUrl ?? resolvedPhoto;
-    ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto; // топ-левел (legacy)
+    ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto;
   }
 
   // 4) мультиселекты: map -> array для UI
@@ -117,12 +147,12 @@ function sanitizeAdForRead(raw = {}) {
     : photosMapToArr(uiReady.photos);
   uiReady.photos = arrPhotos;
 
-  // 6) availabilityDate -> pickup/delivery (UI продолжает работать с двумя полями)
+  // 6) availabilityDate -> pickup/delivery (UI работает с двумя полями)
   if (typeof uiReady.availabilityDate === 'string' && uiReady.availabilityDate.trim()) {
     const s = uiReady.availabilityDate.trim();
-    const sep = (s.includes('—') ? '—' : (s.includes('-') ? '-' : null));
+    const sep = s.includes('—') ? '—' : s.includes('-') ? '-' : null;
     if (sep) {
-      const [from, to] = s.split(sep).map(x => x.trim());
+      const [from, to] = s.split(sep).map((x) => x.trim());
       uiReady.pickupDate = from || '';
       uiReady.deliveryDate = to || '';
       uiReady.availabilityFrom = uiReady.pickupDate;
@@ -142,12 +172,12 @@ function sanitizeAdForRead(raw = {}) {
 }
 
 /* =============== МИГРАЦИИ (patch builders) ДЛЯ ЗАПИСИ В БД =============== */
-/** owner: сформировать patch для перевода легаси-полей автора в owner{} (с записью в БД) */
 function buildOwnerMigrationPatch(raw = {}) {
   const patch = {};
   let changed = false;
 
-  const ownerObj = raw.owner && typeof raw.owner === 'object' ? { ...raw.owner } : {};
+  const ownerObj =
+    raw.owner && typeof raw.owner === 'object' ? { ...raw.owner } : {};
 
   // Топ-левел
   const ownerIdTop = raw.ownerId ?? null;
@@ -171,19 +201,40 @@ function buildOwnerMigrationPatch(raw = {}) {
   };
 
   const ownerPatch = {};
-  if (targetOwner.id !== ownerIdObj) { ownerPatch.id = targetOwner.id; changed = true; }
-  if (targetOwner.name !== ownerNameObj) { ownerPatch.name = targetOwner.name; changed = true; }
-  if (targetOwner.photoUrl !== ownerPhotoObj) { ownerPatch.photoUrl = targetOwner.photoUrl; changed = true; }
-  if (targetOwner.rating !== ownerRatingObj) { ownerPatch.rating = targetOwner.rating; changed = true; }
+  if (targetOwner.id !== ownerIdObj) {
+    ownerPatch.id = targetOwner.id;
+    changed = true;
+  }
+  if (targetOwner.name !== ownerNameObj) {
+    ownerPatch.name = targetOwner.name;
+    changed = true;
+  }
+  if (targetOwner.photoUrl !== ownerPhotoObj) {
+    ownerPatch.photoUrl = targetOwner.photoUrl;
+    changed = true;
+  }
+  if (targetOwner.rating !== ownerRatingObj) {
+    ownerPatch.rating = targetOwner.rating;
+    changed = true;
+  }
 
   if (Object.keys(ownerPatch).length) {
     patch['owner'] = { ...(patch['owner'] || {}), ...ownerPatch };
   }
 
   // Удаляем легаси на верхнем уровне
-  if ('ownerName' in raw) { patch['ownerName'] = null; changed = true; }
-  if ('ownerPhotoUrl' in raw) { patch['ownerPhotoUrl'] = null; changed = true; }
-  if ('ownerRating' in raw) { patch['ownerRating'] = null; changed = true; }
+  if ('ownerName' in raw) {
+    patch['ownerName'] = null;
+    changed = true;
+  }
+  if ('ownerPhotoUrl' in raw) {
+    patch['ownerPhotoUrl'] = null;
+    changed = true;
+  }
+  if ('ownerRating' in raw) {
+    patch['ownerRating'] = null;
+    changed = true;
+  }
 
   // Удаляем legacy owner.avatarUrl
   if ('owner' in raw && raw.owner && 'avatarUrl' in raw.owner) {
@@ -284,8 +335,12 @@ function buildPriceFlattenPatch(raw = {}) {
   if (raw && typeof raw.price === 'object' && raw.price !== null) {
     const val = raw.price.value ?? null;
     const unit = raw.price.unit ?? raw.paymentUnit ?? 'руб';
-    const bargain = !!(raw.price.readyToNegotiate ?? raw.readyToNegotiate ?? true);
-    patch['price'] = (val == null ? null : val);
+    const bargain = !!(
+      raw.price.readyToNegotiate ??
+      raw.readyToNegotiate ??
+      true
+    );
+    patch['price'] = val == null ? null : val;
     patch['paymentUnit'] = unit;
     patch['readyToNegotiate'] = bargain;
     changed = true;
@@ -293,24 +348,34 @@ function buildPriceFlattenPatch(raw = {}) {
   return { patch, changed };
 }
 
-/** зачистка явных легаси-полей после миграции (когда уже есть route/availabilityDate/owner.*) */
+/** зачистка явных легаси-полей после миграции */
 function buildLegacyCleanupPatch(raw = {}) {
   const patch = {};
   let changed = false;
 
-  // если есть route — убираем дубли на верхнем уровне
   if (raw.route && ('departureCity' in raw || 'destinationCity' in raw)) {
     patch['departureCity'] = null;
     patch['destinationCity'] = null;
     changed = true;
   }
 
-  // если есть availabilityDate — убираем старые поля дат
   if (typeof raw.availabilityDate === 'string' && raw.availabilityDate.trim()) {
-    if ('availabilityFrom' in raw) { patch['availabilityFrom'] = null; changed = true; }
-    if ('availabilityTo' in raw) { patch['availabilityTo'] = null; changed = true; }
-    if ('pickupDate' in raw) { patch['pickupDate'] = null; changed = true; }
-    if ('deliveryDate' in raw) { patch['deliveryDate'] = null; changed = true; }
+    if ('availabilityFrom' in raw) {
+      patch['availabilityFrom'] = null;
+      changed = true;
+    }
+    if ('availabilityTo' in raw) {
+      patch['availabilityTo'] = null;
+      changed = true;
+    }
+    if ('pickupDate' in raw) {
+      patch['pickupDate'] = null;
+      changed = true;
+    }
+    if ('deliveryDate' in raw) {
+      patch['deliveryDate'] = null;
+      changed = true;
+    }
   }
 
   return { patch, changed };
@@ -328,8 +393,10 @@ function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
   const before = { ...p.owner };
 
   if (legacyName != null && p.owner.name == null) p.owner.name = legacyName;
-  if (legacyPhoto != null && p.owner.photoUrl == null) p.owner.photoUrl = legacyPhoto;
-  if (legacyRating != null && p.owner.rating == null) p.owner.rating = legacyRating;
+  if (legacyPhoto != null && p.owner.photoUrl == null)
+    p.owner.photoUrl = legacyPhoto;
+  if (legacyRating != null && p.owner.rating == null)
+    p.owner.rating = legacyRating;
 
   const filledOwner =
     before.name !== p.owner.name ||
@@ -391,9 +458,13 @@ function normalizeForDb(ad = {}, opts = {}) {
 function toClientArrays(raw = {}) {
   const ad = { ...raw };
 
-  ad.preferredLoadingTypes = mapToArr(raw.preferredLoadingTypes ?? raw.preferred_loading_types);
+  ad.preferredLoadingTypes = mapToArr(
+    raw.preferredLoadingTypes ?? raw.preferred_loading_types
+  );
   ad.packagingTypes = mapToArr(raw.packagingTypes);
-  ad.loadingTypes = Array.isArray(raw.loadingTypes) ? raw.loadingTypes : mapToArr(raw.loadingTypes);
+  ad.loadingTypes = Array.isArray(raw.loadingTypes)
+    ? raw.loadingTypes
+    : mapToArr(raw.loadingTypes);
 
   return ad;
 }
@@ -412,11 +483,12 @@ async function getAll() {
     const key = childSnap.key;
     const raw = childSnap.val();
 
-    // миграции с записью в БД
     const { patch: pOwner, changed: chOwner } = buildOwnerMigrationPatch(raw);
-    const { patch: pMulti, changed: chMulti } = buildMultiSelectMigrationPatch(raw);
+    const { patch: pMulti, changed: chMulti } =
+      buildMultiSelectMigrationPatch(raw);
     const { patch: pPhotos, changed: chPhotos } = buildPhotosMigrationPatch(raw);
-    const { patch: pAvail, changed: chAvail } = buildAvailabilityDatePatch(raw);
+    const { patch: pAvail, changed: chAvail } =
+      buildAvailabilityDatePatch(raw);
     const { patch: pRoute, changed: chRoute } = buildRouteMigrationPatch(raw);
     const { patch: pPrice, changed: chPrice } = buildPriceFlattenPatch(raw);
 
@@ -428,14 +500,16 @@ async function getAll() {
       ...(chRoute ? pRoute : {}),
       ...(chPrice ? pPrice : {}),
     };
-    const changed = chOwner || chMulti || chPhotos || chAvail || chRoute || chPrice;
+    const changed =
+      chOwner || chMulti || chPhotos || chAvail || chRoute || chPrice;
 
     const base = changed
       ? (() => {
         const merged = {
           ...raw,
           owner: { ...(raw.owner || {}), ...(pOwner.owner || {}) },
-          preferredLoadingTypes: pMulti.preferredLoadingTypes ?? raw.preferredLoadingTypes,
+          preferredLoadingTypes:
+            pMulti.preferredLoadingTypes ?? raw.preferredLoadingTypes,
           packagingTypes: pMulti.packagingTypes ?? raw.packagingTypes,
           loadingTypes: pMulti.loadingTypes ?? raw.loadingTypes,
           photos: pPhotos.photos ?? raw.photos,
@@ -443,12 +517,14 @@ async function getAll() {
           route: pRoute.route ?? raw.route,
           price: pPrice.price ?? raw.price,
           paymentUnit: pPrice.paymentUnit ?? raw.paymentUnit,
-          readyToNegotiate: pPrice.readyToNegotiate ?? raw.readyToNegotiate,
+          readyToNegotiate:
+            pPrice.readyToNegotiate ?? raw.readyToNegotiate,
         };
         if ('ownerName' in pOwner) delete merged.ownerName;
         if ('ownerPhotoUrl' in pOwner) delete merged.ownerPhotoUrl;
         if ('ownerRating' in pOwner) delete merged.ownerRating;
-        if ('owner/avatarUrl' in pOwner && merged.owner) delete merged.owner.avatarUrl;
+        if ('owner/avatarUrl' in pOwner && merged.owner)
+          delete merged.owner.avatarUrl;
         if ('ownerId' in pOwner) merged.ownerId = pOwner.ownerId;
         updates.push(update(child(cargoAdsRef, key), mergedPatch));
         return merged;
@@ -459,7 +535,11 @@ async function getAll() {
     result.push({ adId: key, ...clean });
   });
 
-  try { await Promise.all(updates); } catch (_) { /* игнор */ }
+  try {
+    await Promise.all(updates);
+  } catch (_) {
+    /* игнор */
+  }
   return result;
 }
 
@@ -487,14 +567,16 @@ async function getById(adId) {
     ...(chRoute ? pRoute : {}),
     ...(chPrice ? pPrice : {}),
   };
-  const changed = chOwner || chMulti || chPhotos || chAvail || chRoute || chPrice;
+  const changed =
+    chOwner || chMulti || chPhotos || chAvail || chRoute || chPrice;
 
   const base = changed
     ? (() => {
       const merged = {
         ...raw,
         owner: { ...(raw.owner || {}), ...(pOwner.owner || {}) },
-        preferredLoadingTypes: pMulti.preferredLoadingTypes ?? raw.preferredLoadingTypes,
+        preferredLoadingTypes:
+          pMulti.preferredLoadingTypes ?? raw.preferredLoadingTypes,
         packagingTypes: pMulti.packagingTypes ?? raw.packagingTypes,
         loadingTypes: pMulti.loadingTypes ?? raw.loadingTypes,
         photos: pPhotos.photos ?? raw.photos,
@@ -502,14 +584,18 @@ async function getById(adId) {
         route: pRoute.route ?? raw.route,
         price: pPrice.price ?? raw.price,
         paymentUnit: pPrice.paymentUnit ?? raw.paymentUnit,
-        readyToNegotiate: pPrice.readyToNegotiate ?? raw.readyToNegotiate,
+        readyToNegotiate:
+          pPrice.readyToNegotiate ?? raw.readyToNegotiate,
       };
       if ('ownerName' in pOwner) delete merged.ownerName;
       if ('ownerPhotoUrl' in pOwner) delete merged.ownerPhotoUrl;
       if ('ownerRating' in pOwner) delete merged.ownerRating;
-      if ('owner/avatarUrl' in pOwner && merged.owner) delete merged.owner.avatarUrl;
+      if ('owner/avatarUrl' in pOwner && merged.owner)
+        delete merged.owner.avatarUrl;
       if ('ownerId' in pOwner) merged.ownerId = pOwner.ownerId;
-      try { update(adRef, mergedPatch); } catch (_) { }
+      try {
+        update(adRef, mergedPatch);
+      } catch (_) { }
       return merged;
     })()
     : raw;
@@ -521,19 +607,22 @@ async function getById(adId) {
 /** Создать объявление */
 async function create(adData = {}) {
   const newRef = push(cargoAdsRef);
-  const payload = normalizeForDb({
-    ...adData,
-    adId: newRef.key,
-    createdAt: serverTimestamp(),
-    status: adData.status || 'active',
-  }, { clearLegacyOnWrite: true });
+  const payload = normalizeForDb(
+    {
+      ...adData,
+      adId: newRef.key,
+      createdAt: serverTimestamp(),
+      status: adData.status || 'active',
+    },
+    { clearLegacyOnWrite: true }
+  );
   await set(newRef, payload);
   const snap = await get(newRef);
   const clean = sanitizeAdForRead(snap.val() || {});
   return { adId: newRef.key, ...clean };
 }
 
-/** Обновить объявление (partial update, без потери owner.*) */
+/** Обновить объявление (partial update, с удалением фоток из Storage, если их убрали из формы) */
 async function updateById(adId, patch = {}) {
   if (!adId) throw new Error('updateById: adId is required');
   const adRef = child(cargoAdsRef, adId);
@@ -543,19 +632,48 @@ async function updateById(adId, patch = {}) {
   if (!curSnap.exists()) throw new Error('updateById: ad not found');
   const current = curSnap.val() || {};
 
-  // 2) мерджим
+  // Список URL «до»
+  const beforeUrls = new Set(extractPhotoUrls(current.photos));
+
+  // 2) мерджим пользовательский patch
   const merged = {
     ...current,
     ...patch,
     updatedAt: serverTimestamp(),
   };
 
-  // 3) нормализуем
+  // 3) нормализуем к формату БД
   const payload = normalizeForDb(merged, { clearLegacyOnWrite: true });
 
+  // Список URL «после» (по payload, именно то, что уйдёт в БД)
+  const afterUrls = new Set(extractPhotoUrls(payload.photos));
+
+  // 4) считаем, какие фото удалились
+  const removedUrls = [];
+  beforeUrls.forEach((u) => {
+    if (!afterUrls.has(u)) removedUrls.push(u);
+  });
+
+  // 5) обновляем запись
   await update(adRef, payload);
 
-  // 4) читаем обратно
+  // 6) удаляем лишние файлы из Storage — не блокируем ответ
+  if (removedUrls.length) {
+    Promise.allSettled(
+      removedUrls.map((url) => {
+        try {
+          // ref(storage, url) принимает https/gs ссылки
+          const objRef = storageRef(storage, url);
+          return deleteObject(objRef);
+        } catch {
+          // если URL не из нашего бакета или некорректен — пропускаем
+          return Promise.resolve();
+        }
+      })
+    ).catch(() => { });
+  }
+
+  // 7) читаем обратно для UI
   const snap = await get(adRef);
   const clean = sanitizeAdForRead(snap.val() || {});
   return { adId, ...clean };
@@ -574,11 +692,14 @@ async function setStatusById(adId, status, extra = {}) {
   if (!adId || !status) throw new Error('setStatusById: adId и status обязательны');
   const adRef = child(cargoAdsRef, adId);
 
-  const payload = normalizeForDb({
-    status,
-    updatedAt: serverTimestamp(),
-    ...extra,
-  }, { clearLegacyOnWrite: true });
+  const payload = normalizeForDb(
+    {
+      status,
+      updatedAt: serverTimestamp(),
+      ...extra,
+    },
+    { clearLegacyOnWrite: true }
+  );
 
   await update(adRef, payload);
   const snap = await get(adRef);
@@ -598,18 +719,6 @@ async function reopenById(adId) {
 }
 
 /* ===================== МИГРАЦИЯ ВСЕЙ БАЗЫ ===================== */
-/**
- * Перегоняем ВСЕ cargoAds к канону:
- * - owner.* из легаси
- * - route из departureCity/destinationCity
- * - availabilityDate из pickup/delivery (или availabilityFrom/To)
- * - photos массив -> map
- * - price.{value,unit,ready..} -> плоские price/paymentUnit/readyToNegotiate
- * - зачистка явных легаси полей
- *
- * @param {{dryRun?: boolean}} options
- * @returns {Promise<{total:number, changed:number, ids:string[]}>}
- */
 async function migrateAllToCanonical(options = {}) {
   const { dryRun = true } = options;
   const snap = await get(cargoAdsRef);
@@ -626,9 +735,11 @@ async function migrateAllToCanonical(options = {}) {
     const raw = childSnap.val() || {};
 
     const { patch: pOwner, changed: chOwner } = buildOwnerMigrationPatch(raw);
-    const { patch: pMulti, changed: chMulti } = buildMultiSelectMigrationPatch(raw);
+    const { patch: pMulti, changed: chMulti } =
+      buildMultiSelectMigrationPatch(raw);
     const { patch: pPhotos, changed: chPhotos } = buildPhotosMigrationPatch(raw);
-    const { patch: pAvail, changed: chAvail } = buildAvailabilityDatePatch(raw);
+    const { patch: pAvail, changed: chAvail } =
+      buildAvailabilityDatePatch(raw);
     const { patch: pRoute, changed: chRoute } = buildRouteMigrationPatch(raw);
     const { patch: pPrice, changed: chPrice } = buildPriceFlattenPatch(raw);
 
@@ -641,14 +752,14 @@ async function migrateAllToCanonical(options = {}) {
       ...(chPrice ? pPrice : {}),
     };
 
-    // «виртуально» применим, чтобы решить, что ещё можно подчистить
     const mergedPreview = {
       ...raw,
       ...beforeCleanup,
       owner: { ...(raw.owner || {}), ...(pOwner.owner || {}) },
     };
 
-    const { patch: pClean, changed: chClean } = buildLegacyCleanupPatch(mergedPreview);
+    const { patch: pClean, changed: chClean } =
+      buildLegacyCleanupPatch(mergedPreview);
 
     const finalPatch = { ...beforeCleanup, ...(chClean ? pClean : {}) };
     const willChange = Object.keys(finalPatch).length > 0;
@@ -681,7 +792,6 @@ const CargoAdService = {
   archiveById,
   reopenById,
 
-  // 👇 вот его и ждала админ-кнопка
   migrateAllToCanonical,
 };
 
