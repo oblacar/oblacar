@@ -1,9 +1,10 @@
 // src/pages/CargoAds/NewCargoAdPage.jsx
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useContext } from 'react';
 import Button from '../../../../components/common/Button/Button';
 import ConfirmationDialog from '../../../../components/common/ConfirmationDialog/ConfirmationDialog';
 import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm/CreateCargoAdForm';
 import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
+import CargoAdsContext from '../../../../hooks/CargoAdsContext';
 import './NewCargoAdPage.css';
 
 const initialState = {
@@ -12,29 +13,49 @@ const initialState = {
     ownerPhotoUrl: '',
     ownerRating: '',
     createdAt: new Date().toISOString(),
+
+    // маршрут + даты
     departureCity: '',
     destinationCity: '',
     pickupDate: '',
     deliveryDate: '',
+
+    // цена (плоско)
     price: '',
     paymentUnit: 'руб',
     readyToNegotiate: true,
+
+    // груз
     title: '',
     cargoType: '',
     description: '',
     photos: [],
+
     weightTons: '',
     dimensionsMeters: { height: '', width: '', depth: '' },
+
     quantity: '',
     packagingType: '',
+    packagingTypes: [],
+
     isFragile: false,
     isStackable: false,
     adrClass: '',
     temperature: { mode: 'ambient', minC: '', maxC: '' },
+
     preferredLoadingTypes: [],
 };
 
 const NewCargoAdPage = () => {
+    const ctx = useContext(CargoAdsContext) || {};
+    const { refresh } = ctx;
+
+    // поддержим оба имени: addAd (ваше) и createAd (мой прежний)
+    const saveNewAd =
+        (typeof ctx.addAd === 'function' && ctx.addAd) ||
+        (typeof ctx.createAd === 'function' && ctx.createAd) ||
+        null;
+
     const formRef = useRef(null);
     const [formData, setFormData] = useState(initialState);
     const updateFormData = (patch) => setFormData((p) => ({ ...p, ...patch }));
@@ -46,47 +67,14 @@ const NewCargoAdPage = () => {
     useEffect(() => {
         console.log('[NewCargoAdPage] formData dates:', {
             pickupDate: formData.pickupDate,
-            availabilityFrom: formData.availabilityFrom,
             deliveryDate: formData.deliveryDate,
-            availabilityTo: formData.availabilityTo,
         });
-    }, [
-        formData.pickupDate,
-        formData.availabilityFrom,
-        formData.deliveryDate,
-        formData.availabilityTo,
-    ]);
-
-    // const previewAd = useMemo(() => {
-    //     const fd = formData;
-    //     return {
-    //         adId: '(черновик)',
-    //         createdAt: fd.createdAt || new Date().toISOString(),
-    //         departureCity: fd.departureCity,
-    //         destinationCity: fd.destinationCity,
-    //         pickupDate: fd.pickupDate,
-    //         deliveryDate: fd.deliveryDate,
-    //         cargoType: fd.cargoType,
-    //         cargoWeight: fd.weightTons,
-    //         cargoHeight: fd.dimensionsMeters?.height,
-    //         cargoWidth: fd.dimensionsMeters?.width,
-    //         cargoDepth: fd.dimensionsMeters?.depth,
-    //         loadingTypes: fd.preferredLoadingTypes,
-    //         price: fd.price,
-    //         paymentUnit: fd.paymentUnit,
-    //         readyToNegotiate: fd.readyToNegotiate,
-    //         title: fd.title,
-    //         ownerId: fd.ownerId,
-    //         ownerName: fd.ownerName,
-    //         ownerAvatar: fd.ownerPhotoUrl,   // CargoAdItem читает ownerAvatar/ownerAvatarUrl
-    //         ownerRating: fd.ownerRating,
-    //     };
-    // }, [formData]);
+    }, [formData.pickupDate, formData.deliveryDate]);
 
     const previewAd = useMemo(() => {
         const fd = formData;
         return {
-            // маршрут + даты
+            // маршрут + даты (Карточка умеет читать эти поля)
             departureCity: fd.departureCity,
             destinationCity: fd.destinationCity,
             availabilityFrom: fd.pickupDate,
@@ -99,24 +87,24 @@ const NewCargoAdPage = () => {
 
             // груз
             cargoType: fd.cargoType,
-            title: fd.title,                // если показываешь короткое название
+            title: fd.title,
             weightTons: fd.weightTons,
             cargoHeight: fd.dimensionsMeters?.height,
             cargoWidth: fd.dimensionsMeters?.width,
             cargoDepth: fd.dimensionsMeters?.depth,
             loadingTypes: fd.preferredLoadingTypes,
 
-            // НУЖНО ДЛЯ БЕЙДЖЕЙ:
-            packagingTypes: fd.packagingTypes ?? [], // массив ключей
+            // бейджи
+            packagingTypes: fd.packagingTypes ?? [],
             isFragile: fd.isFragile,
             isStackable: fd.isStackable,
-            temperature: fd.temperature,            // { mode: 'ambient'|'chilled'|'frozen', ... }
+            temperature: fd.temperature,
             adrClass: fd.adrClass,
 
-            // (не обязательно, но ок)
+            // мета
             createdAt: fd.createdAt,
 
-            // владелец
+            // владелец (для карточки)
             ownerId: fd.ownerId,
             ownerName: fd.ownerName,
             ownerAvatar: fd.ownerPhotoUrl,
@@ -125,36 +113,44 @@ const NewCargoAdPage = () => {
     }, [formData]);
 
     useEffect(() => {
-        console.log('[NewCargoAdPage] previewAd:', formData);
+        console.groupCollapsed('%c[NewCargoAdPage] previewAd (from formData)', 'color:#0284c7');
+        console.log(formData);
+        console.groupEnd();
     }, [formData]);
 
     const handlePlaceClick = () => {
-        if (ui !== 'idle') return; // ← защита
+        if (ui !== 'idle') return;
         if (!formRef.current?.validate()) return;
         setUi('confirm');
     };
 
-    const emulateSave = async () => {
-        setUi('saving');
-
-        // <<< ЭМУЛЯЦИЯ СЕТЕВОГО ЗАПРОСА >>>
-        const SHOULD_SUCCEED = false; // переключи на false чтобы увидеть ошибку
-        setTimeout(() => {
-            if (SHOULD_SUCCEED) {
-                setUi('success');
-            } else {
-                setErrorMsg(
-                    'Не удалось сохранить объявление. Проверьте подключение и попробуйте снова.'
-                );
-                setUi('error');
-            }
-        }, 1200);
-        // <<< /ЭМУЛЯЦИЯ >>>
-    };
-
     const handleConfirm = async () => {
-        setUi('idle'); // скрыть диалог
-        await emulateSave();
+        setUi('saving');
+        try {
+            if (!saveNewAd) throw new Error('Метод сохранения объявления недоступен (нет addAd/createAd в CargoAdsContext)');
+
+            const form = formRef.current?.getFormData?.() ?? formData;
+
+            console.groupCollapsed('%c[NEW] Submit formData', 'color:#0ea5e9');
+            console.log(form);
+            console.groupEnd();
+
+            const created = await saveNewAd(form);
+
+            console.groupCollapsed('%c[NEW] Created ← service', 'color:#22c55e');
+            console.log(created);
+            console.groupEnd();
+
+            await refresh?.();
+
+            setUi('success');
+        } catch (e) {
+            console.groupCollapsed('%c[NEW] Create ERROR', 'color:#ef4444');
+            console.error(e);
+            console.groupEnd();
+            setErrorMsg(e?.message || 'Не удалось сохранить объявление. Проверьте подключение и попробуйте снова.');
+            setUi('error');
+        }
     };
 
     const handleCancelConfirm = () => setUi('idle');
@@ -183,41 +179,37 @@ const NewCargoAdPage = () => {
                 {ui !== 'success' && (
                     <Button
                         onClick={handlePlaceClick}
-                        disabled={
-                            ui === 'saving' ||
-                            ui === 'confirm' ||
-                            ui === 'error'
-                        }
+                        disabled={ui === 'saving' || ui === 'confirm' || ui === 'error'}
                     >
                         + Разместить
                     </Button>
                 )}
             </div>
+
             {/* Ошибка */}
             {ui === 'error' && (
                 <div className='ncap__result ncap__result--error'>
                     <div className='ncap__result-title'>Ошибка</div>
                     <div className='ncap__result-text'>{errorMsg}</div>
                     <div className='ncap__result-actions'>
-                        <Button onClick={() => setUi('idle')}>
-                            Попробовать снова
-                        </Button>
+                        <Button onClick={() => setUi('idle')}>Попробовать снова</Button>
                     </div>
                 </div>
             )}
+
             {/* подсказка под превью */}
             {ui !== 'success' && (
                 <div className='new-cargo-page__subtitle'>Введите данные:</div>
             )}
+
             {/* ФОРМА — ВСЕГДА в DOM */}
-            <div
-                className={`ncap__form ${ui === 'saving' ? 'ncap__form--disabled' : ''
-                    } ${ui === 'success' ? 'ncap__form--hidden' : ''}`}
-            >
+            <div className={`ncap__form ${ui === 'saving' ? 'ncap__form--disabled' : ''} ${ui === 'success' ? 'ncap__form--hidden' : ''}`}>
                 <CreateCargoAdForm
                     ref={formRef}
                     formData={formData}
                     updateFormData={updateFormData}
+                // в режиме создания оставляем автодополнение городов (CitySearch)
+                // usePlainCityInputs={false}
                 />
             </div>
 
@@ -243,13 +235,9 @@ const NewCargoAdPage = () => {
             {/* Успех */}
             {ui === 'success' && (
                 <div className='ncap__result ncap__result--success'>
-                    <div className='ncap__result-title'>
-                        Объявление размещено
-                    </div>
+                    <div className='ncap__result-title'>Объявление размещено</div>
                     <div className='ncap__result-actions'>
-                        <Button onClick={handleCreateAnother}>
-                            Добавить ещё
-                        </Button>
+                        <Button onClick={handleCreateAnother}>Добавить ещё</Button>
                         {/* сюда при желании кнопку ко всем объявлениям */}
                     </div>
                 </div>
