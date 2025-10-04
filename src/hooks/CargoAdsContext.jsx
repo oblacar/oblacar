@@ -103,18 +103,40 @@ export const CargoAdsProvider = ({ children }) => {
   );
 
   // Обновить объявление по id (патчем)
+  // src/hooks/CargoAdsContext.jsx
+
   const updateAd = useCallback(async (adId, patch) => {
+    console.groupCollapsed('%c[CargoAdsContext:updateAd] IN', 'color:#0ea5e9');
+    console.log('adId:', adId);
+    console.log('patch:', patch);
+    console.groupEnd();
+
     try {
       const saved = await CargoAdService.updateById(adId, patch);
+
+      console.groupCollapsed('%c[CargoAdsContext:updateAd] FROM service', 'color:#22c55e');
+      console.log('saved:', saved);
+      console.log('saved.owner:', saved?.owner);
+      console.groupEnd();
+
       setAds((prev) => {
         const list = Array.isArray(prev) ? prev.slice() : [];
         const idx = list.findIndex((x) => String(x.adId) === String(adId));
         if (idx === -1) return list;
-        list[idx] = saved;
+
+        const next = { ...list[idx], ...saved };
+        console.groupCollapsed('%c[CargoAdsContext:updateAd] UPDATE state item', 'color:#f59e0b');
+        console.log('before:', list[idx]);
+        console.log('after:', next);
+        console.groupEnd();
+
+        list[idx] = next;
         return list;
       });
+
       return saved;
     } catch (e) {
+      console.error('[CargoAdsContext:updateAd] error:', e);
       setError(e?.message || String(e));
       throw e;
     }

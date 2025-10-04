@@ -8,6 +8,7 @@ import CreateCargoAdForm from '../../../../components/CargoAds/CreateCargoAdForm
 import CargoAdItem from '../../../../components/CargoAds/CargoAdItem';
 
 import CargoAdsContext from '../../../../hooks/CargoAdsContext';
+import UserContext from '../../../../hooks/UserContext';
 import '../NewCargoAd/NewCargoAdPage.css'; // переиспользуем стили от страницы создания
 
 // форма ожидает такой shape — берём ваш initialState как ориентир
@@ -92,7 +93,7 @@ function adToForm(ad = {}) {
         preferredLoadingTypes = Object.keys(plt).filter(k => !!plt[k]);
     }
 
-    return {
+    const form = {
         ...emptyForm,
         ownerId: ad.ownerId ?? ad.owner?.id ?? '',
         ownerName: ad.ownerName ?? ad.owner?.name ?? '',
@@ -159,6 +160,13 @@ function adToForm(ad = {}) {
 
         preferredLoadingTypes,
     };
+
+    console.groupCollapsed('%c[EDIT] adToForm -> formData', 'color:#0284c7');
+    console.log('ad:', ad);
+    console.log('form:', form);
+    console.groupEnd();
+
+    return form;
 }
 
 /** маппинг: значения формы -> patch к объявлению */
@@ -166,7 +174,7 @@ function formToPatch(fd) {
     // приводим цену к объекту (сервис всё равно нормализует)
     const priceValue = fd.price === '' ? null : Number(fd.price);
 
-    return {
+    const patch = {
         title: fd.title || null,
         description: fd.description || null,
 
@@ -190,7 +198,7 @@ function formToPatch(fd) {
         // груз
         cargoType: fd.cargoType || null,
 
-        // габариты/вес в плоском варианте — сервис при чтении/записи мигрирует
+        // габариты/вес
         weightTons: fd.weightTons ? Number(fd.weightTons) : null,
         dimensionsMeters: {
             height: fd.dimensionsMeters?.height || null,
@@ -214,6 +222,53 @@ function formToPatch(fd) {
 
         updatedAt: new Date().toISOString(),
     };
+
+    console.groupCollapsed('%c[EDIT] formToPatch', 'color:#2563eb');
+    console.log(patch);
+    console.groupEnd();
+
+    return patch;
+}
+
+/** Дополняем patch.owner перед сохранением — НЕ затирая существующие значения */
+function ensureOwnerForSave(patch, ad, profile) {
+    const mergedOwner = {
+        id: ad?.owner?.id ?? ad?.ownerId ?? profile?.userId ?? patch?.owner?.id ?? null,
+        name:
+            patch?.owner?.name ??
+            ad?.owner?.name ??
+            ad?.ownerName ??
+            profile?.userName ??
+            profile?.userEmail ??
+            'Пользователь',
+        photoUrl:
+            patch?.owner?.photoUrl ??
+            ad?.owner?.photoUrl ??
+            ad?.ownerAvatar ??
+            ad?.ownerPhotoUrl ??
+            profile?.userPhoto ??
+            '',
+        rating: patch?.owner?.rating ?? ad?.owner?.rating ?? null,
+    };
+
+    const out = {
+        ...patch,
+        owner: {
+            ...(patch?.owner || {}),
+            ...mergedOwner,
+        },
+        ownerId: mergedOwner.id ?? ad?.ownerId ?? null,
+        // подчистим легаси-ключи на всякий случай (сервис тоже чистит, но пусть дубль-контроль будет)
+        ownerName: null,
+        ownerPhotoUrl: null,
+        ownerRating: null,
+    };
+
+    console.groupCollapsed('%c[EDIT] ensureOwnerForSave -> patch with owner', 'color:#7c3aed');
+    console.log(out);
+    console.groupEnd();
+
+    return out;
 }
 
 const EditCargoAdPage = () => {
@@ -223,6 +278,8 @@ const EditCargoAdPage = () => {
     const {
         getById, updateAd, refresh, loading, error
     } = useContext(CargoAdsContext);
+
+    const { user: profile } = useContext(UserContext) || {};
 
     const ad = useMemo(() => getById(adId), [getById, adId]);
 
@@ -285,8 +342,30 @@ const EditCargoAdPage = () => {
         if (!adId) return;
         setUi('saving');
         try {
-            const patch = formToPatch(formData);
-            await updateAd(adId, patch);
+            // 1) берём данные формы
+            const rawForm = formRef.current.getFormData?.() || formData;
+            console.groupCollapsed('%c[EDIT] submit — raw formData', 'color:#0ea5e9');
+            console.log(rawForm);
+            console.groupEnd();
+
+            // 2) превращаем в patch
+            const basePatch = formToPatch(rawForm);
+
+            // 3) дополняем owner, чтобы не потерять name/photoUrl
+            const patch = ensureOwnerForSave(basePatch, ad, profile);
+
+            // 4) лог перед вызовом контекста
+            console.groupCollapsed('%c[EDIT] context.updateAd -> payload', 'color:#7c3aed');
+            console.log('adId:', adId);
+            console.log('patch:', patch);
+            console.groupEnd();
+
+            const saved = await updateAd(adId, patch);
+
+            console.groupCollapsed('%c[EDIT] updateAd result', 'color:#22c55e');
+            console.log(saved);
+            console.log('saved.owner:', saved?.owner);
+            console.groupEnd();
 
             // гарантируем свежие данные во всех местах, где идёт чтение напрямую
             await refresh();
@@ -294,8 +373,11 @@ const EditCargoAdPage = () => {
             // после сохранения — уходим на профиль объявления
             navigate(`/cargo-ads/${adId}`);
         } catch (e) {
+            console.error('[EDIT] save error:', e);
             setErrorMsg(e?.message || 'Не удалось сохранить изменения.');
             setUi('error');
+        } finally {
+            setUi('idle');
         }
     };
 
@@ -365,6 +447,7 @@ const EditCargoAdPage = () => {
                     ref={formRef}
                     formData={formData}
                     updateFormData={updateFormData}
+                    usePlainCityInputs
                 />
             </div>
 

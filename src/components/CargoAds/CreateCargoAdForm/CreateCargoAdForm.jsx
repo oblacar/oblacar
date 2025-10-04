@@ -23,12 +23,9 @@ import UserContext from '../../../hooks/UserContext';
 const CreateCargoAdForm = forwardRef(
     (
         {
-            // onSubmit,
-            // onSubmit — коллбэк, который форма может вызывать при сохранении (передать наружу собранные данные). В текущей версии мы сохраняем из страницы (через ref.validate() + getFormData()), поэтому onSubmit не используется. Оставлен «на будущее/совместимость». Можно смело убрать, если не планируешь вызывать submit из самой формы.
-            // layout = 'stack',
-            // layout = 'stack' — настройка раскладки. Раньше управлял видом (stack/columns). В актуальной разметке мы жёстко используем двухколоночный грид (accf__grid--2col), т.е. layout сейчас не влияет. Либо удаляй проп, либо верни логику, например:
             formData: externalFormData,
             updateFormData: externalUpdateFormData,
+            usePlainCityInputs = false,   // ← режим простых инпутов для городов (например, в Edit)
         },
         ref
     ) => {
@@ -63,7 +60,7 @@ const CreateCargoAdForm = forwardRef(
             preferredLoadingTypes: [],
         }));
 
-        // ЕДИНАЯ точка правды — до useEffect!
+        // единая точка правды
         const formData = externalFormData ?? innerFormData;
         const updateFormData = (patch) => {
             if (externalUpdateFormData) externalUpdateFormData(patch);
@@ -73,19 +70,13 @@ const CreateCargoAdForm = forwardRef(
         useEffect(() => {
             if (!isUserLoaded || !profile) return;
             const today = new Date().toLocaleDateString('ru-RU');
-            // формируем патч только для пустых полей
             const patch = {};
             if (!formData.createdAt) patch.createdAt = today;
-            if (!formData.ownerId && profile.userId)
-                patch.ownerId = profile.userId;
+            if (!formData.ownerId && profile.userId) patch.ownerId = profile.userId;
             if (!formData.ownerName && (profile.userName || profile.userEmail))
                 patch.ownerName = profile.userName || profile.userEmail || 'Пользователь';
-            if (!formData.ownerPhotoUrl && profile.userPhoto)
-                patch.ownerPhotoUrl = profile.userPhoto;
-            if (Object.keys(patch).length > 0) {
-                updateFormData(patch); // это обновит либо внешний стейт, либо локальный
-            }
-            // завязка на profile и нужные поля из formData; так мы избегаем лишних перерендеров
+            if (!formData.ownerPhotoUrl && profile.userPhoto) patch.ownerPhotoUrl = profile.userPhoto;
+            if (Object.keys(patch).length > 0) updateFormData(patch);
         }, [isUserLoaded, profile, formData.createdAt, formData.ownerId, formData.ownerName, formData.ownerPhotoUrl]);
 
         const updateDims = (name, value) =>
@@ -97,8 +88,8 @@ const CreateCargoAdForm = forwardRef(
             });
 
         const [errors, setErrors] = useState({});
-        const [showConfirm, setShowConfirm] = useState(false); // можно оставить, если используешь внутри
-        const [saving, setSaving] = useState(false);
+        const [showConfirm] = useState(false);
+        const [saving] = useState(false);
 
         const cargoTypes = useMemo(
             () => [
@@ -126,15 +117,6 @@ const CreateCargoAdForm = forwardRef(
         );
         const temperatureModes = ['ambient', 'chilled', 'frozen'];
 
-        // const updateFormData = (patch) =>
-        //     setFormData((prev) => ({ ...prev, ...patch }));
-
-        // const updateDims = (name, value) =>
-        //     setFormData((prev) => ({
-        //         ...prev,
-        //         dimensionsMeters: { ...prev.dimensionsMeters, [name]: value },
-        //     }));
-
         const toggleLoadingType = (val) => {
             const arr = Array.isArray(formData.preferredLoadingTypes)
                 ? [...formData.preferredLoadingTypes]
@@ -145,73 +127,39 @@ const CreateCargoAdForm = forwardRef(
             updateFormData({ preferredLoadingTypes: arr });
         };
 
-        // главное — используй `formData` и `updateFormData` вместо локальных имён
-
         const validate = () => {
             const e = {};
             const pos = (v) => v !== '' && !isNaN(Number(v)) && Number(v) > 0;
 
-            if (!formData.departureCity)
-                e.departureCity = 'Укажите пункт отправления';
-            if (!formData.destinationCity)
-                e.destinationCity = 'Укажите пункт назначения';
-            if (!formData.pickupDate)
-                e.pickupDate = 'Укажите дату готовности к отгрузке';
+            if (!formData.departureCity) e.departureCity = 'Укажите пункт отправления';
+            if (!formData.destinationCity) e.destinationCity = 'Укажите пункт назначения';
+            if (!formData.pickupDate) e.pickupDate = 'Укажите дату готовности к отгрузке';
 
-            if (!formData.title?.trim())
-                e.title = 'Укажите краткое название груза';
+            if (!formData.title?.trim()) e.title = 'Укажите краткое название груза';
             if (!formData.cargoType) e.cargoType = 'Выберите тип груза';
-            if (!pos(formData.weightTons))
-                e.weightTons = 'Укажите общий вес (> 0)';
+            if (!pos(formData.weightTons)) e.weightTons = 'Укажите общий вес (> 0)';
 
             setErrors(e);
             return Object.keys(e).length === 0;
         };
 
-        // Экспортируем методы наружу
+        // методы наружу
         useImperativeHandle(ref, () => ({
             validate,
             getFormData: () => formData,
             reset: () => {
-                const empty = {
-                    departureCity: '',
-                    destinationCity: '',
-                    pickupDate: '',
-                    deliveryDate: '',
-                    price: '',
-                    paymentUnit: 'руб',
-                    readyToNegotiate: true,
-                    title: '',
-                    cargoType: '',
-                    description: '',
-                    photos: [],
-                    weightTons: '',
-                    dimensionsMeters: { height: '', width: '', depth: '' },
-                    quantity: '',
-                    packagingType: '',
-                    isFragile: false,
-                    isStackable: false,
-                    adrClass: '',
-                    temperature: { mode: 'ambient', minC: '', maxC: '' },
-                    preferredLoadingTypes: [],
-                };
-                if (externalUpdateFormData) {
-                    externalUpdateFormData(empty);
-                } else {
-                    setInnerFormData(empty);
-                }
+                const empty = getInitialForm();
+                if (externalUpdateFormData) externalUpdateFormData(empty);
+                else setInnerFormData(empty);
                 setErrors({});
             },
         }));
 
         // Фото загрузка:
         const fileInputRef = useRef(null);
-
-        // ограничители (можно подкрутить)
         const MAX_FILES = 12;
         const MAX_SIZE_MB = 8;
 
-        // конвертация File -> dataURL
         const fileToDataURL = (file) =>
             new Promise((resolve, reject) => {
                 const fr = new FileReader();
@@ -226,23 +174,18 @@ const CreateCargoAdForm = forwardRef(
             const files = Array.from(e.target.files || []);
             if (!files.length) return;
 
-            // отсекаем лишнее и большие файлы
             const existing = Array.isArray(formData.photos) ? formData.photos : [];
             const room = Math.max(MAX_FILES - existing.length, 0);
             const picked = files.slice(0, room).filter(f => (f.size / 1024 / 1024) <= MAX_SIZE_MB);
-
             if (picked.length === 0) return;
 
-            // читаем в dataURL
             const dataUrls = await Promise.all(picked.map(file => fileToDataURL(file)));
-
             const next = [
                 ...existing,
                 ...dataUrls.map((src) => ({ id: crypto.randomUUID?.() || String(Math.random()), src }))
             ];
 
             updateFormData({ photos: next });
-            // сбрасываем input, чтобы повторно выбирать те же файлы при желании
             e.target.value = '';
         };
 
@@ -250,7 +193,6 @@ const CreateCargoAdForm = forwardRef(
             const arr = Array.isArray(formData.photos) ? formData.photos : [];
             updateFormData({ photos: arr.filter(p => p.id !== id) });
         };
-
 
         return (
             <div className='accf'>
@@ -264,117 +206,111 @@ const CreateCargoAdForm = forwardRef(
                                 <h3 className='accf__section-title'>Маршрут</h3>
                             </div>
                             <p className='accf__section-hint'>
-                                Когда и где груз готов к перевозке, и куда его
-                                доставить.
+                                Когда и где груз готов к перевозке, и куда его доставить.
                             </p>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Дата готовности к отгрузке
-                                </label>
+                                <label className='accf__label'>Дата готовности к отгрузке</label>
                                 <DatePicker
                                     selected={
                                         formData.pickupDate
                                             ? new Date(
-                                                formData.pickupDate
-                                                    .split('.')
-                                                    .reverse()
-                                                    .join('-')
+                                                formData.pickupDate.split('.').reverse().join('-')
                                             )
                                             : null
                                     }
                                     onChange={(date) => {
-                                        const formatted = date
-                                            ? date.toLocaleDateString('ru-RU')
-                                            : '';
+                                        const formatted = date ? date.toLocaleDateString('ru-RU') : '';
                                         updateFormData({
                                             pickupDate: formatted,
-                                            availabilityFrom: formatted, // ← добавь это
+                                            availabilityFrom: formatted,
                                         });
-                                        setErrors((p) => ({
-                                            ...p,
-                                            pickupDate: '',
-                                        }));
+                                        setErrors((p) => ({ ...p, pickupDate: '' }));
                                     }}
                                     dateFormat='dd.MM.yyyy'
                                     placeholderText='дд.мм.гггг'
                                     className='accf__input accf__date-input'
                                 />
-                                {errors.pickupDate && (
-                                    <p className='accf__error'>
-                                        {errors.pickupDate}
-                                    </p>
+                                {errors.pickupDate && <p className='accf__error'>{errors.pickupDate}</p>}
+                            </div>
+
+                            {/* Пункт отправления */}
+                            <div className='accf__field'>
+                                <label className='accf__label'>Пункт отправления</label>
+
+                                {usePlainCityInputs ? (
+                                    <input
+                                        type='text'
+                                        value={formData.departureCity}
+                                        onChange={(e) => {
+                                            updateFormData({ departureCity: e.target.value });
+                                            setErrors((p) => ({ ...p, departureCity: '' }));
+                                        }}
+                                        placeholder='Например, Москва'
+                                        className='accf__input accf__input--city'
+                                        autoComplete='off'
+                                    />
+                                ) : (
+                                    <CitySearch
+                                        value={formData.departureCity || ''}
+                                        onCitySelected={(city) => {
+                                            updateFormData({ departureCity: city });
+                                            setErrors((p) => ({ ...p, departureCity: '' }));
+                                        }}
+                                        inputClassName='accf__input accf__input--city'
+                                        placeholder='Например, Москва'
+                                    />
                                 )}
+
+                                {errors.departureCity && <p className='accf__error'>{errors.departureCity}</p>}
+                            </div>
+
+                            {/* Пункт назначения */}
+                            <div className='accf__field'>
+                                <label className='accf__label'>Пункт назначения</label>
+
+                                {usePlainCityInputs ? (
+                                    <input
+                                        type='text'
+                                        value={formData.destinationCity}
+                                        onChange={(e) => {
+                                            updateFormData({ destinationCity: e.target.value });
+                                            setErrors((p) => ({ ...p, destinationCity: '' }));
+                                        }}
+                                        placeholder='Например, Санкт-Петербург'
+                                        className='accf__input accf__input--city'
+                                        autoComplete='off'
+                                    />
+                                ) : (
+                                    <CitySearch
+                                        value={formData.destinationCity || ''}
+                                        onCitySelected={(city) => {
+                                            updateFormData({ destinationCity: city });
+                                            setErrors((p) => ({ ...p, destinationCity: '' }));
+                                        }}
+                                        inputClassName='accf__input accf__input--city'
+                                        placeholder='Например, Санкт-Петербург'
+                                    />
+                                )}
+
+                                {errors.destinationCity && <p className='accf__error'>{errors.destinationCity}</p>}
                             </div>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Пункт отправления
-                                </label>
-                                <CitySearch
-                                    onCitySelected={(city) => {
-                                        updateFormData({ departureCity: city });
-                                        setErrors((p) => ({
-                                            ...p,
-                                            departureCity: '',
-                                        }));
-                                    }}
-                                    inputClassName='accf__input accf__input--city'
-                                    placeholder='Например, Москва'
-                                />
-                                {errors.departureCity && (
-                                    <p className='accf__error'>
-                                        {errors.departureCity}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Пункт назначения
-                                </label>
-                                <CitySearch
-                                    onCitySelected={(city) => {
-                                        updateFormData({
-                                            destinationCity: city,
-                                        });
-                                        setErrors((p) => ({
-                                            ...p,
-                                            destinationCity: '',
-                                        }));
-                                    }}
-                                    inputClassName='accf__input accf__input--city'
-                                    placeholder='Например, Санкт-Петербург'
-                                />
-                                {errors.destinationCity && (
-                                    <p className='accf__error'>
-                                        {errors.destinationCity}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Желаемая дата доставки (опц.)
-                                </label>
+                                <label className='accf__label'>Желаемая дата доставки (опц.)</label>
                                 <DatePicker
                                     selected={
                                         formData.deliveryDate
                                             ? new Date(
-                                                formData.deliveryDate
-                                                    .split('.')
-                                                    .reverse()
-                                                    .join('-')
+                                                formData.deliveryDate.split('.').reverse().join('-')
                                             )
                                             : null
                                     }
                                     onChange={(date) => {
-                                        const formatted = date
-                                            ? date.toLocaleDateString('ru-RU')
-                                            : '';
+                                        const formatted = date ? date.toLocaleDateString('ru-RU') : '';
                                         updateFormData({
                                             deliveryDate: formatted,
-                                            availabilityTo: formatted, // ← и это
+                                            availabilityTo: formatted,
                                         });
                                     }}
                                     dateFormat='dd.MM.yyyy'
@@ -387,9 +323,7 @@ const CreateCargoAdForm = forwardRef(
                         {/* === 2) Стоимость === */}
                         <section className='accf__card'>
                             <div className='accf__section-title-container'>
-                                <h3 className='accf__section-title'>
-                                    Стоимость
-                                </h3>
+                                <h3 className='accf__section-title'>Стоимость</h3>
                             </div>
 
                             <div className='accf__row accf__row--price'>
@@ -399,20 +333,12 @@ const CreateCargoAdForm = forwardRef(
                                     min='0'
                                     step='1'
                                     value={formData.price}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            price: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => updateFormData({ price: e.target.value })}
                                     className='accf__input'
                                 />
                                 <select
                                     value={formData.paymentUnit}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            paymentUnit: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => updateFormData({ paymentUnit: e.target.value })}
                                     className='accf__select'
                                 >
                                     <option value='руб'>руб</option>
@@ -424,11 +350,7 @@ const CreateCargoAdForm = forwardRef(
                                 <input
                                     type='checkbox'
                                     checked={formData.readyToNegotiate}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            readyToNegotiate: e.target.checked,
-                                        })
-                                    }
+                                    onChange={(e) => updateFormData({ readyToNegotiate: e.target.checked })}
                                 />
                                 <span>Торг уместен</span>
                             </label>
@@ -444,27 +366,19 @@ const CreateCargoAdForm = forwardRef(
                             </div>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Короткое название
-                                </label>
+                                <label className='accf__label'>Короткое название</label>
                                 <input
                                     type='text'
                                     name='title'
                                     placeholder='Например, 12 паллет плитки'
                                     value={formData.title}
                                     onChange={(e) => {
-                                        updateFormData({
-                                            title: e.target.value,
-                                        });
+                                        updateFormData({ title: e.target.value });
                                         setErrors((p) => ({ ...p, title: '' }));
                                     }}
                                     className='accf__input'
                                 />
-                                {errors.title && (
-                                    <p className='accf__error'>
-                                        {errors.title}
-                                    </p>
-                                )}
+                                {errors.title && <p className='accf__error'>{errors.title}</p>}
                             </div>
 
                             <div className='accf__field'>
@@ -473,51 +387,26 @@ const CreateCargoAdForm = forwardRef(
                                     name='cargoType'
                                     value={formData.cargoType}
                                     onChange={(e) => {
-                                        updateFormData({
-                                            cargoType: e.target.value,
-                                        });
-                                        setErrors((p) => ({
-                                            ...p,
-                                            cargoType: '',
-                                        }));
+                                        updateFormData({ cargoType: e.target.value });
+                                        setErrors((p) => ({ ...p, cargoType: '' }));
                                     }}
                                     className='accf__select'
                                 >
-                                    <option
-                                        value=''
-                                        disabled
-                                    >
-                                        Выберите
-                                    </option>
+                                    <option value='' disabled>Выберите</option>
                                     {cargoTypes.map((ct) => (
-                                        <option
-                                            key={ct}
-                                            value={ct}
-                                        >
-                                            {ct}
-                                        </option>
+                                        <option key={ct} value={ct}>{ct}</option>
                                     ))}
                                 </select>
-                                {errors.cargoType && (
-                                    <p className='accf__error'>
-                                        {errors.cargoType}
-                                    </p>
-                                )}
+                                {errors.cargoType && <p className='accf__error'>{errors.cargoType}</p>}
                             </div>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Описание (опц.)
-                                </label>
+                                <label className='accf__label'>Описание (опц.)</label>
                                 <textarea
                                     rows={3}
                                     placeholder='Любые доп. детали'
                                     value={formData.description}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            description: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => updateFormData({ description: e.target.value })}
                                     className='accf__textarea'
                                 />
                             </div>
@@ -568,7 +457,6 @@ const CreateCargoAdForm = forwardRef(
                                 </div>
                             </div>
 
-
                             <div className='accf__field'>
                                 <label className='accf__label'>Вес, т</label>
                                 <input
@@ -580,26 +468,15 @@ const CreateCargoAdForm = forwardRef(
                                     step='0.01'
                                     value={formData.weightTons}
                                     onChange={(e) => {
-                                        updateFormData({
-                                            weightTons: e.target.value,
-                                        });
-                                        setErrors((p) => ({
-                                            ...p,
-                                            weightTons: '',
-                                        }));
+                                        updateFormData({ weightTons: e.target.value });
+                                        setErrors((p) => ({ ...p, weightTons: '' }));
                                     }}
                                 />
-                                {errors.weightTons && (
-                                    <p className='accf__error'>
-                                        {errors.weightTons}
-                                    </p>
-                                )}
+                                {errors.weightTons && <p className='accf__error'>{errors.weightTons}</p>}
                             </div>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Общие габариты (м) В×Ш×Г
-                                </label>
+                                <label className='accf__label'>Общие габариты (м) В×Ш×Г</label>
                                 <div className='accf__row accf__row--dims'>
                                     <input
                                         type='number'
@@ -607,9 +484,7 @@ const CreateCargoAdForm = forwardRef(
                                         min='0'
                                         step='0.01'
                                         value={formData.dimensionsMeters.height}
-                                        onChange={(e) =>
-                                            updateDims('height', e.target.value)
-                                        }
+                                        onChange={(e) => updateDims('height', e.target.value)}
                                         className='accf__input'
                                     />
                                     <input
@@ -618,9 +493,7 @@ const CreateCargoAdForm = forwardRef(
                                         min='0'
                                         step='0.01'
                                         value={formData.dimensionsMeters.width}
-                                        onChange={(e) =>
-                                            updateDims('width', e.target.value)
-                                        }
+                                        onChange={(e) => updateDims('width', e.target.value)}
                                         className='accf__input'
                                     />
                                     <input
@@ -629,44 +502,32 @@ const CreateCargoAdForm = forwardRef(
                                         min='0'
                                         step='0.01'
                                         value={formData.dimensionsMeters.depth}
-                                        onChange={(e) =>
-                                            updateDims('depth', e.target.value)
-                                        }
+                                        onChange={(e) => updateDims('depth', e.target.value)}
                                         className='accf__input'
                                     />
                                 </div>
                             </div>
 
                             <div className='accf-break-line accf__row accf__row--wrap'>
-                                <label className='accf__label'>
-                                    Количество мест
-                                </label>
+                                <label className='accf__label'>Количество мест</label>
                                 <input
                                     type='number'
                                     placeholder='Количество мест'
                                     min='0'
                                     step='1'
                                     value={formData.quantity}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            quantity: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => updateFormData({ quantity: e.target.value })}
                                     className='accf__input'
                                 />
                             </div>
+
                             <div className='accf__row accf__row--wrap'>
                                 <div className='accf__field'>
-                                    <label className='accf__label'>
-                                        Тип упаковки
-                                    </label>
+                                    <label className='accf__label'>Тип упаковки</label>
                                     <PackagingMultiSelect
                                         options={PACKAGING_OPTIONS}
                                         value={formData.packagingTypes ?? []}
-                                        onChange={(next) =>
-                                            updateFormData({ packagingTypes: next })
-                                            // console.log(next)
-                                        }
+                                        onChange={(next) => updateFormData({ packagingTypes: next })}
                                         placeholder='Выбрать упаковку'
                                     />
                                 </div>
@@ -677,11 +538,7 @@ const CreateCargoAdForm = forwardRef(
                                     <input
                                         type='checkbox'
                                         checked={formData.isFragile}
-                                        onChange={(e) =>
-                                            updateFormData({
-                                                isFragile: e.target.checked,
-                                            })
-                                        }
+                                        onChange={(e) => updateFormData({ isFragile: e.target.checked })}
                                     />
                                     <span>Хрупкий</span>
                                 </label>
@@ -689,11 +546,7 @@ const CreateCargoAdForm = forwardRef(
                                     <input
                                         type='checkbox'
                                         checked={formData.isStackable}
-                                        onChange={(e) =>
-                                            updateFormData({
-                                                isStackable: e.target.checked,
-                                            })
-                                        }
+                                        onChange={(e) => updateFormData({ isStackable: e.target.checked })}
                                     />
                                     <span>Штабелируемый</span>
                                 </label>
@@ -701,19 +554,13 @@ const CreateCargoAdForm = forwardRef(
                                     type='text'
                                     placeholder='ADR класс (опц.)'
                                     value={formData.adrClass}
-                                    onChange={(e) =>
-                                        updateFormData({
-                                            adrClass: e.target.value,
-                                        })
-                                    }
+                                    onChange={(e) => updateFormData({ adrClass: e.target.value })}
                                     className='accf__input accf__input--short'
                                 />
                             </div>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Температура
-                                </label>
+                                <label className='accf__label'>Температура</label>
                                 <div className='accf__row accf__row--wrap'>
                                     <select
                                         value={formData.temperature.mode}
@@ -728,15 +575,8 @@ const CreateCargoAdForm = forwardRef(
                                         className='accf__select'
                                     >
                                         {temperatureModes.map((m) => (
-                                            <option
-                                                key={m}
-                                                value={m}
-                                            >
-                                                {m === 'ambient'
-                                                    ? 'Обычная'
-                                                    : m === 'chilled'
-                                                        ? 'Охлажд.'
-                                                        : 'Заморозка'}
+                                            <option key={m} value={m}>
+                                                {m === 'ambient' ? 'Обычная' : m === 'chilled' ? 'Охлажд.' : 'Заморозка'}
                                             </option>
                                         ))}
                                     </select>
@@ -772,23 +612,14 @@ const CreateCargoAdForm = forwardRef(
                             </div>
 
                             <div className='accf__field'>
-                                <label className='accf__label'>
-                                    Предпочтительные варианты загрузки
-                                </label>
+                                <label className='accf__label'>Предпочтительные варианты загрузки</label>
                                 <div className='accf__tags'>
                                     {loadingTypesAll.map((t) => (
-                                        <label
-                                            key={t}
-                                            className='accf__checkbox accf__checkbox--pill'
-                                        >
+                                        <label key={t} className='accf__checkbox accf__checkbox--pill'>
                                             <input
                                                 type='checkbox'
-                                                checked={formData.preferredLoadingTypes.includes(
-                                                    t
-                                                )}
-                                                onChange={() =>
-                                                    toggleLoadingType(t)
-                                                }
+                                                checked={formData.preferredLoadingTypes.includes(t)}
+                                                onChange={() => toggleLoadingType(t)}
                                             />
                                             <span>{t}</span>
                                         </label>
