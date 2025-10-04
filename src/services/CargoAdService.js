@@ -27,6 +27,7 @@ function mapToArr(obj) {
   if (!obj || typeof obj !== 'object') return [];
   return Object.keys(obj).filter((k) => !!obj[k]);
 }
+const isObj = (v) => v && typeof v === 'object';
 
 /** Локальная миграция автора в объекте после чтения (без записи в БД) */
 function migrateOwnerInSnapshot(raw = {}) {
@@ -37,8 +38,7 @@ function migrateOwnerInSnapshot(raw = {}) {
     photoUrl: ad.ownerPhotoUrl,
     rating: ad.ownerRating,
   };
-
-  if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
+  if (!isObj(ad.owner)) ad.owner = {};
 
   if (legacy.name != null && ad.owner.name == null) ad.owner.name = legacy.name;
   if (legacy.photoUrl != null && ad.owner.photoUrl == null) ad.owner.photoUrl = legacy.photoUrl;
@@ -51,13 +51,13 @@ function migrateOwnerInSnapshot(raw = {}) {
   return { ad, changed: true };
 }
 
-/** Приведение объявления к формату UI: автор + фото-алиасы + массивы мультиселектов */
+/** Приведение объявления к формату UI: автор + фото-алиасы + массивы мультиселектов + цена плоско */
 function sanitizeAdForRead(raw = {}) {
   // 1) локально переносим легаси в owner
   const { ad } = migrateOwnerInSnapshot(raw);
 
   // 2) гарантируем owner-объект
-  if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
+  if (!isObj(ad.owner)) ad.owner = {};
 
   // 3) name/photo — берём из всех возможных источников
   const resolvedName =
@@ -79,23 +79,44 @@ function sanitizeAdForRead(raw = {}) {
 
   if (resolvedPhoto) {
     ad.owner.photoUrl = ad.owner.photoUrl ?? resolvedPhoto;
-    // поддержка старых мест, если где-то ещё читается:
+    // поддержка старых мест (если что-то ещё их читает)
     ad.ownerAvatar = ad.ownerAvatar ?? resolvedPhoto;
     ad.ownerAvatarUrl = ad.ownerAvatarUrl ?? resolvedPhoto;
-    ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto; // топ-левел (legacy)
+    ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto; // топ-левел для легаси
   }
 
   // 4) конвертируем поля мультиселектов в массивы для UI
-  return toClientArrays(ad);
+  const withArrays = toClientArrays(ad);
+
+  // 5) ЦЕНА: если в БД остались старые объекты price {value,unit,readyToNegotiate} — нормализуем плоско
+  if (isObj(withArrays.price)) {
+    const p = withArrays.price;
+    // переносим на верхний уровень
+    withArrays.price = typeof p.value === 'number' ? p.value : (p.value == null ? null : Number(p.value));
+    if (withArrays.price != null && !Number.isFinite(withArrays.price)) {
+      withArrays.price = null;
+    }
+    if (withArrays.paymentUnit == null && p.unit != null) {
+      withArrays.paymentUnit = p.unit;
+    }
+    if (withArrays.readyToNegotiate == null && p.readyToNegotiate != null) {
+      withArrays.readyToNegotiate = !!p.readyToNegotiate;
+    }
+  }
+  // дефолты, если не были заданы
+  if (withArrays.paymentUnit == null) withArrays.paymentUnit = 'руб';
+  if (withArrays.readyToNegotiate == null) withArrays.readyToNegotiate = true;
+
+  return withArrays;
 }
 
-/* =============== МИГРАЦИЯ ДЛЯ ЗАПИСИ В БД (owner) =============== */
+/* =============== МИГРАЦИИ ДЛЯ ЗАПИСИ В БД =============== */
 /** Сформировать patch для перевода легаси-полей автора в owner{} (с записью в БД) */
 function buildOwnerMigrationPatch(raw = {}) {
   const patch = {};
   let changed = false;
 
-  const ownerObj = raw.owner && typeof raw.owner === 'object' ? { ...raw.owner } : {};
+  const ownerObj = isObj(raw.owner) ? { ...raw.owner } : {};
 
   // Топ-левел
   const ownerIdTop = raw.ownerId ?? null;
@@ -148,8 +169,7 @@ function buildOwnerMigrationPatch(raw = {}) {
   return { patch, changed };
 }
 
-/* =============== МИГРАЦИЯ ДЛЯ ЗАПИСИ В БД (мультиселекты) =============== */
-/** Массивы -> map в БД */
+/** Массивы -> map в БД (мультиселекты) */
 function buildMultiSelectMigrationPatch(raw = {}) {
   const patch = {};
   let changed = false;
@@ -182,7 +202,7 @@ function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
   const legacyPhoto = p.ownerPhotoUrl ?? null;
   const legacyRating = p.ownerRating ?? null;
 
-  if (!p.owner) p.owner = {};
+  if (!isObj(p.owner)) p.owner = {};
   const before = { ...p.owner };
 
   if (legacyName != null && p.owner.name == null) p.owner.name = legacyName;
@@ -203,6 +223,35 @@ function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
   return p;
 }
 
+/** Нормализация ЦЕНЫ перед записью (плоско в БД) */
+function normalizePriceForWrite(payload = {}) {
+  const p = { ...payload };
+
+  // Если пришли старые поля price:{value,unit,readyToNegotiate}
+  if (isObj(p.price)) {
+    const obj = p.price;
+    const v = obj.value;
+    p.price = v == null ? null : Number(v);
+    if (!Number.isFinite(p.price)) p.price = null;
+
+    if (obj.unit != null && p.paymentUnit == null) p.paymentUnit = String(obj.unit);
+    if (obj.readyToNegotiate != null && p.readyToNegotiate == null) {
+      p.readyToNegotiate = !!obj.readyToNegotiate;
+    }
+  } else {
+    // число/строка
+    if (p.price != null) {
+      const n = Number(p.price);
+      p.price = Number.isFinite(n) ? n : null;
+    }
+  }
+
+  if (p.paymentUnit == null) p.paymentUnit = 'руб';
+  if (p.readyToNegotiate == null) p.readyToNegotiate = true;
+
+  return p;
+}
+
 /** Общая нормализация payload перед записью в БД */
 function normalizeForDb(ad = {}, opts = {}) {
   const { clearLegacyOnWrite = true } = opts;
@@ -212,12 +261,22 @@ function normalizeForDb(ad = {}, opts = {}) {
   copy = normalizeOwnerForWrite(copy, { clearLegacy: clearLegacyOnWrite });
 
   // Синхронизация owner.id <-> ownerId
-  if (copy.owner && copy.owner.id == null && copy.ownerId != null) {
+  if (isObj(copy.owner) && copy.owner.id == null && copy.ownerId != null) {
     copy.owner = { ...copy.owner, id: copy.ownerId };
   }
-  if (copy.owner && copy.owner.id != null && copy.ownerId == null) {
+  if (isObj(copy.owner) && copy.owner.id != null && copy.ownerId == null) {
     copy.ownerId = copy.owner.id;
   }
+
+  // Маршрут: канонически — route.{from,to}
+  // (Если пришли departure/destination — аккуратно положим в route)
+  if (!isObj(copy.route)) copy.route = {};
+  if (copy.departureCity != null && copy.route.from == null) copy.route.from = copy.departureCity;
+  if (copy.destinationCity != null && copy.route.to == null) copy.route.to = copy.destinationCity;
+
+  // Даты: канонически — availability*
+  if (copy.pickupDate && !copy.availabilityFrom) copy.availabilityFrom = copy.pickupDate;
+  if (copy.deliveryDate && !copy.availabilityTo) copy.availabilityTo = copy.deliveryDate;
 
   // Мультиселекты: массив -> map
   if (Array.isArray(copy.preferredLoadingTypes)) {
@@ -229,6 +288,9 @@ function normalizeForDb(ad = {}, opts = {}) {
   if (Array.isArray(copy.loadingTypes)) {
     copy.loadingTypes = arrToMap(copy.loadingTypes);
   }
+
+  // Цена — плоско
+  copy = normalizePriceForWrite(copy);
 
   return copy;
 }
@@ -337,15 +399,15 @@ async function create(adData = {}) {
     createdAt: serverTimestamp(),
     status: adData.status || 'active',
   }, { clearLegacyOnWrite: true });
+
   await set(newRef, payload);
+
   const snap = await get(newRef);
   const clean = sanitizeAdForRead(snap.val() || {});
   return { adId: newRef.key, ...clean };
 }
 
 /** Обновить объявление (partial update, без потери owner.*) */
-// src/services/CargoAdService.js
-
 async function updateById(adId, patch = {}) {
   if (!adId) throw new Error('updateById: adId is required');
   const adRef = child(cargoAdsRef, adId);
@@ -360,10 +422,12 @@ async function updateById(adId, patch = {}) {
   console.log('current.owner:', current?.owner);
   console.groupEnd();
 
-  // 2) мерджим
+  // 2) аккуратно мержим (НЕ затирая owner, если его нет в patch)
   const merged = {
     ...current,
     ...patch,
+    // если patch.owner есть — мержим глубоко только по owner
+    owner: isObj(patch.owner) ? { ...(current.owner || {}), ...patch.owner } : (current.owner || undefined),
     updatedAt: serverTimestamp(),
   };
 
@@ -372,7 +436,7 @@ async function updateById(adId, patch = {}) {
   console.log('merged.owner:', merged?.owner);
   console.groupEnd();
 
-  // 3) нормализуем (у вас уже есть normalizeForDb)
+  // 3) нормализация в вид БД (канон)
   const payload = normalizeForDb(merged, { clearLegacyOnWrite: true });
 
   console.groupCollapsed('%c[CargoAdService.updateById] PAYLOAD to DB (after normalize)', 'color:#ef4444');
@@ -393,7 +457,6 @@ async function updateById(adId, patch = {}) {
 
   return { adId, ...clean };
 }
-
 
 /** Жёстко удалить объявление (обычно — только админам) */
 async function deleteById(adId) {

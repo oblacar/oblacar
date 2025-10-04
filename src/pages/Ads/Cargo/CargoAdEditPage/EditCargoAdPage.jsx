@@ -53,12 +53,20 @@ const emptyForm = {
 function adToForm(ad = {}) {
     const route = ad.route || {};
 
-    // цена может быть либо числом, либо объектом {value, unit}
-    const priceValue = (ad?.price && typeof ad.price === 'object')
-        ? (ad.price.value ?? '')
-        : (ad.price ?? '');
+    // --- ЦЕНА: читаем плоско, но с защитой от старого формата {value, unit, readyToNegotiate}
+    const priceValue = (typeof ad.price === 'number')
+        ? ad.price
+        : (ad && typeof ad.price === 'object')
+            ? (ad.price.value ?? '')
+            : (ad.price ?? '');
 
-    const paymentUnit = ad?.price?.unit ?? ad?.paymentUnit ?? 'руб';
+    const paymentUnit = ad.paymentUnit ?? (
+        (ad && typeof ad.price === 'object') ? ad.price.unit : 'руб'
+    );
+
+    const readyToNegotiate = (ad.readyToNegotiate != null)
+        ? !!ad.readyToNegotiate
+        : ((ad && typeof ad.price === 'object') ? !!ad.price.readyToNegotiate : true);
 
     // габариты/вес
     const weightTons =
@@ -85,7 +93,7 @@ function adToForm(ad = {}) {
         ad?.dimensionsMeters?.depth ??
         '';
 
-    // preferredLoadingTypes в БД может быть объектом — преобразуем к массиву
+    // preferredLoadingTypes: объект -> массив
     let preferredLoadingTypes = [];
     const plt = ad.preferredLoadingTypes ?? ad.loadingTypes;
     if (Array.isArray(plt)) preferredLoadingTypes = plt;
@@ -95,6 +103,8 @@ function adToForm(ad = {}) {
 
     const form = {
         ...emptyForm,
+
+        // владелец
         ownerId: ad.ownerId ?? ad.owner?.id ?? '',
         ownerName: ad.ownerName ?? ad.owner?.name ?? '',
         ownerPhotoUrl: ad.ownerPhotoUrl ?? ad.owner?.photoUrl ?? '',
@@ -128,10 +138,10 @@ function adToForm(ad = {}) {
             ad?.dates?.deliveryDate ??
             '',
 
-        // деньги
+        // ДЕНЬГИ — ПЛОСКО
         price: priceValue ?? '',
         paymentUnit,
-        readyToNegotiate: !!(ad.readyToNegotiate ?? ad?.price?.readyToNegotiate),
+        readyToNegotiate,
 
         // описание груза
         title: ad.title ?? ad?.cargo?.name ?? '',
@@ -169,31 +179,28 @@ function adToForm(ad = {}) {
     return form;
 }
 
-/** маппинг: значения формы -> patch к объявлению */
+/** маппинг: значения формы -> patch к объявлению (пишем плоскую цену) */
 function formToPatch(fd) {
-    // приводим цену к объекту (сервис всё равно нормализует)
-    const priceValue = fd.price === '' ? null : Number(fd.price);
+    const priceNum = (fd.price === '' || fd.price == null) ? null : Number(fd.price);
 
-    const patch = {
+    return {
         title: fd.title || null,
         description: fd.description || null,
 
-        // маршрут
+        // маршрут (канон — route.{from,to})
         route: {
             from: fd.departureCity || null,
             to: fd.destinationCity || null,
         },
 
-        // даты (в сервисе оставляем availability*)
+        // даты (канон — availability*)
         availabilityFrom: fd.pickupDate || null,
         availabilityTo: fd.deliveryDate || null,
 
-        // деньги
-        price: {
-            value: Number.isFinite(priceValue) ? priceValue : null,
-            unit: fd.paymentUnit || 'руб',
-            readyToNegotiate: !!fd.readyToNegotiate,
-        },
+        // ДЕНЬГИ — ПЛОСКО
+        price: Number.isFinite(priceNum) ? priceNum : null,
+        paymentUnit: fd.paymentUnit || 'руб',
+        readyToNegotiate: !!fd.readyToNegotiate,
 
         // груз
         cargoType: fd.cargoType || null,
@@ -216,19 +223,14 @@ function formToPatch(fd) {
 
         temperature: fd.temperature || null,
 
-        // loading types — пусть сервис сам нормализует объект/массив
+        // loading types — сервис сам нормализует в map
         preferredLoadingTypes: fd.preferredLoadingTypes || [],
         loadingTypes: fd.preferredLoadingTypes || [],
 
         updatedAt: new Date().toISOString(),
     };
-
-    console.groupCollapsed('%c[EDIT] formToPatch', 'color:#2563eb');
-    console.log(patch);
-    console.groupEnd();
-
-    return patch;
 }
+
 
 /** Дополняем patch.owner перед сохранением — НЕ затирая существующие значения */
 function ensureOwnerForSave(patch, ad, profile) {
