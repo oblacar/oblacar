@@ -19,6 +19,7 @@ import ConversationsPage from './pages/ConversationsPage/ConversationsPage';
 
 import NewCargoAdPage from './pages/Ads/Cargo/NewCargoAd/NewCargoAdPage';
 
+import MigrateCargoAdsPage from './pages/Ads/dev/MigrateCargoAdsPage';
 
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
@@ -49,6 +50,9 @@ const App = () => {
                                                             path='/'
                                                             element={<Home />}
                                                         />
+                                                        <Route
+                                                            path="/__dev__/migrate-cargo"
+                                                            element={<MigrateCargoAdsPage />} />
                                                         <Route
                                                             path='/register'
                                                             element={

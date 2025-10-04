@@ -27,7 +27,29 @@ function mapToArr(obj) {
   if (!obj || typeof obj !== 'object') return [];
   return Object.keys(obj).filter((k) => !!obj[k]);
 }
-const isObj = (v) => v && typeof v === 'object';
+
+// photos: Array<{id,url}> -> Map { id: {url} }
+function photosArrToMap(arr) {
+  const out = {};
+  (Array.isArray(arr) ? arr : []).forEach((p) => {
+    const id = p?.id || genId();
+    const url = p?.url || p?.src || '';
+    if (url) out[id] = { url };
+  });
+  return out;
+}
+// photos: Map { id: {url} } -> Array<{id,url}>
+function photosMapToArr(obj) {
+  if (!obj || typeof obj !== 'object') return [];
+  return Object.keys(obj).map((id) => {
+    const url = obj[id]?.url || '';
+    return url ? { id, url } : null;
+  }).filter(Boolean);
+}
+
+function genId() {
+  return (globalThis.crypto?.randomUUID?.() ?? `p_${Math.random().toString(36).slice(2)}`);
+}
 
 /** Локальная миграция автора в объекте после чтения (без записи в БД) */
 function migrateOwnerInSnapshot(raw = {}) {
@@ -38,7 +60,8 @@ function migrateOwnerInSnapshot(raw = {}) {
     photoUrl: ad.ownerPhotoUrl,
     rating: ad.ownerRating,
   };
-  if (!isObj(ad.owner)) ad.owner = {};
+
+  if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
 
   if (legacy.name != null && ad.owner.name == null) ad.owner.name = legacy.name;
   if (legacy.photoUrl != null && ad.owner.photoUrl == null) ad.owner.photoUrl = legacy.photoUrl;
@@ -51,13 +74,13 @@ function migrateOwnerInSnapshot(raw = {}) {
   return { ad, changed: true };
 }
 
-/** Приведение объявления к формату UI: автор + фото-алиасы + массивы мультиселектов + цена плоско */
+/** Приведение объявления к формату UI: автор + фото-алиасы + массивы мультиселектов + photos(array) + availabilityDate->(pickup/delivery) */
 function sanitizeAdForRead(raw = {}) {
   // 1) локально переносим легаси в owner
   const { ad } = migrateOwnerInSnapshot(raw);
 
   // 2) гарантируем owner-объект
-  if (!isObj(ad.owner)) ad.owner = {};
+  if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
 
   // 3) name/photo — берём из всех возможных источников
   const resolvedName =
@@ -79,44 +102,52 @@ function sanitizeAdForRead(raw = {}) {
 
   if (resolvedPhoto) {
     ad.owner.photoUrl = ad.owner.photoUrl ?? resolvedPhoto;
-    // поддержка старых мест (если что-то ещё их читает)
+    // поддержка старых мест, если где-то ещё читается:
     ad.ownerAvatar = ad.ownerAvatar ?? resolvedPhoto;
     ad.ownerAvatarUrl = ad.ownerAvatarUrl ?? resolvedPhoto;
-    ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto; // топ-левел для легаси
+    ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto; // топ-левел (legacy)
   }
 
-  // 4) конвертируем поля мультиселектов в массивы для UI
-  const withArrays = toClientArrays(ad);
+  // 4) мультиселекты: map -> array для UI
+  const uiReady = toClientArrays(ad);
 
-  // 5) ЦЕНА: если в БД остались старые объекты price {value,unit,readyToNegotiate} — нормализуем плоско
-  if (isObj(withArrays.price)) {
-    const p = withArrays.price;
-    // переносим на верхний уровень
-    withArrays.price = typeof p.value === 'number' ? p.value : (p.value == null ? null : Number(p.value));
-    if (withArrays.price != null && !Number.isFinite(withArrays.price)) {
-      withArrays.price = null;
+  // 5) photos: map -> array для UI
+  const arrPhotos = Array.isArray(uiReady.photos)
+    ? uiReady.photos
+    : photosMapToArr(uiReady.photos);
+  uiReady.photos = arrPhotos;
+
+  // 6) availabilityDate -> pickup/delivery (UI продолжает работать с двумя полями)
+  if (typeof uiReady.availabilityDate === 'string' && uiReady.availabilityDate.trim()) {
+    const s = uiReady.availabilityDate.trim();
+    const sep = (s.includes('—') ? '—' : (s.includes('-') ? '-' : null));
+    if (sep) {
+      const [from, to] = s.split(sep).map(x => x.trim());
+      uiReady.pickupDate = from || '';
+      uiReady.deliveryDate = to || '';
+      uiReady.availabilityFrom = uiReady.pickupDate;
+      uiReady.availabilityTo = uiReady.deliveryDate;
+    } else {
+      uiReady.pickupDate = s;
+      uiReady.deliveryDate = '';
+      uiReady.availabilityFrom = s;
+      uiReady.availabilityTo = '';
     }
-    if (withArrays.paymentUnit == null && p.unit != null) {
-      withArrays.paymentUnit = p.unit;
-    }
-    if (withArrays.readyToNegotiate == null && p.readyToNegotiate != null) {
-      withArrays.readyToNegotiate = !!p.readyToNegotiate;
-    }
+  } else {
+    uiReady.pickupDate = uiReady.pickupDate || uiReady.availabilityFrom || '';
+    uiReady.deliveryDate = uiReady.deliveryDate || uiReady.availabilityTo || '';
   }
-  // дефолты, если не были заданы
-  if (withArrays.paymentUnit == null) withArrays.paymentUnit = 'руб';
-  if (withArrays.readyToNegotiate == null) withArrays.readyToNegotiate = true;
 
-  return withArrays;
+  return uiReady;
 }
 
-/* =============== МИГРАЦИИ ДЛЯ ЗАПИСИ В БД =============== */
-/** Сформировать patch для перевода легаси-полей автора в owner{} (с записью в БД) */
+/* =============== МИГРАЦИИ (patch builders) ДЛЯ ЗАПИСИ В БД =============== */
+/** owner: сформировать patch для перевода легаси-полей автора в owner{} (с записью в БД) */
 function buildOwnerMigrationPatch(raw = {}) {
   const patch = {};
   let changed = false;
 
-  const ownerObj = isObj(raw.owner) ? { ...raw.owner } : {};
+  const ownerObj = raw.owner && typeof raw.owner === 'object' ? { ...raw.owner } : {};
 
   // Топ-левел
   const ownerIdTop = raw.ownerId ?? null;
@@ -169,7 +200,7 @@ function buildOwnerMigrationPatch(raw = {}) {
   return { patch, changed };
 }
 
-/** Массивы -> map в БД (мультиселекты) */
+/** мультиселекты: массивы -> map (для записи) */
 function buildMultiSelectMigrationPatch(raw = {}) {
   const patch = {};
   let changed = false;
@@ -190,11 +221,102 @@ function buildMultiSelectMigrationPatch(raw = {}) {
   return { patch, changed };
 }
 
+/** photos: массив -> map (для записи) */
+function buildPhotosMigrationPatch(raw = {}) {
+  const patch = {};
+  let changed = false;
+
+  if (Array.isArray(raw.photos)) {
+    patch['photos'] = photosArrToMap(raw.photos);
+    changed = true;
+  }
+
+  return { patch, changed };
+}
+
+/** availabilityDate: собрать из availabilityFrom/To или pickup/delivery (для записи) */
+function buildAvailabilityDatePatch(raw = {}) {
+  const patch = {};
+  let changed = false;
+
+  const from = raw.availabilityFrom || raw.pickupDate || '';
+  const to = raw.availabilityTo || raw.deliveryDate || '';
+
+  if (typeof raw.availabilityDate === 'string' && raw.availabilityDate.trim()) {
+    return { patch, changed: false };
+  }
+
+  if (from && to) {
+    patch['availabilityDate'] = `${from}—${to}`;
+    changed = true;
+  } else if (from && !to) {
+    patch['availabilityDate'] = from;
+    changed = true;
+  } else if (!from && to) {
+    patch['availabilityDate'] = to;
+    changed = true;
+  }
+
+  return { patch, changed };
+}
+
+/** route: если нет route, собрать из departureCity/destinationCity */
+function buildRouteMigrationPatch(raw = {}) {
+  const patch = {};
+  let changed = false;
+
+  const hasRoute = raw.route && typeof raw.route === 'object';
+  const from = raw?.route?.from ?? raw.departureCity ?? raw.from ?? '';
+  const to = raw?.route?.to ?? raw.destinationCity ?? raw.to ?? '';
+
+  if (!hasRoute && (from || to)) {
+    patch['route'] = { from: from || '', to: to || '' };
+    changed = true;
+  }
+  return { patch, changed };
+}
+
+/** price: если хранится объектом, расплющить в плоские поля */
+function buildPriceFlattenPatch(raw = {}) {
+  const patch = {};
+  let changed = false;
+
+  if (raw && typeof raw.price === 'object' && raw.price !== null) {
+    const val = raw.price.value ?? null;
+    const unit = raw.price.unit ?? raw.paymentUnit ?? 'руб';
+    const bargain = !!(raw.price.readyToNegotiate ?? raw.readyToNegotiate ?? true);
+    patch['price'] = (val == null ? null : val);
+    patch['paymentUnit'] = unit;
+    patch['readyToNegotiate'] = bargain;
+    changed = true;
+  }
+  return { patch, changed };
+}
+
+/** зачистка явных легаси-полей после миграции (когда уже есть route/availabilityDate/owner.*) */
+function buildLegacyCleanupPatch(raw = {}) {
+  const patch = {};
+  let changed = false;
+
+  // если есть route — убираем дубли на верхнем уровне
+  if (raw.route && ('departureCity' in raw || 'destinationCity' in raw)) {
+    patch['departureCity'] = null;
+    patch['destinationCity'] = null;
+    changed = true;
+  }
+
+  // если есть availabilityDate — убираем старые поля дат
+  if (typeof raw.availabilityDate === 'string' && raw.availabilityDate.trim()) {
+    if ('availabilityFrom' in raw) { patch['availabilityFrom'] = null; changed = true; }
+    if ('availabilityTo' in raw) { patch['availabilityTo'] = null; changed = true; }
+    if ('pickupDate' in raw) { patch['pickupDate'] = null; changed = true; }
+    if ('deliveryDate' in raw) { patch['deliveryDate'] = null; changed = true; }
+  }
+
+  return { patch, changed };
+}
+
 /* ===================== НОРМАЛИЗАЦИЯ ПЕРЕД ЗАПИСЬЮ ===================== */
-/**
- * Переносим легаси-поля владельца в owner.*.
- * clearLegacy: чистить ли legacy-ключи на верхнем уровне (делаем это только если реально заполнили owner.*)
- */
 function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
   const p = { ...payload };
 
@@ -202,7 +324,7 @@ function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
   const legacyPhoto = p.ownerPhotoUrl ?? null;
   const legacyRating = p.ownerRating ?? null;
 
-  if (!isObj(p.owner)) p.owner = {};
+  if (!p.owner) p.owner = {};
   const before = { ...p.owner };
 
   if (legacyName != null && p.owner.name == null) p.owner.name = legacyName;
@@ -223,35 +345,6 @@ function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
   return p;
 }
 
-/** Нормализация ЦЕНЫ перед записью (плоско в БД) */
-function normalizePriceForWrite(payload = {}) {
-  const p = { ...payload };
-
-  // Если пришли старые поля price:{value,unit,readyToNegotiate}
-  if (isObj(p.price)) {
-    const obj = p.price;
-    const v = obj.value;
-    p.price = v == null ? null : Number(v);
-    if (!Number.isFinite(p.price)) p.price = null;
-
-    if (obj.unit != null && p.paymentUnit == null) p.paymentUnit = String(obj.unit);
-    if (obj.readyToNegotiate != null && p.readyToNegotiate == null) {
-      p.readyToNegotiate = !!obj.readyToNegotiate;
-    }
-  } else {
-    // число/строка
-    if (p.price != null) {
-      const n = Number(p.price);
-      p.price = Number.isFinite(n) ? n : null;
-    }
-  }
-
-  if (p.paymentUnit == null) p.paymentUnit = 'руб';
-  if (p.readyToNegotiate == null) p.readyToNegotiate = true;
-
-  return p;
-}
-
 /** Общая нормализация payload перед записью в БД */
 function normalizeForDb(ad = {}, opts = {}) {
   const { clearLegacyOnWrite = true } = opts;
@@ -261,22 +354,12 @@ function normalizeForDb(ad = {}, opts = {}) {
   copy = normalizeOwnerForWrite(copy, { clearLegacy: clearLegacyOnWrite });
 
   // Синхронизация owner.id <-> ownerId
-  if (isObj(copy.owner) && copy.owner.id == null && copy.ownerId != null) {
+  if (copy.owner && copy.owner.id == null && copy.ownerId != null) {
     copy.owner = { ...copy.owner, id: copy.ownerId };
   }
-  if (isObj(copy.owner) && copy.owner.id != null && copy.ownerId == null) {
+  if (copy.owner && copy.owner.id != null && copy.ownerId == null) {
     copy.ownerId = copy.owner.id;
   }
-
-  // Маршрут: канонически — route.{from,to}
-  // (Если пришли departure/destination — аккуратно положим в route)
-  if (!isObj(copy.route)) copy.route = {};
-  if (copy.departureCity != null && copy.route.from == null) copy.route.from = copy.departureCity;
-  if (copy.destinationCity != null && copy.route.to == null) copy.route.to = copy.destinationCity;
-
-  // Даты: канонически — availability*
-  if (copy.pickupDate && !copy.availabilityFrom) copy.availabilityFrom = copy.pickupDate;
-  if (copy.deliveryDate && !copy.availabilityTo) copy.availabilityTo = copy.deliveryDate;
 
   // Мультиселекты: массив -> map
   if (Array.isArray(copy.preferredLoadingTypes)) {
@@ -289,14 +372,22 @@ function normalizeForDb(ad = {}, opts = {}) {
     copy.loadingTypes = arrToMap(copy.loadingTypes);
   }
 
-  // Цена — плоско
-  copy = normalizePriceForWrite(copy);
+  // Photos: массив -> map
+  if (Array.isArray(copy.photos)) {
+    copy.photos = photosArrToMap(copy.photos);
+  }
+
+  // AvailabilityDate: собрать из pickup/delivery (или availabilityFrom/To)
+  const from = copy.pickupDate || copy.availabilityFrom || '';
+  const to = copy.deliveryDate || copy.availabilityTo || '';
+  if (from && to) copy.availabilityDate = `${from}—${to}`;
+  else if (from) copy.availabilityDate = from;
+  else if (to) copy.availabilityDate = to;
 
   return copy;
 }
 
 /* ===================== К ФОРМАТУ UI ===================== */
-/** Поля БД (map) -> массивы для UI */
 function toClientArrays(raw = {}) {
   const ad = { ...raw };
 
@@ -309,7 +400,7 @@ function toClientArrays(raw = {}) {
 
 /* ===================== МЕТОДЫ ===================== */
 
-/** Прочитать все объявления + миграции (owner + мультиселекты) */
+/** Прочитать все объявления + миграции (owner + мультиселекты + photos + availabilityDate) */
 async function getAll() {
   const snap = await get(cargoAdsRef);
   if (!snap.exists()) return [];
@@ -321,10 +412,23 @@ async function getAll() {
     const key = childSnap.key;
     const raw = childSnap.val();
 
+    // миграции с записью в БД
     const { patch: pOwner, changed: chOwner } = buildOwnerMigrationPatch(raw);
     const { patch: pMulti, changed: chMulti } = buildMultiSelectMigrationPatch(raw);
-    const mergedPatch = { ...(chOwner ? pOwner : {}), ...(chMulti ? pMulti : {}) };
-    const changed = chOwner || chMulti;
+    const { patch: pPhotos, changed: chPhotos } = buildPhotosMigrationPatch(raw);
+    const { patch: pAvail, changed: chAvail } = buildAvailabilityDatePatch(raw);
+    const { patch: pRoute, changed: chRoute } = buildRouteMigrationPatch(raw);
+    const { patch: pPrice, changed: chPrice } = buildPriceFlattenPatch(raw);
+
+    const mergedPatch = {
+      ...(chOwner ? pOwner : {}),
+      ...(chMulti ? pMulti : {}),
+      ...(chPhotos ? pPhotos : {}),
+      ...(chAvail ? pAvail : {}),
+      ...(chRoute ? pRoute : {}),
+      ...(chPrice ? pPrice : {}),
+    };
+    const changed = chOwner || chMulti || chPhotos || chAvail || chRoute || chPrice;
 
     const base = changed
       ? (() => {
@@ -334,6 +438,12 @@ async function getAll() {
           preferredLoadingTypes: pMulti.preferredLoadingTypes ?? raw.preferredLoadingTypes,
           packagingTypes: pMulti.packagingTypes ?? raw.packagingTypes,
           loadingTypes: pMulti.loadingTypes ?? raw.loadingTypes,
+          photos: pPhotos.photos ?? raw.photos,
+          availabilityDate: pAvail.availabilityDate ?? raw.availabilityDate,
+          route: pRoute.route ?? raw.route,
+          price: pPrice.price ?? raw.price,
+          paymentUnit: pPrice.paymentUnit ?? raw.paymentUnit,
+          readyToNegotiate: pPrice.readyToNegotiate ?? raw.readyToNegotiate,
         };
         if ('ownerName' in pOwner) delete merged.ownerName;
         if ('ownerPhotoUrl' in pOwner) delete merged.ownerPhotoUrl;
@@ -353,7 +463,7 @@ async function getAll() {
   return result;
 }
 
-/** Прочитать объявление по id + миграции (owner + мультиселекты) */
+/** Прочитать объявление по id + миграции (owner + мультиселекты + photos + availabilityDate) */
 async function getById(adId) {
   if (!adId) return null;
   const adRef = child(cargoAdsRef, adId);
@@ -364,8 +474,20 @@ async function getById(adId) {
 
   const { patch: pOwner, changed: chOwner } = buildOwnerMigrationPatch(raw);
   const { patch: pMulti, changed: chMulti } = buildMultiSelectMigrationPatch(raw);
-  const mergedPatch = { ...(chOwner ? pOwner : {}), ...(chMulti ? pMulti : {}) };
-  const changed = chOwner || chMulti;
+  const { patch: pPhotos, changed: chPhotos } = buildPhotosMigrationPatch(raw);
+  const { patch: pAvail, changed: chAvail } = buildAvailabilityDatePatch(raw);
+  const { patch: pRoute, changed: chRoute } = buildRouteMigrationPatch(raw);
+  const { patch: pPrice, changed: chPrice } = buildPriceFlattenPatch(raw);
+
+  const mergedPatch = {
+    ...(chOwner ? pOwner : {}),
+    ...(chMulti ? pMulti : {}),
+    ...(chPhotos ? pPhotos : {}),
+    ...(chAvail ? pAvail : {}),
+    ...(chRoute ? pRoute : {}),
+    ...(chPrice ? pPrice : {}),
+  };
+  const changed = chOwner || chMulti || chPhotos || chAvail || chRoute || chPrice;
 
   const base = changed
     ? (() => {
@@ -375,6 +497,12 @@ async function getById(adId) {
         preferredLoadingTypes: pMulti.preferredLoadingTypes ?? raw.preferredLoadingTypes,
         packagingTypes: pMulti.packagingTypes ?? raw.packagingTypes,
         loadingTypes: pMulti.loadingTypes ?? raw.loadingTypes,
+        photos: pPhotos.photos ?? raw.photos,
+        availabilityDate: pAvail.availabilityDate ?? raw.availabilityDate,
+        route: pRoute.route ?? raw.route,
+        price: pPrice.price ?? raw.price,
+        paymentUnit: pPrice.paymentUnit ?? raw.paymentUnit,
+        readyToNegotiate: pPrice.readyToNegotiate ?? raw.readyToNegotiate,
       };
       if ('ownerName' in pOwner) delete merged.ownerName;
       if ('ownerPhotoUrl' in pOwner) delete merged.ownerPhotoUrl;
@@ -399,9 +527,7 @@ async function create(adData = {}) {
     createdAt: serverTimestamp(),
     status: adData.status || 'active',
   }, { clearLegacyOnWrite: true });
-
   await set(newRef, payload);
-
   const snap = await get(newRef);
   const clean = sanitizeAdForRead(snap.val() || {});
   return { adId: newRef.key, ...clean };
@@ -417,44 +543,21 @@ async function updateById(adId, patch = {}) {
   if (!curSnap.exists()) throw new Error('updateById: ad not found');
   const current = curSnap.val() || {};
 
-  console.groupCollapsed('%c[CargoAdService.updateById] CURRENT from DB', 'color:#6b7280');
-  console.log({ current });
-  console.log('current.owner:', current?.owner);
-  console.groupEnd();
-
-  // 2) аккуратно мержим (НЕ затирая owner, если его нет в patch)
+  // 2) мерджим
   const merged = {
     ...current,
     ...patch,
-    // если patch.owner есть — мержим глубоко только по owner
-    owner: isObj(patch.owner) ? { ...(current.owner || {}), ...patch.owner } : (current.owner || undefined),
     updatedAt: serverTimestamp(),
   };
 
-  console.groupCollapsed('%c[CargoAdService.updateById] MERGED before normalize', 'color:#6b7280');
-  console.log({ merged });
-  console.log('merged.owner:', merged?.owner);
-  console.groupEnd();
-
-  // 3) нормализация в вид БД (канон)
+  // 3) нормализуем
   const payload = normalizeForDb(merged, { clearLegacyOnWrite: true });
-
-  console.groupCollapsed('%c[CargoAdService.updateById] PAYLOAD to DB (after normalize)', 'color:#ef4444');
-  console.log({ payload });
-  console.log('payload.owner:', payload?.owner);
-  console.groupEnd();
 
   await update(adRef, payload);
 
   // 4) читаем обратно
   const snap = await get(adRef);
   const clean = sanitizeAdForRead(snap.val() || {});
-
-  console.groupCollapsed('%c[CargoAdService.updateById] CLEAN to UI (after read)', 'color:#22c55e');
-  console.log({ clean });
-  console.log('clean.owner:', clean?.owner);
-  console.groupEnd();
-
   return { adId, ...clean };
 }
 
@@ -467,7 +570,6 @@ async function deleteById(adId) {
 }
 
 /* ============ СТАТУСЫ (закрыть/архивировать/активировать) ============ */
-/** Базовый сеттер статуса; extra — дополнительные поля (причины и т.п.) */
 async function setStatusById(adId, status, extra = {}) {
   if (!adId || !status) throw new Error('setStatusById: adId и status обязательны');
   const adRef = child(cargoAdsRef, adId);
@@ -485,19 +587,86 @@ async function setStatusById(adId, status, extra = {}) {
   return { adId, ...clean };
 }
 
-/** Закрыть объявление (доставлено/завершено) */
 async function closeById(adId, reason) {
   return setStatusById(adId, 'completed', { closedReason: reason ?? '' });
 }
-
-/** Архивировать (скрыть) объявление */
 async function archiveById(adId, reason) {
   return setStatusById(adId, 'archived', { archivedReason: reason ?? '' });
 }
-
-/** Снова сделать активным */
 async function reopenById(adId) {
   return setStatusById(adId, 'active', { closedReason: '', archivedReason: '' });
+}
+
+/* ===================== МИГРАЦИЯ ВСЕЙ БАЗЫ ===================== */
+/**
+ * Перегоняем ВСЕ cargoAds к канону:
+ * - owner.* из легаси
+ * - route из departureCity/destinationCity
+ * - availabilityDate из pickup/delivery (или availabilityFrom/To)
+ * - photos массив -> map
+ * - price.{value,unit,ready..} -> плоские price/paymentUnit/readyToNegotiate
+ * - зачистка явных легаси полей
+ *
+ * @param {{dryRun?: boolean}} options
+ * @returns {Promise<{total:number, changed:number, ids:string[]}>}
+ */
+async function migrateAllToCanonical(options = {}) {
+  const { dryRun = true } = options;
+  const snap = await get(cargoAdsRef);
+  if (!snap.exists()) return { total: 0, changed: 0, ids: [] };
+
+  let total = 0;
+  let changed = 0;
+  const ids = [];
+  const updates = [];
+
+  snap.forEach((childSnap) => {
+    total += 1;
+    const key = childSnap.key;
+    const raw = childSnap.val() || {};
+
+    const { patch: pOwner, changed: chOwner } = buildOwnerMigrationPatch(raw);
+    const { patch: pMulti, changed: chMulti } = buildMultiSelectMigrationPatch(raw);
+    const { patch: pPhotos, changed: chPhotos } = buildPhotosMigrationPatch(raw);
+    const { patch: pAvail, changed: chAvail } = buildAvailabilityDatePatch(raw);
+    const { patch: pRoute, changed: chRoute } = buildRouteMigrationPatch(raw);
+    const { patch: pPrice, changed: chPrice } = buildPriceFlattenPatch(raw);
+
+    const beforeCleanup = {
+      ...(chOwner ? pOwner : {}),
+      ...(chMulti ? pMulti : {}),
+      ...(chPhotos ? pPhotos : {}),
+      ...(chAvail ? pAvail : {}),
+      ...(chRoute ? pRoute : {}),
+      ...(chPrice ? pPrice : {}),
+    };
+
+    // «виртуально» применим, чтобы решить, что ещё можно подчистить
+    const mergedPreview = {
+      ...raw,
+      ...beforeCleanup,
+      owner: { ...(raw.owner || {}), ...(pOwner.owner || {}) },
+    };
+
+    const { patch: pClean, changed: chClean } = buildLegacyCleanupPatch(mergedPreview);
+
+    const finalPatch = { ...beforeCleanup, ...(chClean ? pClean : {}) };
+    const willChange = Object.keys(finalPatch).length > 0;
+
+    if (willChange) {
+      changed += 1;
+      ids.push(key);
+      if (!dryRun) {
+        updates.push(update(child(cargoAdsRef, key), finalPatch));
+      }
+    }
+  });
+
+  if (!dryRun && updates.length) {
+    await Promise.allSettled(updates);
+  }
+
+  return { total, changed, ids };
 }
 
 const CargoAdService = {
@@ -511,6 +680,9 @@ const CargoAdService = {
   closeById,
   archiveById,
   reopenById,
+
+  // 👇 вот его и ждала админ-кнопка
+  migrateAllToCanonical,
 };
 
 export default CargoAdService;
