@@ -58,20 +58,23 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
             <div className={styles.pageContainer}>
                 {/* Блок объявления */}
                 <div className={styles.transportAdProfile}>
-                    <div className={styles.adContainer}>
-                        <div className={styles.photoArea}>
-                            <HorizontalPhotoCarousel photos={getAdPhotoUrls(ad)} />
+                    <div className={styles.transportAdContentWrapper}>
+
+                        <div className={styles.adContainer}>
+                            <div className={styles.photoArea}>
+                                <HorizontalPhotoCarousel photos={getAdPhotoUrls(ad)} />
+                            </div>
+
+                            {/* ВСТАВКА ПАНЕЛИ ПОД КАРУСЕЛЬЮ */}
+                            <AdActionsPanel adType={adType} ad={ad} />
+
+                            {/* Детали */}
+                            {adType === 'transport'
+                                ? <PersonalTransportAdDetails ad={ad} />
+                                : adType === 'cargo'
+                                    ? <PersonalCargoAdDetails ad={ad} />
+                                    : null}
                         </div>
-
-                        {/* ВСТАВКА ПАНЕЛИ ПОД КАРУСЕЛЬЮ */}
-                        <AdActionsPanel adType={adType} ad={ad} />
-
-                        {/* Детали */}
-                        {adType === 'transport'
-                            ? <PersonalTransportAdDetails ad={ad} />
-                            : adType === 'cargo'
-                                ? <PersonalCargoAdDetails ad={ad} />
-                                : null}
                     </div>
                 </div>
 

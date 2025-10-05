@@ -2,6 +2,8 @@
 import React from 'react';
 import styles from './PersonalAdProfile.module.css';
 
+import { renderPackagingLabels } from '../../utils/packaging';
+
 import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
 import {
     CalendarDaysIcon,
@@ -15,6 +17,8 @@ import {
     ExclamationTriangleIcon,
     TagIcon,
 } from '@heroicons/react/24/outline';
+
+import { LiaTemperatureLowSolid } from "react-icons/lia";
 
 // небольшие хелперы форматирования
 const fmt = {
@@ -115,9 +119,13 @@ const PersonalCargoAdDetails = ({ ad }) => {
         depth: data.cargo?.d ?? data.depth,
     };
 
-    const packagingTypes = data.packagingTypes ?? data.packagingType
-        ? Array.isArray(data.packagingTypes) ? data.packagingTypes : [data.packagingType]
-        : [];
+    // формируем массив ключей упаковки: либо массив, либо одинарный алиас
+    const packagingKeys = Array.isArray(data.packagingTypes)
+        ? data.packagingTypes
+        : (data.packagingType ? [data.packagingType] : []);
+
+    // переводим ключи -> русские подписи
+    const packagingLabels = renderPackagingLabels(packagingKeys);
 
     const isFragile = Boolean(data.isFragile ?? data.cargo?.fragile);
     const isStackable = Boolean(data.isStackable ?? data.cargo?.isStackable);
@@ -151,6 +159,8 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 <span>{fmt.date(createdAt)}</span>
             </div>
 
+            <div className={styles.separator} />
+
             {/* маршрут */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
@@ -165,7 +175,6 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 <span><strong>{destinationCity || '—'}</strong></span>
             </div>
 
-            <div className={styles.separator} />
 
             {/* сроки */}
             <div className={styles.routeDatePriceRow}>
@@ -177,11 +186,30 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 </strong>
                 </span>
             </div>
+
+            <div className={styles.separator} />
+
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Доставить до" size="24px" />
                 </div>
                 <span>{fmt.date(deliveryDate)}</span>
+            </div>
+
+            <div className={styles.separator} />
+
+            {/* бюджет */}
+            <div className={styles.routeDatePriceRow}>
+                <div className={styles.icon}>
+                    <IconWithTooltip icon={<BanknotesIcon />} tooltipText="Стоимость" size="24px" />
+                </div>
+                <span>{fmt.price(price, paymentUnit)}</span>
+            </div>
+            <div className={styles.routeDatePriceRow}>
+                <div className={styles.icon}>
+                    <IconWithTooltip icon={<CreditCardIcon />} tooltipText="Детали оплаты" size="24px" />
+                </div>
+                <span>{readyToNegotiate ? 'торг' : '-'}</span>
             </div>
 
             <div className={styles.separator} />
@@ -217,11 +245,18 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 </div>
                 <span>{quantity || '—'}</span>
             </div>
+
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip icon={<CubeIcon />} tooltipText="Тип упаковки" size="24px" />
                 </div>
-                <span>{fmt.list(packagingTypes)}</span>
+                <span>
+                    {packagingLabels.length === 0 ? '—' : (
+                        packagingLabels.map(lbl => (
+                            <span key={lbl} className={styles.tag}>{lbl}</span>
+                        ))
+                    )}
+                </span>
             </div>
 
             <div className={styles.separator} />
@@ -229,7 +264,11 @@ const PersonalCargoAdDetails = ({ ad }) => {
             {/* условия / флаги */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<BeakerIcon />} tooltipText="Температурный режим" size="24px" />
+                    <IconWithTooltip
+                        icon={<LiaTemperatureLowSolid size="32px" />}
+                        tooltipText="Температурный режим"
+                    // size="32px" 
+                    />
                 </div>
                 <span>{temperatureStr}</span>
             </div>
@@ -248,19 +287,6 @@ const PersonalCargoAdDetails = ({ ad }) => {
 
             <div className={styles.separator} />
 
-            {/* бюджет */}
-            <div className={styles.routeDatePriceRow}>
-                <div className={styles.icon}>
-                    <IconWithTooltip icon={<BanknotesIcon />} tooltipText="Стоимость" size="24px" />
-                </div>
-                <span>{fmt.price(price, paymentUnit)}</span>
-            </div>
-            <div className={styles.routeDatePriceRow}>
-                <div className={styles.icon}>
-                    <IconWithTooltip icon={<CreditCardIcon />} tooltipText="Готовность обсуждать" size="24px" />
-                </div>
-                <span>{readyToNegotiate ? 'да' : 'нет'}</span>
-            </div>
         </div >
     );
 };
