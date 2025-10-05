@@ -5,18 +5,20 @@ import { Link } from 'react-router-dom';
 import CargoAdsContext from '../../hooks/CargoAdsContext';
 import TransportAdContext from '../../hooks/TransportAdContext';
 
+import ConfirmationDialog from '../common/ConfirmationDialog/ConfirmationDialog';
+
 import { FaRegPenToSquare, FaCircleCheck, FaBoxArchive } from 'react-icons/fa6';
 import { FaBan } from 'react-icons/fa';
 
 import './AdActionsPanel.css';
 
 /**
- * Панель действий под каруселью (иконки):
- * - Изменить (карандаш)
- * - На паузу / Вернуть (одно и то же место)
- * - Скрыть/архивировать (ящик)
+ * Панель действий:
+ * 1) Изменить
+ * 2) На паузу / Вернуть (одно место, без «скачков»)
+ * 3) Скрыть/архивировать
  *
- * Работает и для transport, и для cargo.
+ * Работает и для cargo, и для transport.
  */
 const AdActionsPanel = ({ adType = 'cargo', ad }) => {
     const adId = ad?.adId;
@@ -25,17 +27,16 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
     const cargoCtx = useContext(CargoAdsContext) || {};
     const transportCtx = useContext(TransportAdContext) || {};
 
-    // Маппинг методов под тип объявления (+ бэккомпат)
+    // Маппинг методов (+ бэккомпат на close/reopen)
     const handlers = useMemo(() => {
         if (adType === 'cargo') {
             return {
-                pause: cargoCtx?.pauseAd ?? cargoCtx?.closeAd,        // fallback
-                unpause: cargoCtx?.unpauseAd ?? cargoCtx?.reopenAd,    // fallback
+                pause: cargoCtx?.pauseAd ?? cargoCtx?.closeAd,
+                unpause: cargoCtx?.unpauseAd ?? cargoCtx?.reopenAd,
                 archive: cargoCtx?.archiveAd,
                 editTo: adId ? `/cargo-ads/${adId}/edit` : '/cargo-ads',
             };
         }
-        // transport
         return {
             pause: transportCtx?.pauseAd ?? transportCtx?.closeAd ?? transportCtx?.closeTransportAd,
             unpause: transportCtx?.unpauseAd ?? transportCtx?.reopenAd ?? transportCtx?.reopenTransportAd,
@@ -45,27 +46,28 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
     }, [adType, adId, cargoCtx, transportCtx]);
 
     const [busy, setBusy] = useState(false);
+    const [showPauseConfirm, setShowPauseConfirm] = useState(false);
 
     const isActive = status === 'active';
     const isPaused = status === 'paused';
 
-    // Кнопка №2 — всегда на месте, просто меняет вид/обработчик
     const canPause = typeof handlers.pause === 'function' && isActive;
     const canUnpause = typeof handlers.unpause === 'function' && isPaused;
-
     const canArchive =
         typeof handlers.archive === 'function' &&
         status !== 'deleted' &&
         status !== 'archived';
 
-    // Тоггл: active -> paused (с подтверждением)
-    const onPause = async (e) => {
+    // Кнопка #2 — всегда на одном месте: либо «Пауза», либо «Вернуть»
+    const onPauseClick = (e) => {
         e?.stopPropagation?.();
         if (!canPause || !adId) return;
-        const ok = window.confirm(
-            'Вы уверены, что ставите объявление на паузу?\nОно не будет доступно для других.'
-        );
-        if (!ok) return;
+        setShowPauseConfirm(true);
+    };
+
+    const onConfirmPause = async () => {
+        setShowPauseConfirm(false);
+        if (!canPause || !adId) return;
         setBusy(true);
         try {
             await handlers.pause(adId);
@@ -74,7 +76,8 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
         }
     };
 
-    // Тоггл: paused -> active (без лишних вопросов)
+    const onCancelPause = () => setShowPauseConfirm(false);
+
     const onUnpause = async (e) => {
         e?.stopPropagation?.();
         if (!canUnpause || !adId) return;
@@ -103,7 +106,7 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
 
     return (
         <div className="ad-actions-panel">
-            {/* 1) Изменить — всегда слева и всегда на месте */}
+            {/* 1) Изменить */}
             <Link
                 to={handlers.editTo || '/'}
                 className="ad-actions-icon-btn"
@@ -115,19 +118,19 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
                 <FaRegPenToSquare className="icon-24" />
             </Link>
 
-            {/* 2) Тоггл «Пауза / Вернуть» — ОДНА КНОПКА, меняет иконку и обработчик */}
+            {/* 2) Пауза / Вернуть — одно место */}
             <button
                 type="button"
                 className="ad-actions-icon-btn"
                 title={isPaused ? 'Вернуть из паузы' : 'Поставить на паузу'}
                 aria-label={isPaused ? 'Вернуть из паузы' : 'Поставить на паузу'}
-                onClick={isPaused ? onUnpause : onPause}
+                onClick={isPaused ? onUnpause : onPauseClick}
                 disabled={busy || (!canPause && !canUnpause)}
             >
                 {isPaused ? <FaCircleCheck className="icon-24" /> : <FaBan className="icon-24" />}
             </button>
 
-            {/* 3) Скрыть/архивировать — всегда третьей */}
+            {/* 3) Скрыть/архивировать */}
             <button
                 type="button"
                 className="ad-actions-icon-btn danger"
@@ -138,6 +141,17 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
             >
                 <FaBoxArchive className="icon-24 aap-delete-icon" />
             </button>
+
+            {/* Диалог подтверждения ПАУЗЫ */}
+            {showPauseConfirm && (
+                <div className="accf__backdrop">
+                    <ConfirmationDialog
+                        message="Вы уверены, что хотите поставить объявление на паузу? Оно не будет доступно для других."
+                        onConfirm={onConfirmPause}
+                        onCancel={onCancelPause}
+                    />
+                </div>
+            )}
         </div>
     );
 };
