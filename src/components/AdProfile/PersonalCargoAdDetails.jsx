@@ -19,13 +19,54 @@ import {
 // небольшие хелперы форматирования
 const fmt = {
     date(d) {
-        if (!d) return '—';
-        // если пришла строка dd.MM.yyyy — покажем как есть
-        if (typeof d === 'string') return d;
+        // 1. Обработка пустых или нулевых значений
+        if (d === null || d === undefined || d === 0) {
+            return '—';
+        }
+
+        let dateValue = d;
+
+        // 2. Если пришла строка, но это не dd.mm.yyyy, 
+        // мы предполагаем, что это может быть таймстемп-строка или другой формат.
+        // Проверяем, похоже ли значение на dd.mm.yyyy.
+        if (typeof d === 'string') {
+            // Регулярное выражение: проверяем, соответствует ли формат "число.число.число"
+            if (/\d{1,2}\.\d{1,2}\.\d{4}/.test(d.trim())) {
+                // Если строка уже в формате дд.мм.гггг, возвращаем ее как есть
+                return d.trim();
+            }
+            // Если это не формат дд.мм.гггг, пытаемся перевести строку в число.
+            // Это нужно, если пришел таймстемп в виде строки, например '1759642468076'.
+            dateValue = Number(d);
+
+            // Если Number(d) вернул NaN (т.е. это была не таймстемп-строка, а, например, ISO-строка),
+            // то возвращаем обратно исходную строку для создания Date.
+            if (Number.isNaN(dateValue)) {
+                dateValue = d;
+            }
+        }
+
         try {
-            const t = Date.parse(d);
-            return Number.isNaN(t) ? '—' : new Date(t).toLocaleDateString('ru-RU');
-        } catch {
+            // 3. Создаем объект Date. 
+            // new Date() корректно принимает как число-таймстемп, так и строки ISO/других форматов.
+            const dateObj = new Date(dateValue);
+
+            // 4. Проверяем, валидна ли дата. 
+            // Если Date() не смог создать дату, он вернет "Invalid Date".
+            if (isNaN(dateObj.getTime())) {
+                return '—';
+            }
+
+            // 5. Форматируем в дд.мм.гггг (используя ручной метод для гарантии разделителя ".")
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+
+            return `${day}.${month}.${year}`;
+
+        } catch (error) {
+            // Это сработает, только если в new Date() передать что-то совсем странное
+            console.error('Ошибка форматирования даты:', error);
             return '—';
         }
     },
@@ -52,9 +93,9 @@ const PersonalCargoAdDetails = ({ ad }) => {
 
     // поддержим обе схемы (плоскую и вложенную)
 
-    console.log('PersonalCargoAdDetails');
-    console.log(ad);
-    
+    // console.log('PersonalCargoAdDetails');
+    // console.log(ad);
+
     const data = ad?.ad ? ad.ad : ad;
 
     const createdAt = data.createdAt || data.date;
