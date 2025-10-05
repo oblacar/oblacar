@@ -51,6 +51,10 @@ const PersonalCargoAdDetails = ({ ad }) => {
     if (!ad) return null;
 
     // поддержим обе схемы (плоскую и вложенную)
+
+    console.log('PersonalCargoAdDetails');
+    console.log(ad);
+    
     const data = ad?.ad ? ad.ad : ad;
 
     const createdAt = data.createdAt || data.date;
@@ -103,7 +107,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 <div className={styles.icon}>
                     <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Дата объявления" size="24px" />
                 </div>
-                <span><strong>{fmt.date(createdAt)}</strong></span>
+                <span>{fmt.date(createdAt)}</span>
             </div>
 
             {/* маршрут */}
@@ -127,7 +131,10 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 <div className={styles.icon}>
                     <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Забор (готовность к отгрузке)" size="24px" />
                 </div>
-                <span>{fmt.date(pickupDate)}</span>
+                <span><strong>
+                    {fmt.date(pickupDate)}
+                </strong>
+                </span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
@@ -213,7 +220,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 </div>
                 <span>{readyToNegotiate ? 'да' : 'нет'}</span>
             </div>
-        </div>
+        </div >
     );
 };
 
