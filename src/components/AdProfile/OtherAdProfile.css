@@ -13,7 +13,7 @@
     min-width: 300px;
     width: 100%;
     text-align: start;
-    font-size: 18px;
+    font-size: 16px;
     border-radius: 10px;
     margin-left: 20px;
     padding: 10px;
@@ -28,12 +28,19 @@
 .other-ad-profile-price {}
 
 .other-ad-profile-rout-date-price-row strong,
-.other-ad-profile-truck-row strong {
-    width: 130px;
+.other-ad-profile-truck-row strong,
+.other-ad-profile-cargo-className-description-title strong {
+    /* width: 130px; */
     display: inline-block;
     color: rgb(241, 134, 68);
     font-size: 16px;
+    padding-right: 10px;
 }
+
+.other-ad-profile-separator {
+    height: 10px;
+}
+
 
 .other-ad-profile-rout-date-price-row {
     margin: 5px 10px;
