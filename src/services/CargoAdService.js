@@ -688,25 +688,53 @@ async function deleteById(adId) {
 }
 
 /* ============ СТАТУСЫ (закрыть/архивировать/активировать) ============ */
+/** Базовый сеттер статуса; extra — дополнительные поля (причины и т.п.) */
+// ⛑ Безопасная версия: тянем текущую версию объявления, мерджим и сохраняем,
+// чтобы не потерять owner.* и другие поля
 async function setStatusById(adId, status, extra = {}) {
   if (!adId || !status) throw new Error('setStatusById: adId и status обязательны');
   const adRef = child(cargoAdsRef, adId);
 
-  const payload = normalizeForDb(
-    {
-      status,
-      updatedAt: serverTimestamp(),
-      ...extra,
-    },
-    { clearLegacyOnWrite: true }
-  );
+  // 1) читаем текущее состояние
+  const curSnap = await get(adRef);
+  if (!curSnap.exists()) throw new Error('Объявление не найдено');
+  const current = curSnap.val() || {};
 
+  // 2) мерджим статусы/причины поверх текущего объекта
+  const merged = {
+    ...current,
+    status,
+    ...extra,
+    updatedAt: serverTimestamp(),
+  };
+
+  // 3) подстрахуем owner ↔ плоские поля (ничего не обнуляем)
+  if (merged.owner && typeof merged.owner === 'object') {
+    const o = merged.owner;
+    if (o.id && !merged.ownerId) merged.ownerId = o.id;
+    if (o.name && !merged.ownerName) merged.ownerName = o.name;
+    if (o.photoUrl && !merged.ownerPhotoUrl) merged.ownerPhotoUrl = o.photoUrl;
+    if (o.rating != null && !merged.ownerRating) merged.ownerRating = o.rating;
+  } else if (merged.ownerId || merged.ownerName || merged.ownerPhotoUrl || merged.ownerRating != null) {
+    // если owner-объекта нет, но есть плоские поля — соберём owner
+    merged.owner = {
+      id: merged.ownerId ?? null,
+      name: merged.ownerName ?? null,
+      photoUrl: merged.ownerPhotoUrl ?? null,
+      rating: merged.ownerRating ?? null,
+    };
+  }
+
+  // 4) нормализация без агрессивной зачистки легаси — ничего лишнего не зануляем
+  const payload = normalizeForDb(merged, { clearLegacyOnWrite: false });
+
+  // 5) пишем и читаем обратно
   await update(adRef, payload);
   const snap = await get(adRef);
-  if (!snap.exists()) throw new Error('Объявление не найдено');
   const clean = sanitizeAdForRead(snap.val() || {});
   return { adId, ...clean };
 }
+
 
 async function closeById(adId, reason) {
   return setStatusById(adId, 'completed', { closedReason: reason ?? '' });

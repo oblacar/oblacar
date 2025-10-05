@@ -103,8 +103,6 @@ export const CargoAdsProvider = ({ children }) => {
   );
 
   // Обновить объявление по id (патчем)
-  // src/hooks/CargoAdsContext.jsx
-
   const updateAd = useCallback(async (adId, patch) => {
     console.groupCollapsed('%c[CargoAdsContext:updateAd] IN', 'color:#0ea5e9');
     console.log('adId:', adId);
@@ -180,7 +178,6 @@ export const CargoAdsProvider = ({ children }) => {
 
   /* ============ REVIEWED (отобранные) ДЛЯ CARGO ============ */
 
-  // Загрузить список id избранных объявлений текущего юзера
   const loadReviewed = useCallback(async () => {
     if (!authUserId) {
       setReviewedIds([]);
@@ -198,12 +195,8 @@ export const CargoAdsProvider = ({ children }) => {
     }
   }, [authUserId]);
 
-  // Обновляем избранное при смене пользователя
-  useEffect(() => {
-    loadReviewed();
-  }, [loadReviewed]);
+  useEffect(() => { loadReviewed(); }, [loadReviewed]);
 
-  // Добавить в избранное (оптимистично — сразу в стейт, при ошибке откат)
   const addReviewAd = useCallback(
     async (adId) => {
       const id = String(adId ?? '');
@@ -213,17 +206,14 @@ export const CargoAdsProvider = ({ children }) => {
         return;
       }
 
-      // локально
       setReviewedIds((prev) => {
         const list = Array.isArray(prev) ? prev : [];
         return list.includes(id) ? list : [id, ...list];
       });
 
-      // в БД
       try {
         await UserReviewAdService.addReviewAd(authUserId, id, 'cargo');
       } catch (e) {
-        // откат
         setReviewedIds((prev) =>
           Array.isArray(prev) ? prev.filter((x) => x !== id) : []
         );
@@ -234,7 +224,6 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId]
   );
 
-  // Удалить из избранного (оптимистично — сразу из стейта, при ошибке вернуть)
   const removeReviewAd = useCallback(
     async (adId) => {
       const id = String(adId ?? '');
@@ -244,16 +233,13 @@ export const CargoAdsProvider = ({ children }) => {
         return;
       }
 
-      // локально
       setReviewedIds((prev) =>
         Array.isArray(prev) ? prev.filter((x) => x !== id) : []
       );
 
-      // в БД
       try {
         await UserReviewAdService.removeReviewAd(authUserId, id, 'cargo');
       } catch (e) {
-        // откат — добавить id назад
         setReviewedIds((prev) => {
           const list = Array.isArray(prev) ? prev : [];
           return list.includes(id) ? list : [id, ...list];
@@ -265,7 +251,6 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId]
   );
 
-  // Переключить избранное (добавить/удалить)
   const toggleReviewAd = useCallback(
     async (adId) => {
       const id = String(adId ?? '');
@@ -278,27 +263,30 @@ export const CargoAdsProvider = ({ children }) => {
     [authUserId, reviewedIds, addReviewAd, removeReviewAd]
   );
 
-  // Проверить — объявление в избранном?
   const isReviewed = useCallback(
     (adId) => reviewedIds.includes(String(adId)),
     [reviewedIds]
   );
 
-  /* ============ STATUS OPS (закрыть / архив / открыть снова) ============ */
+  /* ============ STATUS OPS (пауза / архив / открыть снова) ============ */
 
-  // Закрыть объявление (status -> 'completed'), reason опционально
+  // ⏸ Поставить объявление на паузу (status -> 'paused'), reason опционально
   const closeAd = useCallback(async (adId, reason) => {
-    // оптимистичный апдейт локально
+    // оптимистично меняем локально
     setAds((prev) => {
       const list = Array.isArray(prev) ? prev.slice() : [];
       const idx = list.findIndex((a) => String(a.adId) === String(adId));
       if (idx === -1) return list;
-      list[idx] = { ...list[idx], status: 'completed', closedReason: reason ?? '' };
+      list[idx] = { ...list[idx], status: 'paused', pausedReason: reason ?? '' };
       return list;
     });
     try {
-      const saved = await CargoAdService.closeById(adId, reason);
-      // синхронизация с ответом
+      const saved = await CargoAdService.setStatusById(adId, 'paused', {
+        pausedReason: reason ?? '',
+        closedReason: '',
+        archivedReason: '',
+      });
+      // синхронизируем с ответом сервиса
       setAds((prev) => {
         const list = Array.isArray(prev) ? prev.slice() : [];
         const idx = list.findIndex((a) => String(a.adId) === String(adId));
@@ -308,13 +296,12 @@ export const CargoAdsProvider = ({ children }) => {
       });
       return saved;
     } catch (e) {
-      // откат через refresh — самый простой и надёжный вариант
-      await refresh();
+      await refresh(); // откат к серверному состоянию
       throw e;
     }
   }, [refresh]);
 
-  // Архивировать объявление (status -> 'archived'), reason опционально
+  // 🗃 Архивировать объявление (status -> 'archived'), reason опционально
   const archiveAd = useCallback(async (adId, reason) => {
     setAds((prev) => {
       const list = Array.isArray(prev) ? prev.slice() : [];
@@ -339,17 +326,27 @@ export const CargoAdsProvider = ({ children }) => {
     }
   }, [refresh]);
 
-  // Снова открыть объявление (status -> 'active')
+  // ✅ Вернуть в активные (status -> 'active')
   const reopenAd = useCallback(async (adId) => {
     setAds((prev) => {
       const list = Array.isArray(prev) ? prev.slice() : [];
       const idx = list.findIndex((a) => String(a.adId) === String(adId));
       if (idx === -1) return list;
-      list[idx] = { ...list[idx], status: 'active', closedReason: '', archivedReason: '' };
+      list[idx] = {
+        ...list[idx],
+        status: 'active',
+        pausedReason: '',
+        closedReason: '',
+        archivedReason: '',
+      };
       return list;
     });
     try {
-      const saved = await CargoAdService.reopenById(adId);
+      const saved = await CargoAdService.setStatusById(adId, 'active', {
+        pausedReason: '',
+        closedReason: '',
+        archivedReason: '',
+      });
       setAds((prev) => {
         const list = Array.isArray(prev) ? prev.slice() : [];
         const idx = list.findIndex((a) => String(a.adId) === String(adId));
@@ -391,9 +388,9 @@ export const CargoAdsProvider = ({ children }) => {
       isReviewed,
 
       // status ops
-      closeAd,
-      archiveAd,
-      reopenAd,
+      closeAd,     // теперь = поставить на ПАУЗУ
+      archiveAd,   // архивировать
+      reopenAd,    // вернуть в активные
     }),
     [
       ads, loading, error, refresh, addAd, updateAd, deleteAd,
