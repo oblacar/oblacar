@@ -1,0 +1,95 @@
+/* базовый листик */
+.ta-mini {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 16px 6px;
+  border-radius: 3px;
+  border: 2px solid #fff;
+  /* белое тонкое кольцо по периметру */
+  background: #f2f2f2 !important;
+
+  font-size: 11px;
+  line-height: 1.15;
+  color: #111827;
+
+  /* важно: анимируем transform + filter */
+  transition: transform .12s ease, filter .15s ease, background-color .15s ease;
+  will-change: transform, filter;
+
+  position: relative;
+  /* для псевдо-элемента контура */
+}
+
+/* сам скошенный клип */
+.paper-style {
+  --cut: 18px;
+  clip-path: polygon(0 0,
+      calc(100% - var(--cut)) 0,
+      100% var(--cut),
+      100% 100%,
+      0 100%);
+}
+
+/* ховер — лёгкий подъём и мягкая тень по форме */
+.ta-mini:hover {
+  background: #fff !important;
+  transform: translateY(-2px);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .18));
+}
+
+/* актив — чуть меньше, глубже тень */
+.ta-mini:active {
+  transform: translateY(-1px) scale(.985);
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, .22));
+}
+
+/* Если нужен ОРАНЖЕВЫЙ КОНТУР по клипу при active/focus */
+/* Рисуем его псевдо-элементом с таким же clip-path (не квадрат!) */
+.ta-mini::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  /* толщина контура наружу */
+  pointer-events: none;
+  border-radius: 5px;
+  /* чтобы нижние углы совпали со скруглением */
+  background: transparent;
+
+  /* маскируем фон и рисуем «кольцо» оранжевым через тень + прозрачную заливку */
+  /* Вариант 1 (простой): дублируем клип и красим полупрозрачным фоном */
+  clip-path: polygon(0 0,
+      calc(100% - var(--cut)) 0,
+      100% var(--cut),
+      100% 100%,
+      0 100%);
+
+  opacity: 0;
+  transition: opacity .12s ease;
+  /* сам цвет кольца: */
+  box-shadow: 0 0 0 2px rgba(255, 154, 47, .9) inset;
+  /* имитация контура */
+}
+
+/* показываем контур на active/focus-visible */
+.ta-mini:active::after,
+.ta-mini:focus-visible::after {
+  opacity: 1;
+}
+
+
+/* Строки: в одну линию, с обрезкой */
+.ta-mini__row {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Дата — чуть приглушённо */
+.ta-mini__date {
+  color: #6b7280;
+  /* gray-500 */
+  font-weight: 500;
+}

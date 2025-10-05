@@ -10,6 +10,7 @@ import PaymentDetails from './UserProfileSections/PaymentDetails';
 import CargoAds from './UserProfileSections/CargoAds';
 import VehiclesBoard from './UserProfileSections/VehiclesBoard';
 import TransportAdsBoard from './UserProfileSections/TransportAdsBoard';
+import CargoAdsBoard from './UserProfileSections/CargoAdsBoard';
 
 import './UserProfile.css'; // Импортируйте стили
 
@@ -24,7 +25,7 @@ const UserProfile = () => {
                     <TransportAdsBoard />
                 </div>
                 <div className='profile-section deliveries-wrapper'>
-                    <CargoAds />
+                    <CargoAdsBoard />
                 </div>
                 <div className='profile-section payment-details-wrapper'>
                     <VehiclesBoard />
