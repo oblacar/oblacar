@@ -1,8 +1,8 @@
 // src/components/CargoAd/PersonalCargoAdDetails.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import styles from './PersonalAdProfile.module.css';
 
-import { renderPackagingLabels } from '../../utils/packaging';
+import { PACKAGING_OPTIONS } from '../../constants/cargoPackagingOptions';
 
 import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
 import {
@@ -120,12 +120,25 @@ const PersonalCargoAdDetails = ({ ad }) => {
     };
 
     // формируем массив ключей упаковки: либо массив, либо одинарный алиас
+    // ключ -> человекочитаемый лейбл
+    const PACK_MAP = useMemo(() => {
+        const m = {};
+        PACKAGING_OPTIONS.forEach(o => { m[o.key] = o.label; });
+        return m;
+    }, []);
+
+    // packagingTypes может прийти массивом ключей или объектом-map
     const packagingKeys = Array.isArray(data.packagingTypes)
         ? data.packagingTypes
-        : (data.packagingType ? [data.packagingType] : []);
+        : (data.packagingTypes && typeof data.packagingTypes === 'object')
+            ? Object.keys(data.packagingTypes).filter(k => !!data.packagingTypes[k])
+            : (data.packagingType ? [data.packagingType] : []);
 
-    // переводим ключи -> русские подписи
-    const packagingLabels = renderPackagingLabels(packagingKeys);
+    const packagingLabels = packagingKeys
+        .map(k => PACK_MAP[k] || k)   // безопасно подставляем известный лейбл, иначе сам ключ
+        .filter(Boolean);
+
+
 
     const isFragile = Boolean(data.isFragile ?? data.cargo?.fragile);
     const isStackable = Boolean(data.isStackable ?? data.cargo?.isStackable);
@@ -250,14 +263,9 @@ const PersonalCargoAdDetails = ({ ad }) => {
                 <div className={styles.icon}>
                     <IconWithTooltip icon={<CubeIcon />} tooltipText="Тип упаковки" size="24px" />
                 </div>
-                <span>
-                    {packagingLabels.length === 0 ? '—' : (
-                        packagingLabels.map(lbl => (
-                            <span key={lbl} className={styles.tag}>{lbl}</span>
-                        ))
-                    )}
-                </span>
+                <span>{packagingLabels.length ? packagingLabels.join(', ') : '—'}</span>
             </div>
+
 
             <div className={styles.separator} />
 
