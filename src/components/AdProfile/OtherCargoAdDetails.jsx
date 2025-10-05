@@ -151,6 +151,7 @@ const OtherCargoAdDetails = ({ ad }) => {
                     <h2>
                         {title || '—'}
                     </h2>
+                    <div class="other-ad-profile-gradient-line"></div> 
                 </div>
 
 
@@ -165,11 +166,7 @@ const OtherCargoAdDetails = ({ ad }) => {
                     <strong>Куда: </strong>{destinationCity || '—'}
                 </div>
 
-                <div className='other-ad-profile-separator' />
 
-                <div className="other-ad-profile-rout-date-price-row">
-                    <strong>Желаемая доставка: </strong>{deliveryDate || '—'}
-                </div>
 
                 <div className="other-ad-profile-rout-date-price-row">
                     <strong>Стоимость: </strong>
@@ -178,6 +175,14 @@ const OtherCargoAdDetails = ({ ad }) => {
                         : '—'}
                     {readyToNegotiate ? ' (торг)' : ''}
                 </div>
+
+                <div className='other-ad-profile-separator' />
+
+                <div className="other-ad-profile-truck-row">
+                    <strong>Желаемая доставка: </strong>{deliveryDate || '—'}
+                </div>
+
+                <div className='other-ad-profile-separator' />
 
                 <div className="other-ad-profile-truck">
                     <div className="other-ad-profile-truck-row">

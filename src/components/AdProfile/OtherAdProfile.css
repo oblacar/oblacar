@@ -16,7 +16,7 @@
     font-size: 16px;
     border-radius: 10px;
     margin-left: 20px;
-    padding: 10px;
+    /* padding: 10px; */
 }
 
 .other-ad-profile-date {}
@@ -32,23 +32,49 @@
 .other-ad-profile-cargo-className-description-title strong {
     /* width: 130px; */
     display: inline-block;
-    color: rgb(241, 134, 68);
+    color: rgb(167 163 160);
+    /* rgb(241, 134, 68); */
     font-size: 16px;
     padding-right: 10px;
+    font-weight: 200;
 }
 
 .other-ad-profile-separator {
     height: 10px;
 }
 
+.other-ad-profile-gradient-line {
+    /* 1. Задаем высоту линии */
+    height: 2px; 
+    
+    /* 2. Используем линейный градиент для создания оранжевой линии */
+    background-image: linear-gradient(
+        to right,      /* Направление: слева направо */
+        #ffc299,       /* Светлый/прозрачный оранжевый (начинаем) */
+        #ff8c3c,       /* Яркий оранжевый (центр) */
+        #ffc299        /* Светлый/прозрачный оранжевый (заканчиваем) */
+    );
+    
+    /* 3. Убираем повторение фона (обычно не нужно для градиента, но хорошая практика) */
+    background-repeat: no-repeat;
+    
+    /* 4. При желании можно добавить отступы сверху/снизу */
+    margin-top: 15px; 
+    margin-bottom: 15px;
+}
 
 .other-ad-profile-rout-date-price-row {
-    margin: 5px 10px;
+    margin: 5px 0px;
+    font-weight: 600;
+    color: #313131;
+    font-size: 20px;
 }
+
+
 
 /* Данные об автомобиле / параметры */
 .other-ad-profile-truck {
-    margin-top: 50px;
+    /* margin-top: 50px; */
 }
 
 .other-ad-profile-truck-row {
