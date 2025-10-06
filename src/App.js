@@ -11,6 +11,7 @@ import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страниц
 import NewTransportAd from './pages/Ads/NewTransportAd/NewTransportAd';
 import AdPage from './pages/Ads/AdPage';
 import MyTransportAdsPage from './pages/Ads/MyTransportAdsPage';
+import MyCargoAdsPage from './pages/Ads/Cargo/MyCargoAds/MyCargoAdsPage'
 import EditCargoAdPage from './pages/Ads/Cargo/CargoAdEditPage/EditCargoAdPage';
 import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 import VehiclePage from './pages/Vehicles/VehiclePage';
@@ -35,14 +36,12 @@ const App = () => {
         <>
             <Router>
                 <SearchModeProvider>
-
                     <AuthProvider>
                         <UserProvider>
                             <VehicleProvider>
                                 <ConversationProvider>
                                     <TransportAdProvider>
                                         <CargoAdsProvider>
-
                                             <TransportationProvider>
                                                 <Routes>
                                                     <Route element={<Layout />}>
@@ -51,13 +50,18 @@ const App = () => {
                                                             element={<Home />}
                                                         />
                                                         <Route
-                                                            path="/__dev__/migrate-cargo"
-                                                            element={<MigrateCargoAdsPage />} />
+                                                            path='/__dev__/migrate-cargo'
+                                                            element={
+                                                                <MigrateCargoAdsPage />
+                                                            }
+                                                        />
                                                         <Route
                                                             path='/register'
                                                             element={
                                                                 <AuthPage
-                                                                    isLogin={false}
+                                                                    isLogin={
+                                                                        false
+                                                                    }
                                                                 />
                                                             }
                                                         />
@@ -65,7 +69,9 @@ const App = () => {
                                                             path='/login'
                                                             element={
                                                                 <AuthPage
-                                                                    isLogin={true}
+                                                                    isLogin={
+                                                                        true
+                                                                    }
                                                                 />
                                                             }
                                                         />
@@ -77,15 +83,21 @@ const App = () => {
                                                         />
                                                         <Route
                                                             path='/auth'
-                                                            element={<AuthPage />}
+                                                            element={
+                                                                <AuthPage />
+                                                            }
                                                         />
                                                         <Route
                                                             path='/new-tansport-ad'
-                                                            element={<NewTransportAd />}
+                                                            element={
+                                                                <NewTransportAd />
+                                                            }
                                                         />
                                                         <Route
                                                             path='/new-cargo-ad'
-                                                            element={<NewCargoAdPage />}
+                                                            element={
+                                                                <NewCargoAdPage />
+                                                            }
                                                         />
                                                         {/* <Route
                                             path='/ads'
@@ -100,16 +112,27 @@ const App = () => {
                                                             element={<AdPage />}
                                                         />
                                                         <Route
+                                                            path='/my-transport-ads'
+                                                            element={
+                                                                <MyTransportAdsPage />
+                                                            }
+                                                        />
+                                                        <Route
                                                             path='/cargo-ads/:adId'
                                                             element={<AdPage />}
                                                         />
                                                         <Route
-                                                            path='/my-transport-ads'
-                                                            element={<MyTransportAdsPage />}
+                                                            path='/my-cargo-ads'
+                                                            element={
+                                                                <MyCargoAdsPage />
+                                                            }
                                                         />
                                                         <Route
-                                                            path="/cargo-ads/:adId/edit"
-                                                            element={<EditCargoAdPage />} />
+                                                            path='/cargo-ads/:adId/edit'
+                                                            element={
+                                                                <EditCargoAdPage />
+                                                            }
+                                                        />
                                                         <Route
                                                             path='/dialogs'
                                                             element={
@@ -118,15 +141,21 @@ const App = () => {
                                                         />
                                                         <Route
                                                             path='/new-vehicle'
-                                                            element={<NewVehiclePage />}
+                                                            element={
+                                                                <NewVehiclePage />
+                                                            }
                                                         />
                                                         <Route
-                                                            path="/vehicles/:truckId"
-                                                            element={<VehiclePage />}
+                                                            path='/vehicles/:truckId'
+                                                            element={
+                                                                <VehiclePage />
+                                                            }
                                                         />
                                                         <Route
-                                                            path="/vehicles"
-                                                            element={<VehiclesPage />}
+                                                            path='/vehicles'
+                                                            element={
+                                                                <VehiclesPage />
+                                                            }
                                                         />
                                                     </Route>
                                                 </Routes>
