@@ -264,24 +264,27 @@
 
 /* Стилизация прямоугольника-тега */
 .oatp-tag {
-    /* Фон и скругление */
-    background-color: #f0f0f0;
-    /* Мягкий серый фон */
+    /* background-color: #f0f0f0;
     color: #333333;
-    /* Цвет текста */
     border-radius: 10px;
-    /* Закругленные углы */
 
-    /* Отступы */
     padding: 2px 10px;
-    /* Внутренние отступы (сверху/снизу 4px, слева/справа 10px) */
 
-    /* Шрифт */
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 500; */
 
     /* Важно: не переносить текст внутри тега */
-    white-space: nowrap;
+    /* white-space: nowrap; */
+
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    font-size: 13px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
 }
 
 /* Опционально: стили для оранжевых тегов */
