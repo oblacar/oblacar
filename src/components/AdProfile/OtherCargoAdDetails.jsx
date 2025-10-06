@@ -129,16 +129,17 @@ const OtherCargoAdDetails = ({ ad }) => {
             <div className="other-ad-profile-truck-photo-area">
                 <PhotoCarousel photos={photos} />
 
-                <div className='other-ad-profile-cargo-className-description'>
-                    <div className="other-ad-profile-rout-date-price-row">
+                <div className='other-ad-profile-cargo-description'>
+                    <div className="other-ad-profile-rout-date-price-row
+                    other-ad-profile-cargo-description-title">
                         <strong>Тип груза: </strong>{cargoType || '—'}
                     </div>
-                    <div className="other-ad-profile-cargo-className-description-title">
+                    <div className="other-ad-profile-cargo-description-title">
                         <strong>
                             Описание:
                         </strong>
                     </div>
-                    <div className='other-ad-profile-cargo-className-description-text'>
+                    <div className='other-ad-profile-cargo-description-text'>
                         {description}
                     </div>
                 </div>
@@ -151,7 +152,7 @@ const OtherCargoAdDetails = ({ ad }) => {
                     <h2>
                         {title || '—'}
                     </h2>
-                    <div class="other-ad-profile-gradient-line"></div> 
+                    <div className="other-ad-profile-gradient-line"></div>
                 </div>
 
 
