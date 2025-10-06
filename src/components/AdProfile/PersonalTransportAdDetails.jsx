@@ -48,12 +48,14 @@ const PersonalTransportAdDetails = ({ ad }) => {
     };
 
     const tonnageAndVolume = () => {
-        const volNum = Number(truckHeight) * Number(truckWidth) * Number(truckDepth);
+        const volNum =
+            Number(truckHeight) * Number(truckWidth) * Number(truckDepth);
         const vol = volNum ? cutNumber(volNum) : null;
 
         const volPart = vol ? (
             <>
-                {vol}м<sup>3</sup> ({Number(truckHeight)}м × {Number(truckWidth)}м × {Number(truckDepth)}м)
+                {vol}м<sup>3</sup> ({Number(truckHeight)}м ×{' '}
+                {Number(truckWidth)}м × {Number(truckDepth)}м)
             </>
         ) : null;
 
@@ -75,23 +77,41 @@ const PersonalTransportAdDetails = ({ ad }) => {
             {/* дата */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Дата готовности машины к перевозке" size="24px" />
+                    <IconWithTooltip
+                        icon={CalendarDaysIcon}
+                        tooltipText='Дата готовности машины к перевозке'
+                        size='24px'
+                    />
                 </div>
-                <span><strong>{availabilityDate || '—'}</strong></span>
+                <span>
+                    <strong>{availabilityDate || '—'}</strong>
+                </span>
             </div>
 
             {/* маршрут */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<MapPinIcon />} tooltipText="Пункт отправления" size="24px" />
+                    <IconWithTooltip
+                        icon={MapPinIcon}
+                        tooltipText='Пункт отправления'
+                        size='24px'
+                    />
                 </div>
-                <span><strong>{departureCity || '—'}</strong></span>
+                <span>
+                    <strong>{departureCity || '—'}</strong>
+                </span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<MapPinIcon />} tooltipText="Пункт назначения" size="24px" />
+                    <IconWithTooltip
+                        icon={MapPinIcon}
+                        tooltipText='Пункт назначения'
+                        size='24px'
+                    />
                 </div>
-                <span><strong>{destinationCity || '—'}</strong></span>
+                <span>
+                    <strong>{destinationCity || '—'}</strong>
+                </span>
             </div>
 
             <div className={styles.separator} />
@@ -99,13 +119,27 @@ const PersonalTransportAdDetails = ({ ad }) => {
             {/* бюджет */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<BanknotesIcon />} tooltipText="Стоимость перевозки" size="24px" />
+                    <IconWithTooltip
+                        icon={BanknotesIcon}
+                        tooltipText='Стоимость перевозки'
+                        size='24px'
+                    />
                 </div>
-                <span>{price ? `${formatNumber(String(price))} ${paymentUnit || 'руб'}` : '—'}</span>
+                <span>
+                    {price
+                        ? `${formatNumber(String(price))} ${
+                              paymentUnit || 'руб'
+                          }`
+                        : '—'}
+                </span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CreditCardIcon />} tooltipText="Условия оплаты" size="24px" />
+                    <IconWithTooltip
+                        icon={CreditCardIcon}
+                        tooltipText='Условия оплаты'
+                        size='24px'
+                    />
                 </div>
                 <span>{paymentOptionsItem() || '—'}</span>
             </div>
@@ -115,25 +149,41 @@ const PersonalTransportAdDetails = ({ ad }) => {
             {/* ТС */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<TruckIcon />} tooltipText="Марка автомобиля" size="24px" />
+                    <IconWithTooltip
+                        icon={TruckIcon}
+                        tooltipText='Марка автомобиля'
+                        size='24px'
+                    />
                 </div>
                 <span>{truckName || '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CheckBadgeIcon />} tooltipText="Тип кузова" size="24px" />
+                    <IconWithTooltip
+                        icon={CheckBadgeIcon}
+                        tooltipText='Тип кузова'
+                        size='24px'
+                    />
                 </div>
                 <span>{transportType || '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<ScaleIcon />} tooltipText="Грузоподъемность и габариты" size="24px" />
+                    <IconWithTooltip
+                        icon={ScaleIcon}
+                        tooltipText='Грузоподъемность и габариты'
+                        size='24px'
+                    />
                 </div>
                 <span>{tonnageAndVolume() || '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<ArrowsPointingInIcon />} tooltipText="Доступные варианты загрузки" size="24px" />
+                    <IconWithTooltip
+                        icon={ArrowsPointingInIcon}
+                        tooltipText='Доступные варианты загрузки'
+                        size='24px'
+                    />
                 </div>
                 <span>{loadingTypesItem() || '—'}</span>
             </div>
