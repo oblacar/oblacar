@@ -240,3 +240,53 @@
     align-items: center;
     text-align: center;
 }
+
+/* styles.otherAdProfileTruckRow - Убедитесь, что заголовок и теги выровнены */
+.other-ad-profile-truck-row {
+    display: flex;
+    /* Выравниваем "Упаковка:" и теги по верху */
+    align-items: flex-start;
+    /* Небольшой отступ между заголовком и списком тегов */
+    gap: 10px;
+}
+
+/* Контейнер для списка тегов */
+.oatp-tag-list {
+    display: flex;
+    /* Разрешаем тегам переноситься на новую строку, если их много */
+    flex-wrap: wrap;
+    /* Отступ между самими тегами */
+    gap: 8px;
+    /* Гарантируем, что список займет оставшееся пространство */
+    flex: 1;
+    min-width: 0;
+}
+
+/* Стилизация прямоугольника-тега */
+.oatp-tag {
+    /* Фон и скругление */
+    background-color: #f0f0f0;
+    /* Мягкий серый фон */
+    color: #333333;
+    /* Цвет текста */
+    border-radius: 10px;
+    /* Закругленные углы */
+
+    /* Отступы */
+    padding: 2px 10px;
+    /* Внутренние отступы (сверху/снизу 4px, слева/справа 10px) */
+
+    /* Шрифт */
+    font-size: 13px;
+    font-weight: 500;
+
+    /* Важно: не переносить текст внутри тега */
+    white-space: nowrap;
+}
+
+/* Опционально: стили для оранжевых тегов */
+.oatp-tag.orange {
+    background-color: #ff904c;
+    color: white;
+    font-weight: 600;
+}

@@ -198,14 +198,45 @@ const OtherCargoAdDetails = ({ ad }) => {
 
                     <div className='other-ad-profile-separator' />
 
+                    {/* // Предполагаем, что вы используете CSS Modules (styles.tag, styles.tagList) */}
                     <div className="other-ad-profile-truck-row">
                         <strong>Упаковка: </strong>
-                        {packagingLabels.length ? packagingLabels.join(', ') : '—'}
+
+                        {packagingLabels.length ? (
+                            // 1. Оборачиваем все теги в контейнер для управления расположением
+                            <div className='oatp-tag-list'>
+                                {packagingLabels.map((label, index) => (
+                                    // 2. Каждый элемент - отдельный span с классом
+                                    <span key={index} className='oatp-tag'>
+                                        {label}
+                                    </span>
+                                ))}
+                            </div>
+                        ) : (
+                            '—'
+                        )}
                     </div>
-                    <div className="other-ad-profile-truck-row">
+
+                    {/* То же самое для второго списка */}
+                    <div className='other-ad-profile-truck-row'>
                         <strong>Загрузка: </strong>
-                        {Array.isArray(loadingTypes) ? (loadingTypes.length ? loadingTypes.join(', ') : '—') : (loadingTypes || '—')}
+
+                        {Array.isArray(loadingTypes) && loadingTypes.length ? (
+                            <div className='oatp-tag-list'>
+                                {loadingTypes.map((label, index) => (
+                                    <span key={index} className='oatp-tag'>
+                                        {label}
+                                    </span>
+                                ))}
+                            </div>
+                        ) : (
+                            loadingTypes || '—'
+                        )}
                     </div>
+                    {/* Если вы хотите, чтобы некоторые теги (например, "Загрузка") были оранжевыми, просто добавьте класс orange в JSX
+                    <span key={index} className='oatp-tag-orange'}>
+                        {label}
+                    </span> */}
 
                     <div className='other-ad-profile-separator' />
 
