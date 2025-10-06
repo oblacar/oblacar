@@ -133,21 +133,21 @@ const PersonalCargoAdDetails = ({ ad }) => {
     const quantity = data.quantity ?? '';
     const dims = data.dimensionsMeters ||
         data.cargo?.dims || {
-            height: data.cargo?.h ?? data.height,
-            width: data.cargo?.w ?? data.width,
-            depth: data.cargo?.d ?? data.depth,
-        };
+        height: data.cargo?.h ?? data.height,
+        width: data.cargo?.w ?? data.width,
+        depth: data.cargo?.d ?? data.depth,
+    };
 
     // packagingTypes может прийти массивом ключей или объектом-map
     const packagingKeys = Array.isArray(data.packagingTypes)
         ? data.packagingTypes
         : data.packagingTypes && typeof data.packagingTypes === 'object'
-        ? Object.keys(data.packagingTypes).filter(
-              (k) => !!data.packagingTypes[k]
-          )
-        : data.packagingType
-        ? [data.packagingType]
-        : [];
+            ? Object.keys(data.packagingTypes).filter(
+                (k) => !!data.packagingTypes[k]
+            )
+            : data.packagingType
+                ? [data.packagingType]
+                : [];
 
     const packagingLabels = packagingKeys
         .map((k) => PACK_MAP[k] || k) // безопасно подставляем известный лейбл, иначе сам ключ
@@ -165,8 +165,8 @@ const PersonalCargoAdDetails = ({ ad }) => {
             temp.mode === 'chilled'
                 ? 'охлаждение'
                 : temp.mode === 'frozen'
-                ? 'заморозка'
-                : 'обычная';
+                    ? 'заморозка'
+                    : 'обычная';
         const bounds =
             temp.minC !== '' || temp.maxC !== ''
                 ? ` (${temp.minC ?? ''}…${temp.maxC ?? ''}°C)`
@@ -186,7 +186,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CalendarDaysIcon />}
+                        icon={CalendarDaysIcon}
                         tooltipText='Дата объявления'
                         size='24px'
                     />
@@ -200,7 +200,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<MapPinIcon />}
+                        icon={MapPinIcon}
                         tooltipText='Пункт отправления'
                         size='24px'
                     />
@@ -212,7 +212,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<MapPinIcon />}
+                        icon={MapPinIcon}
                         tooltipText='Пункт назначения'
                         size='24px'
                     />
@@ -226,7 +226,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CalendarDaysIcon />}
+                        icon={CalendarDaysIcon}
                         tooltipText='Забор (готовность к отгрузке)'
                         size='24px'
                     />
@@ -241,7 +241,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CalendarDaysIcon />}
+                        icon={CalendarDaysIcon}
                         tooltipText='Доставить до'
                         size='24px'
                     />
@@ -255,7 +255,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<BanknotesIcon />}
+                        icon={BanknotesIcon}
                         tooltipText='Стоимость'
                         size='24px'
                     />
@@ -265,7 +265,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CreditCardIcon />}
+                        icon={CreditCardIcon}
                         tooltipText='Детали оплаты'
                         size='24px'
                     />
@@ -279,7 +279,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<TagIcon />}
+                        icon={TagIcon}
                         tooltipText='Короткое название груза'
                         size='24px'
                     />
@@ -289,7 +289,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CubeIcon />}
+                        icon={CubeIcon}
                         tooltipText='Тип груза'
                         size='24px'
                     />
@@ -299,7 +299,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<ScaleIcon />}
+                        icon={ScaleIcon}
                         tooltipText='Вес, т'
                         size='24px'
                     />
@@ -309,7 +309,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<ArrowsPointingOutIcon />}
+                        icon={ArrowsPointingOutIcon}
                         tooltipText='Габариты (В×Ш×Г)'
                         size='24px'
                     />
@@ -319,7 +319,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CubeIcon />}
+                        icon={CubeIcon}
                         tooltipText='Количество мест'
                         size='24px'
                     />
@@ -330,7 +330,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<CubeIcon />}
+                        icon={CubeIcon}
                         tooltipText='Тип упаковки'
                         size='24px'
                     />
@@ -346,9 +346,9 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<LiaTemperatureLowSolid size='32px' />}
+                        icon={LiaTemperatureLowSolid}
                         tooltipText='Температурный режим'
-                        // size="32px"
+                        size="24px"
                     />
                 </div>
                 <span>{temperatureStr}</span>
@@ -356,7 +356,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<ExclamationTriangleIcon />}
+                        icon={ExclamationTriangleIcon}
                         tooltipText='ADR класс (опасный груз)'
                         size='24px'
                     />
@@ -366,7 +366,7 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<ArrowsPointingOutIcon />}
+                        icon={ArrowsPointingOutIcon}
                         tooltipText='Предпочтительные варианты загрузки'
                         size='24px'
                     />

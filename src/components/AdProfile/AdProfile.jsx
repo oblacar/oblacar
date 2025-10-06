@@ -28,8 +28,6 @@ const AdProfile = ({ adType, ad }) => {
     const { isAuthenticated } = useContext(AuthContext) || {};
     const { user, isUserLoaded } = useContext(UserContext) || {};
 
-    console.log('adType: ' + { adType });
-
     // единая «data» для всей разметки
     const data = useMemo(() => unwrapAd(ad), [ad]);
 
@@ -53,8 +51,7 @@ const AdProfile = ({ adType, ad }) => {
                     ad={data}
                 />
             ) : (
-                // если у тебя есть «другой» профиль и для груза тоже — лучше передать adType,
-                // чтобы внутри он тоже мог отличать, что рендерить
+                // если у есть «другой» профиль и для груза тоже — лучше передать adType,
                 <OtherAdProfile
                     adType={adType}
                     ad={data}
