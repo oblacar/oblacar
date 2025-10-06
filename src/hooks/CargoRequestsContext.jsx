@@ -10,119 +10,122 @@ import {
     getAdCargoRequestsForOwner,
     CargoRequestStatus,
 } from '../services/CargoRequestsService';
-
-// проверь путь до AuthContext
 import AuthContext from './Authorization/AuthContext';
 import UserContext from './UserContext';
 
 export const CargoRequestsContext = createContext(null);
 
 export function CargoRequestsProvider({ children }) {
-    const { isAuthenticated } = useContext(AuthContext); // ожидается user.userId и пр.
-    const { user, isUserLoaded, } = useContext(UserContext); // ожидается user.userId и пр.
+    const { isAuthenticated } = useContext(AuthContext);
+    const { user } = useContext(UserContext);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
 
-    // статусы исходящих (водителя) по adId
-    const [sentRequestsStatuses, setSentRequestsStatuses] = useState([]); // [{adId, status, requestId}]
-
-    // входящие по конкретному объявлению для владельца груза
-    const [currentAdRequests, setCurrentAdRequests] = useState({
-        main: null,
-        requests: [], // [{requestId, sender{...}, status, message, ...}]
-    });
-
-    // ===== Actions =====
+    const [sentRequestsStatuses, setSentRequestsStatuses] = useState([]);
+    const [currentAdRequests, setCurrentAdRequests] = useState({ main: null, requests: [] });
 
     const refreshSentStatuses = useCallback(async () => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated) {
+            console.warn('[CargoRequestsContext] refreshSentStatuses: no user');
+            return;
+        }
         setIsLoading(true);
-        setError(null);
+        setError('');
         try {
-            const list = await getSentRequestsStatuses(user?.userId);
+            console.log('[CargoRequestsContext] getSentRequestsStatuses for', user.userId);
+            const list = await getSentRequestsStatuses(user.userId);
+            console.log('[CargoRequestsContext] statuses →', list);
             setSentRequestsStatuses(list || []);
         } catch (e) {
-            console.error(e);
+            console.error('[CargoRequestsContext] refreshSentStatuses ERROR', e);
             setError(e?.message || 'Failed to load statuses');
         } finally {
             setIsLoading(false);
         }
     }, [user?.userId, isAuthenticated]);
 
-    const sendCargoRequest = useCallback(
-        async ({ ad, message }) => {
-            if (!isAuthenticated) throw new Error('Not authenticated');
+    const sendCargoRequest = useCallback(async ({ ad, message }) => {
+        if (!isAuthenticated) throw new Error('Не авторизован');
+        if (!ad?.id || !ad?.ownerId) throw new Error('Нет ad.id или ad.ownerId');
 
-            const driver = {
+        console.log('[CargoRequestsContext] addCargoRequest →', { adId: ad.id, ownerId: ad.ownerId, driverId: user.userId, message });
+        const res = await addCargoRequest({
+            ad,
+            driver: {
                 id: user.userId,
                 name: user.userName || '',
                 photoUrl: user.userPhoto || '',
                 contact: user.userPhone || user.userEmail || '',
-            };
+            },
+            message,
+        });
+        console.log('[CargoRequestsContext] addCargoRequest DONE →', res);
 
-            const res = await addCargoRequest({ ad, driver, message });
-            // локально апдейтим список статусов
-            setSentRequestsStatuses((prev) => {
-                const next = [...prev];
-                const idx = next.findIndex((x) => x.adId === ad.id);
-                const row = { adId: ad.id, status: CargoRequestStatus.Pending, requestId: res.requestId };
-                if (idx >= 0) next[idx] = { ...next[idx], ...row };
-                else next.push(row);
-                return next;
-            });
-            return res;
-        },
-        [user?.userId, user?.userName, user?.userPhoto, user?.userPhone, user?.userEmail]
-    );
+        setSentRequestsStatuses((prev) => {
+            const next = [...prev];
+            const idx = next.findIndex((x) => x.adId === ad.id);
+            const row = { adId: ad.id, status: CargoRequestStatus.Pending, requestId: res.requestId };
+            if (idx >= 0) next[idx] = { ...next[idx], ...row };
+            else next.push(row);
+            return next;
+        });
 
-    const cancelMyCargoRequest = useCallback(
-        async ({ ownerId, adId, requestId }) => {
-            if (!user?.userId) throw new Error('Not authenticated');
-            await cancelCargoRequest({ driverId: user.userId, ownerId, adId, requestId });
-            setSentRequestsStatuses((prev) => {
-                const next = [...prev];
-                const idx = next.findIndex((x) => x.adId === adId);
-                if (idx >= 0) next[idx] = { ...next[idx], status: CargoRequestStatus.Cancelled, requestId };
-                else next.push({ adId, status: CargoRequestStatus.Cancelled, requestId });
-                return next;
-            });
-        },
-        [user?.userId]
-    );
+        return res;
+    }, [user?.userId, user?.userName, user?.userPhoto, user?.userPhone, user?.userEmail, isAuthenticated]);
 
-    const restartMyCargoRequest = useCallback(
-        async ({ ad, message }) => {
-            if (!user?.userId) throw new Error('Not authenticated');
-            const driver = {
+    const cancelMyCargoRequest = useCallback(async ({ ownerId, adId, requestId }) => {
+        if (!user?.userId) throw new Error('Не авторизован');
+        console.log('[CargoRequestsContext] cancelCargoRequest →', { driverId: user.userId, ownerId, adId, requestId });
+        await cancelCargoRequest({ driverId: user.userId, ownerId, adId, requestId });
+        console.log('[CargoRequestsContext] cancelCargoRequest DONE');
+
+        setSentRequestsStatuses((prev) => {
+            const next = [...prev];
+            const idx = next.findIndex((x) => x.adId === adId);
+            if (idx >= 0) next[idx] = { ...next[idx], status: CargoRequestStatus.Cancelled, requestId };
+            else next.push({ adId, status: CargoRequestStatus.Cancelled, requestId });
+            return next;
+        });
+    }, [user?.userId]);
+
+    const restartMyCargoRequest = useCallback(async ({ ad, message }) => {
+        if (!isAuthenticated) throw new Error('Не авторизован');
+        console.log('[CargoRequestsContext] restartCargoRequest →', { adId: ad.id, ownerId: ad.ownerId, driverId: user.userId, message });
+        const res = await restartCargoRequest({
+            ad,
+            driver: {
                 id: user.userId,
                 name: user.userName || '',
                 photoUrl: user.userPhoto || '',
                 contact: user.userPhone || user.userEmail || '',
-            };
-            const res = await restartCargoRequest({ ad, driver, message });
-            setSentRequestsStatuses((prev) => {
-                const next = [...prev];
-                const idx = next.findIndex((x) => x.adId === ad.id);
-                const row = { adId: ad.id, status: CargoRequestStatus.Pending, requestId: res.requestId };
-                if (idx >= 0) next[idx] = { ...next[idx], ...row };
-                else next.push(row);
-                return next;
-            });
-            return res;
-        },
-        [user?.userId, user?.userName, user?.userPhoto, user?.userPhone, user?.userEmail]
-    );
+            },
+            message,
+        });
+        console.log('[CargoRequestsContext] restartCargoRequest DONE →', res);
 
-    // Для владельца груза
+        setSentRequestsStatuses((prev) => {
+            const next = [...prev];
+            const idx = next.findIndex((x) => x.adId === ad.id);
+            const row = { adId: ad.id, status: CargoRequestStatus.Pending, requestId: res.requestId };
+            if (idx >= 0) next[idx] = { ...next[idx], ...row };
+            else next.push(row);
+            return next;
+        });
+
+        return res;
+    }, [user?.userId, user?.userName, user?.userPhoto, user?.userPhone, user?.userEmail]);
+
     const loadAdRequestsForOwner = useCallback(async (adId, ownerId) => {
         setIsLoading(true);
-        setError(null);
+        setError('');
         try {
+            console.log('[CargoRequestsContext] getAdCargoRequestsForOwner →', { adId, ownerId });
             const data = await getAdCargoRequestsForOwner({ ownerId, adId });
+            console.log('[CargoRequestsContext] currentAdRequests ←', data);
             setCurrentAdRequests(data || { main: null, requests: [] });
         } catch (e) {
-            console.error(e);
+            console.error('[CargoRequestsContext] loadAdRequestsForOwner ERROR', e);
             setError(e?.message || 'Failed to load ad requests');
         } finally {
             setIsLoading(false);
@@ -130,66 +133,49 @@ export function CargoRequestsProvider({ children }) {
     }, []);
 
     const acceptCargoRequestAsOwner = useCallback(async ({ ad, requestId }) => {
-        // создаст Transportation, переведёт объявление в work и проставит статусы
-        return acceptCargoRequest({ ownerId: ad.ownerId, ad, requestId });
+        console.log('[CargoRequestsContext] acceptCargoRequest →', { adId: ad.id, ownerId: ad.ownerId, requestId });
+        const res = await acceptCargoRequest({ ownerId: ad.ownerId, ad, requestId });
+        console.log('[CargoRequestsContext] acceptCargoRequest DONE →', res);
+        return res;
     }, []);
 
     const declineCargoRequestAsOwner = useCallback(async ({ ownerId, adId, requestId }) => {
+        console.log('[CargoRequestsContext] declineCargoRequest →', { ownerId, adId, requestId });
         await declineCargoRequest({ ownerId, adId, requestId });
-        // перегружаем текущий список
         await loadAdRequestsForOwner(adId, ownerId);
     }, [loadAdRequestsForOwner]);
 
-    // утилита
-    const getMyRequestStatusForAd = useCallback(
-        (adId) => {
-            const f = sentRequestsStatuses.find((x) => x.adId === adId);
-            return f?.status || 'none';
-        },
-        [sentRequestsStatuses]
-    );
+    const getMyRequestStatusForAd = useCallback((adId) => {
+        const f = sentRequestsStatuses.find((x) => x.adId === adId);
+        return f?.status || 'none';
+    }, [sentRequestsStatuses]);
 
-    // ===== Effects =====
     useEffect(() => {
         if (user?.userId) refreshSentStatuses();
     }, [user?.userId, refreshSentStatuses]);
 
-    const value = useMemo(
-        () => ({
-            // state
-            isLoading,
-            error,
-            sentRequestsStatuses,
-            currentAdRequests,
+    const value = useMemo(() => ({
+        isLoading,
+        error,
+        sentRequestsStatuses,
+        currentAdRequests,
 
-            // actions
-            refreshSentStatuses,
-            sendCargoRequest,
-            cancelMyCargoRequest,
-            restartMyCargoRequest,
+        refreshSentStatuses,
+        sendCargoRequest,
+        cancelMyCargoRequest,
+        restartMyCargoRequest,
 
-            loadAdRequestsForOwner,
-            acceptCargoRequestAsOwner,
-            declineCargoRequestAsOwner,
+        loadAdRequestsForOwner,
+        acceptCargoRequestAsOwner,
+        declineCargoRequestAsOwner,
 
-            // utils
-            getMyRequestStatusForAd,
-        }),
-        [
-            isLoading,
-            error,
-            sentRequestsStatuses,
-            currentAdRequests,
-            refreshSentStatuses,
-            sendCargoRequest,
-            cancelMyCargoRequest,
-            restartMyCargoRequest,
-            loadAdRequestsForOwner,
-            acceptCargoRequestAsOwner,
-            declineCargoRequestAsOwner,
-            getMyRequestStatusForAd,
-        ]
-    );
+        getMyRequestStatusForAd,
+    }), [
+        isLoading, error, sentRequestsStatuses, currentAdRequests,
+        refreshSentStatuses, sendCargoRequest, cancelMyCargoRequest, restartMyCargoRequest,
+        loadAdRequestsForOwner, acceptCargoRequestAsOwner, declineCargoRequestAsOwner,
+        getMyRequestStatusForAd,
+    ]);
 
     return (
         <CargoRequestsContext.Provider value={value}>

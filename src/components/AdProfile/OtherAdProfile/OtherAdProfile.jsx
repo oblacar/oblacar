@@ -65,9 +65,8 @@ const OtherAdProfile = ({ adType, ad }) => {
             <div className='other-ad-profile'>
                 {/* 1. Кнопка "Варианты" (Bookmark) */}
                 <div
-                    className={`oap-in-review ${
-                        isInReviewAds ? 'oap-in-review--is-active' : ''
-                    }`}
+                    className={`oap-in-review ${isInReviewAds ? 'oap-in-review--is-active' : ''
+                        }`}
                 >
                     <IconWithTooltip
                         icon={isInReviewAds ? FaBookmark : FaRegBookmark}
@@ -87,6 +86,7 @@ const OtherAdProfile = ({ adType, ad }) => {
 
                 {/* 3. Правая панель с контактами/запросом (Вынесенный компонент) */}
                 <AdRightPanel
+                    ad={data}
                     adType={adType}
                     owner={owner}
                     cargoDescription={cargoDescription}
@@ -110,23 +110,23 @@ const OtherAdProfile = ({ adType, ad }) => {
                     adData={
                         adType === 'transport'
                             ? {
-                                  adId: adProps.adId,
-                                  availabilityDate: adProps.availabilityDate,
-                                  departureCity: adProps.routeFrom,
-                                  destinationCity: adProps.routeTo,
-                                  priceAndPaymentUnit:
-                                      formatNumber(String(adProps.price)) +
-                                      ' ' +
-                                      (adProps.paymentUnit || ''),
-                              }
+                                adId: adProps.adId,
+                                availabilityDate: adProps.availabilityDate,
+                                departureCity: adProps.routeFrom,
+                                destinationCity: adProps.routeTo,
+                                priceAndPaymentUnit:
+                                    formatNumber(String(adProps.price)) +
+                                    ' ' +
+                                    (adProps.paymentUnit || ''),
+                            }
                             : {
-                                  adId: adProps.adId,
-                                  availabilityDate: adProps.pickupDate,
-                                  departureCity: adProps.routeFrom,
-                                  destinationCity: adProps.routeTo,
-                                  priceAndPaymentUnit: '',
-                                  title: adProps.title || '',
-                              }
+                                adId: adProps.adId,
+                                availabilityDate: adProps.pickupDate,
+                                departureCity: adProps.routeFrom,
+                                destinationCity: adProps.routeTo,
+                                priceAndPaymentUnit: '',
+                                title: adProps.title || '',
+                            }
                     }
                     chatPartnerName={owner.name}
                     chatPartnerPhoto={owner.photoUrl}
