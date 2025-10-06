@@ -1,10 +1,10 @@
 // src/components/CargoAd/PersonalCargoAdDetails.jsx
 import React, { useMemo } from 'react';
-import styles from './PersonalAdProfile.module.css';
+import styles from './../../PersonalAdProfile/PersonalAdProfile.module.css';
 
-import { PACKAGING_OPTIONS } from '../../constants/cargoPackagingOptions';
+import { PACKAGING_OPTIONS } from '../../../../constants/cargoPackagingOptions';
 
-import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
+import IconWithTooltip from '../../../common/IconWithTooltip/IconWithTooltip';
 import {
     CalendarDaysIcon,
     MapPinIcon,
@@ -18,7 +18,7 @@ import {
     TagIcon,
 } from '@heroicons/react/24/outline';
 
-import { LiaTemperatureLowSolid } from "react-icons/lia";
+import { LiaTemperatureLowSolid } from 'react-icons/lia';
 
 // небольшие хелперы форматирования
 const fmt = {
@@ -30,7 +30,7 @@ const fmt = {
 
         let dateValue = d;
 
-        // 2. Если пришла строка, но это не dd.mm.yyyy, 
+        // 2. Если пришла строка, но это не dd.mm.yyyy,
         // мы предполагаем, что это может быть таймстемп-строка или другой формат.
         // Проверяем, похоже ли значение на dd.mm.yyyy.
         if (typeof d === 'string') {
@@ -51,11 +51,11 @@ const fmt = {
         }
 
         try {
-            // 3. Создаем объект Date. 
+            // 3. Создаем объект Date.
             // new Date() корректно принимает как число-таймстемп, так и строки ISO/других форматов.
             const dateObj = new Date(dateValue);
 
-            // 4. Проверяем, валидна ли дата. 
+            // 4. Проверяем, валидна ли дата.
             // Если Date() не смог создать дату, он вернет "Invalid Date".
             if (isNaN(dateObj.getTime())) {
                 return '—';
@@ -67,7 +67,6 @@ const fmt = {
             const year = dateObj.getFullYear();
 
             return `${day}.${month}.${year}`;
-
         } catch (error) {
             // Это сработает, только если в new Date() передать что-то совсем странное
             console.error('Ошибка форматирования даты:', error);
@@ -80,9 +79,13 @@ const fmt = {
         return `${n.toLocaleString('ru-RU')} ${unit}`;
     },
     dims({ height, width, depth }) {
-        const H = Number(height), W = Number(width), D = Number(depth);
+        const H = Number(height),
+            W = Number(width),
+            D = Number(depth);
         const s = (x) =>
-            Number.isFinite(x) ? String(Math.round(x * 100) / 100).replace(/\.00?$/, '') : '—';
+            Number.isFinite(x)
+                ? String(Math.round(x * 100) / 100).replace(/\.00?$/, '')
+                : '—';
         if (![H, W, D].some(Number.isFinite)) return '—';
         return `${s(H)} × ${s(W)} × ${s(D)} м`;
     },
@@ -93,14 +96,28 @@ const fmt = {
 };
 
 const PersonalCargoAdDetails = ({ ad }) => {
-    if (!ad) return null;
+    // 1. Определение объекта данных (нужно для useMemo)
+    const data = ad?.ad ? ad.ad : ad;
 
-    // поддержим обе схемы (плоскую и вложенную)
+    // 2. ✅ ХУКИ REACT (useMemo) — ДОЛЖНЫ БЫТЬ ВЫШЕ УСЛОВНОГО RETURN
+
+    // формируем массив ключей упаковки: либо массив, либо одинарный алиас
+    // ключ -> человекочитаемый лейбл
+    const PACK_MAP = useMemo(() => {
+        const m = {};
+        PACKAGING_OPTIONS.forEach((o) => {
+            m[o.key] = o.label;
+        });
+        return m;
+    }, []);
+
+    // 3. ❌ УСЛОВНЫЙ RETURN — ДОЛЖЕН БЫТЬ ПОСЛЕ ВСЕХ ХУКОВ
+    if (!ad) return null;
 
     // console.log('PersonalCargoAdDetails');
     // console.log(ad);
 
-    const data = ad?.ad ? ad.ad : ad;
+    // 4. Остальные вычисления
 
     const createdAt = data.createdAt || data.date;
     const departureCity = data.route?.from || data.departureCity;
@@ -111,48 +128,49 @@ const PersonalCargoAdDetails = ({ ad }) => {
 
     const title = data.title || data.cargo?.title || data.cargoName || '';
     const cargoType = data.cargoType || data.cargo?.type || '';
-    const weightTons = data.weightTons ?? data.cargo?.weightTons ?? data.weight ?? '';
+    const weightTons =
+        data.weightTons ?? data.cargo?.weightTons ?? data.weight ?? '';
     const quantity = data.quantity ?? '';
-    const dims = data.dimensionsMeters || data.cargo?.dims || {
-        height: data.cargo?.h ?? data.height,
-        width: data.cargo?.w ?? data.width,
-        depth: data.cargo?.d ?? data.depth,
-    };
-
-    // формируем массив ключей упаковки: либо массив, либо одинарный алиас
-    // ключ -> человекочитаемый лейбл
-    const PACK_MAP = useMemo(() => {
-        const m = {};
-        PACKAGING_OPTIONS.forEach(o => { m[o.key] = o.label; });
-        return m;
-    }, []);
+    const dims = data.dimensionsMeters ||
+        data.cargo?.dims || {
+            height: data.cargo?.h ?? data.height,
+            width: data.cargo?.w ?? data.width,
+            depth: data.cargo?.d ?? data.depth,
+        };
 
     // packagingTypes может прийти массивом ключей или объектом-map
     const packagingKeys = Array.isArray(data.packagingTypes)
         ? data.packagingTypes
-        : (data.packagingTypes && typeof data.packagingTypes === 'object')
-            ? Object.keys(data.packagingTypes).filter(k => !!data.packagingTypes[k])
-            : (data.packagingType ? [data.packagingType] : []);
+        : data.packagingTypes && typeof data.packagingTypes === 'object'
+        ? Object.keys(data.packagingTypes).filter(
+              (k) => !!data.packagingTypes[k]
+          )
+        : data.packagingType
+        ? [data.packagingType]
+        : [];
 
     const packagingLabels = packagingKeys
-        .map(k => PACK_MAP[k] || k)   // безопасно подставляем известный лейбл, иначе сам ключ
+        .map((k) => PACK_MAP[k] || k) // безопасно подставляем известный лейбл, иначе сам ключ
         .filter(Boolean);
-
-
 
     const isFragile = Boolean(data.isFragile ?? data.cargo?.fragile);
     const isStackable = Boolean(data.isStackable ?? data.cargo?.isStackable);
     const adrClass = data.adrClass ?? data.cargo?.adrClass ?? '';
 
-    const temp = data.temperature || data.cargo?.temperature || { mode: 'ambient' };
+    const temp = data.temperature ||
+        data.cargo?.temperature || { mode: 'ambient' };
     const temperatureStr = (() => {
         if (!temp) return '—';
         const mode =
-            temp.mode === 'chilled' ? 'охлаждение' :
-                temp.mode === 'frozen' ? 'заморозка' :
-                    'обычная';
+            temp.mode === 'chilled'
+                ? 'охлаждение'
+                : temp.mode === 'frozen'
+                ? 'заморозка'
+                : 'обычная';
         const bounds =
-            (temp.minC !== '' || temp.maxC !== '') ? ` (${temp.minC ?? ''}…${temp.maxC ?? ''}°C)` : '';
+            temp.minC !== '' || temp.maxC !== ''
+                ? ` (${temp.minC ?? ''}…${temp.maxC ?? ''}°C)`
+                : '';
         return `${mode}${bounds}`;
     })();
 
@@ -167,7 +185,11 @@ const PersonalCargoAdDetails = ({ ad }) => {
             {/* создано */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Дата объявления" size="24px" />
+                    <IconWithTooltip
+                        icon={<CalendarDaysIcon />}
+                        tooltipText='Дата объявления'
+                        size='24px'
+                    />
                 </div>
                 <span>{fmt.date(createdAt)}</span>
             </div>
@@ -177,26 +199,40 @@ const PersonalCargoAdDetails = ({ ad }) => {
             {/* маршрут */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<MapPinIcon />} tooltipText="Пункт отправления" size="24px" />
+                    <IconWithTooltip
+                        icon={<MapPinIcon />}
+                        tooltipText='Пункт отправления'
+                        size='24px'
+                    />
                 </div>
-                <span><strong>{departureCity || '—'}</strong></span>
+                <span>
+                    <strong>{departureCity || '—'}</strong>
+                </span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<MapPinIcon />} tooltipText="Пункт назначения" size="24px" />
+                    <IconWithTooltip
+                        icon={<MapPinIcon />}
+                        tooltipText='Пункт назначения'
+                        size='24px'
+                    />
                 </div>
-                <span><strong>{destinationCity || '—'}</strong></span>
+                <span>
+                    <strong>{destinationCity || '—'}</strong>
+                </span>
             </div>
-
 
             {/* сроки */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Забор (готовность к отгрузке)" size="24px" />
+                    <IconWithTooltip
+                        icon={<CalendarDaysIcon />}
+                        tooltipText='Забор (готовность к отгрузке)'
+                        size='24px'
+                    />
                 </div>
-                <span><strong>
-                    {fmt.date(pickupDate)}
-                </strong>
+                <span>
+                    <strong>{fmt.date(pickupDate)}</strong>
                 </span>
             </div>
 
@@ -204,7 +240,11 @@ const PersonalCargoAdDetails = ({ ad }) => {
 
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CalendarDaysIcon />} tooltipText="Доставить до" size="24px" />
+                    <IconWithTooltip
+                        icon={<CalendarDaysIcon />}
+                        tooltipText='Доставить до'
+                        size='24px'
+                    />
                 </div>
                 <span>{fmt.date(deliveryDate)}</span>
             </div>
@@ -214,13 +254,21 @@ const PersonalCargoAdDetails = ({ ad }) => {
             {/* бюджет */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<BanknotesIcon />} tooltipText="Стоимость" size="24px" />
+                    <IconWithTooltip
+                        icon={<BanknotesIcon />}
+                        tooltipText='Стоимость'
+                        size='24px'
+                    />
                 </div>
                 <span>{fmt.price(price, paymentUnit)}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CreditCardIcon />} tooltipText="Детали оплаты" size="24px" />
+                    <IconWithTooltip
+                        icon={<CreditCardIcon />}
+                        tooltipText='Детали оплаты'
+                        size='24px'
+                    />
                 </div>
                 <span>{readyToNegotiate ? 'торг' : '-'}</span>
             </div>
@@ -230,42 +278,67 @@ const PersonalCargoAdDetails = ({ ad }) => {
             {/* о грузе */}
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<TagIcon />} tooltipText="Короткое название груза" size="24px" />
+                    <IconWithTooltip
+                        icon={<TagIcon />}
+                        tooltipText='Короткое название груза'
+                        size='24px'
+                    />
                 </div>
                 <span>{title || '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CubeIcon />} tooltipText="Тип груза" size="24px" />
+                    <IconWithTooltip
+                        icon={<CubeIcon />}
+                        tooltipText='Тип груза'
+                        size='24px'
+                    />
                 </div>
                 <span>{cargoType || '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<ScaleIcon />} tooltipText="Вес, т" size="24px" />
+                    <IconWithTooltip
+                        icon={<ScaleIcon />}
+                        tooltipText='Вес, т'
+                        size='24px'
+                    />
                 </div>
                 <span>{weightTons ? String(weightTons) : '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<ArrowsPointingOutIcon />} tooltipText="Габариты (В×Ш×Г)" size="24px" />
+                    <IconWithTooltip
+                        icon={<ArrowsPointingOutIcon />}
+                        tooltipText='Габариты (В×Ш×Г)'
+                        size='24px'
+                    />
                 </div>
                 <span>{fmt.dims(dims)}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CubeIcon />} tooltipText="Количество мест" size="24px" />
+                    <IconWithTooltip
+                        icon={<CubeIcon />}
+                        tooltipText='Количество мест'
+                        size='24px'
+                    />
                 </div>
                 <span>{quantity || '—'}</span>
             </div>
 
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<CubeIcon />} tooltipText="Тип упаковки" size="24px" />
+                    <IconWithTooltip
+                        icon={<CubeIcon />}
+                        tooltipText='Тип упаковки'
+                        size='24px'
+                    />
                 </div>
-                <span>{packagingLabels.length ? packagingLabels.join(', ') : '—'}</span>
+                <span>
+                    {packagingLabels.length ? packagingLabels.join(', ') : '—'}
+                </span>
             </div>
-
 
             <div className={styles.separator} />
 
@@ -273,29 +346,36 @@ const PersonalCargoAdDetails = ({ ad }) => {
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
                     <IconWithTooltip
-                        icon={<LiaTemperatureLowSolid size="32px" />}
-                        tooltipText="Температурный режим"
-                    // size="32px" 
+                        icon={<LiaTemperatureLowSolid size='32px' />}
+                        tooltipText='Температурный режим'
+                        // size="32px"
                     />
                 </div>
                 <span>{temperatureStr}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<ExclamationTriangleIcon />} tooltipText="ADR класс (опасный груз)" size="24px" />
+                    <IconWithTooltip
+                        icon={<ExclamationTriangleIcon />}
+                        tooltipText='ADR класс (опасный груз)'
+                        size='24px'
+                    />
                 </div>
                 <span>{adrClass ? String(adrClass) : '—'}</span>
             </div>
             <div className={styles.routeDatePriceRow}>
                 <div className={styles.icon}>
-                    <IconWithTooltip icon={<ArrowsPointingOutIcon />} tooltipText="Предпочтительные варианты загрузки" size="24px" />
+                    <IconWithTooltip
+                        icon={<ArrowsPointingOutIcon />}
+                        tooltipText='Предпочтительные варианты загрузки'
+                        size='24px'
+                    />
                 </div>
                 <span>{fmt.list(loadingTypes)}</span>
             </div>
 
             <div className={styles.separator} />
-
-        </div >
+        </div>
     );
 };
 

@@ -1,10 +1,10 @@
 // src/components/AdProfile/AdRightPanel.jsx
 
 import React from 'react';
-import UserSmallCard from '../common/UserSmallCard/UserSmallCard';
-import Button from '../common/Button/Button';
-import Preloader from '../common/Preloader/Preloader';
-import RequestStatusBlock from './RequestStatusBlock'; // Убедитесь, что путь правильный
+import UserSmallCard from '../../common/UserSmallCard/UserSmallCard';
+import Button from '../../common/Button/Button';
+import Preloader from '../../common/Preloader/Preloader';
+import RequestStatusBlock from '../components/AdRequests/RequestStatusBlock'; // Убедитесь, что путь правильный
 import { FaEnvelope } from 'react-icons/fa'; // Иконка
 
 /**

@@ -3,8 +3,8 @@ import React, { useContext, useMemo } from 'react';
 import AuthContext from '../../hooks/Authorization/AuthContext';
 import UserContext from '../../hooks/UserContext';
 
-import PersonalAdProfile from './PersonalAdProfile';
-import OtherAdProfile from './OtherAdProfile';
+import PersonalAdProfile from './PersonalAdProfile/PersonalAdProfile';
+import OtherAdProfile from './OtherAdProfile/OtherAdProfile';
 
 // аккуратно разворачиваем вложенные { ad: { ... } }
 function unwrapAd(input) {
@@ -38,7 +38,7 @@ const AdProfile = ({ adType, ad }) => {
 
     // Если данных ещё нет — показываем скелет/лоадер
     if (!data || Object.keys(data).length === 0) {
-        return <div className="loading">Загрузка объявления...</div>;
+        return <div className='loading'>Загрузка объявления...</div>;
     }
 
     const isOwnAd =
@@ -48,11 +48,17 @@ const AdProfile = ({ adType, ad }) => {
     return (
         <div>
             {isOwnAd ? (
-                <PersonalAdProfile adType={adType} ad={data} />
+                <PersonalAdProfile
+                    adType={adType}
+                    ad={data}
+                />
             ) : (
                 // если у тебя есть «другой» профиль и для груза тоже — лучше передать adType,
                 // чтобы внутри он тоже мог отличать, что рендерить
-                <OtherAdProfile adType={adType} ad={data} />
+                <OtherAdProfile
+                    adType={adType}
+                    ad={data}
+                />
             )}
         </div>
     );

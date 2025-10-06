@@ -1,15 +1,15 @@
 import React, { useContext } from 'react';
 import classNames from 'classnames';
 import styles from './IncomingRequestsItem.module.css';
-import UserSmallCard from '../common/UserSmallCard/UserSmallCard';
-import Button from '../common/Button/Button';
+import UserSmallCard from '../../../common/UserSmallCard/UserSmallCard';
+import Button from '../../../common/Button/Button';
 import {
     XMarkIcon,
     CheckIcon,
     ArrowPathIcon,
     ArrowUturnLeftIcon,
 } from '@heroicons/react/24/solid';
-import ConversationContext from '../../hooks/ConversationContext';
+import ConversationContext from '../../../../hooks/ConversationContext';
 
 const IncomingRequestsItem = ({
     request,

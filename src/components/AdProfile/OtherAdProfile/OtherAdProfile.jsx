@@ -2,15 +2,15 @@
 
 import React from 'react';
 // Импортируем только нужные компоненты и наш новый хук
-import useAdProfileLogic from './useAdProfileLogic';
+import useAdProfileLogic from '../hooks/useAdProfileLogic';
 import AdRightPanel from './AdRightPanel';
-import ChatBox from '../common/ChatBox/ChatBox';
-import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
-import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
-import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
-import OtherTransportAdDetails from './OtherTransportAdDetails';
-import OtherCargoAdDetails from './OtherCargoAdDetails';
-import { formatNumber } from '../../utils/helper'; // Только для ChatBox
+import ChatBox from '../../common/ChatBox/ChatBox';
+import ModalBackdrop from '../../common/ModalBackdrop/ModalBackdrop';
+import ConversationLoadingInfo from '../../common/ConversationLoadingInfo/ConversationLoadingInfo';
+import IconWithTooltip from '../../common/IconWithTooltip/IconWithTooltip';
+import OtherTransportAdDetails from '../components/AdDetails/OtherTransportAdDetails';
+import OtherCargoAdDetails from '../components/AdDetails/OtherCargoAdDetails';
+import { formatNumber } from '../../../utils/helper'; // Только для ChatBox
 
 // Иконки
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa6';

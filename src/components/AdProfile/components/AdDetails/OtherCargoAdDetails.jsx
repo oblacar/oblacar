@@ -1,23 +1,25 @@
 import React, { useMemo } from 'react';
-import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
-import { formatNumber } from '../../utils/helper';
-import { PACKAGING_OPTIONS } from '../../constants/cargoPackagingOptions';
+import PhotoCarousel from '../../../common/PhotoCarousel/PhotoCarousel';
+import { formatNumber } from '../../../../utils/helper';
+import { PACKAGING_OPTIONS } from '../../../../constants/cargoPackagingOptions';
 
 const OtherCargoAdDetails = ({ ad }) => {
-    if (!ad) return null;
+    // 1. Определение вспомогательных функций (должны быть в теле, но перед хуками/вычислениями)
 
-    console.log(ad);
-
-    // Лучше вынести в utils, но оставлю рядом для наглядности
     const getAdPhotoUrls = (adObj = {}) => {
         // 1) Для объявлений по транспорту
-        if (Array.isArray(adObj.truckPhotoUrls) && adObj.truckPhotoUrls.length) {
+        if (
+            Array.isArray(adObj.truckPhotoUrls) &&
+            adObj.truckPhotoUrls.length
+        ) {
             return adObj.truckPhotoUrls.filter(Boolean);
         }
         // 2) Если photos — массив строк или объектов {id,url/src}
         if (Array.isArray(adObj.photos)) {
             return adObj.photos
-                .map((p) => (typeof p === 'string' ? p : p?.url || p?.src || ''))
+                .map((p) =>
+                    typeof p === 'string' ? p : p?.url || p?.src || ''
+                )
                 .filter(Boolean);
         }
         // 3) Если photos — map {id: {url}}
@@ -29,7 +31,6 @@ const OtherCargoAdDetails = ({ ad }) => {
         return [];
     };
 
-    // В начале компонента (рядом с утилитками)
     const safeFormatNumber = (v) => {
         if (v === null || v === undefined) return '';
         // приводим всё к строке
@@ -42,37 +43,10 @@ const OtherCargoAdDetails = ({ ad }) => {
         }
     };
 
+    // 2. Определение основного объекта данных, от которого зависят хуки
     const data = ad?.ad ? ad.ad : ad;
 
-    const departureCity = data.route?.from || data.departureCity;
-    const destinationCity = data.route?.to || data.destinationCity;
-
-    const pickupDate = data.pickupDate ?? data.availabilityFrom;
-    const deliveryDate = data.deliveryDate ?? data.availabilityTo;
-
-    const title = data.title || data.cargo?.title || data.cargoName || '';
-    const cargoType = data.cargoType || data.cargo?.type || '';
-    const weightTons = data.weightTons ?? data.cargo?.weightTons ?? data.weight ?? '';
-
-    const quantity = data.quantity ?? '';
-
-    const dimsRaw =
-        data.dimensionsMeters ||
-        data.cargo?.dims || {
-            height: data.cargo?.h ?? data.height,
-            width: data.cargo?.w ?? data.width,
-            depth: data.cargo?.d ?? data.depth,
-        };
-
-    const formatDims = (dims) => {
-        if (!dims) return '—';
-        if (typeof dims === 'string') return dims || '—';
-        const h = dims.height ?? dims.h;
-        const w = dims.width ?? dims.w;
-        const d = dims.depth ?? dims.d;
-        const parts = [h, w, d].filter((v) => v !== undefined && v !== null && v !== '');
-        return parts.length ? `${parts.join('×')} м` : '—';
-    };
+    // 3. ✅ ХУКИ REACT (useMemo) - ДОЛЖНЫ БЫТЬ ПЕРЕД ЛЮБЫМ return!
 
     // map для упаковки
     const PACK_MAP = useMemo(() => {
@@ -83,14 +57,58 @@ const OtherCargoAdDetails = ({ ad }) => {
         return m;
     }, []);
 
+    // Фото для карусели
+    const photos = useMemo(() => getAdPhotoUrls(data), [data]);
+
+    // 4. ❌ УСЛОВНЫЙ ВОЗВРАТ (return null) - ДОЛЖЕН БЫТЬ ПОСЛЕ ВСЕХ ХУКОВ
+    if (!ad) return null;
+
+    console.log(ad); // Если этот лог нужен, он должен быть здесь, после проверки 'ad'
+
+    // 5. Все остальные вычисления и переменные, которые не являются хуками
+
+    const formatDims = (dims) => {
+        if (!dims) return '—';
+        if (typeof dims === 'string') return dims || '—';
+        const h = dims.height ?? dims.h;
+        const w = dims.width ?? dims.w;
+        const d = dims.depth ?? dims.d;
+        const parts = [h, w, d].filter(
+            (v) => v !== undefined && v !== null && v !== ''
+        );
+        return parts.length ? `${parts.join('×')} м` : '—';
+    };
+
+    const departureCity = data.route?.from || data.departureCity;
+    const destinationCity = data.route?.to || data.destinationCity;
+
+    const pickupDate = data.pickupDate ?? data.availabilityFrom;
+    const deliveryDate = data.deliveryDate ?? data.availabilityTo;
+
+    const title = data.title || data.cargo?.title || data.cargoName || '';
+    const cargoType = data.cargoType || data.cargo?.type || '';
+    const weightTons =
+        data.weightTons ?? data.cargo?.weightTons ?? data.weight ?? '';
+
+    const quantity = data.quantity ?? '';
+
+    const dimsRaw = data.dimensionsMeters ||
+        data.cargo?.dims || {
+            height: data.cargo?.h ?? data.height,
+            width: data.cargo?.w ?? data.width,
+            depth: data.cargo?.d ?? data.depth,
+        };
+
     // ключи упаковки из массива / map / одиночного ключа
     const packagingKeys = Array.isArray(data.packagingTypes)
         ? data.packagingTypes
         : data.packagingTypes && typeof data.packagingTypes === 'object'
-            ? Object.keys(data.packagingTypes).filter((k) => !!data.packagingTypes[k])
-            : data.packagingType
-                ? [data.packagingType]
-                : [];
+        ? Object.keys(data.packagingTypes).filter(
+              (k) => !!data.packagingTypes[k]
+          )
+        : data.packagingType
+        ? [data.packagingType]
+        : [];
 
     const packagingLabels = packagingKeys
         .map((k) => PACK_MAP[k] || k)
@@ -100,16 +118,24 @@ const OtherCargoAdDetails = ({ ad }) => {
     const isStackable = Boolean(data.isStackable ?? data.cargo?.isStackable);
     const adrClass = data.adrClass ?? data.cargo?.adrClass ?? '';
 
-    const temp = data.temperature || data.cargo?.temperature || { mode: 'ambient' };
+    const temp = data.temperature ||
+        data.cargo?.temperature || { mode: 'ambient' };
     const temperatureStr = (() => {
         if (!temp || typeof temp !== 'object') return '—';
         const mode =
-            temp.mode === 'chilled' ? 'охлаждение' :
-                temp.mode === 'frozen' ? 'заморозка' :
-                    'обычная';
-        const hasMin = temp.minC !== undefined && temp.minC !== null && temp.minC !== '';
-        const hasMax = temp.maxC !== undefined && temp.maxC !== null && temp.maxC !== '';
-        const bounds = hasMin || hasMax ? ` (${hasMin ? temp.minC : ''}…${hasMax ? temp.maxC : ''}°C)` : '';
+            temp.mode === 'chilled'
+                ? 'охлаждение'
+                : temp.mode === 'frozen'
+                ? 'заморозка'
+                : 'обычная';
+        const hasMin =
+            temp.minC !== undefined && temp.minC !== null && temp.minC !== '';
+        const hasMax =
+            temp.maxC !== undefined && temp.maxC !== null && temp.maxC !== '';
+        const bounds =
+            hasMin || hasMax
+                ? ` (${hasMin ? temp.minC : ''}…${hasMax ? temp.maxC : ''}°C)`
+                : '';
         return `${mode}${bounds}`;
     })();
 
@@ -121,85 +147,84 @@ const OtherCargoAdDetails = ({ ad }) => {
 
     const description = data.description || '';
 
-    // Фото для карусели
-    const photos = useMemo(() => getAdPhotoUrls(data), [data]);
-
     return (
         <>
-            <div className="other-ad-profile-truck-photo-area">
+            <div className='other-ad-profile-truck-photo-area'>
                 <PhotoCarousel photos={photos} />
 
                 <div className='other-ad-profile-cargo-description'>
-                    <div className="other-ad-profile-rout-date-price-row
-                    other-ad-profile-cargo-description-title">
-                        <strong>Тип груза: </strong>{cargoType || '—'}
+                    <div
+                        className='other-ad-profile-rout-date-price-row
+                    other-ad-profile-cargo-description-title'
+                    >
+                        <strong>Тип груза: </strong>
+                        {cargoType || '—'}
                     </div>
-                    <div className="other-ad-profile-cargo-description-title">
-                        <strong>
-                            Описание:
-                        </strong>
+                    <div className='other-ad-profile-cargo-description-title'>
+                        <strong>Описание:</strong>
                     </div>
                     <div className='other-ad-profile-cargo-description-text'>
                         {description}
                     </div>
                 </div>
-
             </div>
 
-
-            <div className="other-ad-profile-rout-date-price">
-                <div className="other-ad-profile-rout-date-price-row">
-                    <h2>
-                        {title || '—'}
-                    </h2>
-                    <div className="other-ad-profile-gradient-line"></div>
+            <div className='other-ad-profile-rout-date-price'>
+                <div className='other-ad-profile-rout-date-price-row'>
+                    <h2>{title || '—'}</h2>
+                    <div className='other-ad-profile-gradient-line'></div>
                 </div>
 
-
-                <div className="other-ad-profile-rout-date-price-row">
+                <div className='other-ad-profile-rout-date-price-row'>
                     <strong>Готов к отгрузке: </strong> {pickupDate || '—'}
                 </div>
 
-                <div className="other-ad-profile-rout-date-price-row">
-                    <strong>Откуда: </strong>{departureCity || '—'}
+                <div className='other-ad-profile-rout-date-price-row'>
+                    <strong>Откуда: </strong>
+                    {departureCity || '—'}
                 </div>
-                <div className="other-ad-profile-rout-date-price-row">
-                    <strong>Куда: </strong>{destinationCity || '—'}
+                <div className='other-ad-profile-rout-date-price-row'>
+                    <strong>Куда: </strong>
+                    {destinationCity || '—'}
                 </div>
 
-
-
-                <div className="other-ad-profile-rout-date-price-row">
+                <div className='other-ad-profile-rout-date-price-row'>
                     <strong>Стоимость: </strong>
                     {price !== undefined && price !== null && price !== ''
-                        ? `${safeFormatNumber(price)} ${paymentUnit || ''}`.trim()
+                        ? `${safeFormatNumber(price)} ${
+                              paymentUnit || ''
+                          }`.trim()
                         : '—'}
                     {readyToNegotiate ? ' (торг)' : ''}
                 </div>
 
                 <div className='other-ad-profile-separator' />
 
-                <div className="other-ad-profile-truck-row">
-                    <strong>Желаемая доставка: </strong>{deliveryDate || '—'}
+                <div className='other-ad-profile-truck-row'>
+                    <strong>Желаемая доставка: </strong>
+                    {deliveryDate || '—'}
                 </div>
 
                 <div className='other-ad-profile-separator' />
 
-                <div className="other-ad-profile-truck">
-                    <div className="other-ad-profile-truck-row">
-                        <strong>Вес, т: </strong>{weightTons || '—'}
+                <div className='other-ad-profile-truck'>
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>Вес, т: </strong>
+                        {weightTons || '—'}
                     </div>
-                    <div className="other-ad-profile-truck-row">
-                        <strong>Габариты (В×Ш×Г): </strong>{formatDims(dimsRaw)}
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>Габариты (В×Ш×Г): </strong>
+                        {formatDims(dimsRaw)}
                     </div>
-                    <div className="other-ad-profile-truck-row">
-                        <strong>Кол-во мест: </strong>{quantity || '—'}
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>Кол-во мест: </strong>
+                        {quantity || '—'}
                     </div>
 
                     <div className='other-ad-profile-separator' />
 
                     {/* // Предполагаем, что вы используете CSS Modules (styles.tag, styles.tagList) */}
-                    <div className="other-ad-profile-truck-row">
+                    <div className='other-ad-profile-truck-row'>
                         <strong>Упаковка: </strong>
 
                         {packagingLabels.length ? (
@@ -207,7 +232,10 @@ const OtherCargoAdDetails = ({ ad }) => {
                             <div className='oatp-tag-list'>
                                 {packagingLabels.map((label, index) => (
                                     // 2. Каждый элемент - отдельный span с классом
-                                    <span key={index} className='oatp-tag'>
+                                    <span
+                                        key={index}
+                                        className='oatp-tag'
+                                    >
                                         {label}
                                     </span>
                                 ))}
@@ -224,7 +252,10 @@ const OtherCargoAdDetails = ({ ad }) => {
                         {Array.isArray(loadingTypes) && loadingTypes.length ? (
                             <div className='oatp-tag-list'>
                                 {loadingTypes.map((label, index) => (
-                                    <span key={index} className='oatp-tag'>
+                                    <span
+                                        key={index}
+                                        className='oatp-tag'
+                                    >
                                         {label}
                                     </span>
                                 ))}
@@ -240,17 +271,21 @@ const OtherCargoAdDetails = ({ ad }) => {
 
                     <div className='other-ad-profile-separator' />
 
-                    <div className="other-ad-profile-truck-row">
-                        <strong>Температура: </strong>{temperatureStr}
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>Температура: </strong>
+                        {temperatureStr}
                     </div>
-                    <div className="other-ad-profile-truck-row">
-                        <strong>Хрупкий: </strong>{isFragile ? 'да' : 'нет'}
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>Хрупкий: </strong>
+                        {isFragile ? 'да' : 'нет'}
                     </div>
-                    <div className="other-ad-profile-truck-row">
-                        <strong>Штабелируемый: </strong>{isStackable ? 'да' : 'нет'}
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>Штабелируемый: </strong>
+                        {isStackable ? 'да' : 'нет'}
                     </div>
-                    <div className="other-ad-profile-truck-row">
-                        <strong>ADR: </strong>{adrClass || '—'}
+                    <div className='other-ad-profile-truck-row'>
+                        <strong>ADR: </strong>
+                        {adrClass || '—'}
                     </div>
                 </div>
 

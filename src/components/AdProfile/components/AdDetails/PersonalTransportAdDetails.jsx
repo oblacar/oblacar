@@ -1,8 +1,8 @@
 // src/components/TransportAd/TransportAdDetails.jsx
 import React from 'react';
-import styles from './PersonalAdProfile.module.css';
+import styles from './../../PersonalAdProfile/PersonalAdProfile.module.css';
 
-import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
+import IconWithTooltip from '../../../common/IconWithTooltip/IconWithTooltip';
 import {
     CalendarDaysIcon,
     MapPinIcon,
@@ -14,7 +14,7 @@ import {
     CheckBadgeIcon,
 } from '@heroicons/react/24/outline';
 
-import { cutNumber, formatNumber } from '../../utils/helper';
+import { cutNumber, formatNumber } from '../../../../utils/helper';
 
 const PersonalTransportAdDetails = ({ ad }) => {
     if (!ad) return null;

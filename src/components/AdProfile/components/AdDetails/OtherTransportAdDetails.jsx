@@ -1,6 +1,6 @@
 import React from 'react';
-import PhotoCarousel from '../common/PhotoCarousel/PhotoCarousel';
-import { cutNumber, formatNumber } from '../../utils/helper';
+import PhotoCarousel from '../../../common/PhotoCarousel/PhotoCarousel';
+import { cutNumber, formatNumber } from '../../../../utils/helper';
 
 const OtherTransportAdDetails = ({ ad }) => {
     const data = ad?.ad && typeof ad.ad === 'object' ? ad.ad : ad;

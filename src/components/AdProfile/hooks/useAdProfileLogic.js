@@ -3,14 +3,14 @@
 import { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 
 // Контексты
-import CargoAdsContext from '../../hooks/CargoAdsContext';
-import TransportAdContext from '../../hooks/TransportAdContext';
-import ConversationContext from '../../hooks/ConversationContext';
-import UserContext from '../../hooks/UserContext';
-import TransportationContext from '../../hooks/TransportationContext';
+import CargoAdsContext from '../../../hooks/CargoAdsContext';
+import TransportAdContext from '../../../hooks/TransportAdContext';
+import ConversationContext from '../../../hooks/ConversationContext';
+import UserContext from '../../../hooks/UserContext';
+import TransportationContext from '../../../hooks/TransportationContext';
 
 // Утилиты
-import { formatNumber } from '../../utils/helper';
+import { formatNumber } from '../../../utils/helper';
 
 /**
  * Кастомный хук для инкапсуляции всей бизнес-логики компонента OtherAdProfile.

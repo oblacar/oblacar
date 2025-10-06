@@ -2,20 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import styles from './PersonalAdProfile.module.css';
 
-import TransportIncomingRequestsList from './TransportIncomingRequestsList';
-import CargoIncomingRequestsList from './CargoIncomingRequestsList';
+import TransportIncomingRequestsList from '../components/AdRequests/TransportIncomingRequestsList';
+import CargoIncomingRequestsList from '../components/AdRequests/CargoIncomingRequestsList';
 
-import ToggleSearchMode from '../common/ToggleSearchMode/ToggleSearchMode';
-import ChatInterface from '../ChatInterface/ChatInterface';
-import HorizontalPhotoCarousel from '../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
+import ToggleSearchMode from '../../common/ToggleSearchMode/ToggleSearchMode';
+import ChatInterface from '../../ChatInterface/ChatInterface';
+import HorizontalPhotoCarousel from '../../common/HorizontalPhotoCarousel/HorizontalPhotoCarousel';
 import { InboxArrowDownIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 
-import PersonalTransportAdDetails from './PersonalTransportAdDetails';
-import PersonalCargoAdDetails from './PersonalCargoAdDetails';
+import PersonalTransportAdDetails from '../components/AdDetails/PersonalTransportAdDetails';
+import PersonalCargoAdDetails from '../components/AdDetails/PersonalCargoAdDetails';
 
-import AdActionsPanel from './AdActionsPanel';
+import AdActionsPanel from '../components/AdActionsPanel/AdActionsPanel';
 
-const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) => {
+const PersonalAdProfile = ({
+    adType,
+    ad,
+    onSendRequest,
+    onMessage,
+    userType,
+}) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSelectFirst, setIsSelectFirst] = useState(true);
 
@@ -34,19 +40,22 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
     // где-нибудь рядом (утилитка)
     const getAdPhotoUrls = (ad = {}) => {
         // 1) для объявлений по транспорту
-        if (Array.isArray(ad.truckPhotoUrls) && ad.truckPhotoUrls.length) return ad.truckPhotoUrls;
+        if (Array.isArray(ad.truckPhotoUrls) && ad.truckPhotoUrls.length)
+            return ad.truckPhotoUrls;
 
         // 2) если photos — массив строк или объектов {id,url}
         if (Array.isArray(ad.photos)) {
             return ad.photos
-                .map(p => typeof p === 'string' ? p : p?.url || p?.src || '')
+                .map((p) =>
+                    typeof p === 'string' ? p : p?.url || p?.src || ''
+                )
                 .filter(Boolean);
         }
 
         // 3) если photos — map {id: {url}}
         if (ad.photos && typeof ad.photos === 'object') {
             return Object.values(ad.photos)
-                .map(p => p?.url || '')
+                .map((p) => p?.url || '')
                 .filter(Boolean);
         }
 
@@ -59,21 +68,25 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                 {/* Блок объявления */}
                 <div className={styles.transportAdProfile}>
                     <div className={styles.transportAdContentWrapper}>
-
                         <div className={styles.adContainer}>
                             <div className={styles.photoArea}>
-                                <HorizontalPhotoCarousel photos={getAdPhotoUrls(ad)} />
+                                <HorizontalPhotoCarousel
+                                    photos={getAdPhotoUrls(ad)}
+                                />
                             </div>
 
                             {/* ВСТАВКА ПАНЕЛИ ПОД КАРУСЕЛЬЮ */}
-                            <AdActionsPanel adType={adType} ad={ad} />
+                            <AdActionsPanel
+                                adType={adType}
+                                ad={ad}
+                            />
 
                             {/* Детали */}
-                            {adType === 'transport'
-                                ? <PersonalTransportAdDetails ad={ad} />
-                                : adType === 'cargo'
-                                    ? <PersonalCargoAdDetails ad={ad} />
-                                    : null}
+                            {adType === 'transport' ? (
+                                <PersonalTransportAdDetails ad={ad} />
+                            ) : adType === 'cargo' ? (
+                                <PersonalCargoAdDetails ad={ad} />
+                            ) : null}
                         </div>
                     </div>
                 </div>
@@ -82,8 +95,14 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                 <div className={styles.requests}>
                     <div style={{ padding: '20px', marginBottom: '30px' }}>
                         <ToggleSearchMode
-                            firstOption={{ icon: <InboxArrowDownIcon />, label: 'Запросы' }}
-                            secondOption={{ icon: <EnvelopeIcon />, label: 'Сообщения' }}
+                            firstOption={{
+                                icon: <InboxArrowDownIcon />,
+                                label: 'Запросы',
+                            }}
+                            secondOption={{
+                                icon: <EnvelopeIcon />,
+                                label: 'Сообщения',
+                            }}
                             isSelectFirst={isSelectFirst}
                             onToggle={handleToggle}
                         />
@@ -94,7 +113,9 @@ const PersonalAdProfile = ({ adType, ad, onSendRequest, onMessage, userType }) =
                             {adType === 'transport' && (
                                 <>
                                     <strong>Запросы на перевозку</strong>
-                                    <TransportIncomingRequestsList adId={adId} />
+                                    <TransportIncomingRequestsList
+                                        adId={adId}
+                                    />
                                 </>
                             )}
                             {adType === 'cargo' && (

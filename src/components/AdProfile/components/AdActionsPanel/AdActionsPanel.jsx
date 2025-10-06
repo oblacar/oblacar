@@ -2,10 +2,10 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import CargoAdsContext from '../../hooks/CargoAdsContext';
-import TransportAdContext from '../../hooks/TransportAdContext';
+import CargoAdsContext from '../../../../hooks/CargoAdsContext';
+import TransportAdContext from '../../../../hooks/TransportAdContext';
 
-import ConfirmationDialog from '../common/ConfirmationDialog/ConfirmationDialog';
+import ConfirmationDialog from '../../../common/ConfirmationDialog/ConfirmationDialog';
 
 import { FaRegPenToSquare, FaCircleCheck, FaBoxArchive } from 'react-icons/fa6';
 import { FaBan } from 'react-icons/fa';
@@ -38,9 +38,16 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
             };
         }
         return {
-            pause: transportCtx?.pauseAd ?? transportCtx?.closeAd ?? transportCtx?.closeTransportAd,
-            unpause: transportCtx?.unpauseAd ?? transportCtx?.reopenAd ?? transportCtx?.reopenTransportAd,
-            archive: transportCtx?.archiveAd ?? transportCtx?.archiveTransportAd,
+            pause:
+                transportCtx?.pauseAd ??
+                transportCtx?.closeAd ??
+                transportCtx?.closeTransportAd,
+            unpause:
+                transportCtx?.unpauseAd ??
+                transportCtx?.reopenAd ??
+                transportCtx?.reopenTransportAd,
+            archive:
+                transportCtx?.archiveAd ?? transportCtx?.archiveTransportAd,
             editTo: adId ? `/transport-ads/${adId}/edit` : '/transport-ads',
         };
     }, [adType, adId, cargoCtx, transportCtx]);
@@ -105,48 +112,54 @@ const AdActionsPanel = ({ adType = 'cargo', ad }) => {
     };
 
     return (
-        <div className="ad-actions-panel">
+        <div className='ad-actions-panel'>
             {/* 1) Изменить */}
             <Link
                 to={handlers.editTo || '/'}
-                className="ad-actions-icon-btn"
-                title="Изменить"
-                aria-label="Изменить"
+                className='ad-actions-icon-btn'
+                title='Изменить'
+                aria-label='Изменить'
                 onClick={(e) => e.stopPropagation()}
                 aria-disabled={busy}
             >
-                <FaRegPenToSquare className="icon-24" />
+                <FaRegPenToSquare className='icon-24' />
             </Link>
 
             {/* 2) Пауза / Вернуть — одно место */}
             <button
-                type="button"
-                className="ad-actions-icon-btn"
+                type='button'
+                className='ad-actions-icon-btn'
                 title={isPaused ? 'Вернуть из паузы' : 'Поставить на паузу'}
-                aria-label={isPaused ? 'Вернуть из паузы' : 'Поставить на паузу'}
+                aria-label={
+                    isPaused ? 'Вернуть из паузы' : 'Поставить на паузу'
+                }
                 onClick={isPaused ? onUnpause : onPauseClick}
                 disabled={busy || (!canPause && !canUnpause)}
             >
-                {isPaused ? <FaCircleCheck className="icon-24" /> : <FaBan className="icon-24" />}
+                {isPaused ? (
+                    <FaCircleCheck className='icon-24' />
+                ) : (
+                    <FaBan className='icon-24' />
+                )}
             </button>
 
             {/* 3) Скрыть/архивировать */}
             <button
-                type="button"
-                className="ad-actions-icon-btn danger"
-                title="Скрыть объявление"
-                aria-label="Скрыть объявление"
+                type='button'
+                className='ad-actions-icon-btn danger'
+                title='Скрыть объявление'
+                aria-label='Скрыть объявление'
                 onClick={onArchive}
                 disabled={busy || !canArchive}
             >
-                <FaBoxArchive className="icon-24 aap-delete-icon" />
+                <FaBoxArchive className='icon-24 aap-delete-icon' />
             </button>
 
             {/* Диалог подтверждения ПАУЗЫ */}
             {showPauseConfirm && (
-                <div className="accf__backdrop">
+                <div className='accf__backdrop'>
                     <ConfirmationDialog
-                        message="Вы уверены, что хотите поставить объявление на паузу? Оно не будет доступно для других."
+                        message='Вы уверены, что хотите поставить объявление на паузу? Оно не будет доступно для других.'
                         onConfirm={onConfirmPause}
                         onCancel={onCancelPause}
                     />
