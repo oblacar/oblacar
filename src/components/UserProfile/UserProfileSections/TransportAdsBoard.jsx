@@ -18,7 +18,7 @@ const TransportAdsBoard = () => {
   return (
     <ProfileSectionCard
       className="profile-section--fill profile-section--stick-bottom"
-      title="Мои объявления о Траспорте"
+      title="Мои объявления о готовности Траспорта для перевозки"
       subtitle="Здесь будут размещенные вами объявления о наличие Транспорта для перевозки."
       toList="/my-transport-ads"
       items={myAds}

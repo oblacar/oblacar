@@ -19,277 +19,354 @@ import OtherTransportAdDetails from './OtherTransportAdDetails';
 import OtherCargoAdDetails from './OtherCargoAdDetails';
 import { FaEnvelope } from 'react-icons/fa';
 
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa6';
+
 const OtherAdProfile = ({ adType, ad }) => {
-  // нормализуем вход: иногда приходит { ad: {...} }
-  const data = ad?.ad && typeof ad.ad === 'object' ? ad.ad : ad;
+    const [isInReviewAds, setIsInReviewAds] = useState(true);
 
-  const { currentConversation, setCurrentConversationState, isConversationsLoaded } =
-    useContext(ConversationContext);
-  const { user } = useContext(UserContext);
-  const {
-    sendTransportationRequest,
-    getAdTransportationRequestByAdId,
-    adTransportationRequests,
-    cancelTransportationRequest,
-    restartTransportationRequest,
-  } = useContext(TransportationContext);
+    // нормализуем вход: иногда приходит { ad: {...} }
+    const data = ad?.ad && typeof ad.ad === 'object' ? ad.ad : ad;
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
-  const [isModalBackShow, setIsModalBackShow] = useState(false);
-  const [isLoadingConversation, setIsLoadingConversation] = useState(false);
+    const {
+        currentConversation,
+        setCurrentConversationState,
+        isConversationsLoaded,
+    } = useContext(ConversationContext);
+    const { user } = useContext(UserContext);
+    const {
+        sendTransportationRequest,
+        getAdTransportationRequestByAdId,
+        adTransportationRequests,
+        cancelTransportationRequest,
+        restartTransportationRequest,
+    } = useContext(TransportationContext);
 
-  // только для транспорта (панель «отправить запрос»)
-  const [cargoDescription, setCargoDescription] = useState('');
-  const [adRequestStatus, setAdRequestStatus] = useState('none');
-  const [adTransportationRequest, setAdTransportationRequest] = useState(null);
-  const [isTransportationRequestSending, setIsTransportationRequestSending] = useState(false);
-  const [requestId, setRequestId] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isChatBoxOpen, setIsChatBoxOpen] = useState(false);
+    const [isModalBackShow, setIsModalBackShow] = useState(false);
+    const [isLoadingConversation, setIsLoadingConversation] = useState(false);
 
-  useEffect(() => {
-    if (data) setIsLoading(false);
-  }, [data]);
+    // только для транспорта (панель «отправить запрос»)
+    const [cargoDescription, setCargoDescription] = useState('');
+    const [adRequestStatus, setAdRequestStatus] = useState('none');
+    const [adTransportationRequest, setAdTransportationRequest] =
+        useState(null);
+    const [isTransportationRequestSending, setIsTransportationRequestSending] =
+        useState(false);
+    const [requestId, setRequestId] = useState(null);
 
-  // ===== НОРМАЛИЗАЦИЯ ПОЛЕЙ ПОД ОБЩИЙ ИНТЕРФЕЙС =====
-  // 1) владелец
-  const owner =
-    adType === 'cargo'
-      ? {
-        id: data?.owner?.id ?? data?.ownerId ?? null,
-        name: data?.owner?.name ?? data?.ownerName ?? 'Пользователь',
-        photoUrl: data?.owner?.photoUrl ?? data?.ownerPhotoUrl ?? '',
-        rating: data?.owner?.rating ?? data?.ownerRating ?? '',
-      }
-      : {
-        id: data?.ownerId ?? null,
-        name: data?.ownerName ?? 'Пользователь',
-        photoUrl: data?.ownerPhotoUrl ?? '',
-        rating: data?.ownerRating ?? '',
-      };
+    useEffect(() => {
+        if (data) setIsLoading(false);
+    }, [data]);
 
-  // 2) маршруты/даты/цены — разные названия в cargo/transport
-  const adId = data?.adId ?? null;
+    // ===== НОРМАЛИЗАЦИЯ ПОЛЕЙ ПОД ОБЩИЙ ИНТЕРФЕЙС =====
+    // 1) владелец
+    const owner =
+        adType === 'cargo'
+            ? {
+                  id: data?.owner?.id ?? data?.ownerId ?? null,
+                  name: data?.owner?.name ?? data?.ownerName ?? 'Пользователь',
+                  photoUrl: data?.owner?.photoUrl ?? data?.ownerPhotoUrl ?? '',
+                  rating: data?.owner?.rating ?? data?.ownerRating ?? '',
+              }
+            : {
+                  id: data?.ownerId ?? null,
+                  name: data?.ownerName ?? 'Пользователь',
+                  photoUrl: data?.ownerPhotoUrl ?? '',
+                  rating: data?.ownerRating ?? '',
+              };
 
-  const availabilityDate =
-    adType === 'transport' ? data?.availabilityDate ?? '' : data?.pickupDate ?? '';
+    // 2) маршруты/даты/цены — разные названия в cargo/transport
+    const adId = data?.adId ?? null;
 
-  const routeFrom =
-    adType === 'transport' ? data?.departureCity ?? '' : data?.departureCity ?? '';
-  const routeTo =
-    adType === 'transport' ? data?.destinationCity ?? '' : data?.destinationCity ?? '';
+    const availabilityDate =
+        adType === 'transport'
+            ? data?.availabilityDate ?? ''
+            : data?.pickupDate ?? '';
 
-  const price = data?.price ?? '';
-  const paymentUnit = data?.paymentUnit ?? '';
+    const routeFrom =
+        adType === 'transport'
+            ? data?.departureCity ?? ''
+            : data?.departureCity ?? '';
+    const routeTo =
+        adType === 'transport'
+            ? data?.destinationCity ?? ''
+            : data?.destinationCity ?? '';
 
-  // для ChatBox заголовка у груза пригодится
-  const title = adType === 'cargo' ? data?.title ?? '' : '';
+    const price = data?.price ?? '';
+    const paymentUnit = data?.paymentUnit ?? '';
 
-  // (доп. поля, если нужны ниже)
-  const pickupDate = adType === 'cargo' ? data?.pickupDate ?? '' : '';
-  const deliveryDate = adType === 'cargo' ? data?.deliveryDate ?? '' : '';
+    // для ChatBox заголовка у груза пригодится
+    const title = adType === 'cargo' ? data?.title ?? '' : '';
 
-  // ===== СТАТУСЫ ЗАПРОСОВ (ТОЛЬКО ДЛЯ ТРАНСПОРТА) =====
-  useEffect(() => {
-    if (adType !== 'transport' || !adTransportationRequests || !adId) return;
-    const atr = getAdTransportationRequestByAdId(adId);
-    let status = 'none';
-    let rid = null;
-    if (atr?.requestData) {
-      status = atr.requestData.status ?? 'none';
-      rid = atr.requestData.requestId ?? null;
+    // (доп. поля, если нужны ниже)
+    const pickupDate = adType === 'cargo' ? data?.pickupDate ?? '' : '';
+    const deliveryDate = adType === 'cargo' ? data?.deliveryDate ?? '' : '';
+
+    // ===== СТАТУСЫ ЗАПРОСОВ (ТОЛЬКО ДЛЯ ТРАНСПОРТА) =====
+    useEffect(() => {
+        if (adType !== 'transport' || !adTransportationRequests || !adId)
+            return;
+        const atr = getAdTransportationRequestByAdId(adId);
+        let status = 'none';
+        let rid = null;
+        if (atr?.requestData) {
+            status = atr.requestData.status ?? 'none';
+            rid = atr.requestData.requestId ?? null;
+        }
+        setAdRequestStatus(status);
+        setRequestId(rid);
+        setAdTransportationRequest(atr);
+        setIsTransportationRequestSending(false);
+    }, [
+        adTransportationRequests,
+        adType,
+        adId,
+        getAdTransportationRequestByAdId,
+    ]);
+
+    // ===== ЧАТ ПРИВЯЗКА =====
+    useEffect(() => {
+        if (!isConversationsLoaded || !isChatBoxOpen || !data) return;
+        // порядок: (adId, currentUserId, otherUserId)
+        setCurrentConversationState(adId, user?.userId, owner.id);
+        setIsModalBackShow(false);
+    }, [
+        isConversationsLoaded,
+        isChatBoxOpen,
+        adId,
+        user?.userId,
+        owner.id,
+        setCurrentConversationState,
+    ]);
+
+    useEffect(() => {
+        setIsLoadingConversation(false);
+    }, [isChatBoxOpen, currentConversation]);
+
+    if (isLoading) {
+        return <div className='loading'>Загрузка объявления...</div>;
     }
-    setAdRequestStatus(status);
-    setRequestId(rid);
-    setAdTransportationRequest(atr);
-    setIsTransportationRequestSending(false);
-  }, [adTransportationRequests, adType, adId, getAdTransportationRequestByAdId]);
 
-  // ===== ЧАТ ПРИВЯЗКА =====
-  useEffect(() => {
-    if (!isConversationsLoaded || !isChatBoxOpen || !data) return;
-    // порядок: (adId, currentUserId, otherUserId)
-    setCurrentConversationState(adId, user?.userId, owner.id);
-    setIsModalBackShow(false);
-  }, [isConversationsLoaded, isChatBoxOpen, adId, user?.userId, owner.id, setCurrentConversationState]);
-
-  useEffect(() => {
-    setIsLoadingConversation(false);
-  }, [isChatBoxOpen, currentConversation]);
-
-  if (isLoading) {
-    return <div className="loading">Загрузка объявления...</div>;
-  }
-
-  // ===== Обработчики (чат) =====
-  const handleStartChat = () => {
-    setIsLoadingConversation(true);
-    setIsChatBoxOpen(true);
-    if (!isConversationsLoaded) setIsModalBackShow(true);
-  };
-  const handleCloseModalBack = () => {
-    setIsModalBackShow(false);
-    setIsChatBoxOpen(false);
-  };
-
-  // ===== Обработчики (заявка перевозчику — ТОЛЬКО ТРАНСПОРТ) =====
-  const handleSendRequest = async () => {
-    if (adType !== 'transport') return;
-    if (!cargoDescription.trim()) return;
-
-    setIsTransportationRequestSending(true);
-
-    const adData = {
-      adId,
-      locationFrom: routeFrom,
-      locationTo: routeTo,
-      date: availabilityDate,
-      price,
-      paymentUnit,
-      owner: {
-        id: owner.id,
-        name: owner.name,
-        photoUrl: owner.photoUrl,
-        contact: '—',
-      },
+    // ===== Обработчики (чат) =====
+    const handleStartChat = () => {
+        setIsLoadingConversation(true);
+        setIsChatBoxOpen(true);
+        if (!isConversationsLoaded) setIsModalBackShow(true);
+    };
+    const handleCloseModalBack = () => {
+        setIsModalBackShow(false);
+        setIsChatBoxOpen(false);
     };
 
-    const request = {
-      sender: {
-        id: user.userId,
-        name: user.userName,
-        photoUrl: user.userPhoto,
-        contact: user.userPhone,
-      },
-      dateSent: new Date().toLocaleDateString('ru-RU'),
-      status: 'pending',
-      description: cargoDescription,
+    // ===== Обработчики (заявка перевозчику — ТОЛЬКО ТРАНСПОРТ) =====
+    const handleSendRequest = async () => {
+        if (adType !== 'transport') return;
+        if (!cargoDescription.trim()) return;
+
+        setIsTransportationRequestSending(true);
+
+        const adData = {
+            adId,
+            locationFrom: routeFrom,
+            locationTo: routeTo,
+            date: availabilityDate,
+            price,
+            paymentUnit,
+            owner: {
+                id: owner.id,
+                name: owner.name,
+                photoUrl: owner.photoUrl,
+                contact: '—',
+            },
+        };
+
+        const request = {
+            sender: {
+                id: user.userId,
+                name: user.userName,
+                photoUrl: user.userPhoto,
+                contact: user.userPhone,
+            },
+            dateSent: new Date().toLocaleDateString('ru-RU'),
+            status: 'pending',
+            description: cargoDescription,
+        };
+
+        try {
+            await sendTransportationRequest(adData, request);
+            setCargoDescription('');
+        } catch (e) {
+            console.error('Failed to send request:', e);
+            setIsTransportationRequestSending(false);
+        }
     };
 
-    try {
-      await sendTransportationRequest(adData, request);
-      setCargoDescription('');
-    } catch (e) {
-      console.error('Failed to send request:', e);
-      setIsTransportationRequestSending(false);
-    }
-  };
+    const handleCancelRequest = async () => {
+        try {
+            await cancelTransportationRequest(
+                adId,
+                user.userId,
+                owner.id,
+                requestId
+            );
+            setAdRequestStatus('cancelled');
+        } catch (e) {
+            console.error('Failed to cancel request:', e);
+        }
+    };
+    const handleRestartRequest = async () => {
+        try {
+            await restartTransportationRequest(
+                adId,
+                user.userId,
+                owner.id,
+                requestId
+            );
+            setAdRequestStatus('none');
+        } catch (e) {
+            console.error('Failed to restart request:', e);
+        }
+    };
 
-  const handleCancelRequest = async () => {
-    try {
-      await cancelTransportationRequest(adId, user.userId, owner.id, requestId);
-      setAdRequestStatus('cancelled');
-    } catch (e) {
-      console.error('Failed to cancel request:', e);
-    }
-  };
-  const handleRestartRequest = async () => {
-    try {
-      await restartTransportationRequest(adId, user.userId, owner.id, requestId);
-      setAdRequestStatus('none');
-    } catch (e) {
-      console.error('Failed to restart request:', e);
-    }
-  };
+    // какой блок описания слева
+    const Details =
+        adType === 'cargo' ? OtherCargoAdDetails : OtherTransportAdDetails;
 
-  // какой блок описания слева
-  const Details = adType === 'cargo' ? OtherCargoAdDetails : OtherTransportAdDetails;
+    const RightPanel = () => (
+        <div className='other-ad-profile-owner-data'>
+            <UserSmallCard
+                photoUrl={owner.photoUrl}
+                rating={owner.rating}
+                name={owner.name}
+                onMessageClick={handleStartChat}
+                isLoading={false}
+            />
 
-  const RightPanel = () => (
-    <div className="other-ad-profile-owner-data">
-      <UserSmallCard
-        photoUrl={owner.photoUrl}
-        rating={owner.rating}
-        name={owner.name}
-        onMessageClick={handleStartChat}
-        isLoading={false}
-      />
+            {adType === 'transport' ? (
+                <div className='other-ad-profile-owner-send-request'>
+                    {!isTransportationRequestSending &&
+                        (adRequestStatus === 'none' ||
+                        adRequestStatus === '' ? (
+                            <>
+                                <strong>
+                                    Опишите груз и отправьте Перевозчику запрос.
+                                </strong>
+                                <textarea
+                                    placeholder='Описание вашего груза и деталей перевозки.'
+                                    value={cargoDescription}
+                                    onChange={(e) =>
+                                        setCargoDescription(e.target.value)
+                                    }
+                                />
+                                <Button
+                                    type='button'
+                                    children='Отправить запрос'
+                                    icon={<FaEnvelope />}
+                                    onClick={handleSendRequest}
+                                />
+                            </>
+                        ) : (
+                            <RequestStatusBlock
+                                status={adRequestStatus}
+                                onCancelRequest={handleCancelRequest}
+                                onRestartRequest={handleRestartRequest}
+                                adTransportationRequest={
+                                    adTransportationRequest
+                                }
+                            />
+                        ))}
 
-      {adType === 'transport' ? (
-        <div className="other-ad-profile-owner-send-request">
-          {!isTransportationRequestSending &&
-            (adRequestStatus === 'none' || adRequestStatus === '' ? (
-              <>
-                <strong>Опишите груз и отправьте Перевозчику запрос.</strong>
-                <textarea
-                  placeholder="Описание вашего груза и деталей перевозки."
-                  value={cargoDescription}
-                  onChange={(e) => setCargoDescription(e.target.value)}
-                />
-                <Button
-                  type="button"
-                  children="Отправить запрос"
-                  icon={<FaEnvelope />}
-                  onClick={handleSendRequest}
-                />
-              </>
+                    {isTransportationRequestSending && (
+                        <div className='other-ad-profile-send-request-preloader'>
+                            <Preloader />
+                        </div>
+                    )}
+                </div>
             ) : (
-              <RequestStatusBlock
-                status={adRequestStatus}
-                onCancelRequest={handleCancelRequest}
-                onRestartRequest={handleRestartRequest}
-                adTransportationRequest={adTransportationRequest}
-              />
-            ))}
+                <div className='other-ad-profile-owner-send-request'>
+                    <strong>Свяжитесь с автором объявления о грузе.</strong>
+                    <div style={{ marginTop: 8 }}>
+                        <Button
+                            type='button'
+                            children='Написать сообщение'
+                            onClick={handleStartChat}
+                        />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 
-          {isTransportationRequestSending && (
-            <div className="other-ad-profile-send-request-preloader">
-              <Preloader />
+    const handleToggleReviewAd = () => {
+        // 💡 React передает в этот колбэк гарантированно актуальное предыдущее значение (prev)
+        setIsInReviewAds((prev) => !prev);
+    };
+
+    return (
+        <>
+            <div className='other-ad-profile'>
+                {isInReviewAds ? (
+                    <div
+                        className={`oap-in-review oap-in-review--is-active`}
+                        title='Убрать из Вариантов'
+                    >
+                        <FaBookmark onClick={handleToggleReviewAd} />
+                    </div>
+                ) : (
+                    <div
+                        className={`oap-in-review`}
+                        title='Добавить в Варианты'
+                    >
+                        <FaRegBookmark onClick={handleToggleReviewAd} />
+                    </div>
+                )}
+
+                <div className='other-ad-profile-main-data'>
+                    <Details ad={data} />
+                </div>
+
+                <RightPanel />
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="other-ad-profile-owner-send-request">
-          <strong>Свяжитесь с автором объявления о грузе.</strong>
-          <div style={{ marginTop: 8 }}>
-            <Button type="button" children="Написать сообщение" onClick={handleStartChat} />
-          </div>
-        </div>
-      )}
-    </div>
-  );
 
-  return (
-    <>
-      <div className="other-ad-profile">
-        <div className="other-ad-profile-main-data">
-          <Details ad={data} />
-        </div>
+            {isChatBoxOpen && isConversationsLoaded && (
+                <ChatBox
+                    onClose={() => setIsChatBoxOpen(false)}
+                    adData={
+                        adType === 'transport'
+                            ? {
+                                  adId,
+                                  availabilityDate,
+                                  departureCity: routeFrom,
+                                  destinationCity: routeTo,
+                                  priceAndPaymentUnit:
+                                      formatNumber(String(price)) +
+                                      ' ' +
+                                      (paymentUnit || ''),
+                              }
+                            : {
+                                  adId,
+                                  availabilityDate: pickupDate,
+                                  departureCity: routeFrom,
+                                  destinationCity: routeTo,
+                                  priceAndPaymentUnit: '', // у груза пока без ставки
+                                  title: title || '',
+                              }
+                    }
+                    chatPartnerName={owner.name}
+                    chatPartnerPhoto={owner.photoUrl}
+                    chatPartnerId={owner.id}
+                />
+            )}
 
-        <RightPanel />
-      </div>
-
-      {isChatBoxOpen && isConversationsLoaded && (
-        <ChatBox
-          onClose={() => setIsChatBoxOpen(false)}
-          adData={
-            adType === 'transport'
-              ? {
-                adId,
-                availabilityDate,
-                departureCity: routeFrom,
-                destinationCity: routeTo,
-                priceAndPaymentUnit: formatNumber(String(price)) + ' ' + (paymentUnit || ''),
-              }
-              : {
-                adId,
-                availabilityDate: pickupDate,
-                departureCity: routeFrom,
-                destinationCity: routeTo,
-                priceAndPaymentUnit: '', // у груза пока без ставки
-                title: title || '',
-              }
-          }
-          chatPartnerName={owner.name}
-          chatPartnerPhoto={owner.photoUrl}
-          chatPartnerId={owner.id}
-        />
-      )}
-
-      {isModalBackShow && (
-        <ModalBackdrop children={<ConversationLoadingInfo />} onClose={() => setIsModalBackShow(false)} />
-      )}
-    </>
-  );
+            {isModalBackShow && (
+                <ModalBackdrop
+                    children={<ConversationLoadingInfo />}
+                    onClose={() => setIsModalBackShow(false)}
+                />
+            )}
+        </>
+    );
 };
 
 export default OtherAdProfile;

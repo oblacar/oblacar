@@ -3,6 +3,8 @@
     border: 1px solid rgb(231, 231, 231);
     padding: 10px;
     border-radius: 5px;
+
+    position: relative;
 }
 
 .other-ad-profile-main-data {
@@ -19,13 +21,17 @@
     /* padding: 10px; */
 }
 
-.other-ad-profile-date {}
+.other-ad-profile-date {
+}
 
-.other-ad-profile-departure-city {}
+.other-ad-profile-departure-city {
+}
 
-.other-ad-profile-destination-city {}
+.other-ad-profile-destination-city {
+}
 
-.other-ad-profile-price {}
+.other-ad-profile-price {
+}
 
 .other-ad-profile-rout-date-price-row strong,
 .other-ad-profile-truck-row strong,
@@ -52,15 +58,13 @@
     height: 2px;
 
     /* 2. Используем линейный градиент для создания оранжевой линии */
-    background-image: linear-gradient(to right,
-            /* Направление: слева направо */
-            #ffc299,
-            /* Светлый/прозрачный оранжевый (начинаем) */
-            #ff8c3c,
-            /* Яркий оранжевый (центр) */
-            #ffc299
+    background-image: linear-gradient(
+        to right,
+        /* Направление: слева направо */ #ffc299,
+        /* Светлый/прозрачный оранжевый (начинаем) */ #ff8c3c,
+        /* Яркий оранжевый (центр) */ #ffc299
             /* Светлый/прозрачный оранжевый (заканчиваем) */
-        );
+    );
 
     /* 3. Убираем повторение фона (обычно не нужно для градиента, но хорошая практика) */
     background-repeat: no-repeat;
@@ -69,8 +73,6 @@
     margin-top: 15px;
     margin-bottom: 15px;
 }
-
-
 
 .other-ad-profile-cargo-description {
     width: 300px;
@@ -82,8 +84,6 @@
     color: #313131;
     font-size: 18px;
 }
-
-
 
 /* Данные об автомобиле / параметры */
 .other-ad-profile-truck {
@@ -99,14 +99,18 @@
     font-size: 24px;
 }
 
-.other-ad-profile-truck-type {}
+.other-ad-profile-truck-type {
+}
 
-.other-ad-profile-truck-weight-value {}
+.other-ad-profile-truck-weight-value {
+}
 
-.other-ad-profile-truck-loadings {}
+.other-ad-profile-truck-loadings {
+}
 
 /* Фото зона */
-.other-ad-profile-truck-photo-area {}
+.other-ad-profile-truck-photo-area {
+}
 
 /* Информация о пользователе */
 .other-ad-profile-owner-data {
@@ -228,7 +232,7 @@
     z-index: 10;
 }
 
-.other-ad-profile-send-request-preloader>* {
+.other-ad-profile-send-request-preloader > * {
     position: absolute;
 }
 
@@ -284,7 +288,6 @@
     background: #f3f4f6;
     color: #374151;
     border: 1px solid rgba(0, 0, 0, 0.06);
-
 }
 
 /* Опционально: стили для оранжевых тегов */
@@ -293,3 +296,39 @@
     color: white;
     font-weight: 600;
 }
+
+/* =======================================
+   БАЗОВЫЙ КОНТЕЙНЕР ДЛЯ ИКОНКИ (Активный и неактивный)
+   ======================================= */
+.oap-in-review {
+    cursor: pointer;
+    /* Базовые размеры, отступы и позиционирование */
+}
+
+/* ---------------------------------------
+   СТИЛИ ИКОНКИ В НЕАКТИВНОМ СОСТОЯНИИ
+   --------------------------------------- */
+
+/* Стилизуем КОНТУРНУЮ иконку внутри базового контейнера */
+.oap-in-review > svg {
+    /* Обращение к SVG-элементу (иконке) внутри контейнера */
+    color: #a0a0a0; /* Серый цвет, по умолчанию */
+    font-size: 24px; /* Установите желаемый размер */
+    transition: color 0.2s ease;
+}
+
+/* ---------------------------------------
+   СТИЛИ ИКОНКИ В АКТИВНОМ СОСТОЯНИИ
+   --------------------------------------- */
+
+.oap-in-review {
+    position: absolute;
+    right: 20px;
+    top: 0px;
+}
+
+/* Стилизуем ЗАПОЛНЕННУЮ иконку внутри контейнера с модификатором */
+.oap-in-review--is-active > svg {
+    color: #ff904c; /* Оранжевый цвет */
+}
+

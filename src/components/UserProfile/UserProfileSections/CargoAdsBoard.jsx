@@ -19,7 +19,7 @@ const CargoAdsBoard = () => {
     return (
         <ProfileSectionCard
             className="profile-section--fill profile-section--stick-bottom"
-            title="Мои объявления о Грузе"
+            title="Мои объявления о наличие Груза для перевозки"
             subtitle="Здесь будут размещенные вами объявления о грузах для перевозки."
             toList="/my-cargo-ads"
             items={myAds}

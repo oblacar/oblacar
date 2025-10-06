@@ -7,7 +7,6 @@ import Requests from './UserProfileSections/Requests';
 import Deliveries from './UserProfileSections/Deliveries';
 import PaymentDetails from './UserProfileSections/PaymentDetails';
 
-import CargoAds from './UserProfileSections/CargoAds';
 import VehiclesBoard from './UserProfileSections/VehiclesBoard';
 import TransportAdsBoard from './UserProfileSections/TransportAdsBoard';
 import CargoAdsBoard from './UserProfileSections/CargoAdsBoard';
