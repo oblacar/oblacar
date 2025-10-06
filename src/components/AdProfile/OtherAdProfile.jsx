@@ -14,6 +14,7 @@ import RequestStatusBlock from './RequestStatusBlock';
 import UserSmallCard from '../common/UserSmallCard/UserSmallCard';
 import ModalBackdrop from '../common/ModalBackdrop/ModalBackdrop';
 import ConversationLoadingInfo from '../common/ConversationLoadingInfo/ConversationLoadingInfo';
+import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
 
 import OtherTransportAdDetails from './OtherTransportAdDetails';
 import OtherCargoAdDetails from './OtherCargoAdDetails';
@@ -307,25 +308,28 @@ const OtherAdProfile = ({ adType, ad }) => {
         <>
             <div className='other-ad-profile'>
                 {isInReviewAds ? (
-                    <div
-                        className={`oap-in-review oap-in-review--is-active`}
-                        title='Убрать из Вариантов'
-                    >
-                        <FaBookmark onClick={handleToggleReviewAd} />
+                    // СОСТОЯНИЕ: Активно (УЖЕ В СПИСКЕ)
+                    <div className={`oap-in-review oap-in-review--is-active`}>
+                        <IconWithTooltip
+                            icon={FaBookmark} // Заполненная иконка
+                            tooltipText='Убрать из Вариантов'
+                            onClick={handleToggleReviewAd} // Переключаем на Неактивно
+                        />
                     </div>
                 ) : (
-                    <div
-                        className={`oap-in-review`}
-                        title='Добавить в Варианты'
-                    >
-                        <FaRegBookmark onClick={handleToggleReviewAd} />
+                    // СОСТОЯНИЕ: Неактивно (НЕТ В СПИСКЕ)
+                    <div className={`oap-in-review`}>
+                        <IconWithTooltip
+                            icon={FaRegBookmark} // Контурная иконка
+                            tooltipText='Добавить в Варианты'
+                            onClick={handleToggleReviewAd} // Переключаем на Активно
+                        />
                     </div>
                 )}
 
                 <div className='other-ad-profile-main-data'>
                     <Details ad={data} />
                 </div>
-
                 <RightPanel />
             </div>
 

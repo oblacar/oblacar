@@ -1,34 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './IconWithTooltip.module.css';
 
-const IconWithTooltip = ({ icon, tooltipText, size = '24px' }) => {
+// 💡 Переименовываем 'icon' в 'Icon' с заглавной буквы
+const IconWithTooltip = ({
+    icon: Icon,
+    tooltipText,
+    size = '24px',
+    onClick,
+}) => {
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const timeoutRef = useRef(null);
+
+    // Очистка таймера при размонтировании (чтобы избежать утечек)
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleMouseEnter = () => {
         if (tooltipText) {
-            setTimeout(() => {
+            // Очищаем предыдущий таймер, если он был
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+            // Запускаем новый таймер
+            timeoutRef.current = setTimeout(() => {
                 setIsTooltipVisible(true);
-            }, 500); // Показываем подсказку через 1 секунду
+            }, 500);
         }
     };
 
     const handleMouseLeave = () => {
-        setIsTooltipVisible(false); // Убираем подсказку при уходе курсора
+        // Очищаем таймер, чтобы подсказка не появилась после ухода курсора
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setIsTooltipVisible(false);
     };
 
     return (
         <div
             className={styles.iconContainer}
-            style={{ width: size, height: size }}
+            // 💡 Добавили onClick, который передали извне
+            onClick={onClick}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <div
+            {/* ✅ Рендерим 'Icon' как компонент, передавая ему размер */}
+            <Icon
+                style={{ width: size, height: size }} // Часто иконки из react-icons лучше стилизовать через inline style
+                size={size} // Передаем пропс size, если Icon его поддерживает
                 className={styles.icon}
-                style={{ width: size, height: size }}
-            >
-                {icon}
-            </div>
+            />
+
             {isTooltipVisible && (
                 <div className={styles.tooltip}>{tooltipText}</div>
             )}
