@@ -19,54 +19,39 @@ const toDMY = (d) => {
     const dd = String(dt.getDate()).padStart(2, '0');
     const mm = String(dt.getMonth() + 1).padStart(2, '0');
     const yyyy = dt.getFullYear();
-
-    const date = `${dd}.${mm}.${yyyy}`;
-
-    console.log(date);
-
-    return date;
+    return `${dd}.${mm}.${yyyy}`;
 };
 
 // из UserContext собираем sender
 const buildSenderFromUser = (u) => ({
     id: u?.userId || u?.id || '',
     name: u?.userName || u?.displayName || u?.name || '',
-    // поддержим оба ключа — и photourl, и photoUrl (на всякий)
-    // photourl: u?.profilePhotoUrl || u?.photoUrl || u?.photoURL || '',
     photoUrl: u?.userPhoto || u?.profilePhotoUrl || u?.photoUrl || u?.photoURL || '',
     contact: u?.userPhone || u?.phone || u?.phoneNumber || u?.contact || u?.userEmail || '',
 });
 
 // НОРМАЛИЗУЕМ объявление → строгий mainData для сервиса/контекста
 const buildCargoMainDataFromAd = (raw) => {
-
-    console.log('raw:');
-    console.log(raw);
-
     const adId = raw?.adId ?? raw?.id ?? null;
     const ownerId = raw?.ownerId ?? raw?.owner?.id ?? null;
 
     return {
         adId,
-
-        departureCity: raw?.route.from ?? raw?.departureCity ?? raw?.locationFrom ?? raw?.routeFrom ?? '',
-        destinationCity: raw?.route.to ?? raw?.destinationCity ?? raw?.locationTo ?? raw?.routeTo ?? '',
-
+        departureCity: raw?.route?.from ?? raw?.departureCity ?? raw?.locationFrom ?? raw?.routeFrom ?? '',
+        destinationCity: raw?.route?.to ?? raw?.destinationCity ?? raw?.locationTo ?? raw?.routeTo ?? '',
         // ВАЖНО: именно mainData.date (а не pickupDate)
         date: raw?.availabilityFrom ?? raw?.pickupDate ?? raw?.date ?? raw?.availabilityDate ?? toDMY(new Date()),
-
-        //TODO цена обнуляется
-        // price: typeof raw?.price === 'number' ? raw.price : (raw?.priceAndPaymentUnit?.price ?? 0),
-        price: raw?.price ?? '',
+        price: num(
+            typeof raw?.price === 'number' ? raw.price : (raw?.priceAndPaymentUnit?.price ?? Number(raw?.price) ?? 0),
+            0
+        ),
         paymentUnit: raw?.paymentUnit ?? raw?.priceAndPaymentUnit?.unit ?? raw?.currency ?? '',
-
         owner: {
             id: ownerId || '',
             name: raw?.owner?.name ?? raw?.ownerName ?? '',
-            // в БД принят ключ photourl — но и photoUrl сохраним для UI-удобства
             photoUrl: raw?.owner?.photourl ?? raw?.ownerPhotoUrl ?? raw?.owner?.photoUrl ?? '',
-            //Контакт пока будет пустой, т.к. форму объявления он не передается.
-            contact: raw.raw?.owner?.contact ?? raw?.ownerPhone ?? '',
+            // фикс опечатки raw.raw?.owner?.contact
+            contact: raw?.owner?.contact ?? raw?.ownerPhone ?? '',
         },
     };
 };
@@ -86,11 +71,14 @@ const AdRightPanel = ({
     handleCancelRequest,
     handleRestartRequest,
 
-
     adTransportationRequest,
 }) => {
     const isTransportAd = adType === 'transport';
     const isCargoAd = adType === 'cargo';
+
+    // «Новый запрос» — открыть форму составления
+    const [forceComposeCargo, setForceComposeCargo] = useState(false);
+    const [forceComposeTransport, setForceComposeTransport] = useState(false);
 
     const { user } = useContext(UserContext) || {};
     const cargoCtx = useContext(CargoRequestsContext);
@@ -98,10 +86,10 @@ const AdRightPanel = ({
     const {
         sendCargoRequest,
         cancelMyCargoRequest,
-        restartMyCargoRequest,
+        // restartMyCargoRequest, // больше не используем тут — «Новый запрос» только открывает форму
         getMyRequestStatusForAd,
-        getMyCargoRequestByAdId,   // ← правильный метод из контекста
-        sentRequestsStatuses,      // ← нужно для meta-записи (requestId)
+        getMyCargoRequestByAdId,   // полный объект моей заявки
+        sentRequestsStatuses,      // meta-записи (requestId/status)
         error: cargoError,
         isLoading: cargoCtxLoading,
     } = cargoCtx || {};
@@ -134,18 +122,12 @@ const AdRightPanel = ({
     // статус моей заявки (cargo) — строго по adId
     const cargoAdStatus = useMemo(() => {
         if (!isCargoAd || !adId || !getMyRequestStatusForAd) return 'none';
-        const s = getMyRequestStatusForAd(adId);
-        return s;
+        return getMyRequestStatusForAd(adId);
     }, [isCargoAd, adId, getMyRequestStatusForAd]);
 
-    // ПОЛНЫЙ объект моей заявки из контекста (для RequestStatusBlock)
+    // ПОЛНЫЙ объект моей заявки (для RequestStatusBlock)
     const myCargoFull = useMemo(() => {
-        console.log('TODO прошел К myCargoFull = useMemo')
-
         if (!isCargoAd || !getMyCargoRequestByAdId || !adId) return null;
-
-        console.log('TODO прошел в myCargoFull = useMemo')
-
         return getMyCargoRequestByAdId(adId);
     }, [isCargoAd, getMyCargoRequestByAdId, adId]);
 
@@ -168,6 +150,7 @@ const AdRightPanel = ({
         }
         try {
             await Promise.resolve(handleSendRequest());
+            setForceComposeTransport(false);
         } catch (e) {
             console.error('[AdRightPanel] handleSendRequest ERROR', e);
             setLocalError(e?.message || 'Ошибка отправки заявки (transport).');
@@ -177,10 +160,6 @@ const AdRightPanel = ({
     // ── CARGO: отправка ──
     const handleSendCargoRequest = async () => {
         setLocalError('');
-
-
-        console.log('handleSendCargoRequest');
-
         if (!isCargoAd) return;
         if (!cargoCtx || !sendCargoRequest) {
             console.error('[AdRightPanel] CargoRequestsContext/sendCargoRequest missing');
@@ -189,12 +168,7 @@ const AdRightPanel = ({
         }
 
         try {
-
-            console.log('TODO in method');
-
             setIsCargoRequestSending(true);
-
-            console.log('TODO after setIsCargoRequestSending');
 
             // 1) строгий mainData
             const mainData = buildCargoMainDataFromAd({ ...ad, adId, ownerId: adOwnerId });
@@ -202,30 +176,22 @@ const AdRightPanel = ({
                 console.error('[AdRightPanel] CARGO invalid mainData', mainData);
                 throw new Error('Некорректные данные объявления (cargo).');
             }
-            console.log('TODO after 1');
 
-            // 2) строгий request (экземпляр класса) с sender из UserContext
+            // 2) строгий request (класс) с sender из UserContext
             const sender = buildSenderFromUser(user);
-            //TODO смотрим дальше
             const request = new CargoRequest({
-                // requestId генерит сервис/БД
                 sender,
                 dateSent: toDMY(new Date()),
                 status: 'pending',
                 description: cargoDescription || '',
             });
 
-            console.log('TODO after 2');
-
-            // 3) контекст ждёт строгие объекты: sendCargoRequest(mainData, request)
-
-
-            console.log(mainData);
-            console.log(request);
-
+            // 3) отправляем через контекст
             await sendCargoRequest(mainData, request);
-            // опционально: очистим текстовое поле
-            // setCargoDescription('');
+
+            // скрыть форму и очистить поле
+            setForceComposeCargo(false);
+            setCargoDescription?.('');
         } catch (e) {
             console.error('[AdRightPanel] CARGO send ERROR', e);
             setLocalError(e?.message || 'Ошибка отправки заявки (cargo).');
@@ -242,8 +208,7 @@ const AdRightPanel = ({
             setLocalError('Метод отмены недоступен (cargo).');
             return;
         }
-        const requestId =
-            myCargoFull?.requestData?.requestId || myCargoReqMeta?.requestId || '';
+        const requestId = myCargoFull?.requestData?.requestId || myCargoReqMeta?.requestId || '';
         if (!requestId) {
             console.error('[AdRightPanel] requestId missing for cancel');
             setLocalError('Не найден requestId для отмены (cargo).');
@@ -257,33 +222,11 @@ const AdRightPanel = ({
         }
     };
 
-    // ── CARGO: перезапуск ── (создаёт новую заявку)
-    const handleRestartCargoRequest = async () => {
+    // ── CARGO: «Новый запрос» — просто открыть форму (без записи в БД)
+    const handleRestartCargoRequest = () => {
         setLocalError('');
-        if (!cargoCtx || !restartMyCargoRequest) {
-            console.error('[AdRightPanel] restartMyCargoRequest missing');
-            setLocalError('Метод повторной отправки недоступен (cargo).');
-            return;
-        }
-        try {
-            setIsCargoRequestSending(true);
-
-            const mainData = buildCargoMainDataFromAd({ ...ad, adId, ownerId: adOwnerId });
-            const sender = buildSenderFromUser(user);
-            const request = new CargoRequest({
-                sender,
-                dateSent: toDMY(new Date()),
-                status: 'pending',
-                description: cargoDescription || '',
-            });
-
-            await restartMyCargoRequest(mainData, request);
-        } catch (e) {
-            console.error('[AdRightPanel] CARGO restart ERROR', e);
-            setLocalError(e?.message || 'Ошибка повторной отправки (cargo).');
-        } finally {
-            setIsCargoRequestSending(false);
-        }
+        setForceComposeCargo(true);
+        setCargoDescription?.('');
     };
 
     const titleTextTransport = 'Опишите груз и отправьте Перевозчику запрос.';
@@ -304,7 +247,7 @@ const AdRightPanel = ({
             {isTransportAd ? (
                 <div className='other-ad-profile-owner-send-request'>
                     {!isTransportationRequestSending &&
-                        (adRequestStatus === 'none' || adRequestStatus === '' ? (
+                        (forceComposeTransport || adRequestStatus === 'none' || adRequestStatus === '' ? (
                             <>
                                 <strong>{titleTextTransport}</strong>
                                 <textarea
@@ -320,7 +263,10 @@ const AdRightPanel = ({
                             <RequestStatusBlock
                                 status={adRequestStatus}
                                 onCancelRequest={handleCancelRequest}
-                                onRestartRequest={handleRestartRequest}
+                                onRestartRequest={() => {
+                                    setForceComposeTransport(true);
+                                    setCargoDescription?.('');
+                                }}
                                 adTransportationRequest={adTransportationRequest}
                             />
                         ))}
@@ -332,7 +278,7 @@ const AdRightPanel = ({
             ) : isCargoAd ? (
                 <div className='other-ad-profile-owner-send-request'>
                     {!cargoSending &&
-                        (cargoAdStatus === 'none' || cargoAdStatus === '' ? (
+                        (forceComposeCargo || cargoAdStatus === 'none' || cargoAdStatus === '' ? (
                             <>
                                 <strong>{titleTextCargo}</strong>
                                 <textarea
@@ -368,18 +314,6 @@ const AdRightPanel = ({
                     <strong>Свяжитесь с автором объявления.</strong>
                 </div>
             )}
-
-            {/* DEBUG */}
-            {/* <div style={{ marginTop: 12, fontSize: 12, opacity: .7, padding: 8, border: '1px dashed #ccc', borderRadius: 8 }}>
-                <div><b>DEBUG</b></div>
-                <div>adType: {String(adType)}</div>
-                <div>hasCargoCtx: {String(!!cargoCtx)}</div>
-                <div>ad.adId: {String(adId)}</div>
-                <div>ad.ownerId: {String(adOwnerId)}</div>
-                <div>cargoAdStatus: {String(cargoAdStatus)}</div>
-                <div>transport adRequestStatus: {String(adRequestStatus)}</div>
-                <div>has myCargoFull: {String(!!myCargoFull)}</div>
-            </div> */}
         </div>
     );
 };

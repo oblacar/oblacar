@@ -79,7 +79,7 @@ const useTransportAdProfileLogic = ({ ad }) => {
         getAdTransportationRequestByAdId,
         adTransportationRequests,
         cancelTransportationRequest,
-        restartTransportationRequest,
+        // restartTransportationRequest, // ← больше не используем, убрал, чтобы не путало
     } = useContext(TransportationContext);
 
     // state
@@ -93,6 +93,9 @@ const useTransportAdProfileLogic = ({ ad }) => {
     const [adRequestStatus, setAdRequestStatus] = useState('none');
     const [adTransportationRequest, setAdTransportationRequest] = useState(null);
     const [isTransportationRequestSending, setIsTransportationRequestSending] = useState(false);
+
+    // compose-режим для нового запроса (аналогично ветке cargo)
+    const [forceComposeTransport, setForceComposeTransport] = useState(false);
 
     // data normalize
     const data = useMemo(() => (ad?.ad && typeof ad.ad === 'object' ? ad.ad : ad), [ad]);
@@ -156,10 +159,8 @@ const useTransportAdProfileLogic = ({ ad }) => {
         setIsChatBoxOpen(false);
     }, []);
 
-    // requests
+    // SEND (transport)
     const handleSendRequest = useCallback(async () => {
-        console.log('[useTransportAdProfileLogic] SEND click');
-
         if (typeof sendTransportationRequest !== 'function') {
             console.error('[useTransportAdProfileLogic] sendTransportationRequest not a function');
             return;
@@ -207,6 +208,9 @@ const useTransportAdProfileLogic = ({ ad }) => {
             }
             setAdTransportationRequest(atr);
             setAdRequestStatus(atr.requestData?.status || 'pending');
+
+            // ⬇️ выключаем compose-режим после успешной отправки
+            setForceComposeTransport(false);
         } catch (e) {
             console.error('[useTransportAdProfileLogic] send ERROR', e);
         } finally {
@@ -214,40 +218,37 @@ const useTransportAdProfileLogic = ({ ad }) => {
         }
     }, [data, user, cargoDescription, sendTransportationRequest, getAdTransportationRequestByAdId]);
 
+    // CANCEL (transport)
     const handleCancelRequest = useCallback(async () => {
-        const reqId = adTransportationRequest?.requestData?.requestId || adTransportationRequest?.requestId;
-        if (!reqId) return;
+        const req = adTransportationRequest;
+        const requestId = req?.requestData?.requestId || req?.requestId;
+        const adId = req?.adId || req?.requestData?.adId || req?.adData?.adId;
+        const ownerId = req?.adData?.owner?.id || req?.ownerId;
+
+        if (!requestId || !adId || !ownerId || !user?.userId) {
+            console.error('[useTransportAdProfileLogic] cancel: missing ids', {
+                adId, ownerId, requestId, userId: user?.userId, req
+            });
+            return;
+        }
+
         try {
-            await cancelTransportationRequest(reqId);
+            await cancelTransportationRequest(adId, user.userId, ownerId, requestId);
             setAdRequestStatus('cancelled');
+
+            // (опционально) сразу предложить набрать новый запрос:
+            // setForceComposeTransport(true);
+            // setCargoDescription('');
         } catch (e) {
             console.error('[useTransportAdProfileLogic] cancel ERROR', e);
         }
-    }, [adTransportationRequest, cancelTransportationRequest]);
+    }, [adTransportationRequest, cancelTransportationRequest, user?.userId]);
 
-    const handleRestartRequest = useCallback(async () => {
-        if (typeof restartTransportationRequest !== 'function') return;
-        const mainData = makeTransportMainData(data);
-        if (!mainData?.adId || !mainData?.owner?.id) return;
-
-        const sender = buildSenderFromUser(user);
-        const request = new TransportationRequest({
-            sender,
-            dateSent: toDMY(new Date()),
-            status: 'pending',
-            description: cargoDescription || '',
-        });
-
-        try {
-            setIsTransportationRequestSending(true);
-            await restartTransportationRequest(mainData, request);
-            setAdRequestStatus('pending');
-        } catch (e) {
-            console.error('[useTransportAdProfileLogic] restart ERROR', e);
-        } finally {
-            setIsTransportationRequestSending(false);
-        }
-    }, [data, user, cargoDescription, restartTransportationRequest]);
+    // RESTART → только включаем compose-режим
+    const handleRestartRequest = useCallback(() => {
+        setForceComposeTransport(true);
+        setCargoDescription?.('');
+    }, [setCargoDescription]);
 
     // effects
     useEffect(() => {
@@ -293,10 +294,12 @@ const useTransportAdProfileLogic = ({ ad }) => {
         adRequestStatus,
         adTransportationRequest,
         cargoDescription,
+        forceComposeTransport,             // 👈 экспортируем compose-флаг
 
         // setters
         setIsChatBoxOpen,
         setCargoDescription,
+        setForceComposeTransport,          // 👈 при желании можно дёргать извне
 
         // data
         data,

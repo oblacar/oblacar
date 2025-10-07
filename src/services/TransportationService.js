@@ -449,12 +449,17 @@ class TransportationService {
         try {
             console.log('В Сервисе adId: ', adId);
 
-            // Удаляем запись из transportationRequestsSent
+            // было — удаляешь по requestId (и вообще удаляешь). теперь сохраняем старые запросы для админа
             const sentRequestRef = databaseRef(
                 db,
-                `transportationRequestsSent/${senderId}/${requestId}`
+                `transportationRequestsSent/${senderId}/${adId}`
             );
-            await set(sentRequestRef, null);
+            await update(sentRequestRef, {
+                status: 'cancelled',
+                updatedAt: new Date().toISOString(),
+            });
+
+
 
             // Обновляем статус в transportationRequests
             const requestRef = databaseRef(
