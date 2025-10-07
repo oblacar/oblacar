@@ -2,7 +2,10 @@
 
 import React from 'react';
 // Импортируем только нужные компоненты и наш новый хук
-import useAdProfileLogic from '../hooks/useAdProfileLogic';
+// import useAdProfileLogic from '../hooks/useAdProfileLogic';
+import useTransportAdProfileLogic from '../hooks/useTransportAdProfileLogic';
+import useCargoAdProfileLogic from '../hooks/useCargoAdProfileLogic';
+
 import AdRightPanel from './AdRightPanel';
 import ChatBox from '../../common/ChatBox/ChatBox';
 import ModalBackdrop from '../../common/ModalBackdrop/ModalBackdrop';
@@ -17,38 +20,48 @@ import { FaBookmark, FaRegBookmark } from 'react-icons/fa6';
 import './OtherAdProfile.css';
 
 const OtherAdProfile = ({ adType, ad }) => {
+    const logic =
+        adType === 'transport'
+            ? useTransportAdProfileLogic({ ad })
+            : useCargoAdProfileLogic({ ad });
+
     // 1. ИСПОЛЬЗУЕМ ВЕСЬ ФУНКЦИОНАЛ ИЗ ХУКА
     const {
-        // Состояния и данные для рендеринга
+        // общее
         isLoading,
         isChatBoxOpen,
         isModalBackShow,
-        isInReviewAds,
         isConversationsLoaded,
+        isInReviewAds,
+        isLoadingConversation,
+        data,
+        owner,
+        adProps,
+        formatNumber,
+
+        // сообщения
+        handleStartChat,
+        setIsChatBoxOpen,
+        handleCloseModalBack,
+
+        // закладки
+        handleToggleReviewAd,
+
+        // ТРАНСПОРТ (если надо)
         isTransportationRequestSending,
         adRequestStatus,
         adTransportationRequest,
         cargoDescription,
-
-        // Сеттеры
-        setIsChatBoxOpen,
         setCargoDescription,
+        handleSendRequest,           // только транспорт
+        handleCancelRequest,         // только транспорт
+        handleRestartRequest,        // только транспорт
 
-        // Данные
-        data,
-        owner,
-        adProps, // adId, routeFrom, routeTo, price и т.д.
-
-        // Обработчики
-        handleToggleReviewAd,
-        handleStartChat,
-        handleCloseModalBack,
-        handleSendRequest,
-        handleCancelRequest,
-        handleRestartRequest,
-
-        formatNumber,
-    } = useAdProfileLogic({ adType, ad });
+        // ГРУЗ (если надо)
+        handleSendCargoRequest,
+        handleCancelCargoRequest,
+        handleRestartCargoRequest,
+    } = logic;
 
     // 2. Вспомогательные данные
     const Details =

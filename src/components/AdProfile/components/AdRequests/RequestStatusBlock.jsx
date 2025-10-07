@@ -26,6 +26,10 @@ const RequestStatusBlock = ({
             </div>
         );
     }
+
+    console.log('adTransportationRequest:');
+    console.log(adTransportationRequest);
+
     return (
         <div className='transport-ad-profile-request-status'>
             <strong>Статус вашего запроса:</strong>

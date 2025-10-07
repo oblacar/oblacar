@@ -1,4 +1,4 @@
-// src/contexts/CargoRequestsContext.js
+// src/hooks/CargoRequestsContext.js
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 import {
     addCargoRequest,
@@ -13,6 +13,9 @@ import {
 import AuthContext from './Authorization/AuthContext';
 import UserContext from './UserContext';
 
+// Стандартизированный объект для UI (унифицирован под RequestStatusBlock)
+import AdTransportationRequest from '../entities/Transportation/AdTransportationRequest';
+
 export const CargoRequestsContext = createContext(null);
 
 export function CargoRequestsProvider({ children }) {
@@ -22,20 +25,64 @@ export function CargoRequestsProvider({ children }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // Зеркало статусов моих отправленных заявок (по adId)
     const [sentRequestsStatuses, setSentRequestsStatuses] = useState([]);
-    const [currentAdRequests, setCurrentAdRequests] = useState({ main: null, requests: [] });
+
+    // Полные мои заявки (для мгновенного UI) — по каждой заявке объект AdTransportationRequest
+    const [myCargoRequests, setMyCargoRequests] = useState([]);
+
+    // =====================================================================
+    // helpers
+    const toAdTransportationRequest = useCallback((adId, main, req, fallbackStatus) => {
+        // main: { departureCity, destinationCity, date|pickupDate, price, paymentUnit, owner{ id,name,photoUrl|photourl,contact } }
+        // req:  { requestId, sender{ id,name,photoUrl|photourl,contact }, dateSent, status, description }
+        const ownerPhoto =
+            main?.owner?.photoUrl ?? main?.owner?.photourl ?? '';
+        const senderPhoto =
+            req?.sender?.photoUrl ?? req?.sender?.photourl ?? '';
+
+        return new AdTransportationRequest({
+            adId,
+            adData: {
+                locationFrom: main?.departureCity || '',
+                locationTo: main?.destinationCity || '',
+                date: main?.date || main?.pickupDate || '',
+                price: Number(main?.price) || 0,
+                paymentUnit: main?.paymentUnit || '',
+                owner: {
+                    id: main?.owner?.id || '',
+                    name: main?.owner?.name || '',
+                    photoUrl: ownerPhoto,
+                    contact: main?.owner?.contact || '',
+                },
+            },
+            requestData: {
+                requestId: req?.requestId || '',
+                sender: {
+                    id: req?.sender?.id || '',
+                    name: req?.sender?.name || '',
+                    photoUrl: senderPhoto,
+                    contact: req?.sender?.contact || '',
+                },
+                dateSent: req?.dateSent || '',
+                status: req?.status || fallbackStatus || CargoRequestStatus.Pending,
+                description: req?.description || '',
+            },
+        });
+    }, []);
+
+    // =====================================================================
+    // загрузка данных
 
     const refreshSentStatuses = useCallback(async () => {
-        if (!isAuthenticated) {
-            console.warn('[CargoRequestsContext] refreshSentStatuses: no user');
+        if (!isAuthenticated || !user?.userId) {
+            setSentRequestsStatuses([]);
             return;
         }
         setIsLoading(true);
         setError('');
         try {
-            console.log('[CargoRequestsContext] getSentRequestsStatuses for', user.userId);
             const list = await getSentRequestsStatuses(user.userId);
-            console.log('[CargoRequestsContext] statuses →', list);
             setSentRequestsStatuses(list || []);
         } catch (e) {
             console.error('[CargoRequestsContext] refreshSentStatuses ERROR', e);
@@ -45,85 +92,212 @@ export function CargoRequestsProvider({ children }) {
         }
     }, [user?.userId, isAuthenticated]);
 
-    const sendCargoRequest = useCallback(async ({ ad, message }) => {
+    const refreshMyCargoRequests = useCallback(async () => {
+        if (!isAuthenticated || !user?.userId) {
+            setMyCargoRequests([]);
+            return;
+        }
+        setIsLoading(true);
+        setError('');
+        try {
+            // 1) сначала зеркала статусов (в них есть ownerId, adId, requestId)
+            const statuses = await getSentRequestsStatuses(user.userId);
+            setSentRequestsStatuses(statuses || []);
+
+            // 2) для каждого статуса — тянем main+requests и собираем полный объект
+            const full = [];
+            for (const row of (statuses || [])) {
+                const { adId, ownerId, requestId, status } = row || {};
+                if (!adId || !ownerId || !requestId) continue;
+
+                const { main, requests } = await getAdCargoRequestsForOwner({ ownerId, adId });
+                if (!main || !Array.isArray(requests)) continue;
+                const req = requests.find((r) => r?.requestId === requestId);
+                if (!req) continue;
+
+                full.push(toAdTransportationRequest(adId, main, req, status));
+            }
+            setMyCargoRequests(full);
+        } catch (e) {
+            console.error('[CargoRequestsContext] refreshMyCargoRequests ERROR', e);
+            setError(e?.message || 'Failed to load my cargo requests');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [isAuthenticated, user?.userId, toAdTransportationRequest]);
+
+    // useEffect(() => {
+    //     if (!user?.userId) {
+    //         setSentRequestsStatuses([]);
+    //         setMyCargoRequests([]);
+    //         return;
+    //     }
+    //     // Загружаем статусы + полные заявки при входе пользователя
+    //     refreshMyCargoRequests();
+    // }, [user?.userId, refreshMyCargoRequests]);
+
+
+    useEffect(() => {
+        if (!isAuthenticated || !user?.userId) {
+            setSentRequestsStatuses([]);
+            setMyCargoRequests([]);
+            return;
+        }
+
+        (async () => {
+            try {
+                console.log('[CargoCtx] mount: user', { userId: user.userId });
+
+                // 1) статусы
+                console.log('[CargoCtx] load sent statuses…');
+                const statuses = await getSentRequestsStatuses(user.userId);
+                console.log('[CargoCtx] sent statuses ←', statuses.length, statuses);
+                setSentRequestsStatuses(statuses || []);
+
+                // 2) полные мои заявки
+                console.log('[CargoCtx] load my requests…');
+                // ⚠️ нужен сервисный метод, который соберёт по mirrors полный объект
+                const list = await CargoRequestsService.getMyCargoRequests(user.userId);
+                console.log('[CargoCtx] myCargoRequests ←', list.length, list);
+                setMyCargoRequests(list || []);
+            } catch (e) {
+                console.error('[CargoCtx] init ERROR', e);
+                setSentRequestsStatuses([]);
+                setMyCargoRequests([]);
+            }
+        })();
+
+        return () => {
+            setSentRequestsStatuses([]);
+            setMyCargoRequests([]);
+        };
+    }, [isAuthenticated, user?.userId]);
+
+
+    // =====================================================================
+    // публичные методы
+
+    /**
+     * Отправить заявку по грузу.
+     * ОЖИДАЕТ СТРОГИЕ объекты:
+     *   - mainData: { adId, departureCity, destinationCity, date, price, paymentUnit, owner{ id,name,photourl|photoUrl,contact } }
+     *   - request:  { sender{ id,name,photourl|photoUrl,contact }, dateSent, status, description }
+     * Возвращает { requestId }.
+     */
+    const sendCargoRequest = useCallback(async (mainData, request) => {
+        console.log(mainData);
+        console.log(request);
+
         if (!isAuthenticated) throw new Error('Не авторизован');
-        if (!ad?.id || !ad?.ownerId) throw new Error('Нет ad.id или ad.ownerId');
+        if (!mainData?.adId || !mainData?.owner?.id) throw new Error('Некорректный mainData');
+        if (!request?.sender?.id) throw new Error('Некорректный request.sender');
 
-        console.log('[CargoRequestsContext] addCargoRequest →', { adId: ad.id, ownerId: ad.ownerId, driverId: user.userId, message });
-        const res = await addCargoRequest({
-            ad,
-            driver: {
-                id: user.userId,
-                name: user.userName || '',
-                photoUrl: user.userPhoto || '',
-                contact: user.userPhone || user.userEmail || '',
-            },
-            message,
-        });
-        console.log('[CargoRequestsContext] addCargoRequest DONE →', res);
+        // 1) в БД
+        const requestId = await addCargoRequest(mainData, request);
 
+        // 2) зеркало статусов
         setSentRequestsStatuses((prev) => {
             const next = [...prev];
-            const idx = next.findIndex((x) => x.adId === ad.id);
-            const row = { adId: ad.id, status: CargoRequestStatus.Pending, requestId: res.requestId };
+            const idx = next.findIndex((x) => x.adId === mainData.adId);
+            const row = { adId: mainData.adId, ownerId: mainData.owner.id, status: CargoRequestStatus.Pending, requestId };
             if (idx >= 0) next[idx] = { ...next[idx], ...row };
             else next.push(row);
             return next;
         });
 
-        return res;
-    }, [user?.userId, user?.userName, user?.userPhoto, user?.userPhone, user?.userEmail, isAuthenticated]);
+        // 3) полный объект в локальный кеш (для UI)
+        const full = toAdTransportationRequest(
+            mainData.adId,
+            {
+                departureCity: mainData.departureCity,
+                destinationCity: mainData.destinationCity,
+                date: mainData.date,
+                price: mainData.price,
+                paymentUnit: mainData.paymentUnit,
+                owner: {
+                    id: mainData.owner.id,
+                    name: mainData.owner.name || '',
+                    photoUrl: mainData.owner.photoUrl ?? mainData.owner.photourl ?? '',
+                    contact: mainData.owner.contact || '',
+                },
+            },
+            {
+                requestId,
+                sender: {
+                    id: request.sender.id,
+                    name: request.sender.name || '',
+                    photoUrl: request.sender.photoUrl ?? request.sender.photourl ?? '',
+                    contact: request.sender.contact || '',
+                },
+                dateSent: request.dateSent || '',
+                status: request.status || CargoRequestStatus.Pending,
+                description: request.description || '',
+            },
+            CargoRequestStatus.Pending
+        );
 
+        setMyCargoRequests((prev) => {
+            const idx = prev.findIndex((x) => x.adId === mainData.adId);
+            if (idx >= 0) {
+                const copy = [...prev];
+                copy[idx] = full;
+                return copy;
+            }
+            return [...prev, full];
+        });
+
+        return { requestId };
+    }, [isAuthenticated, toAdTransportationRequest]);
+
+    /**
+     * Отмена своей заявки.
+     */
     const cancelMyCargoRequest = useCallback(async ({ ownerId, adId, requestId }) => {
         if (!user?.userId) throw new Error('Не авторизован');
-        console.log('[CargoRequestsContext] cancelCargoRequest →', { driverId: user.userId, ownerId, adId, requestId });
         await cancelCargoRequest({ driverId: user.userId, ownerId, adId, requestId });
-        console.log('[CargoRequestsContext] cancelCargoRequest DONE');
 
+        // зеркало
         setSentRequestsStatuses((prev) => {
             const next = [...prev];
             const idx = next.findIndex((x) => x.adId === adId);
             if (idx >= 0) next[idx] = { ...next[idx], status: CargoRequestStatus.Cancelled, requestId };
-            else next.push({ adId, status: CargoRequestStatus.Cancelled, requestId });
+            else next.push({ adId, ownerId, status: CargoRequestStatus.Cancelled, requestId });
             return next;
         });
+
+        // полный объект
+        setMyCargoRequests((prev) =>
+            prev.map((r) =>
+                r.adId === adId
+                    ? new AdTransportationRequest({
+                        ...r,
+                        requestData: { ...r.requestData, status: CargoRequestStatus.Cancelled },
+                    })
+                    : r
+            )
+        );
     }, [user?.userId]);
 
-    const restartMyCargoRequest = useCallback(async ({ ad, message }) => {
+    /**
+     * Повторно отправить (создаёт НОВУЮ заявку).
+     * ОЖИДАЕТ СТРОГИЕ объекты, как и sendCargoRequest.
+     */
+    const restartMyCargoRequest = useCallback(async (mainData, request) => {
         if (!isAuthenticated) throw new Error('Не авторизован');
-        console.log('[CargoRequestsContext] restartCargoRequest →', { adId: ad.id, ownerId: ad.ownerId, driverId: user.userId, message });
-        const res = await restartCargoRequest({
-            ad,
-            driver: {
-                id: user.userId,
-                name: user.userName || '',
-                photoUrl: user.userPhoto || '',
-                contact: user.userPhone || user.userEmail || '',
-            },
-            message,
-        });
-        console.log('[CargoRequestsContext] restartCargoRequest DONE →', res);
+        const { requestId } = await sendCargoRequest(mainData, request); // создаём как новую
+        return { requestId };
+    }, [isAuthenticated, sendCargoRequest]);
 
-        setSentRequestsStatuses((prev) => {
-            const next = [...prev];
-            const idx = next.findIndex((x) => x.adId === ad.id);
-            const row = { adId: ad.id, status: CargoRequestStatus.Pending, requestId: res.requestId };
-            if (idx >= 0) next[idx] = { ...next[idx], ...row };
-            else next.push(row);
-            return next;
-        });
-
-        return res;
-    }, [user?.userId, user?.userName, user?.userPhoto, user?.userPhone, user?.userEmail]);
-
+    /**
+     * Подтянуть все заявки по объявлению (для владельца груза).
+     */
     const loadAdRequestsForOwner = useCallback(async (adId, ownerId) => {
         setIsLoading(true);
         setError('');
         try {
-            console.log('[CargoRequestsContext] getAdCargoRequestsForOwner →', { adId, ownerId });
             const data = await getAdCargoRequestsForOwner({ ownerId, adId });
-            console.log('[CargoRequestsContext] currentAdRequests ←', data);
-            setCurrentAdRequests(data || { main: null, requests: [] });
+            // это «владелец-режим», кладём как было
+            // если нужно — можно держать отдельный стейт для owner-view
         } catch (e) {
             console.error('[CargoRequestsContext] loadAdRequestsForOwner ERROR', e);
             setError(e?.message || 'Failed to load ad requests');
@@ -133,46 +307,59 @@ export function CargoRequestsProvider({ children }) {
     }, []);
 
     const acceptCargoRequestAsOwner = useCallback(async ({ ad, requestId }) => {
-        console.log('[CargoRequestsContext] acceptCargoRequest →', { adId: ad.id, ownerId: ad.ownerId, requestId });
         const res = await acceptCargoRequest({ ownerId: ad.ownerId, ad, requestId });
-        console.log('[CargoRequestsContext] acceptCargoRequest DONE →', res);
         return res;
     }, []);
 
     const declineCargoRequestAsOwner = useCallback(async ({ ownerId, adId, requestId }) => {
-        console.log('[CargoRequestsContext] declineCargoRequest →', { ownerId, adId, requestId });
         await declineCargoRequest({ ownerId, adId, requestId });
-        await loadAdRequestsForOwner(adId, ownerId);
-    }, [loadAdRequestsForOwner]);
+        // можно при желании освежить owner-view
+    }, []);
 
+    /**
+     * Статус моей заявки по объявлению.
+     */
     const getMyRequestStatusForAd = useCallback((adId) => {
         const f = sentRequestsStatuses.find((x) => x.adId === adId);
         return f?.status || 'none';
     }, [sentRequestsStatuses]);
 
-    useEffect(() => {
-        if (user?.userId) refreshSentStatuses();
-    }, [user?.userId, refreshSentStatuses]);
+    /**
+     * Полный объект моей заявки по adId (для RequestStatusBlock).
+     */
+    const getMyCargoRequestByAdId = useCallback((adId) => {
+        return myCargoRequests.find(x => x.adId === adId) || null;
+    }, [myCargoRequests]);
 
+    // =====================================================================
     const value = useMemo(() => ({
         isLoading,
         error,
-        sentRequestsStatuses,
-        currentAdRequests,
 
-        refreshSentStatuses,
+        // зеркала
+        sentRequestsStatuses,
+
+        // мои заявки (полные)
+        myCargoRequests,
+        getMyCargoRequestByAdId,
+        refreshMyCargoRequests,
+
+        // действия
         sendCargoRequest,
         cancelMyCargoRequest,
         restartMyCargoRequest,
 
+        // owner-view (как было)
         loadAdRequestsForOwner,
         acceptCargoRequestAsOwner,
         declineCargoRequestAsOwner,
 
         getMyRequestStatusForAd,
     }), [
-        isLoading, error, sentRequestsStatuses, currentAdRequests,
-        refreshSentStatuses, sendCargoRequest, cancelMyCargoRequest, restartMyCargoRequest,
+        isLoading, error,
+        sentRequestsStatuses,
+        myCargoRequests, getMyCargoRequestByAdId, refreshMyCargoRequests,
+        sendCargoRequest, cancelMyCargoRequest, restartMyCargoRequest,
         loadAdRequestsForOwner, acceptCargoRequestAsOwner, declineCargoRequestAsOwner,
         getMyRequestStatusForAd,
     ]);

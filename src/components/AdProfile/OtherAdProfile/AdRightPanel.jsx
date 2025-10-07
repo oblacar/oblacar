@@ -6,44 +6,111 @@ import Preloader from '../../common/Preloader/Preloader';
 import RequestStatusBlock from '../components/AdRequests/RequestStatusBlock';
 import { FaEnvelope } from 'react-icons/fa';
 
-// ВАЖНО: путь такой, как у тебя в примере
+// контексты/сущности
 import { CargoRequestsContext } from '../../../hooks/CargoRequestsContext';
+import UserContext from '../../../hooks/UserContext';
+import CargoRequest from '../../../entities/CargoAd/CargoRequest';
+
+// ───────── helpers ─────────
+const num = (v, def = 0) => (typeof v === 'number' && !Number.isNaN(v) ? v : def);
+
+const toDMY = (d) => {
+    const dt = d instanceof Date ? d : new Date(d || Date.now());
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const yyyy = dt.getFullYear();
+
+    const date = `${dd}.${mm}.${yyyy}`;
+
+    console.log(date);
+
+    return date;
+};
+
+// из UserContext собираем sender
+const buildSenderFromUser = (u) => ({
+    id: u?.userId || u?.id || '',
+    name: u?.userName || u?.displayName || u?.name || '',
+    // поддержим оба ключа — и photourl, и photoUrl (на всякий)
+    // photourl: u?.profilePhotoUrl || u?.photoUrl || u?.photoURL || '',
+    photoUrl: u?.userPhoto || u?.profilePhotoUrl || u?.photoUrl || u?.photoURL || '',
+    contact: u?.userPhone || u?.phone || u?.phoneNumber || u?.contact || u?.userEmail || '',
+});
+
+// НОРМАЛИЗУЕМ объявление → строгий mainData для сервиса/контекста
+const buildCargoMainDataFromAd = (raw) => {
+
+    console.log('raw:');
+    console.log(raw);
+
+    const adId = raw?.adId ?? raw?.id ?? null;
+    const ownerId = raw?.ownerId ?? raw?.owner?.id ?? null;
+
+    return {
+        adId,
+
+        departureCity: raw?.route.from ?? raw?.departureCity ?? raw?.locationFrom ?? raw?.routeFrom ?? '',
+        destinationCity: raw?.route.to ?? raw?.destinationCity ?? raw?.locationTo ?? raw?.routeTo ?? '',
+
+        // ВАЖНО: именно mainData.date (а не pickupDate)
+        date: raw?.availabilityFrom ?? raw?.pickupDate ?? raw?.date ?? raw?.availabilityDate ?? toDMY(new Date()),
+
+        //TODO цена обнуляется
+        // price: typeof raw?.price === 'number' ? raw.price : (raw?.priceAndPaymentUnit?.price ?? 0),
+        price: raw?.price ?? '',
+        paymentUnit: raw?.paymentUnit ?? raw?.priceAndPaymentUnit?.unit ?? raw?.currency ?? '',
+
+        owner: {
+            id: ownerId || '',
+            name: raw?.owner?.name ?? raw?.ownerName ?? '',
+            // в БД принят ключ photourl — но и photoUrl сохраним для UI-удобства
+            photoUrl: raw?.owner?.photourl ?? raw?.ownerPhotoUrl ?? raw?.owner?.photoUrl ?? '',
+            //Контакт пока будет пустой, т.к. форму объявления он не передается.
+            contact: raw.raw?.owner?.contact ?? raw?.ownerPhone ?? '',
+        },
+    };
+};
 
 const AdRightPanel = ({
     adType,            // 'transport' | 'cargo'
-    ad,                // ОЖИДАЕМ: { adId: string, ownerId: string, ... }
+    ad,                // ожидаем { adId, ownerId, ... }
     owner,             // { photoUrl, rating, name }
     cargoDescription,
     setCargoDescription,
 
-    // для объявлений ТРАНСПОРТА (как было)
+    // для ТРАНСПОРТА:
     handleStartChat,
     handleSendRequest,
     isTransportationRequestSending,
     adRequestStatus,
     handleCancelRequest,
     handleRestartRequest,
+
+
     adTransportationRequest,
 }) => {
     const isTransportAd = adType === 'transport';
     const isCargoAd = adType === 'cargo';
 
-    // ==== СТРОГИЕ идентификаторы (устойчиво к разным схемам) ====
-    // adId: предпочитаем ad.adId, иначе ad.id
+    const { user } = useContext(UserContext) || {};
+    const cargoCtx = useContext(CargoRequestsContext);
+
+    const {
+        sendCargoRequest,
+        cancelMyCargoRequest,
+        restartMyCargoRequest,
+        getMyRequestStatusForAd,
+        getMyCargoRequestByAdId,   // ← правильный метод из контекста
+        sentRequestsStatuses,      // ← нужно для meta-записи (requestId)
+        error: cargoError,
+        isLoading: cargoCtxLoading,
+    } = cargoCtx || {};
+
+    // устойчивые идентификаторы
     const adId = ad?.adId ?? ad?.id ?? null;
-    // ownerId: предпочитаем ad.ownerId, иначе owner.id (как иногда приходит у транспорта/груза)
     const adOwnerId = ad?.ownerId ?? ad?.owner?.id ?? null;
 
-    useEffect(() => {
-        console.log('[AdRightPanel] incoming ad snapshot:', {
-            keys: Object.keys(ad || {}),
-            adId,
-            adOwnerId,
-            ownerInline: ad?.owner,
-        });
-    }, [ad, adId, adOwnerId]);
-
-    // базовая валидация входных данных
+    // локальная валидация входа
     const [localError, setLocalError] = useState('');
     useEffect(() => {
         if (!ad) {
@@ -64,55 +131,34 @@ const AdRightPanel = ({
         setLocalError('');
     }, [ad, adId, adOwnerId]);
 
-    // ===== CARGO context =====
-    const cargoCtx = useContext(CargoRequestsContext);
-    const {
-        sendCargoRequest,
-        cancelMyCargoRequest,
-        restartMyCargoRequest,
-        getMyRequestStatusForAd,
-        sentRequestsStatuses,
-        error: cargoError,
-        isLoading: cargoCtxLoading,
-    } = cargoCtx || {};
-
-    const [isCargoRequestSending, setIsCargoRequestSending] = useState(false);
-
     // статус моей заявки (cargo) — строго по adId
     const cargoAdStatus = useMemo(() => {
         if (!isCargoAd || !adId || !getMyRequestStatusForAd) return 'none';
         const s = getMyRequestStatusForAd(adId);
-        console.log('[AdRightPanel] cargoAdStatus', { adId, s });
         return s;
     }, [isCargoAd, adId, getMyRequestStatusForAd]);
 
-    // мета моей заявки (cargo)
+    // ПОЛНЫЙ объект моей заявки из контекста (для RequestStatusBlock)
+    const myCargoFull = useMemo(() => {
+        console.log('TODO прошел К myCargoFull = useMemo')
+
+        if (!isCargoAd || !getMyCargoRequestByAdId || !adId) return null;
+
+        console.log('TODO прошел в myCargoFull = useMemo')
+
+        return getMyCargoRequestByAdId(adId);
+    }, [isCargoAd, getMyCargoRequestByAdId, adId]);
+
+    // мета (зеркало статуса/ID) — на случай, если полного ещё нет
     const myCargoReqMeta = useMemo(() => {
         if (!isCargoAd || !adId || !Array.isArray(sentRequestsStatuses)) return null;
-        const meta = sentRequestsStatuses.find((x) => x.adId === adId) || null;
-        console.log('[AdRightPanel] myCargoReqMeta', { adId, meta });
-        return meta;
+        return sentRequestsStatuses.find((x) => x.adId === adId) || null;
     }, [isCargoAd, adId, sentRequestsStatuses]);
 
-    // Минимальный объект, чтобы RequestStatusBlock не падал в cargo-ветке
-    const cargoStatusStub = useMemo(() => {
-        if (!isCargoAd) return null;
-        return {
-            // поля, к которым RequestStatusBlock обычно тянется
-            requestData: {
-                requestId: myCargoReqMeta?.requestId || '',
-                adId: adId || '',
-                ownerId: adOwnerId || '',
-                // сообщение мы не храним в зеркале — пусть будет пустым
-                message: '',
-            },
-            // на всякий случай — метки времени
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
-    }, [isCargoAd, myCargoReqMeta?.requestId, adId, adOwnerId]);
+    const [isCargoRequestSending, setIsCargoRequestSending] = useState(false);
+    const cargoSending = isCargoRequestSending || cargoCtxLoading;
 
-    // === TRANSPORT ===
+    // ── TRANSPORT ──
     const handleTransportSendClick = async () => {
         setLocalError('');
         if (!handleSendRequest) {
@@ -121,20 +167,21 @@ const AdRightPanel = ({
             return;
         }
         try {
-            console.log('[AdRightPanel] TRANSPORT send →', { message: cargoDescription });
             await Promise.resolve(handleSendRequest());
-            console.log('[AdRightPanel] TRANSPORT send DONE');
         } catch (e) {
             console.error('[AdRightPanel] handleSendRequest ERROR', e);
             setLocalError(e?.message || 'Ошибка отправки заявки (transport).');
         }
     };
 
-    // === CARGO ===
+    // ── CARGO: отправка ──
     const handleSendCargoRequest = async () => {
         setLocalError('');
-        if (!isCargoAd) return;
 
+
+        console.log('handleSendCargoRequest');
+
+        if (!isCargoAd) return;
         if (!cargoCtx || !sendCargoRequest) {
             console.error('[AdRightPanel] CargoRequestsContext/sendCargoRequest missing');
             setLocalError('Контекст заявок не инициализирован (cargo).');
@@ -142,14 +189,42 @@ const AdRightPanel = ({
         }
 
         try {
+
+            console.log('TODO in method');
+
             setIsCargoRequestSending(true);
-            console.log('[AdRightPanel] CARGO sendCargoRequest →', { adId, adOwnerId, message: cargoDescription });
-            // Сервис ожидает ad.id — маппим строго: id = ad.adId
-            await sendCargoRequest({
-                ad: { ...ad, id: adId, ownerId: adOwnerId },
-                message: cargoDescription || '',
+
+            console.log('TODO after setIsCargoRequestSending');
+
+            // 1) строгий mainData
+            const mainData = buildCargoMainDataFromAd({ ...ad, adId, ownerId: adOwnerId });
+            if (!mainData?.adId || !mainData?.owner?.id || !mainData?.date) {
+                console.error('[AdRightPanel] CARGO invalid mainData', mainData);
+                throw new Error('Некорректные данные объявления (cargo).');
+            }
+            console.log('TODO after 1');
+
+            // 2) строгий request (экземпляр класса) с sender из UserContext
+            const sender = buildSenderFromUser(user);
+            const request = new CargoRequest({
+                // requestId генерит сервис/БД
+                sender,
+                dateSent: toDMY(new Date()),
+                status: 'pending',
+                description: cargoDescription || '',
             });
-            console.log('[AdRightPanel] CARGO send DONE');
+
+            console.log('TODO after 2');
+
+            // 3) контекст ждёт строгие объекты: sendCargoRequest(mainData, request)
+
+
+            console.log(mainData);
+            console.log(request);
+
+            await sendCargoRequest(mainData, request);
+            // опционально: очистим текстовое поле
+            // setCargoDescription('');
         } catch (e) {
             console.error('[AdRightPanel] CARGO send ERROR', e);
             setLocalError(e?.message || 'Ошибка отправки заявки (cargo).');
@@ -158,6 +233,7 @@ const AdRightPanel = ({
         }
     };
 
+    // ── CARGO: отмена ──
     const handleCancelCargoRequest = async () => {
         setLocalError('');
         if (!cargoCtx || !cancelMyCargoRequest) {
@@ -165,20 +241,22 @@ const AdRightPanel = ({
             setLocalError('Метод отмены недоступен (cargo).');
             return;
         }
-        if (!myCargoReqMeta?.requestId) {
-            console.error('[AdRightPanel] requestId missing for cancel', { myCargoReqMeta });
+        const requestId =
+            myCargoFull?.requestData?.requestId || myCargoReqMeta?.requestId || '';
+        if (!requestId) {
+            console.error('[AdRightPanel] requestId missing for cancel');
             setLocalError('Не найден requestId для отмены (cargo).');
             return;
         }
         try {
-            console.log('[AdRightPanel] CARGO cancel →', { ownerId: adOwnerId, adId, requestId: myCargoReqMeta.requestId });
-            await cancelMyCargoRequest({ ownerId: adOwnerId, adId, requestId: myCargoReqMeta.requestId });
+            await cancelMyCargoRequest({ ownerId: adOwnerId, adId, requestId });
         } catch (e) {
             console.error('[AdRightPanel] CARGO cancel ERROR', e);
             setLocalError(e?.message || 'Ошибка отмены заявки (cargo).');
         }
     };
 
+    // ── CARGO: перезапуск ── (создаёт новую заявку)
     const handleRestartCargoRequest = async () => {
         setLocalError('');
         if (!cargoCtx || !restartMyCargoRequest) {
@@ -188,12 +266,17 @@ const AdRightPanel = ({
         }
         try {
             setIsCargoRequestSending(true);
-            console.log('[AdRightPanel] CARGO restart →', { adId, adOwnerId, message: cargoDescription });
-            await restartMyCargoRequest({
-                ad: { ...ad, id: adId, ownerId: adOwnerId },
-                message: cargoDescription || '',
+
+            const mainData = buildCargoMainDataFromAd({ ...ad, adId, ownerId: adOwnerId });
+            const sender = buildSenderFromUser(user);
+            const request = new CargoRequest({
+                sender,
+                dateSent: toDMY(new Date()),
+                status: 'pending',
+                description: cargoDescription || '',
             });
-            console.log('[AdRightPanel] CARGO restart DONE');
+
+            await restartMyCargoRequest(mainData, request);
         } catch (e) {
             console.error('[AdRightPanel] CARGO restart ERROR', e);
             setLocalError(e?.message || 'Ошибка повторной отправки (cargo).');
@@ -206,8 +289,6 @@ const AdRightPanel = ({
     const placeholderTransport = 'Описание вашего груза и деталей перевозки.';
     const titleTextCargo = 'Опишите условия и отправьте запрос владельцу груза.';
     const placeholderCargo = 'Ваше предложение по перевозке: цена, дата, маршрут, условия.';
-
-    const cargoSending = isCargoRequestSending || cargoCtxLoading;
 
     return (
         <div className='other-ad-profile-owner-data'>
@@ -267,7 +348,7 @@ const AdRightPanel = ({
                                 status={cargoAdStatus}
                                 onCancelRequest={handleCancelCargoRequest}
                                 onRestartRequest={handleRestartCargoRequest}
-                                adTransportationRequest={cargoStatusStub}
+                                adTransportationRequest={myCargoFull}
                             />
                         ))}
 
@@ -287,8 +368,8 @@ const AdRightPanel = ({
                 </div>
             )}
 
-            {/* DEBUG (строго по ожидаемым полям) */}
-            <div style={{ marginTop: 12, fontSize: 12, opacity: .7, padding: 8, border: '1px dashed #ccc', borderRadius: 8 }}>
+            {/* DEBUG */}
+            {/* <div style={{ marginTop: 12, fontSize: 12, opacity: .7, padding: 8, border: '1px dashed #ccc', borderRadius: 8 }}>
                 <div><b>DEBUG</b></div>
                 <div>adType: {String(adType)}</div>
                 <div>hasCargoCtx: {String(!!cargoCtx)}</div>
@@ -296,7 +377,8 @@ const AdRightPanel = ({
                 <div>ad.ownerId: {String(adOwnerId)}</div>
                 <div>cargoAdStatus: {String(cargoAdStatus)}</div>
                 <div>transport adRequestStatus: {String(adRequestStatus)}</div>
-            </div>
+                <div>has myCargoFull: {String(!!myCargoFull)}</div>
+            </div> */}
         </div>
     );
 };
