@@ -228,6 +228,7 @@ export async function getSentRequestsStatuses(driverId) {
     const obj = snap.val();
     return Object.keys(obj).map((adId) => ({
         adId,
+        ownerId: obj[adId]?.ownerId,        // 👈 добавили
         status: obj[adId]?.status,
         requestId: obj[adId]?.requestId,
     }));
@@ -239,10 +240,37 @@ export async function getSentRequestsStatuses(driverId) {
  */
 export async function getAdCargoRequestsForOwner({ ownerId, adId }) {
     const path = `${ROOT_CARGO_REQUESTS}/${ownerId}/${adId}`;
+    console.log('[CargoRequestsService] getAdCargoRequestsForOwner read →', path);
     const snap = await get(ref(db, path));
     if (!snap.exists()) return { main: null, requests: [] };
-    const data = snap.val();
-    return { main: data.main || null, requests: data.requests ? Object.values(data.requests) : [] };
+
+    const data = snap.val() || {};
+    // requests — единственная вложенная ветка; всё остальное — «шапка»
+    const requestsObj = data.requests || {};
+    const requests = Object.values(requestsObj);
+
+    // нормализуем main из верхнего уровня
+    const main = {
+        adId,
+        departureCity: data.departureCity || '',
+        destinationCity: data.destinationCity || '',
+        // дата теперь хранится в data.date (раньше могла быть pickupDate)
+        date: data.date || data.pickupDate || '',
+        price: typeof data.price === 'number' ? data.price : 0,
+        paymentUnit: data.paymentUnit || '',
+        owner: {
+            id: data.owner?.id || '',
+            name: data.owner?.name || '',
+            photoUrl: data.owner?.photoUrl || data.owner?.photourl || '',
+            contact: data.owner?.contact || '',
+        },
+    };
+
+    console.log('[CargoRequestsService] getAdCargoRequestsForOwner ←', {
+        hasMain: !!main.adId, requestsCount: requests.length,
+    });
+
+    return { main, requests };
 }
 
 /**

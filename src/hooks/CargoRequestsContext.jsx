@@ -32,6 +32,56 @@ export function CargoRequestsProvider({ children }) {
     // { [adId]: AdTransportationRequest }
     const [myCargoRequests, setMyCargoRequests] = useState({});
 
+    useEffect(() => {
+        if (!isAuthenticated || !user?.userId) {
+            setSentRequestsStatuses([]);
+            setMyCargoRequests({});            // 👈 MAP сбрасываем в пустой объект
+            return;
+        }
+
+        (async () => {
+            setIsLoading(true);
+            setError('');
+            try {
+                // 1) зеркало
+                const statuses = await getSentRequestsStatuses(user.userId);
+                // обязательно должны иметь ownerId (см. правку сервиса)
+                setSentRequestsStatuses(statuses || []);
+
+                // 2) строим полный MAP
+                const fullMap = {};
+                for (const row of (statuses || [])) {
+                    const { adId, ownerId, requestId, status } = row || {};
+                    if (!adId || !ownerId || !requestId) {
+                        console.warn('[CargoCtx] skip row, missing ids:', row);
+                        continue;
+                    }
+                    const { main, requests } = await getAdCargoRequestsForOwner({ ownerId, adId });
+                    if (!main || !Array.isArray(requests)) {
+                        console.warn('[CargoCtx] no main/requests for', { ownerId, adId });
+                        continue;
+                    }
+                    const req = requests.find(r => r?.requestId === requestId);
+                    if (!req) {
+                        console.warn('[CargoCtx] requestId not found in list', { adId, requestId });
+                        continue;
+                    }
+                    fullMap[adId] = toAdTransportationRequest(adId, main, req, status);
+                }
+
+                setMyCargoRequests(fullMap);     // 👈 кладём MAP
+                console.log('[CargoCtx] bootstrap done. statuses:', (statuses || []).length, 'full:', Object.keys(fullMap).length);
+            } catch (e) {
+                console.error('[CargoCtx] bootstrap ERROR', e);
+                setSentRequestsStatuses([]);
+                setMyCargoRequests({});
+                setError(e?.message || 'Failed to load my cargo requests');
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    }, [isAuthenticated, user?.userId]);
+
     // =====================================================================
     // helpers
     const toAdTransportationRequest = useCallback((adId, main, req, fallbackStatus) => {
@@ -109,7 +159,12 @@ export function CargoRequestsProvider({ children }) {
             const map = {};
             for (const row of (statuses || [])) {
                 const { adId, ownerId, requestId, status } = row || {};
-                if (!adId || !ownerId || !requestId) continue;
+
+                if (!adId || !ownerId || !requestId) {
+
+                    console.warn('[CargoCtx] skip status row (missing id):', row);
+                    continue;
+                }
 
                 const { main, requests } = await getAdCargoRequestsForOwner({ ownerId, adId });
                 if (!main || !Array.isArray(requests)) continue;
@@ -128,29 +183,8 @@ export function CargoRequestsProvider({ children }) {
         }
     }, [isAuthenticated, user?.userId, toAdTransportationRequest]);
 
-    useEffect(() => {
-        if (!isAuthenticated || !user?.userId) {
-            setSentRequestsStatuses([]);
-            setMyCargoRequests({});
-            return;
-        }
 
-        (async () => {
-            try {
-                console.log('[CargoCtx] mount: user', { userId: user.userId });
-                await refreshMyCargoRequests(); // подтягивает и статусы, и полный кеш
-            } catch (e) {
-                console.error('[CargoCtx] init ERROR', e);
-                setSentRequestsStatuses([]);
-                setMyCargoRequests({});
-            }
-        })();
 
-        return () => {
-            setSentRequestsStatuses([]);
-            setMyCargoRequests({});
-        };
-    }, [isAuthenticated, user?.userId, refreshMyCargoRequests]);
 
     // =====================================================================
     // публичные методы
