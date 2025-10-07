@@ -12,10 +12,20 @@ import {
 
 const RequestStatusBlock = ({
     status,
+    adTransportationRequest,
     onCancelRequest,
     onRestartRequest,
-    adTransportationRequest,
+    adTransportationRequest: _unused, // если есть
+    ...rest
 }) => {
+    const req = adTransportationRequest?.requestData || adTransportationRequest;
+    if (!req) {
+        return (
+            <div style={{ opacity: 0.7, fontSize: 12 }}>
+                Загрузка статуса…
+            </div>
+        );
+    }
     return (
         <div className='transport-ad-profile-request-status'>
             <strong>Статус вашего запроса:</strong>

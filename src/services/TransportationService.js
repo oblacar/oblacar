@@ -109,6 +109,12 @@ class TransportationService {
      */
     static async addTransportationRequest(mainData, request) {
         try {
+            console.log('mainData: ');
+            console.log(mainData);
+
+            console.log('request: ' + request);
+
+
             const userId = mainData.owner.id; // ID пользователя-владельца объявления
             const adId = mainData.adId; // ID объявления
 

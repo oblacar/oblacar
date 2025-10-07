@@ -9,8 +9,84 @@ import ConversationContext from '../../../hooks/ConversationContext';
 import UserContext from '../../../hooks/UserContext';
 import TransportationContext from '../../../hooks/TransportationContext';
 
+import TransportationRequest from '../../../entities/Transportation/TransportationRequest';
+import TransportationRequestMainData from '../../../entities/Transportation/TransportationRequestMainData';
+
 // Утилиты
 import { formatNumber } from '../../../utils/helper';
+
+// ===== helpers =====
+const toDMY = (d) => {
+    const dt = d instanceof Date ? d : new Date(d || Date.now());
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const yyyy = dt.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
+};
+
+const num = (v, def = 0) =>
+    typeof v === 'number' && !Number.isNaN(v) ? v : def;
+
+// Формируем sender из UserContext под ключи, которые ждёт БД/классы
+const buildSenderFromUser = (u) => ({
+    id: u?.userId || u?.id || '',
+    name: u?.userName || u?.displayName || u?.name || '',
+    photourl: u?.profilePhotoUrl || u?.photoUrl || u?.photoURL || '',
+    contact: u?.phone || u?.phoneNumber || u?.userPhone || u?.contact || '',
+});
+
+// Нормализуем сырое объявление транспорта → экземпляр TransportationRequestMainData
+const makeTransportMainData = (raw) => {
+    if (!raw) return null;
+    const adId = raw.adId ?? raw.id ?? null;
+    const ownerId = raw.ownerId ?? raw.owner?.id ?? '';
+
+    const date =
+        raw.date ??
+        raw.availabilityDate ??
+        '';
+
+    const locationFrom =
+        raw.locationFrom ??
+        raw.departureCity ??
+        raw.routeFrom ??
+        '';
+
+    const locationTo =
+        raw.locationTo ??
+        raw.destinationCity ??
+        raw.routeTo ??
+        '';
+
+    const price =
+        typeof raw.price === 'number'
+            ? raw.price
+            : (raw.priceAndPaymentUnit?.price ?? 0);
+
+    const paymentUnit =
+        raw.paymentUnit ??
+        raw.priceAndPaymentUnit?.unit ??
+        raw.currency ??
+        '';
+
+    const owner = {
+        id: ownerId,
+        name: raw.owner?.name ?? raw.ownerName ?? '',
+        photourl: raw.owner?.photourl ?? raw.ownerPhotoUrl ?? raw.owner?.photoUrl ?? '',
+        contact: raw.owner?.contact ?? raw.ownerPhone ?? '',
+    };
+
+    // Создаём именно КЛАСС mainData
+    return new TransportationRequestMainData({
+        adId,
+        locationFrom,
+        locationTo,
+        date,
+        price: num(price),
+        paymentUnit,
+        owner,
+    });
+};
 
 /**
  * Кастомный хук для инкапсуляции всей бизнес-логики компонента OtherAdProfile.
@@ -19,7 +95,7 @@ import { formatNumber } from '../../../utils/helper';
  */
 const useAdProfileLogic = ({ adType, ad }) => {
     // =================================================================
-    // 1. КОНТЕКСТЫ (UseContext & Destructuring)
+    // 1. КОНТЕКСТЫ
     // =================================================================
 
     // --- 1. Контекст ГРУЗОВ ---
@@ -45,7 +121,7 @@ const useAdProfileLogic = ({ adType, ad }) => {
     } = useContext(ConversationContext);
     const { user } = useContext(UserContext);
 
-    // --- 4. Запросы на перевозку ---
+    // --- 4. Запросы на перевозку (ТРАНСПОРТ) ---
     const {
         sendTransportationRequest,
         getAdTransportationRequestByAdId,
@@ -55,7 +131,7 @@ const useAdProfileLogic = ({ adType, ad }) => {
     } = useContext(TransportationContext);
 
     // =================================================================
-    // 2. СТЕЙТЫ (useState)
+    // 2. СТЕЙТЫ
     // =================================================================
 
     const [isLoading, setIsLoading] = useState(true);
@@ -64,17 +140,15 @@ const useAdProfileLogic = ({ adType, ad }) => {
     const [isLoadingConversation, setIsLoadingConversation] = useState(false);
     const [isInReviewAds, setIsInReviewAds] = useState(false); // Закладка
 
-    // Запрос перевозчику
+    // Заявки
     const [cargoDescription, setCargoDescription] = useState('');
     const [adRequestStatus, setAdRequestStatus] = useState('none');
-    const [adTransportationRequest, setAdTransportationRequest] =
-        useState(null);
+    const [adTransportationRequest, setAdTransportationRequest] = useState(null);
     const [isTransportationRequestSending, setIsTransportationRequestSending] =
         useState(false);
-    // const [requestId, setRequestId] = useState(null); // requestId можно убрать, т.к. он хранится в adTransportationRequest
 
     // =================================================================
-    // 3. НОРМАЛИЗАЦИЯ И MEMOИЗИРОВАННЫЕ ДАННЫЕ (useMemo)
+    // 3. НОРМАЛИЗАЦИЯ / MEMO
     // =================================================================
 
     const data = useMemo(() => {
@@ -83,25 +157,23 @@ const useAdProfileLogic = ({ adType, ad }) => {
 
     // 1) Владелец
     const owner = useMemo(() => {
-        // Логика извлечения owner (осталась прежней)
         return adType === 'cargo'
             ? {
-                  id: data?.owner?.id ?? data?.ownerId ?? null,
-                  name: data?.owner?.name ?? data?.ownerName ?? 'Пользователь',
-                  photoUrl: data?.owner?.photoUrl ?? data?.ownerPhotoUrl ?? '',
-                  rating: data?.owner?.rating ?? data?.ownerRating ?? '',
-              }
+                id: data?.owner?.id ?? data?.ownerId ?? null,
+                name: data?.owner?.name ?? data?.ownerName ?? 'Пользователь',
+                photoUrl: data?.owner?.photoUrl ?? data?.ownerPhotoUrl ?? '',
+                rating: data?.owner?.rating ?? data?.ownerRating ?? '',
+            }
             : {
-                  id: data?.ownerId ?? null,
-                  name: data?.ownerName ?? 'Пользователь',
-                  photoUrl: data?.ownerPhotoUrl ?? '',
-                  rating: data?.ownerRating ?? '',
-              };
+                id: data?.ownerId ?? null,
+                name: data?.ownerName ?? 'Пользователь',
+                photoUrl: data?.ownerPhotoUrl ?? '',
+                rating: data?.ownerRating ?? '',
+            };
     }, [data, adType]);
 
     // 2) Поля объявления
     const adProps = useMemo(() => {
-        // Логика извлечения adProps (осталась прежней)
         const adId = data?.adId ?? null;
         const routeFrom = data?.departureCity ?? '';
         const routeTo = data?.destinationCity ?? '';
@@ -127,7 +199,6 @@ const useAdProfileLogic = ({ adType, ad }) => {
 
     // 3) Review API (Закладки)
     const reviewApi = useMemo(() => {
-        // Логика унификации Review API (см. предыдущее сообщение)
         if (adType === 'transport') {
             return {
                 add: transportAddReview,
@@ -156,13 +227,12 @@ const useAdProfileLogic = ({ adType, ad }) => {
     ]);
 
     // =================================================================
-    // 4. ОБРАБОТЧИКИ (useCallback)
+    // 4. ОБРАБОТЧИКИ
     // =================================================================
 
-    // Обработчик кнопки "Варианты" (Bookmark)
+    // Bookmark
     const handleToggleReviewAd = useCallback(
         async (e) => {
-            // Логика осталась прежней, но использует adProps.adId
             e?.stopPropagation?.();
             if (!adProps.adId) return;
 
@@ -171,13 +241,11 @@ const useAdProfileLogic = ({ adType, ad }) => {
                 const api = reviewApi;
                 if (isInReviewAds) {
                     if (typeof api.remove === 'function') await api.remove(id);
-                    else if (typeof api.toggle === 'function')
-                        await api.toggle(id);
+                    else if (typeof api.toggle === 'function') await api.toggle(id);
                     setIsInReviewAds(false);
                 } else {
                     if (typeof api.add === 'function') await api.add(id);
-                    else if (typeof api.toggle === 'function')
-                        await api.toggle(id);
+                    else if (typeof api.toggle === 'function') await api.toggle(id);
                     setIsInReviewAds(true);
                 }
             } catch (err) {
@@ -187,7 +255,7 @@ const useAdProfileLogic = ({ adType, ad }) => {
         [adProps.adId, isInReviewAds, reviewApi]
     );
 
-    // Обработчики (чат)
+    // Чат
     const handleStartChat = useCallback(() => {
         setIsLoadingConversation(true);
         setIsChatBoxOpen(true);
@@ -199,29 +267,159 @@ const useAdProfileLogic = ({ adType, ad }) => {
         setIsChatBoxOpen(false);
     }, []);
 
-    // Обработчики (заявка перевозчику — ТОЛЬКО ТРАНСПОРТ)
-    // Имплементация должна быть перенесена сюда.
+    // ======== Заявка перевозчику (ТРАНСПОРТ) ========
     const handleSendRequest = useCallback(async () => {
-        // ... ваша логика handleSendRequest ...
-    }, [
-        adProps.adId,
-        user?.userId,
-        owner.id,
-        cargoDescription,
-        sendTransportationRequest,
-        setIsTransportationRequestSending,
-    ]);
+        if (adType !== 'transport') return;
+
+        console.log('[useAdProfileLogic] TRANSPORT/SEND click', {
+            adRawKeys: Object.keys(data || {}),
+            adRaw: data,
+            hasCtxMethod: typeof sendTransportationRequest === 'function',
+        });
+
+        if (typeof sendTransportationRequest !== 'function') {
+            console.error('[useAdProfileLogic] sendTransportationRequest is not a function (TransportationContext?)');
+            return;
+        }
+
+        // 1) MainData (экземпляр класса)
+        const mainData = makeTransportMainData(data);
+        console.log('[useAdProfileLogic] TRANSPORT mainData →', mainData);
+
+        if (!mainData?.adId || !mainData?.owner?.id) {
+            console.error('[useAdProfileLogic] TRANSPORT: missing adId/owner.id', mainData);
+            return;
+        }
+
+        // 2) Request (экземпляр класса)
+        const sender = buildSenderFromUser(user);
+        const request = new TransportationRequest({
+            // requestId генерирует сервис
+            sender,
+            dateSent: toDMY(new Date()),           // формат dd.mm.yyyy
+            status: 'pending',
+            dateConfirmed: null,
+            description: cargoDescription || '',
+        });
+
+        console.log('[useAdProfileLogic] TRANSPORT request(class) →', request);
+
+        try {
+            setIsTransportationRequestSending(true);
+
+            const requestId = await sendTransportationRequest(mainData, request);
+
+            // Попытка сразу взять из контекста (он уже setState-нул)
+            let atr = getAdTransportationRequestByAdId?.(mainData.adId) || null;
+
+            // Если контекст ещё не успел — делаем локальный «эхо»-объект
+            if (!atr) {
+                atr = {
+                    adId: mainData.adId,
+                    adData: {
+                        locationFrom: mainData.locationFrom,
+                        locationTo: mainData.locationTo,
+                        date: mainData.date,
+                        price: mainData.price,
+                        paymentUnit: mainData.paymentUnit,
+                        owner: mainData.owner,
+                    },
+                    requestData: {
+                        requestId,
+                        sender: request.sender,
+                        dateSent: request.dateSent,
+                        status: 'pending',
+                        description: request.description,
+                    },
+                };
+            }
+
+            // Обновляем локальный UI немедленно
+            setAdTransportationRequest(atr);
+            setAdRequestStatus(atr.requestData?.status || 'pending');
+
+            console.log('[useAdProfileLogic] TRANSPORT send OK →', requestId);
+        } catch (e) {
+            console.error('[useAdProfileLogic] TRANSPORT send ERROR', e);
+        } finally {
+            setIsTransportationRequestSending(false);
+        }
+    }, [adType, data, user, cargoDescription, sendTransportationRequest]);
 
     const handleCancelRequest = useCallback(async () => {
-        // ... ваша логика handleCancelRequest ...
-    }, [adTransportationRequest, cancelTransportationRequest]);
+        if (adType !== 'transport') return;
+
+        const reqId =
+            adTransportationRequest?.requestData?.requestId ||
+            adTransportationRequest?.requestId;
+
+        console.log('[useAdProfileLogic] TRANSPORT/CANCEL click', {
+            hasCtxMethod: typeof cancelTransportationRequest === 'function',
+            reqId,
+            adTransportationRequest,
+        });
+
+        if (typeof cancelTransportationRequest !== 'function') {
+            console.error('[useAdProfileLogic] cancelTransportationRequest is not a function');
+            return;
+        }
+        if (!reqId) {
+            console.error('[useAdProfileLogic] no requestId for cancel');
+            return;
+        }
+
+        try {
+            await cancelTransportationRequest(reqId);
+            console.log('[useAdProfileLogic] TRANSPORT cancel OK');
+            setAdRequestStatus('cancelled');
+        } catch (e) {
+            console.error('[useAdProfileLogic] TRANSPORT cancel ERROR', e);
+        }
+    }, [adType, adTransportationRequest, cancelTransportationRequest]);
 
     const handleRestartRequest = useCallback(async () => {
-        // ... ваша логика handleRestartRequest ...
-    }, [adTransportationRequest, restartTransportationRequest]);
+        if (adType !== 'transport') return;
+
+        console.log('[useAdProfileLogic] TRANSPORT/RESTART click', {
+            hasCtxMethod: typeof restartTransportationRequest === 'function',
+            cargoDescription,
+        });
+
+        if (typeof restartTransportationRequest !== 'function') {
+            console.error('[useAdProfileLogic] restartTransportationRequest is not a function');
+            return;
+        }
+
+        const mainData = makeTransportMainData(data);
+        if (!mainData?.adId || !mainData?.owner?.id) {
+            console.error('[useAdProfileLogic] TRANSPORT restart: missing adId/owner.id', mainData);
+            return;
+        }
+
+        const sender = buildSenderFromUser(user);
+        const request = new TransportationRequest({
+            sender,
+            dateSent: toDMY(new Date()),
+            status: 'pending',
+            dateConfirmed: null,
+            description: cargoDescription || '',
+        });
+
+        try {
+            setIsTransportationRequestSending(true);
+            // повторно создаём заявку тем же способом
+            const res = await restartTransportationRequest(mainData, request);
+            console.log('[useAdProfileLogic] TRANSPORT restart OK →', res);
+            setAdRequestStatus('pending');
+        } catch (e) {
+            console.error('[useAdProfileLogic] TRANSPORT restart ERROR', e);
+        } finally {
+            setIsTransportationRequestSending(false);
+        }
+    }, [adType, data, user, cargoDescription, restartTransportationRequest]);
 
     // =================================================================
-    // 5. ЭФФЕКТЫ (useEffect)
+    // 5. ЭФФЕКТЫ
     // =================================================================
 
     // 5.1. Первичная загрузка
@@ -232,35 +430,32 @@ const useAdProfileLogic = ({ adType, ad }) => {
     // 5.2. Инициализация/Синхронизация закладки
     useEffect(() => {
         if (!adProps.adId) return;
-        // Логика осталась прежней
         try {
             const val =
                 typeof reviewApi.isReviewed === 'function'
                     ? !!reviewApi.isReviewed(adProps.adId)
                     : Array.isArray(reviewApi.reviewedIds) &&
-                      reviewApi.reviewedIds.includes(adProps.adId);
+                    reviewApi.reviewedIds.includes(adProps.adId);
             setIsInReviewAds(val);
         } catch {
-            /* молча */
+            /* noop */
         }
     }, [adProps.adId, reviewApi.isReviewed, reviewApi.reviewedIds]);
 
     // 5.3. Статусы запросов (ТОЛЬКО ДЛЯ ТРАНСПОРТА)
     useEffect(() => {
-        // Логика осталась прежней
-        if (
-            adType !== 'transport' ||
-            !adTransportationRequests ||
-            !adProps.adId
-        )
-            return;
+        if (adType !== 'transport' || !adTransportationRequests || !adProps.adId) return;
 
         const atr = getAdTransportationRequestByAdId(adProps.adId);
         let status = 'none';
+        if (atr?.requestData) status = atr.requestData.status ?? 'none';
 
-        if (atr?.requestData) {
-            status = atr.requestData.status ?? 'none';
-        }
+        console.log('[useAdProfileLogic] TRANSPORT status sync', {
+            adId: adProps.adId,
+            found: !!atr,
+            status,
+            atr,
+        });
 
         setAdRequestStatus(status);
         setAdTransportationRequest(atr);
@@ -275,7 +470,6 @@ const useAdProfileLogic = ({ adType, ad }) => {
     // 5.4. Чат-привязка
     useEffect(() => {
         if (!isConversationsLoaded || !isChatBoxOpen || !data) return;
-        // порядок: (adId, currentUserId, otherUserId)
         setCurrentConversationState(adProps.adId, user?.userId, owner.id);
         setIsModalBackShow(false);
     }, [
@@ -294,7 +488,7 @@ const useAdProfileLogic = ({ adType, ad }) => {
     }, [isChatBoxOpen, currentConversation]);
 
     // =================================================================
-    // 6. ВОЗВРАТ ДАННЫХ И МЕТОДОВ
+    // 6. ВОЗВРАТ
     // =================================================================
     return {
         // Состояния
@@ -317,7 +511,7 @@ const useAdProfileLogic = ({ adType, ad }) => {
         adType,
         data,
         owner,
-        adProps, // Содержит adId, routeFrom, routeTo, price и т.д.
+        adProps, // adId, routeFrom, routeTo, price, и т.д.
         user,
 
         // Обработчики
@@ -328,8 +522,8 @@ const useAdProfileLogic = ({ adType, ad }) => {
         handleCancelRequest,
         handleRestartRequest,
 
-        // Дополнительные данные
-        formatNumber, // Полезная утилита
+        // Доп. утилиты
+        formatNumber,
     };
 };
 

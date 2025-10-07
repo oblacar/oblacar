@@ -122,6 +122,12 @@ export const TransportationProvider = ({ children }) => {
      */
     const sendTransportationRequest = async (mainData, request) => {
         try {
+            console.log('mainData: ');
+            console.log(mainData);
+
+            console.log('request: ');
+            console.log(request);
+
             // Отправляем запрос через сервис
             const requestId =
                 await TransportationService.addTransportationRequest(
