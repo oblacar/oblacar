@@ -206,6 +206,7 @@ const AdRightPanel = ({
 
             // 2) строгий request (экземпляр класса) с sender из UserContext
             const sender = buildSenderFromUser(user);
+            //TODO смотрим дальше
             const request = new CargoRequest({
                 // requestId генерит сервис/БД
                 sender,

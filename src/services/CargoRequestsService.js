@@ -244,3 +244,95 @@ export async function getAdCargoRequestsForOwner({ ownerId, adId }) {
     const data = snap.val();
     return { main: data.main || null, requests: data.requests ? Object.values(data.requests) : [] };
 }
+
+/**
+ * Вернуть МОИ заявки по грузу (для текущего водителя).
+ * Источник: /cargoRequestsSent/{driverId}
+ * Для каждого adId подтягиваем main и сам request из /cargoRequests/{ownerId}/{adId}
+ *
+ * @param {string} driverId
+ * @returns {Promise<Record<string, {
+ *   adId: string,
+ *   adData: {
+ *     locationFrom: string,
+ *     locationTo: string,
+ *     date: string,
+ *     price: number,
+ *     paymentUnit: string,
+ *     owner: { id: string, name: string, photoUrl: string, contact: string }
+ *   },
+ *   requestData: {
+ *     requestId: string,
+ *     sender: { id: string, name: string, photoUrl: string, contact: string },
+ *     dateSent: string,
+ *     status: string,
+ *     description: string
+ *   }
+ * }>>}
+ */
+export async function getMyCargoRequests(driverId) {
+    const sentPath = `${ROOT_CARGO_REQUESTS_SENT}/${driverId}`;
+    const sentSnap = await get(ref(db, sentPath));
+    if (!sentSnap.exists()) return {};
+
+    const sent = sentSnap.val(); // { [adId]: { ownerId, requestId, status, ... } }
+    const entries = Object.entries(sent);
+
+    const results = await Promise.all(entries.map(async ([adId, meta]) => {
+        const ownerId = meta?.ownerId;
+        const requestId = meta?.requestId;
+
+        // читаем main + requests
+        const basePath = `${ROOT_CARGO_REQUESTS}/${ownerId}/${adId}`;
+        const baseSnap = await get(ref(db, basePath));
+        if (!baseSnap.exists()) {
+            return [adId, null];
+        }
+        const base = baseSnap.val(); // { main, requests: {reqId: {...}} }
+        const main = base?.main || base; // если исторически писали в корень
+
+        const reqNode = requestId ? base?.requests?.[requestId] : null;
+
+        // Сформируем UI-удобный объект (как AdTransportationRequest по форме)
+        const adData = {
+            locationFrom: main?.departureCity ?? main?.locationFrom ?? '',
+            locationTo: main?.destinationCity ?? main?.locationTo ?? '',
+            date: main?.date ?? main?.pickupDate ?? '',
+            price: Number(main?.price) || 0,
+            paymentUnit: main?.paymentUnit ?? '',
+            owner: {
+                id: main?.owner?.id ?? '',
+                name: main?.owner?.name ?? '',
+                photoUrl: main?.owner?.photoUrl ?? main?.owner?.photourl ?? '',
+                contact: main?.owner?.contact ?? '',
+            },
+        };
+
+        const requestData = {
+            requestId: requestId || '',
+            sender: {
+                id: reqNode?.sender?.id ?? '',
+                name: reqNode?.sender?.name ?? '',
+                photoUrl: reqNode?.sender?.photoUrl ?? reqNode?.sender?.photourl ?? '',
+                contact: reqNode?.sender?.contact ?? '',
+            },
+            dateSent: reqNode?.dateSent ?? '',
+            // статус берём из зеркала (sent), а если его нет — из узла заявки
+            status: meta?.status ?? reqNode?.status ?? 'pending',
+            description: reqNode?.description ?? '',
+        };
+
+        return [adId, {
+            adId,
+            adData,
+            requestData,
+        }];
+    }));
+
+    // соберём в map по adId
+    const map = {};
+    for (const [adId, obj] of results) {
+        if (adId && obj) map[adId] = obj;
+    }
+    return map;
+}
