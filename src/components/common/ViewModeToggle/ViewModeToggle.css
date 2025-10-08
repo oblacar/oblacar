@@ -1,0 +1,16 @@
+.viewmode-toggle {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.viewmode-toggle .vm-btn {
+    border: 1px solid #ddd;
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.viewmode-toggle .vm-btn.active {
+    border-color: #888;
+    background: #f4f4f4;
+}

@@ -329,7 +329,7 @@
     pointer-events: none;
 } */
 
-.ad-item-show-status {
+.ad-cargo-item-show-status {
     position: absolute;
     display: none;
     right: 150px;
@@ -400,3 +400,4 @@
         grid-area: right;
     }
 }
+

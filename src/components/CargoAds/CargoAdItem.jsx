@@ -17,6 +17,7 @@ const CargoAdItem = ({
     ableHover = true,
     isViewMode = false,
     isActive = true, // внешняя «галка активности» (сохраняем поведение); дополнительно учитываем статус
+    compact = '',
 }) => {
     const data = ad?.ad ? ad.ad : ad;
 
@@ -207,7 +208,8 @@ const CargoAdItem = ({
         'cargo-card',
         className,
         !ableHover ? 'cargo-card--nohover' : '',
-        !isActiveFinal ? 'is-disabled' : '', // НОВОЕ: делаем карточку «некликабельной» и притушенной
+        !isActiveFinal ? 'is-disabled' : '',
+        compact ? 'cargo-card--compact' : '', //TODO классы для компактного режима
     ]
         .filter(Boolean)
         .join(' ');
@@ -222,7 +224,7 @@ const CargoAdItem = ({
         >
             {/* Бейдж статуса, как у транспортной карточки */}
             <div
-                className={`ad-item-show-status ${
+                className={`ad-cargo-item-show-status ${
                     isActiveFinal ? '' : 'no-active'
                 }`}
             >

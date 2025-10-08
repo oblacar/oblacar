@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import CargoAdItem from './CargoAdItem';
+import ViewModeToggle from '../common/ViewModeToggle/ViewModeToggle';
 import './CargoAdsList.css';
 
 // Если нужен контекст — подключим его; если items передан, контекст не используем.
@@ -35,8 +36,17 @@ const CargoAdsList = ({
     clickable = true,
     filterOwnerId = null,
     emptyText = 'Пока нет объявлений',
+    defaultView = 'list',
 }) => {
     const ctx = useContext(CargoAdsContext);
+
+    // Храним режим с восстановлением из localStorage
+    const [viewMode, setViewMode] = React.useState(() => {
+        return localStorage.getItem('cargo_viewMode') || defaultView;
+    });
+    React.useEffect(() => {
+        localStorage.setItem('cargo_viewMode', viewMode);
+    }, [viewMode]);
 
     // Берём данные: приоритет у items, иначе — из контекста
     const loading = items ? false : !!ctx?.loading;
@@ -58,6 +68,14 @@ const CargoAdsList = ({
 
     return (
         <div className='cargo-ads-list'>
+            {/* панелька с переключателем */}
+            <div className='cargo-ads-list__toolbar'>
+                <ViewModeToggle
+                    mode={viewMode}
+                    onChange={setViewMode}
+                />
+            </div>
+
             {loading && (
                 <div className='cargo-ads-list__preloader'>
                     <Preloader />
@@ -100,9 +118,15 @@ const CargoAdsList = ({
                         const isClickableNow =
                             clickable && derivedActive && hasAdId;
 
+                        // обёртка элемента: в grid — свой класс, в list — свой
+                        const itemClass =
+                            viewMode === 'grid'
+                                ? 'cargo-ads-list__cell'
+                                : 'cargo-ads-list__item';
+
                         return (
                             <div
-                                className='cargo-ads-list__item'
+                                className={itemClass}
                                 key={key}
                             >
                                 {/* убрал кавычки вокруг cargo */}

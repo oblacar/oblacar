@@ -1,47 +1,77 @@
 .cargo-ads-list {
-  width: 100%;
+    width: 100%;
 
-  max-width: 740px;
-  margin-left: auto;
-  margin-right: auto;
+    max-width: 740px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Центрируем прелоадер при загрузке */
 .cargo-ads-list__preloader {
-  display: grid;
-  place-items: center;
-  padding: 24px 0;
+    display: grid;
+    place-items: center;
+    padding: 24px 0;
 }
 
 .cargo-ads-list__error {
-  color: #b91c1c;
-  /* red-700 */
-  padding: 8px 0;
+    color: #b91c1c;
+    /* red-700 */
+    padding: 8px 0;
 }
 
 .cargo-ads-list__empty {
-  color: #6b7280;
-  /* gray-500 */
-  padding: 8px 0;
-  font-size: 14px;
+    color: #6b7280;
+    /* gray-500 */
+    padding: 8px 0;
+    font-size: 14px;
 }
 
 /* Вертикальная колонна карточек */
 .cargo-ads-list__column {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px;
 }
 
 /* Элемент списка */
 .cargo-ads-list__item {
-  width: 100%;
+    width: 100%;
 }
 
 /* Ссылка-обёртка карточки */
 .cargo-ads-list__link {
-  display: block;
-  text-decoration: none;
-  color: inherit;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Режим «плитка» */
+.cargo-ads-list__grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(320px, 1fr)
+    ); /* адаптивные колонки */
+    gap: 12px;
+}
+
+/* Ячейка плитки — без внешних отступов, карточка растягивается */
+.cargo-ads-list__cell {
+    display: flex;
+    min-width: 0;
+}
+
+/* Если нужно чуть уменьшить карточку в плитке */
+.cargo-ads-list__grid .cargo-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Тулбар */
+.cargo-ads-list__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
 }
