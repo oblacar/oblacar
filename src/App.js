@@ -5,6 +5,14 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/Layout'; // Импортируем новый компонент Layout
 
+import AdminApp from './admin/routes/AdminApp';
+import AdminDashboard from './admin/routes/AdminDashboard';
+import AdminAds from './admin/routes/AdminAds';
+import AdminUsers from './admin/routes/AdminUsers';
+import AdminAuthGuard from './admin/context/AdminAuthGuard';
+import AdminAdsProvider from './admin/context/AdminAdsContext';
+import AdminUsersProvider from './admin/context/AdminUsersContext';
+
 import Home from './pages/Home/Home';
 import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
 import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страницы аутентификации
@@ -47,6 +55,35 @@ const App = () => {
 
                                                 <TransportationProvider>
                                                     <Routes>
+                                                        <Route
+                                                            path="/admin/*"
+                                                            element={
+                                                                <AdminAuthGuard>
+                                                                    <AdminApp />
+                                                                </AdminAuthGuard>
+                                                            }
+                                                        >
+                                                            <Route
+                                                                index
+                                                                element={<AdminDashboard />}
+                                                            />
+                                                            <Route
+                                                                path="ads"
+                                                                element={
+                                                                    <AdminAdsProvider>
+                                                                        <AdminAds />
+                                                                    </AdminAdsProvider>
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path="users"
+                                                                element={
+                                                                    <AdminUsersProvider>
+                                                                        <AdminUsers />
+                                                                    </AdminUsersProvider>
+                                                                }
+                                                            />
+                                                        </Route>
                                                         <Route element={<Layout />}>
                                                             <Route
                                                                 path='/'

@@ -1,0 +1,1 @@
+export const formatDate = (d) => d; // TODO: при необходимости локализовать
