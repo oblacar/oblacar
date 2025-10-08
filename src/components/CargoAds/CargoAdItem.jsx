@@ -2,12 +2,9 @@
 import React, { useMemo, useContext, useState, useCallback } from 'react';
 import CargoBadgesRow from './icons/CargoBadgesRow';
 import CargoAdsContext from '../../hooks/CargoAdsContext';
-import ToggleIconButtonPlus from '../common/ToggleIconButtonPlus/ToggleIconButtonPlus'; // если нужно — проверь путь
+import ToggleIconButtonPlus from '../common/ToggleIconButtonPlus/ToggleIconButtonPlus';
 import './CargoAdItem.css';
-
-import {
-    FaCheck,
-} from 'react-icons/fa';
+import { FaCheck } from 'react-icons/fa';
 
 /**
  * Карточка объявления о перевозке груза (элемент списка).
@@ -19,7 +16,7 @@ const CargoAdItem = ({
     className = '',
     ableHover = true,
     isViewMode = false,
-    isActive = true,
+    isActive = true, // внешняя «галка активности» (сохраняем поведение); дополнительно учитываем статус
 }) => {
     const data = ad?.ad ? ad.ad : ad;
 
@@ -32,6 +29,20 @@ const CargoAdItem = ({
         loadingTypes,
         price = {},
     } = data || {};
+
+    // ------ НОВОЕ: статус карточки ------
+    const status = data?.status || 'active';
+    const nonActiveStatuses = [
+        'work',
+        'completed',
+        'deleted',
+        'archived',
+        'inactive',
+    ];
+    const derivedActive = !nonActiveStatuses.includes(status);
+    const isActiveFinal = Boolean(isActive && derivedActive); // Итого
+
+    const statusLabel = getCargoStatusLabel(status);
 
     // === CONTEXT: работа с "Вариантами" (review) ===
     const { addReviewAd, removeReviewAd, reviewAds, isReviewed } =
@@ -68,14 +79,17 @@ const CargoAdItem = ({
     const handleMouseLeaveReviewAdsAdd = () => setOnReviewAdsAdd(false);
 
     // обработчик тоггла
-    const handleToggle = useCallback((willBeAdded) => {
-        if (!adKey) return;
-        if (willBeAdded) {
-            addReviewAd?.(adKey);
-        } else {
-            removeReviewAd?.(adKey);
-        }
-    }, [adKey, addReviewAd, removeReviewAd]);
+    const handleToggle = useCallback(
+        (willBeAdded) => {
+            if (!adKey) return;
+            if (willBeAdded) {
+                addReviewAd?.(adKey);
+            } else {
+                removeReviewAd?.(adKey);
+            }
+        },
+        [adKey, addReviewAd, removeReviewAd]
+    );
 
     // «щит» от навигации: гасим события
     const stopNav = (e) => {
@@ -104,10 +118,16 @@ const CargoAdItem = ({
 
     // даты перевозки
     const pickup =
-        data?.availabilityFrom ?? data?.pickupDate ?? data?.dates?.pickupDate ?? null;
+        data?.availabilityFrom ??
+        data?.pickupDate ??
+        data?.dates?.pickupDate ??
+        null;
 
     const delivery =
-        data?.availabilityTo ?? data?.deliveryDate ?? data?.dates?.deliveryDate ?? null;
+        data?.availabilityTo ??
+        data?.deliveryDate ??
+        data?.dates?.deliveryDate ??
+        null;
 
     // груз
     const cargoName = data?.title ?? cargo?.name ?? data?.cargoName ?? '—';
@@ -122,24 +142,23 @@ const CargoAdItem = ({
         data?.weight ??
         null;
 
-    const dims =
-        cargo?.dims || {
-            h:
-                cargo?.h ??
-                data?.cargoHeight ??
-                data?.dimensionsMeters?.height ??
-                data?.truckHeight,
-            w:
-                cargo?.w ??
-                data?.cargoWidth ??
-                data?.dimensionsMeters?.width ??
-                data?.truckWidth,
-            d:
-                cargo?.d ??
-                data?.cargoDepth ??
-                data?.dimensionsMeters?.depth ??
-                data?.truckDepth,
-        };
+    const dims = cargo?.dims || {
+        h:
+            cargo?.h ??
+            data?.cargoHeight ??
+            data?.dimensionsMeters?.height ??
+            data?.truckHeight,
+        w:
+            cargo?.w ??
+            data?.cargoWidth ??
+            data?.dimensionsMeters?.width ??
+            data?.truckWidth,
+        d:
+            cargo?.d ??
+            data?.cargoDepth ??
+            data?.dimensionsMeters?.depth ??
+            data?.truckDepth,
+    };
 
     const tagsLoading = useMemo(
         () => normalizeLoadingTypes(loadingTypes ?? data?.loadingTypes),
@@ -163,7 +182,8 @@ const CargoAdItem = ({
     const ownerRaw = data?.owner || {};
     const owner = {
         id: data?.ownerId ?? ownerRaw?.id ?? null,
-        name: data?.ownerName ?? data?.userName ?? ownerRaw?.name ?? 'Без имени',
+        name:
+            data?.ownerName ?? data?.userName ?? ownerRaw?.name ?? 'Без имени',
         photoUrl:
             ownerRaw?.photoUrl ??
             data?.ownerPhotoUrl ??
@@ -173,17 +193,22 @@ const CargoAdItem = ({
         rating: isFiniteNumber(ownerRaw?.rating)
             ? Number(ownerRaw.rating)
             : isFiniteNumber(data?.ownerRating)
-                ? Number(data.ownerRating)
-                : isFiniteNumber(data?.rating)
-                    ? Number(data.rating)
-                    : null,
+            ? Number(data.ownerRating)
+            : isFiniteNumber(data?.rating)
+            ? Number(data.rating)
+            : null,
     };
 
     const ownerName = owner.name;
     const ownerAvatar = owner.photoUrl;
     const ownerRating = owner.rating;
 
-    const rootClass = ['cargo-card', className, !ableHover ? 'cargo-card--nohover' : '']
+    const rootClass = [
+        'cargo-card',
+        className,
+        !ableHover ? 'cargo-card--nohover' : '',
+        !isActiveFinal ? 'is-disabled' : '', // НОВОЕ: делаем карточку «некликабельной» и притушенной
+    ]
         .filter(Boolean)
         .join(' ');
 
@@ -192,64 +217,87 @@ const CargoAdItem = ({
             className={rootClass}
             onMouseEnter={() => setIsSelectedAdItem(true)}
             onMouseLeave={() => setIsSelectedAdItem(false)}
+            aria-disabled={!isActiveFinal}
+            title={!isActiveFinal && statusLabel ? statusLabel : undefined}
         >
+            {/* Бейдж статуса, как у транспортной карточки */}
+            <div
+                className={`ad-item-show-status ${
+                    isActiveFinal ? '' : 'no-active'
+                }`}
+            >
+                {status === 'work' && 'Занят'}
+                {status === 'completed' && 'Доставлено'}
+                {status === 'deleted' && 'Удалено'}
+                {status === 'archived' && 'Скрыто'}
+                {status === 'inactive' && 'Не активно'}
+            </div>
+
             {isInReviewAds ? (
-                <>
-                    <div className={`ad-item-show-in-review`}>
-                        <FaCheck />
-                    </div>
-                </>
-            ) : (
-                ''
-            )}
+                <div className='ad-item-show-in-review'>
+                    <FaCheck />
+                </div>
+            ) : null}
 
             {/* ВЕРХ: 2 колонки — слева контент, справа даты+цена */}
-            <div className="cargo-card__head">
+            <div className='cargo-card__head'>
                 {/* ЛЕВЫЙ СТОЛБЕЦ */}
-                <div className="cargo-card__leftcol">
-                    <div className="cargo-card__cities">
-                        <span className="cargo-card__city">{from || '-'}</span>
-                        <span className="cargo-card__arrow">→</span>
-                        <span className="cargo-card__city">{to || '-'}</span>
+                <div className='cargo-card__leftcol'>
+                    <div className='cargo-card__cities'>
+                        <span className='cargo-card__city'>{from || '-'}</span>
+                        <span className='cargo-card__arrow'>→</span>
+                        <span className='cargo-card__city'>{to || '-'}</span>
                     </div>
 
-                    <div className="cargo-card__meta">
-                        Дата объявления: {String(dateStr) ? String(dateStr) : '-'}
+                    <div className='cargo-card__meta'>
+                        Дата объявления:{' '}
+                        {String(dateStr) ? String(dateStr) : '-'}
                     </div>
 
-                    <div className="cargo-card__body">
-                        <div className="cargo-card__row">
-                            <span className="cargo-card__label">Груз:</span>
-                            <span className="cargo-card__value">{cargoName || '—'}</span>
-                        </div>
-
-                        {cargoType && (
-                            <div className="cargo-card__row">
-                                <span className="cargo-card__label">Тип:</span>
-                                <span className="cargo-card__value">{cargoType}</span>
-                            </div>
-                        )}
-
-                        <div className="cargo-card__row">
-                            <span className="cargo-card__label">Вес:</span>
-                            <span className="cargo-card__value">
-                                {isFiniteNumber(weight) ? `${fmtNum(weight)} т` : '—'}
+                    <div className='cargo-card__body'>
+                        <div className='cargo-card__row'>
+                            <span className='cargo-card__label'>Груз:</span>
+                            <span className='cargo-card__value'>
+                                {cargoName || '—'}
                             </span>
                         </div>
 
-                        <div className="cargo-card__row">
-                            <span className="cargo-card__label">Габариты:</span>
-                            <span className="cargo-card__value">
+                        {cargoType && (
+                            <div className='cargo-card__row'>
+                                <span className='cargo-card__label'>Тип:</span>
+                                <span className='cargo-card__value'>
+                                    {cargoType}
+                                </span>
+                            </div>
+                        )}
+
+                        <div className='cargo-card__row'>
+                            <span className='cargo-card__label'>Вес:</span>
+                            <span className='cargo-card__value'>
+                                {isFiniteNumber(weight)
+                                    ? `${fmtNum(weight)} т`
+                                    : '—'}
+                            </span>
+                        </div>
+
+                        <div className='cargo-card__row'>
+                            <span className='cargo-card__label'>Габариты:</span>
+                            <span className='cargo-card__value'>
                                 {fmtDims(dims?.h, dims?.w, dims?.d)} м
                             </span>
                         </div>
 
                         {!!tagsLoading.length && (
-                            <div className="cargo-card__row cargo-card__row--tags">
-                                <span className="cargo-card__label">Загрузка:</span>
-                                <span className="cargo-card__tags">
+                            <div className='cargo-card__row cargo-card__row--tags'>
+                                <span className='cargo-card__label'>
+                                    Загрузка:
+                                </span>
+                                <span className='cargo-card__tags'>
                                     {tagsLoading.map((t) => (
-                                        <span key={t} className="cargo-card__tag">
+                                        <span
+                                            key={t}
+                                            className='cargo-card__tag'
+                                        >
                                             {t}
                                         </span>
                                     ))}
@@ -260,61 +308,81 @@ const CargoAdItem = ({
                 </div>
 
                 {/* ПРАВЫЙ СТОЛБЕЦ */}
-                <div className="cargo-card__right">
-                    <div className="cargo-card__dates">
-                        <div className="cargo-card__date-row">
-                            <span className="cargo-card__date-label">Загрузка</span>
-                            <span className="cargo-card__date-value cargo-card__date-pickup">
+                <div className='cargo-card__right'>
+                    <div className='cargo-card__dates'>
+                        <div className='cargo-card__date-row'>
+                            <span className='cargo-card__date-label'>
+                                Загрузка
+                            </span>
+                            <span className='cargo-card__date-value cargo-card__date-pickup'>
                                 {pickup ? fmtDate(pickup) : '-'}
                             </span>
                         </div>
 
-                        <div className="cargo-card__date-row">
-                            <span className="cargo-card__date-label">Доставка до</span>
-                            <span className="cargo-card__date-value cargo-card__date-delivery">
+                        <div className='cargo-card__date-row'>
+                            <span className='cargo-card__date-label'>
+                                Доставка до
+                            </span>
+                            <span className='cargo-card__date-value cargo-card__date-delivery'>
                                 {delivery ? fmtDate(delivery) : '-'}
                             </span>
                         </div>
                     </div>
 
-                    <div className="cargo-card__price">
+                    <div className='cargo-card__price'>
                         {isFiniteNumber(priceValue) ? (
                             <>
-                                <div className="cargo-card__price-value">{fmtPrice(priceValue)}</div>
-                                <div className="cargo-card__price-unit">{priceUnit}</div>
+                                <div className='cargo-card__price-value'>
+                                    {fmtPrice(priceValue)}
+                                </div>
+                                <div className='cargo-card__price-unit'>
+                                    {priceUnit}
+                                </div>
                             </>
                         ) : (
-                            <div className="cargo-card__price-na">Цена не указана</div>
+                            <div className='cargo-card__price-na'>
+                                Цена не указана
+                            </div>
                         )}
                     </div>
 
-                    {bargain && <div className="cargo-card__bargain">торг</div>}
+                    {bargain && <div className='cargo-card__bargain'>торг</div>}
                 </div>
             </div>
 
             {/* НИЗ: бейджи + владелец + действие */}
-            <div className="cargo-card__foot">
-                <div className="cargo-card__foot-left">
-                    <CargoBadgesRow ad={ad} size={16} gap={6} />
+            <div className='cargo-card__foot'>
+                <div className='cargo-card__foot-left'>
+                    <CargoBadgesRow
+                        ad={ad}
+                        size={16}
+                        gap={6}
+                    />
                 </div>
 
-                <div className="cargo-card__owner">
-                    <div className="cargo-card__owner-avatar">
+                <div className='cargo-card__owner'>
+                    <div className='cargo-card__owner-avatar'>
                         {ownerAvatar ? (
-                            <img src={ownerAvatar} alt={ownerName} />
+                            <img
+                                src={ownerAvatar}
+                                alt={ownerName}
+                            />
                         ) : (
-                            <div className="cargo-card__owner-fallback">
+                            <div className='cargo-card__owner-fallback'>
                                 {String(ownerName).slice(0, 1).toUpperCase()}
                             </div>
                         )}
                     </div>
-                    <div className="cargo-card__owner-meta">
-                        <div className="cargo-card__owner-name" title={ownerName}>
+                    <div className='cargo-card__owner-meta'>
+                        <div
+                            className='cargo-card__owner-name'
+                            title={ownerName}
+                        >
                             {ownerName}
                         </div>
                         {ownerRating != null && (
                             <div
-                                className="cargo-card__owner-rating"
+                                className='cargo-card__owner-rating'
                                 aria-label={`Рейтинг ${ownerRating} из 5`}
                             >
                                 {renderStars(ownerRating)}
@@ -323,23 +391,26 @@ const CargoAdItem = ({
                     </div>
                 </div>
 
-                <div className="cargo-card__foot-right">
-                    {isActive ? (
-                        <div className={`container-icon-add-review-cargo-ad ${isViewMode ? 'view-mode' : ''}`}>
+                <div className='cargo-card__foot-right'>
+                    {isActiveFinal ? (
+                        <div
+                            className={`container-icon-add-review-cargo-ad ${
+                                isViewMode ? 'view-mode' : ''
+                            }`}
+                        >
                             <div
                                 onMouseEnter={handleMouseEnterReviewAdsAdd}
                                 onMouseLeave={handleMouseLeaveReviewAdsAdd}
-
-                                // ГАСИМ СОБЫТИЯ, чтобы клик по тогглу не «пробивал» до карточки/Link
                                 onMouseDown={stopNav}
                                 onClick={stopNav}
                                 onTouchStart={stopNav}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') stopNav(e);
+                                    if (e.key === 'Enter' || e.key === ' ')
+                                        stopNav(e);
                                 }}
-                                role="button"
+                                role='button'
                                 tabIndex={0}
-                                aria-label="Добавить в варианты"
+                                aria-label='Добавить в варианты'
                             >
                                 <ToggleIconButtonPlus
                                     onToggle={handleToggle}
@@ -349,7 +420,6 @@ const CargoAdItem = ({
                             </div>
                         </div>
                     ) : null}
-
                 </div>
             </div>
         </div>
@@ -360,10 +430,28 @@ export default CargoAdItem;
 
 /* ===== УТИЛИТЫ ===== */
 
+function getCargoStatusLabel(status) {
+    switch (status) {
+        case 'work':
+            return 'Занят';
+        case 'completed':
+            return 'Доставлено';
+        case 'deleted':
+            return 'Удалено';
+        case 'archived':
+            return 'Скрыто';
+        case 'inactive':
+            return 'Не активно';
+        default:
+            return '';
+    }
+}
+
 function normalizeLoadingTypes(val) {
     if (!val) return [];
     if (Array.isArray(val)) return val;
-    if (typeof val === 'object') return Object.keys(val).filter((k) => !!val[k]);
+    if (typeof val === 'object')
+        return Object.keys(val).filter((k) => !!val[k]);
     return [];
 }
 

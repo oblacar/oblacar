@@ -218,7 +218,6 @@
     background-color: rgba(0, 0, 0, 0.04);
     margin: 5px -14px -14px -14px;
     border-radius: 0px 0px 10px 10px;
-
 }
 
 /* Левый столбец — прижат влево */
@@ -315,6 +314,54 @@
     transform: translateY(0.5px) scale(0.98);
 }
 
+/* Плашка статуса */
+/* .ad-item-show-status {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    pointer-events: none;
+} */
+
+.ad-item-show-status {
+    position: absolute;
+    display: none;
+    right: 150px;
+    top: 90px;
+    border: 4px double rgb(154, 142, 246);
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: 600;
+    /* color: #000000; */
+    color: rgb(154, 142, 246);
+    background-color: #ffffff; /* полностью белый фон */
+    border-radius: 5px;
+
+    z-index: 1;
+    transform: rotate(-20deg);
+}
+
+/* .ad-item-show-status.no-active {
+    display: block;
+} */
+
+/* Делает карточку некликабельной и притушенной */
+.cargo-card.is-disabled {
+    position: relative;
+    opacity: 0.55;
+    pointer-events: none; /* блокируем клики и навигацию по ссылкам внутри */
+}
+
+/* Если у тебя уже есть .no-active — можно оставить для доп. стилей */
+.ad-item-show-status.no-active {
+}
+
 /* АДАПТИВ */
 @media (max-width: 720px) {
     .cargo-card__head {
@@ -335,8 +382,8 @@
     .cargo-card__foot {
         grid-template-columns: 1fr auto;
         grid-template-areas:
-            "left right"
-            "owner owner";
+            'left right'
+            'owner owner';
         row-gap: 6px;
     }
 
