@@ -93,48 +93,35 @@ const CargoAdsList = ({
             )}
 
             {!loading && !error && data.length > 0 && (
-                <div className='cargo-ads-list__column'>
+                <div className={viewMode === 'grid' ? 'cargo-ads-list__grid' : 'cargo-ads-list__column'}>
                     {data.map((ad) => {
-                        const key =
-                            ad.adId ||
-                            `${ad.departureCity}-${ad.destinationCity}-${ad.createdAt}`;
+                        const key = ad.adId || `${ad.departureCity}-${ad.destinationCity}-${ad.createdAt}`;
 
-                        // 1) вычисляем активность карточки по статусу
                         const status = ad?.status || 'active';
-                        const derivedActive =
-                            !NON_ACTIVE_STATUSES.includes(status);
+                        const derivedActive = !NON_ACTIVE_STATUSES.includes(status);
 
-                        // 2) карточка сама покажет плашку/притушится
+                        const hasAdId = !!ad?.adId;
+                        const isClickableNow = clickable && derivedActive && hasAdId;
+
+                        // для плитки делаем карточку компактнее
                         const card = (
                             <CargoAdItem
                                 ad={ad}
                                 ableHover={true}
                                 isActive={derivedActive}
+                                compact={viewMode === 'grid'}
                             />
                         );
 
-                        // 3) оборачиваем в Link ТОЛЬКО если кликабельно и есть adId
-                        const hasAdId = !!ad?.adId;
-                        const isClickableNow =
-                            clickable && derivedActive && hasAdId;
-
-                        // обёртка элемента: в grid — свой класс, в list — свой
-                        const itemClass =
-                            viewMode === 'grid'
-                                ? 'cargo-ads-list__cell'
-                                : 'cargo-ads-list__item';
+                        // ячейка: в grid используем .cargo-ads-list__cell, в list — .cargo-ads-list__item
+                        const itemClass = viewMode === 'grid' ? 'cargo-ads-list__cell' : 'cargo-ads-list__item';
 
                         return (
-                            <div
-                                className={itemClass}
-                                key={key}
-                            >
-                                {/* убрал кавычки вокруг cargo */}
+                            <div className={itemClass} key={key}>
                                 {isClickableNow ? (
                                     <Link
-                                        className='cargo-ads-list__link'
+                                        className="cargo-ads-list__link"
                                         to={`${linkBase}/${ad.adId}?type=cargo`}
-                                        // доп. защита: если вдруг derivedActive сменится на лету
                                         onClick={(e) => {
                                             if (!derivedActive) {
                                                 e.preventDefault();
@@ -145,19 +132,12 @@ const CargoAdsList = ({
                                         {card}
                                     </Link>
                                 ) : (
-                                    // Неактивные — без Link
                                     <div
-                                        role='button'
-                                        aria-disabled='true'
+                                        role="button"
+                                        aria-disabled="true"
                                         tabIndex={-1}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                        }}
-                                        onMouseDown={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                        }}
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                     >
                                         {card}
                                     </div>
@@ -167,6 +147,7 @@ const CargoAdsList = ({
                     })}
                 </div>
             )}
+
         </div>
     );
 };

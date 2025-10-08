@@ -1,12 +1,22 @@
+/* Контейнер списка */
 .cargo-ads-list {
     width: 100%;
-
-    max-width: 740px;
+    max-width: 1200px;
+    /* увеличили, чтобы плитка реально раскладывалась */
     margin-left: auto;
     margin-right: auto;
+    box-sizing: border-box;
+    padding: 0 16px;
 }
 
-/* Центрируем прелоадер при загрузке */
+/* Тулбар (переключатель вид/сетка) */
+.cargo-ads-list__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0 12px;
+}
+
+/* Прелоадер/состояния */
 .cargo-ads-list__preloader {
     display: grid;
     place-items: center;
@@ -15,26 +25,38 @@
 
 .cargo-ads-list__error {
     color: #b91c1c;
-    /* red-700 */
     padding: 8px 0;
 }
 
 .cargo-ads-list__empty {
     color: #6b7280;
-    /* gray-500 */
     padding: 8px 0;
     font-size: 14px;
 }
 
-/* Вертикальная колонна карточек */
+/* Режим СПИСОК */
 .cargo-ads-list__column {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin: 20px;
 }
 
-/* Элемент списка */
+/* Режим ПЛИТКА */
+.cargo-ads-list__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* было 320 — сделали чуть компактнее */
+    gap: 12px;
+}
+
+/* Ячейка в плитке и ссылка растягиваются на 100% */
+.cargo-ads-list__cell,
+.cargo-ads-list__grid .cargo-ads-list__link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 .cargo-ads-list__item {
     width: 100%;
 }
@@ -46,32 +68,40 @@
     color: inherit;
 }
 
-/* Режим «плитка» */
-.cargo-ads-list__grid {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(320px, 1fr)
-    ); /* адаптивные колонки */
-    gap: 12px;
-}
-
-/* Ячейка плитки — без внешних отступов, карточка растягивается */
-.cargo-ads-list__cell {
-    display: flex;
-    min-width: 0;
-}
-
-/* Если нужно чуть уменьшить карточку в плитке */
+/* Подправим карточку внутри грида */
 .cargo-ads-list__grid .cargo-card {
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-/* Тулбар */
-.cargo-ads-list__toolbar {
+/* Немного воздуха по краям на больших экранах */
+@media (min-width: 1280px) {
+    .cargo-ads-list {
+        max-width: 1320px;
+    }
+}
+
+/* опционально — компактная карточка */
+.cargo-card--compact .cargo-card__head {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cargo-card--compact .cargo-card__right {
+    justify-items: start;
+    min-width: 0;
+}
+
+.cargo-card--compact .cargo-card__city {
+    font-size: 16px;
+}
+
+.cargo-card--compact .cargo-card__date-value {
+    font-size: 18px;
+}
+
+.cargo-card--compact .cargo-card__price-value {
+    font-size: 24px;
 }

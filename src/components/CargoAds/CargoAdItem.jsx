@@ -194,10 +194,10 @@ const CargoAdItem = ({
         rating: isFiniteNumber(ownerRaw?.rating)
             ? Number(ownerRaw.rating)
             : isFiniteNumber(data?.ownerRating)
-            ? Number(data.ownerRating)
-            : isFiniteNumber(data?.rating)
-            ? Number(data.rating)
-            : null,
+                ? Number(data.ownerRating)
+                : isFiniteNumber(data?.rating)
+                    ? Number(data.rating)
+                    : null,
     };
 
     const ownerName = owner.name;
@@ -209,10 +209,9 @@ const CargoAdItem = ({
         className,
         !ableHover ? 'cargo-card--nohover' : '',
         !isActiveFinal ? 'is-disabled' : '',
-        compact ? 'cargo-card--compact' : '', //TODO классы для компактного режима
-    ]
-        .filter(Boolean)
-        .join(' ');
+        compact ? 'cargo-card--compact' : '',
+    ].filter(Boolean).join(' ');
+
 
     return (
         <div
@@ -224,9 +223,8 @@ const CargoAdItem = ({
         >
             {/* Бейдж статуса, как у транспортной карточки */}
             <div
-                className={`ad-cargo-item-show-status ${
-                    isActiveFinal ? '' : 'no-active'
-                }`}
+                className={`ad-cargo-item-show-status ${isActiveFinal ? '' : 'no-active'
+                    }`}
             >
                 {status === 'work' && 'Занят'}
                 {status === 'completed' && 'Доставлено'}
@@ -396,9 +394,8 @@ const CargoAdItem = ({
                 <div className='cargo-card__foot-right'>
                     {isActiveFinal ? (
                         <div
-                            className={`container-icon-add-review-cargo-ad ${
-                                isViewMode ? 'view-mode' : ''
-                            }`}
+                            className={`container-icon-add-review-cargo-ad ${isViewMode ? 'view-mode' : ''
+                                }`}
                         >
                             <div
                                 onMouseEnter={handleMouseEnterReviewAdsAdd}

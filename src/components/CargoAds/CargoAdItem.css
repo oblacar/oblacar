@@ -1,403 +1,191 @@
+/* ===== Карточка груза ===== */
+
 .cargo-card {
-    --cc-pad: 14px;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    padding: var(--cc-pad);
-    transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
-    position: relative;
+  --cc-pad: 14px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 2px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  padding: var(--cc-pad);
+  transition: border-color .15s, box-shadow .15s, transform .12s;
+  position: relative;
+  box-sizing: border-box;
 }
 
-.cargo-card:hover {
-    border-color: #f68612;
-}
+.cargo-card:hover { border-color: #f68612; }
 
 .cargo-card:active {
-    /* transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); */
-    -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+  box-shadow: 0 0 0 8px rgba(255,203,112,.53);
 }
 
-/* Режим превью — отключаем hover/active эффекты */
-.cargo-card--nohover {
-    cursor: default;
-    transition: none;
+/* Превью/неинтерактивные карточки */
+.cargo-card--nohover { cursor: default; transition: none; }
+.cargo-card--nohover:hover { border-color: rgba(0,0,0,.08); box-shadow: none; }
+.cargo-card--nohover:active { transform: none; box-shadow: none; }
+
+/* Плашка статуса (как у транспорта) */
+.ad-item-show-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 8px;
+  background: rgba(0,0,0,.65);
+  color: #fff;
+  pointer-events: none;
+}
+.ad-item-show-status.no-active { display: block; }
+
+/* Некликабельная карточка (work/completed/archived/deleted/inactive) */
+.cargo-card.is-disabled {
+  opacity: .55;
+  pointer-events: none;
+  position: relative;
 }
 
-.cargo-card--nohover:hover {
-    /* вернуть базовые значения, как у .cargo-card без :hover */
-    border-color: rgba(0, 0, 0, 0.08);
-    box-shadow: none;
-}
-
-.cargo-card--nohover:active {
-    transform: none;
-    box-shadow: none;
-}
-
-/* ВЕРХ: ДВА СТОЛБЦА */
+/* ===== Верх: две колонки ===== */
 .cargo-card__head {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: start;
 }
 
-/* ЛЕВЫЙ СТОЛБЕЦ */
-.cargo-card__leftcol {
-    display: grid;
-    grid-auto-rows: min-content;
-    gap: 8px;
-}
+/* Левый столбец */
+.cargo-card__leftcol { display: grid; grid-auto-rows: min-content; gap: 8px; }
 
 .cargo-card__cities {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-weight: 800;
-    font-size: 18px;
-    color: #111827;
-    line-height: 1.1;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 800;
+  font-size: 18px;
+  color: #111827;
+  line-height: 1.1;
 }
-
 .cargo-card__city {
-    max-width: 20ch;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #e96d26;
-    font-size: 20px;
+  max-width: 20ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #e96d26;
+  font-size: 20px;
 }
+.cargo-card__arrow { opacity: .75; color: #747187; }
 
-.cargo-card__arrow {
-    opacity: 0.75;
-    color: #747187;
-}
+.cargo-card__meta { font-size: 12px; color: #b2b8c4; text-align: left; }
 
-.cargo-card__meta {
-    font-size: 12px;
-    color: #b2b8c4;
-    /* margin-left: 20px; */
-    text-align: left;
-}
+.cargo-card__body { display: grid; }
+.cargo-card__row { display: flex; align-items: baseline; gap: 8px; min-height: 20px; }
+.cargo-card__label { color: #6b7280; font-size: 13px; flex: 0 0 auto; }
+.cargo-card__value { color: #111827; font-size: 14px; }
 
-.cargo-card__body {
-    display: grid;
-    /* gap: 6px; */
-}
-
-.cargo-card__row {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    min-height: 20px;
-}
-
-.cargo-card__label {
-    color: #6b7280;
-    font-size: 13px;
-    flex: 0 0 auto;
-}
-
-.cargo-card__value {
-    color: #111827;
-    font-size: 14px;
-}
-
-.cargo-card__row--tags {
-    align-items: center;
-}
-
-.cargo-card__tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
+.cargo-card__row--tags { align-items: center; }
+.cargo-card__tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .cargo-card__tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 8px;
-    font-size: 12px;
-    border-radius: 999px;
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+  display: inline-flex; align-items: center;
+  padding: 3px 8px; font-size: 12px; border-radius: 999px;
+  background: #f3f4f6; color: #374151; border: 1px solid rgba(0,0,0,.06);
 }
 
-/* ПРАВЫЙ СТОЛБЕЦ */
+/* Правый столбец */
 .cargo-card__right {
-    display: grid;
-    gap: 8px;
-    align-content: start;
-    /* даты сверху, дальше цена, потом «готов обсудить» */
-    justify-items: end;
-    min-width: 200px;
+  display: grid; gap: 8px; align-content: start; justify-items: end;
+  min-width: 200px;
 }
+.cargo-card__dates { display: grid; text-align: right; width: 100%; }
+.cargo-card__date-row { display: flex; justify-content: flex-end; gap: 8px; align-items: baseline; }
+.cargo-card__date-label { color: #b2b8c4; font-size: 13px; }
+.cargo-card__date-value { font-size: 22px; font-weight: 700; color: #363636; }
+.cargo-card__date-delivery { color: #6b7280; font-size: 13px; font-weight: 400; }
 
-.cargo-card__dates {
-    display: grid;
-    /* gap: 6px; */
-    text-align: right;
-    width: 100%;
-}
-
-.cargo-card__date-row {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    align-items: baseline;
-}
-
-.cargo-card__date-label {
-    /* color: #6b7280; */
-    color: #b2b8c4;
-    font-size: 13px;
-}
-
-.cargo-card__date-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: #363636;
-}
-
-.cargo-card__date-delivery {
-    color: #6b7280;
-    font-size: 13px;
-    font-weight: 400;
-}
-
-.cargo-card__price {
-    text-align: right;
-    margin-top: 10px;
-}
-
-.cargo-card__price-value {
-    font-size: 32px;
-    line-height: 1;
-    font-weight: 900;
-    color: #111827;
-}
-
-.cargo-card__price-unit {
-    font-size: 16px;
-    color: #6b7280;
-    font-weight: 600;
-}
-
-.cargo-card__price-na {
-    font-size: 14px;
-    color: #6b7280;
-}
+.cargo-card__price { text-align: right; margin-top: 10px; }
+.cargo-card__price-value { font-size: 32px; line-height: 1; font-weight: 900; color: #111827; }
+.cargo-card__price-unit { font-size: 16px; color: #6b7280; font-weight: 600; }
+.cargo-card__price-na { font-size: 14px; color: #6b7280; }
 
 .cargo-card__bargain {
-    font-size: 12px;
-    color: #065f46;
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    padding: 2px 8px;
-    border-radius: 999px;
+  font-size: 12px; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0;
+  padding: 2px 8px; border-radius: 999px;
 }
 
-/* ПОДВАЛ */
+/* ===== Низ: бейджи + владелец + действие ===== */
 .cargo-card__foot {
-    display: grid;
-    grid-template-columns: 60% 25% 15%;
-    align-items: center;
-    gap: 8px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    /* margin-top: 5px; */
-    /* border-top: 1px dashed rgba(0, 0, 0, .08); */
-    /* background-color: rgba(0, 0, 0, 0.08); */
-    background-color: rgba(0, 0, 0, 0.04);
-    margin: 5px -14px -14px -14px;
-    border-radius: 0px 0px 10px 10px;
+  display: grid;
+  grid-template-columns: 60% 25% 15%;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 14px;
+  margin: 5px -14px -14px -14px;
+  border-radius: 0 0 10px 10px;
+  background: rgba(0,0,0,.04);
 }
+.cargo-card__foot-left { justify-self: start; min-width: 0; }
 
-/* Левый столбец — прижат влево */
-.cargo-card__foot-left {
-    justify-self: start;
-    min-width: 0;
-}
-
-/* Средний столбец (владелец) — прижат влево */
 .cargo-card__owner {
-    justify-self: start;
-    /* было center */
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
+  justify-self: start;
+  display: inline-flex; align-items: center; gap: 8px; min-width: 0;
 }
-
 .cargo-card__owner-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #e5e7eb;
-    display: grid;
-    place-items: center;
-    border: 1px solid white;
+  width: 50px; height: 50px; border-radius: 50%; overflow: hidden;
+  background: #e5e7eb; display: grid; place-items: center; border: 1px solid #fff;
 }
+.cargo-card__owner-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cargo-card__owner-fallback { font-size: 12px; font-weight: 700; color: #374151; }
 
-.cargo-card__owner-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.cargo-card__owner-fallback {
-    font-size: 12px;
-    font-weight: 700;
-    color: #374151;
-}
-
-.cargo-card__owner-meta {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
-    min-width: 0;
-}
-
+.cargo-card__owner-meta { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
 .cargo-card__owner-name {
-    font-size: 16px;
-    font-weight: 500;
-    color: #111827;
-    max-width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 16px; font-weight: 500; color: #111827;
+  max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cargo-card__owner-rating { font-size: 11px; color: #f59e0b; letter-spacing: .5px; }
+
+.cargo-card__foot-right { justify-self: end; display: flex; align-items: center; gap: 6px; margin-right: 20px; }
+
+/* ===== Режим ПЛИТКИ: компактнее и более «карточно» ===== */
+.cargo-ads-list__grid .cargo-card {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  padding: 12px;
 }
 
-.cargo-card__owner-rating {
-    font-size: 11px;
-    color: #f59e0b;
-    letter-spacing: 0.5px;
+.cargo-ads-list__grid .cargo-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Правый столбец — прижат вправо */
-.cargo-card__foot-right {
-    justify-self: end;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-right: 20px;
+.cargo-ads-list__grid .cargo-card__right {
+  justify-items: start;
+  min-width: 0;               /* важно: даём сжиматься в узкой колонке */
 }
 
-.cargo-card__icon-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: #fff;
-    color: #374151;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    transition: background-color 0.15s, box-shadow 0.15s, transform 0.06s;
-}
+.cargo-ads-list__grid .cargo-card__city { font-size: 16px; }
+.cargo-ads-list__grid .cargo-card__date-value { font-size: 18px; }
+.cargo-ads-list__grid .cargo-card__price-value { font-size: 24px; }
 
-.cargo-card__icon-btn:hover {
-    background: #fffdf3;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-}
-
-.cargo-card__icon-btn:active {
-    transform: translateY(0.5px) scale(0.98);
-}
-
-/* Плашка статуса */
-/* .ad-item-show-status {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 2;
-    padding: 4px 8px;
-    font-size: 12px;
-    line-height: 1;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.65);
-    color: #fff;
-    pointer-events: none;
-} */
-
-.ad-cargo-item-show-status {
-    position: absolute;
-    display: none;
-    right: 150px;
-    top: 90px;
-    border: 4px double rgb(154, 142, 246);
-    padding: 5px 10px;
-    font-size: 16px;
-    font-weight: 600;
-    /* color: #000000; */
-    color: rgb(154, 142, 246);
-    background-color: #ffffff; /* полностью белый фон */
-    border-radius: 5px;
-
-    z-index: 1;
-    transform: rotate(-20deg);
-}
-
-/* .ad-item-show-status.no-active {
-    display: block;
-} */
-
-/* Делает карточку некликабельной и притушенной */
-.cargo-card.is-disabled {
-    position: relative;
-    opacity: 0.55;
-    pointer-events: none; /* блокируем клики и навигацию по ссылкам внутри */
-}
-
-/* Если у тебя уже есть .no-active — можно оставить для доп. стилей */
-.ad-item-show-status.no-active {
-}
-
-/* АДАПТИВ */
+/* ===== Адаптив ===== */
 @media (max-width: 720px) {
-    .cargo-card__head {
-        grid-template-columns: 1fr;
-    }
-
-    .cargo-card__right {
-        justify-items: start;
-        min-width: 0;
-    }
-
-    .cargo-card__dates {
-        text-align: left;
-    }
+  .cargo-card__head { grid-template-columns: 1fr; }
+  .cargo-card__right { justify-items: start; min-width: 0; }
+  .cargo-card__dates { text-align: left; }
 }
 
 @media (max-width: 480px) {
-    .cargo-card__foot {
-        grid-template-columns: 1fr auto;
-        grid-template-areas:
-            'left right'
-            'owner owner';
-        row-gap: 6px;
-    }
-
-    .cargo-card__foot-left {
-        grid-area: left;
-    }
-
-    .cargo-card__owner {
-        grid-area: owner;
-        justify-self: start;
-    }
-
-    .cargo-card__foot-right {
-        grid-area: right;
-    }
+  .cargo-card__foot {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "left right"
+      "owner owner";
+    row-gap: 6px;
+  }
+  .cargo-card__foot-left { grid-area: left; }
+  .cargo-card__owner { grid-area: owner; justify-self: start; }
+  .cargo-card__foot-right { grid-area: right; }
 }
-
