@@ -21,17 +21,13 @@
     /* padding: 10px; */
 }
 
-.other-ad-profile-date {
-}
+.other-ad-profile-date {}
 
-.other-ad-profile-departure-city {
-}
+.other-ad-profile-departure-city {}
 
-.other-ad-profile-destination-city {
-}
+.other-ad-profile-destination-city {}
 
-.other-ad-profile-price {
-}
+.other-ad-profile-price {}
 
 .other-ad-profile-rout-date-price-row strong,
 .other-ad-profile-truck-row strong,
@@ -58,13 +54,15 @@
     height: 2px;
 
     /* 2. Используем линейный градиент для создания оранжевой линии */
-    background-image: linear-gradient(
-        to right,
-        /* Направление: слева направо */ #ffc299,
-        /* Светлый/прозрачный оранжевый (начинаем) */ #ff8c3c,
-        /* Яркий оранжевый (центр) */ #ffc299
+    background-image: linear-gradient(to right,
+            /* Направление: слева направо */
+            #ffc299,
+            /* Светлый/прозрачный оранжевый (начинаем) */
+            #ff8c3c,
+            /* Яркий оранжевый (центр) */
+            #ffc299
             /* Светлый/прозрачный оранжевый (заканчиваем) */
-    );
+        );
 
     /* 3. Убираем повторение фона (обычно не нужно для градиента, но хорошая практика) */
     background-repeat: no-repeat;
@@ -99,18 +97,14 @@
     font-size: 24px;
 }
 
-.other-ad-profile-truck-type {
-}
+.other-ad-profile-truck-type {}
 
-.other-ad-profile-truck-weight-value {
-}
+.other-ad-profile-truck-weight-value {}
 
-.other-ad-profile-truck-loadings {
-}
+.other-ad-profile-truck-loadings {}
 
 /* Фото зона */
-.other-ad-profile-truck-photo-area {
-}
+.other-ad-profile-truck-photo-area {}
 
 /* Информация о пользователе */
 .other-ad-profile-owner-data {
@@ -232,7 +226,7 @@
     z-index: 10;
 }
 
-.other-ad-profile-send-request-preloader > * {
+.other-ad-profile-send-request-preloader>* {
     position: absolute;
 }
 
@@ -318,13 +312,13 @@
     /* 1. Позиционирование контейнера */
     position: absolute;
     right: 20px;
-    top: 0px;
+    top: -2px;
 
     /* 2. ✅ Наследуемый цвет (color) */
     color: #a0a0a0;
 
     /* 3. ✅ Размер (font-size) - управляет размером SVG-иконки */
-    font-size: 24px;
+    font-size: 18px;
 
     /* 4. Переход (для плавного изменения цвета) */
     transition: color 0.2s ease;
@@ -336,7 +330,8 @@
 
 .oap-in-review--is-active {
     /* Модификатор: только для активного состояния */
-    color: #ff904c; /* Переопределяем цвет на оранжевый */
+    color: #ff904c;
+    /* Переопределяем цвет на оранжевый */
 }
 
 /* Теперь иконка (SVG), благодаря наследуемости и правильным настройкам 
