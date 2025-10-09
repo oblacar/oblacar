@@ -1,27 +1,23 @@
 // src/components/CargoAds/CargoAdItem.jsx
-import React, { useMemo, useContext, useState, useCallback } from 'react';
+import React, { useMemo, useContext, useCallback } from 'react';
 import CargoBadgesRow from './icons/CargoBadgesRow';
 import CargoAdsContext from '../../hooks/CargoAdsContext';
 
 import './CargoAdItem.css';
-import './CargoAdItem.compact.css';
 
-// новый флажок с тултипом
+// флажок «Варианты» с тултипом
 import IconWithTooltip from '../common/IconWithTooltip/IconWithTooltip';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 
 /**
  * Карточка объявления о перевозке груза (элемент списка).
- *
  * Поддерживаем плоские и { ad } структуры.
  */
 const CargoAdItem = ({
     ad = {},
     className = '',
     ableHover = true,
-    isViewMode = false,
     isActive = true, // внешняя «галка активности»
-    compact = '',
 }) => {
     const data = ad?.ad ? ad.ad : ad;
 
@@ -40,25 +36,20 @@ const CargoAdItem = ({
     const nonActiveStatuses = ['work', 'completed', 'deleted', 'archived', 'inactive'];
     const derivedActive = !nonActiveStatuses.includes(status);
     const isActiveFinal = Boolean(isActive && derivedActive);
-    const statusLabel = getCargoStatusLabel(status);
 
     // === CONTEXT: работа с "Вариантами" (review) ===
     const { addReviewAd, removeReviewAd, reviewAds, isReviewed } =
         useContext(CargoAdsContext) || {};
 
-    // объявление может быть уже "расширенным"
-    const isExtended = ad && typeof ad.isInReviewAds === 'boolean' && ad.ad;
-    const extAd = isExtended ? ad : { ad: data, isInReviewAds: false };
-
     // определяем, находится ли объявление в "Вариантах"
-    const isInReviewFromAd = isExtended ? Boolean(ad.isInReviewAds) : false;
     const isInReviewFromCtx = useMemo(() => {
         if (!Array.isArray(reviewAds)) return false;
         const set = new Set(reviewAds.map((x) => x?.ad?.adId));
         return set.has(adId);
     }, [reviewAds, adId]);
 
-    const isInReviewAds = isInReviewFromAd || isInReviewFromCtx || (isReviewed ? isReviewed(String(adId ?? '')) : false);
+    const isInReviewAds =
+        isInReviewFromCtx || (isReviewed ? isReviewed(String(adId ?? '')) : false);
 
     // id объявления
     const adKey = String(data?.adId ?? adId ?? data?.id ?? '');
@@ -66,8 +57,7 @@ const CargoAdItem = ({
     // обработчик тоггла «Варианты»
     const handleToggleReviewAd = useCallback(
         (e) => {
-            // гасим навигацию (карточка в Link)
-            if (e && typeof e.preventDefault === 'function') {
+            if (e?.preventDefault) {
                 e.preventDefault();
                 e.stopPropagation();
             }
@@ -80,12 +70,6 @@ const CargoAdItem = ({
         },
         [adKey, isInReviewAds, addReviewAd, removeReviewAd]
     );
-
-    // «щит» от навигации: на всякий
-    const stopNav = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
 
     // дата создания
     const created = createdAt || date || null;
@@ -121,8 +105,6 @@ const CargoAdItem = ({
 
     // груз
     const cargoName = data?.title ?? cargo?.name ?? data?.cargoName ?? '—';
-    const cargoType = cargo?.type ?? data?.cargoType ?? '';
-
     const weight =
         cargo?.weightTons ??
         cargo?.weight ??
@@ -155,14 +137,6 @@ const CargoAdItem = ({
         () => normalizeLoadingTypes(loadingTypes ?? data?.loadingTypes),
         [loadingTypes, data?.loadingTypes]
     );
-
-    const temperature = cargo?.temperature ?? data?.temperature ?? null;
-    const temperatureMode =
-        (data?.temperature?.mode ?? cargo?.temperature?.mode) ||
-        data?.temperatureMode ||
-        null;
-    const fragile = Boolean(cargo?.fragile ?? data?.fragile);
-    const isStackable = Boolean(data?.isStackable ?? cargo?.isStackable);
 
     // цена
     const priceValue = isFiniteNumber(price?.value) ? price.value : data?.price;
@@ -198,17 +172,12 @@ const CargoAdItem = ({
         className,
         !ableHover ? 'cargo-card--nohover' : '',
         !isActiveFinal ? 'is-disabled' : '',
-        compact ? 'cargo-card--compact' : '',
     ]
         .filter(Boolean)
         .join(' ');
 
     return (
-        <div
-            className={rootClass}
-            aria-disabled={!isActiveFinal}
-            title={!isActiveFinal && statusLabel ? statusLabel : undefined}
-        >
+        <div className={rootClass} aria-disabled={!isActiveFinal}>
             {/* Плашка статуса */}
             <div className={`ad-cargo-item-show-status ${isActiveFinal ? '' : 'no-active'}`}>
                 {status === 'work' && 'Занят'}
@@ -218,12 +187,13 @@ const CargoAdItem = ({
                 {status === 'inactive' && 'Не активно'}
             </div>
 
+            {/* Флажок «Варианты» */}
             {isActiveFinal ? (
                 <div
                     className={`oap-in-review ${isInReviewAds ? 'oap-in-review--is-active' : ''}`}
                     onClick={handleToggleReviewAd}
-                    onMouseDown={stopNav}
-                    onTouchStart={stopNav}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     role="button"
                     tabIndex={0}
                     aria-label={isInReviewAds ? 'Убрать из Вариантов' : 'Добавить в Варианты'}
@@ -234,67 +204,25 @@ const CargoAdItem = ({
                     <IconWithTooltip
                         icon={isInReviewAds ? FaBookmark : FaRegBookmark}
                         tooltipText={isInReviewAds ? 'Убрать из Вариантов' : 'Добавить в Варианты'}
-                        size='18px'
+                        size="18px"
                     />
                 </div>
             ) : null}
 
-            {/* ВЕРХ: 2 колонки — слева контент, справа даты+цена */}
-            <div className="cargo-card__head">
-                {/* ЛЕВЫЙ СТОЛБЕЦ */}
-                <div className="cargo-card__leftcol">
+            {/* ===== 1) HEAD: слева города+дата, справа даты перевозки ===== */}
+            <div className="cargo-row cargo-card__head">
+                <div className="cargo-col--left head-left">
                     <div className="cargo-card__cities">
                         <span className="cargo-card__city">{from || '-'}</span>
                         <span className="cargo-card__arrow">→</span>
                         <span className="cargo-card__city">{to || '-'}</span>
                     </div>
-
                     <div className="cargo-card__meta">
                         Дата объявления: {String(dateStr) ? String(dateStr) : '-'}
                     </div>
-
-                    <div className="cargo-card__body">
-                        <div className="cargo-card__row">
-                            <span className="cargo-card__label">Груз:</span>
-                            <span className="cargo-card__value">{cargoName || '—'}</span>
-                        </div>
-
-                        {cargoType && (
-                            <div className="cargo-card__row">
-                                <span className="cargo-card__label">Тип:</span>
-                                <span className="cargo-card__value">{cargoType}</span>
-                            </div>
-                        )}
-
-                        <div className="cargo-card__row">
-                            <span className="cargo-card__label">Вес:</span>
-                            <span className="cargo-card__value">
-                                {isFiniteNumber(weight) ? `${fmtNum(weight)} т` : '—'}
-                            </span>
-                        </div>
-
-                        <div className="cargo-card__row">
-                            <span className="cargo-card__label">Габариты:</span>
-                            <span className="cargo-card__value">{fmtDims(dims?.h, dims?.w, dims?.d)} м</span>
-                        </div>
-
-                        {!!tagsLoading.length && (
-                            <div className="cargo-card__row cargo-card__row--tags">
-                                <span className="cargo-card__label">Загрузка:</span>
-                                <span className="cargo-card__tags">
-                                    {tagsLoading.map((t) => (
-                                        <span key={t} className="cargo-card__tag">
-                                            {t}
-                                        </span>
-                                    ))}
-                                </span>
-                            </div>
-                        )}
-                    </div>
                 </div>
 
-                {/* ПРАВЫЙ СТОЛБЕЦ */}
-                <div className="cargo-card__right">
+                <div className="cargo-col--right head-right">
                     <div className="cargo-card__dates">
                         <div className="cargo-card__date-row">
                             <span className="cargo-card__date-label">Загрузка</span>
@@ -302,7 +230,6 @@ const CargoAdItem = ({
                                 {pickup ? fmtDate(pickup) : '-'}
                             </span>
                         </div>
-
                         <div className="cargo-card__date-row">
                             <span className="cargo-card__date-label">Доставка до</span>
                             <span className="cargo-card__date-value cargo-card__date-delivery">
@@ -310,23 +237,57 @@ const CargoAdItem = ({
                             </span>
                         </div>
                     </div>
+                </div>
+            </div>
 
+            {/* ===== 2) BODY: слева детали груза, справа цена/условия ===== */}
+            <div className="cargo-row cargo-card__body-row">
+                {/* RIGHT column — Price */}
+                <div className="cargo-col--right body-right body-price">
                     <div className="cargo-card__price">
                         {isFiniteNumber(priceValue) ? (
                             <>
-                                <div className="cargo-card__price-value">{fmtPrice(priceValue)}</div>
-                                <div className="cargo-card__price-unit">{priceUnit}</div>
+                                <span className="cargo-card__price-value">{fmtPrice(priceValue)}</span>
+                                <span className="cargo-card__price-unit"> {priceUnit}</span>
                             </>
                         ) : (
                             <div className="cargo-card__price-na">Цена не указана</div>
                         )}
                     </div>
-
                     {bargain && <div className="cargo-card__bargain">торг</div>}
+                </div>
+
+                {/* LEFT column — Details */}
+                <div className="cargo-col--left body-left body-details">
+                    <div className="cargo-card__row">
+                        <span className="cargo-card__label">Груз:</span>
+                        <span className="cargo-card__value">{cargoName || '—'}</span>
+                    </div>
+                    <div className="cargo-card__row">
+                        <span className="cargo-card__label">Вес:</span>
+                        <span className="cargo-card__value">
+                            {isFiniteNumber(weight) ? `${fmtNum(weight)} т` : '—'}
+                        </span>
+                    </div>
+                    <div className="cargo-card__row">
+                        <span className="cargo-card__label">Габариты:</span>
+                        <span className="cargo-card__value">{fmtDims(dims?.h, dims?.w, dims?.d)} м</span>
+                    </div>
+
+                    {/* {!!tagsLoading.length && ( */}
+                        <div className="cargo-card__row cargo-card__row--tags">
+                            <span className="cargo-card__label">Загрузка:</span>
+                            <span className="cargo-card__tags">
+                                {tagsLoading.map((t) => (
+                                    <span key={t} className="cargo-card__tag">{t}</span>
+                                ))}
+                            </span>
+                        </div>
+                    {/* )} */}
                 </div>
             </div>
 
-            {/* НИЗ: бейджи + владелец + действие */}
+            {/* ===== 3) FOOT: слева бейджи, справа владелец ===== */}
             <div className="cargo-card__foot">
                 <div className="cargo-card__foot-left">
                     <CargoBadgesRow ad={ad} size={16} gap={6} />
@@ -353,29 +314,6 @@ const CargoAdItem = ({
                         )}
                     </div>
                 </div>
-
-                {/* <div className="cargo-card__foot-right">
-                    {isActiveFinal ? (
-                        <div
-                            className={`oap-in-review ${isInReviewAds ? 'oap-in-review--is-active' : ''}`}
-                            onClick={handleToggleReviewAd}
-                            onMouseDown={stopNav}
-                            onTouchStart={stopNav}
-                            role="button"
-                            tabIndex={0}
-                            aria-label={isInReviewAds ? 'Убрать из Вариантов' : 'Добавить в Варианты'}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') handleToggleReviewAd(e);
-                            }}
-                        >
-                            <IconWithTooltip
-                                icon={isInReviewAds ? FaBookmark : FaRegBookmark}
-                                tooltipText={isInReviewAds ? 'Убрать из Вариантов' : 'Добавить в Варианты'}
-                                size='18px'
-                            />
-                        </div>
-                    ) : null}
-                </div> */}
             </div>
         </div>
     );
@@ -384,23 +322,6 @@ const CargoAdItem = ({
 export default CargoAdItem;
 
 /* ===== УТИЛИТЫ ===== */
-
-function getCargoStatusLabel(status) {
-    switch (status) {
-        case 'work':
-            return 'Занят';
-        case 'completed':
-            return 'Доставлено';
-        case 'deleted':
-            return 'Удалено';
-        case 'archived':
-            return 'Скрыто';
-        case 'inactive':
-            return 'Не активно';
-        default:
-            return '';
-    }
-}
 
 function normalizeLoadingTypes(val) {
     if (!val) return [];
@@ -430,9 +351,7 @@ function fmtNum(n) {
 }
 
 function fmtDims(h, w, d) {
-    const H = Number(h),
-        W = Number(w),
-        D = Number(d);
+    const H = Number(h), W = Number(w), D = Number(d);
     const hasAny = [H, W, D].some(Number.isFinite);
     if (!hasAny) return '—';
     const s = (x) =>

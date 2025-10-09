@@ -39,6 +39,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    align-items: center;
 }
 
 /* Режим ПЛИТКА */
@@ -59,6 +60,7 @@
 
 .cargo-ads-list__item {
     width: 100%;
+    max-width: 680px;
 }
 
 /* Ссылка-обёртка карточки */
@@ -79,6 +81,16 @@
 @media (min-width: 1280px) {
     .cargo-ads-list {
         max-width: 1320px;
+    }
+}
+
+@media (max-width: 800px) {
+    .cargo-ads-list__item {
+        max-width: 100%;
+    }
+
+    .cargo-ads-list__column {
+        margin: 12px;
     }
 }
 

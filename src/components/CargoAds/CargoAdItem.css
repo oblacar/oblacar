@@ -1,4 +1,4 @@
-/* ===== Карточка груза ===== */
+/* ===== БАЗА КАРТОЧКИ ===== */
 
 .cargo-card {
     --cc-pad: 14px;
@@ -11,6 +11,7 @@
     transition: border-color .15s, box-shadow .15s, transform .12s;
     position: relative;
     box-sizing: border-box;
+    text-align: start;
 }
 
 .cargo-card:hover {
@@ -21,7 +22,6 @@
     box-shadow: 0 0 0 8px rgba(255, 203, 112, .53);
 }
 
-/* Превью/неинтерактивные карточки */
 .cargo-card--nohover {
     cursor: default;
     transition: none;
@@ -37,9 +37,15 @@
     box-shadow: none;
 }
 
-/* Плашка статуса (как у транспорта) */
-.ad-item-show-status {
-    position: absolute;
+.cargo-card.is-disabled {
+    opacity: .55;
+    pointer-events: none;
+    position: relative;
+}
+
+/* Плашка статуса */
+.ad-cargo-item-show-status {
+    /* position: absolute;
     top: 10px;
     left: 10px;
     z-index: 2;
@@ -49,35 +55,61 @@
     border-radius: 8px;
     background: rgba(0, 0, 0, .65);
     color: #fff;
-    pointer-events: none;
+    pointer-events: none; */
+
+    position: absolute;
+    display: none;
+    right: 150px;
+    top: 50px;
+    border: 4px double rgb(154, 142, 246);
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: 600;
+    /* color: #000000; */
+    color: rgb(154, 142, 246);
+    background-color: #ffffff;
+    /* полностью белый фон */
+    border-radius: 5px;
+
+    z-index: 2;
+    transform: rotate(-20deg);
 }
 
-.ad-item-show-status.no-active {
+.ad-cargo-item-show-status.no-active {
     display: block;
 }
 
-/* Некликабельная карточка (work/completed/archived/deleted/inactive) */
-.cargo-card.is-disabled {
-    opacity: .55;
-    pointer-events: none;
-    position: relative;
-}
+/* ===== КАРКАС РЯДОВ: 2 КОЛОНКИ С ПЕРЕНОСОМ ===== */
 
-/* ===== Верх: две колонки ===== */
-.cargo-card__head {
-    display: grid;
-    grid-template-columns: 1fr auto;
+.cargo-row {
+    display: flex;
     gap: 16px;
-    align-items: start;
+    align-items: flex-start;
+    justify-content: space-between;
+    /* левый влево, правый вправо */
+    flex-wrap: wrap;
+    /* на узком правая падает вниз */
 }
 
-/* Левый столбец */
-.cargo-card__leftcol {
-    display: grid;
-    grid-auto-rows: min-content;
-    gap: 8px;
+/* колонки по умолчанию (режим списка) */
+.cargo-col--left {
+    flex: 1 1 200px;
+    /* тянется, но может ужаться */
+    min-width: 200px;
 }
 
+.cargo-col--right {
+    flex: 0 0 auto;
+    /* ширина по содержимому */
+    min-width: 220px;
+    margin-left: auto;
+    /* прижим вправо */
+    text-align: right;
+}
+
+/* ===== СОДЕРЖИМОЕ СТРОК ===== */
+
+/* 1) HEAD */
 .cargo-card__cities {
     display: inline-flex;
     align-items: baseline;
@@ -106,11 +138,74 @@
 .cargo-card__meta {
     font-size: 12px;
     color: #b2b8c4;
-    text-align: left;
 }
 
-.cargo-card__body {
+/* даты */
+.cargo-card__dates {
     display: grid;
+    width: 100%;
+    text-align: right;
+}
+
+.cargo-card__date-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.cargo-card__date-label {
+    color: #b2b8c4;
+    font-size: 13px;
+}
+
+.cargo-card__date-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #363636;
+}
+
+.cargo-card__date-delivery {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* 2) BODY */
+.cargo-card__price {
+    margin-top: 6px;
+}
+
+.cargo-card__price-value {
+    display: inline-block;
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 900;
+    color: #111827;
+    padding-right: 10px;
+}
+
+.cargo-card__price-unit {
+    display: inline-block;
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.cargo-card__price-na {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.cargo-card__bargain {
+    font-size: 12px;
+    color: #065f46;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 2px 8px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-top: 6px;
 }
 
 .cargo-card__row {
@@ -152,96 +247,25 @@
     border: 1px solid rgba(0, 0, 0, .06);
 }
 
-/* Правый столбец */
-.cargo-card__right {
-    display: grid;
-    gap: 8px;
-    align-content: start;
-    justify-items: end;
-    min-width: 200px;
-}
-
-.cargo-card__dates {
-    display: grid;
-    text-align: right;
-    width: 100%;
-}
-
-.cargo-card__date-row {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    align-items: baseline;
-}
-
-.cargo-card__date-label {
-    color: #b2b8c4;
-    font-size: 13px;
-}
-
-.cargo-card__date-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: #363636;
-}
-
-.cargo-card__date-delivery {
-    color: #6b7280;
-    font-size: 13px;
-    font-weight: 400;
-}
-
-.cargo-card__price {
-    text-align: right;
-    margin-top: 10px;
-}
-
-.cargo-card__price-value {
-    font-size: 32px;
-    line-height: 1;
-    font-weight: 900;
-    color: #111827;
-}
-
-.cargo-card__price-unit {
-    font-size: 16px;
-    color: #6b7280;
-    font-weight: 600;
-}
-
-.cargo-card__price-na {
-    font-size: 14px;
-    color: #6b7280;
-}
-
-.cargo-card__bargain {
-    font-size: 12px;
-    color: #065f46;
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    padding: 2px 8px;
-    border-radius: 999px;
-}
-
-/* ===== Низ: бейджи + владелец + действие ===== */
+/* 3) FOOT */
 .cargo-card__foot {
-    display: grid;
-    grid-template-columns: 60% 25% 15%;
+    display: flex;
+    gap: 12px;
     align-items: center;
-    gap: 8px;
-    padding: 3px 14px;
+    flex-wrap: wrap;
+    padding: 3px 10px 3px 0;
     margin: 5px -14px -14px -14px;
     border-radius: 0 0 10px 10px;
     background: rgba(0, 0, 0, .04);
 }
 
 .cargo-card__foot-left {
-    justify-self: start;
-    min-width: 0;
+    flex: 1 1 auto;
 }
 
 .cargo-card__owner {
-    justify-self: start;
+    flex: 0 0 auto;
+    margin-left: auto;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -295,81 +319,31 @@
     letter-spacing: .5px;
 }
 
-.cargo-card__foot-right {
-    justify-self: end;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-right: 20px;
-}
+/* ===== ОГРАНИЧЕНИЕ ШИРИНЫ В СПИСКЕ ===== */
 
-/* ===== Режим ПЛИТКИ: компактнее и более «карточно» ===== */
-.cargo-ads-list__grid .cargo-card {
+.cargo-ads-list__column .cargo-ads-list__item,
+.cargo-ads-list__column .cargo-ads-list__link,
+.cargo-ads-list__column .cargo-card {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
     width: 100%;
-    max-width: none;
-    height: 100%;
-    padding: 12px;
 }
 
-.cargo-ads-list__grid .cargo-card__head {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+/* ===== АДАПТИВ: при сужении правая колонка уходит вниз и выравнивание слева ===== */
 
-.cargo-ads-list__grid .cargo-card__right {
-    justify-items: start;
-    min-width: 0;
-    /* важно: даём сжиматься в узкой колонке */
-}
-
-.cargo-ads-list__grid .cargo-card__city {
-    font-size: 16px;
-}
-
-.cargo-ads-list__grid .cargo-card__date-value {
-    font-size: 18px;
-}
-
-.cargo-ads-list__grid .cargo-card__price-value {
-    font-size: 24px;
-}
-
-/* ===== Адаптив ===== */
-@media (max-width: 720px) {
-    .cargo-card__head {
-        grid-template-columns: 1fr;
-    }
-
-    .cargo-card__right {
-        justify-items: start;
-        min-width: 0;
+@media (max-width: 760px) {
+    .cargo-col--right {
+        margin-left: 0;
+        text-align: left;
+        width: 100%;
     }
 
     .cargo-card__dates {
         text-align: left;
     }
-}
 
-@media (max-width: 480px) {
-    .cargo-card__foot {
-        grid-template-columns: 1fr auto;
-        grid-template-areas:
-            "left right"
-            "owner owner";
-        row-gap: 6px;
-    }
-
-    .cargo-card__foot-left {
-        grid-area: left;
-    }
-
-    .cargo-card__owner {
-        grid-area: owner;
-        justify-self: start;
-    }
-
-    .cargo-card__foot-right {
-        grid-area: right;
+    .cargo-card__owner-name {
+        max-width: 130px;
     }
 }
