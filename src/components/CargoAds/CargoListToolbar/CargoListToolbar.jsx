@@ -1,18 +1,24 @@
 import React from 'react';
 import './CargoListToolbar.css';
 
+import SortDropdown from '../../common/SortDropdown/SortDropdown'
+
 const SORT_OPTIONS = [
-    { id: 'priceAsc', label: 'Цена ↑' },
-    { id: 'priceDesc', label: 'Цена ↓' },
-    { id: 'fromAsc', label: 'Откуда A→Я' },
-    { id: 'fromDesc', label: 'Откуда Я→A' },
-    { id: 'soonest', label: 'Ближайшая загрузка' },
-    { id: 'latest', label: 'Поздняя загрузка' },
+    { value: 'priceAsc', label: 'По возрастанию цены' },
+    { value: 'priceDesc', label: 'По убыванию цены' },
+    { value: 'fromAsc', label: 'По алфавиту (откуда)' },
+    { value: 'fromDesc', label: 'В обратном порядке' },
+    { value: 'soonest', label: 'Сначала ближайшие' },
+    { value: 'latest', label: 'Сначала поздние' },
 ];
 
 export default function CargoListToolbar({
     sort = 'priceDesc',
-    onChangeSort,
+    onSortChange,
+
+    rightSlot = null, // сюда можно передать переключатель "список/плитка"
+    className = "",
+
     loadingTypes = [],            // массив опций загрузки (например: ['верхняя','боковая',...])
     loadingKinds = [],            // массив опций способа/условий (например: ['гидроборт','кран','налив',...])
     specialTags = ['опасный', 'хрупкий', 'охлаждение', 'заморозка'],
@@ -43,16 +49,14 @@ export default function CargoListToolbar({
     return (
         <div className="cargo-toolbar">
             {/* Сортировка */}
-            <label className="ctb-block">
-                <span className="ctb-label">Сортировка</span>
-                <select
-                    className="ctb-select"
+            <div className={`cargo-toolbar ${className}`}>
+                <SortDropdown
+                    options={SORT_OPTIONS}
                     value={sort}
-                    onChange={(e) => onChangeSort?.(e.target.value)}
-                >
-                    {SORT_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
-                </select>
-            </label>
+                    onChange={onSortChange}
+                />
+                <div style={{ marginLeft: "auto" }}>{rightSlot}</div>
+            </div>
 
             {/* Типы загрузки */}
             <details className="ctb-dd">

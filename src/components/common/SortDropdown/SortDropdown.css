@@ -1,0 +1,131 @@
+/* src/components/common/SortDropdown/SortDropdown.css */
+
+.sort-dd {
+    position: relative;
+    display: inline-block;
+}
+
+.sort-dd__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, .12);
+    background: #fff;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 14px;
+    user-select: none;
+}
+
+.sort-dd__btn:hover {
+    background: #fffdf7;
+}
+
+.sort-dd__icon {
+    font-size: 18px;
+    opacity: .8;
+}
+
+.sort-dd__text {
+    white-space: nowrap;
+}
+
+.sort-dd__label {
+    color: #6b7280;
+}
+
+.sort-dd__caret {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #555;
+    border-bottom: 2px solid #555;
+    transform: rotate(45deg);
+    margin-left: 4px;
+    transition: transform .15s ease;
+}
+
+.sort-dd__caret.is-open {
+    transform: rotate(-135deg);
+}
+
+/* Dropdown */
+.sort-dd__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 280px;
+    margin-top: 6px;
+    /* визуальный отступ */
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .12);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+    z-index: 50;
+
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity .12s ease, transform .12s ease;
+}
+
+/* «мостик», чтобы не было срыва при движении мыши вниз */
+.sort-dd__menu::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+}
+
+.sort-dd__menu.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.sort-dd__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 6px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.sort-dd__item:hover {
+    background: #fafafa;
+}
+
+.sort-dd__item input {
+    display: none;
+}
+
+.sort-dd__radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    border: 2px solid #a3a3a3;
+    position: relative;
+    flex: 0 0 auto;
+}
+
+/* состояние выбранного */
+.sort-dd__item input:checked+.sort-dd__radio {
+    border-color: #6c4cff;
+}
+
+.sort-dd__item input:checked+.sort-dd__radio::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 999px;
+    background: #6c4cff;
+}
+
+.sort-dd__labeltext {
+    font-size: 16px;
+}

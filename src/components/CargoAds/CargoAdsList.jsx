@@ -6,6 +6,7 @@ import CargoAdItem from './CargoAdItem';
 import ViewModeToggle from '../common/ViewModeToggle/ViewModeToggle';
 import CargoListToolbar from './CargoListToolbar/CargoListToolbar'; // <— новая панель
 
+
 import './CargoAdsList.css';
 
 // Если нужен контекст — подключим его; если items передан, контекст не используем.
@@ -130,10 +131,32 @@ const CargoAdsList = ({
         return arr;
     }, [data, matchesFilters, sort, compare]);
 
+    function applySorting(list, sort) {
+        const byNum = (x) => Number(x?.price?.value ?? x?.price ?? 0);
+        const byDate = (x) => {
+            const d = x?.availabilityFrom ?? x?.pickupDate ?? x?.dates?.pickupDate ?? x?.createdAt ?? x?.date;
+            const t = Date.parse(d);
+            return Number.isFinite(t) ? t : 0;
+        };
+        const byFrom = (x) => String(x?.route?.from ?? x?.departureCity ?? "").toLowerCase();
+
+        const arr = [...list];
+        switch (sort) {
+            case "priceAsc": return arr.sort((a, b) => byNum(a) - byNum(b));
+            case "priceDesc": return arr.sort((a, b) => byNum(b) - byNum(a));
+            case "fromAsc": return arr.sort((a, b) => byFrom(a).localeCompare(byFrom(b)));
+            case "fromDesc": return arr.sort((a, b) => byFrom(b).localeCompare(byFrom(a)));
+            case "soonest": return arr.sort((a, b) => byDate(a) - byDate(b));
+            case "latest": return arr.sort((a, b) => byDate(b) - byDate(a));
+            default: return arr;
+        }
+    }
+
+
     return (
         <div className="cargo-ads-list">
             {/* Панель инструментов: сортировка/фильтры + переключатель вида */}
-            <div className="cargo-ads-list__toolbar" style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            {/* <div className="cargo-ads-list__toolbar" style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                 <CargoListToolbar
                     sort={sort}
                     onChangeSort={setSort}
@@ -144,6 +167,16 @@ const CargoAdsList = ({
                     onChangeFilters={setFilters}
                 />
                 <ViewModeToggle mode={viewMode} onChange={setViewMode} />
+            </div> */}
+
+            <div className="cargo-ads-list__toolbar">
+                <CargoListToolbar
+                    sort={sort}
+                    onSortChange={setSort}
+                    rightSlot={
+                        <ViewModeToggle mode={viewMode} onChange={setViewMode} />
+                    }
+                />
             </div>
 
             {loading && (
