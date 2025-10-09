@@ -1,31 +1,39 @@
-// src/components/common/ViewModeToggle.jsx
 import React from 'react';
 import { FaList, FaThLarge } from 'react-icons/fa';
+import { TiThLargeOutline, TiThMenuOutline } from "react-icons/ti";
 
-export default function ViewModeToggle({ mode = 'list', onChange }) {
+
+import './ViewModeToggle.css'
+
+export default function ViewModeToggle({ mode = 'list', onChange, className = '' }) {
     return (
         <div
-            className='viewmode-toggle'
-            role='group'
-            aria-label='Режим отображения'
+            className={`viewmode-toggle ${className}`}
+            role="group"
+            aria-label="Режим отображения"
         >
             <button
-                type='button'
+                type="button"
                 className={`vm-btn ${mode === 'list' ? 'active' : ''}`}
                 onClick={() => onChange?.('list')}
                 aria-pressed={mode === 'list'}
-                title='Список'
+                aria-label="Список"
+                title="Список"
             >
-                <FaList />
+                {/* <FaList /> */}
+                <TiThMenuOutline />
             </button>
+
             <button
-                type='button'
+                type="button"
                 className={`vm-btn ${mode === 'grid' ? 'active' : ''}`}
                 onClick={() => onChange?.('grid')}
                 aria-pressed={mode === 'grid'}
-                title='Плитка'
+                aria-label="Плитка"
+                title="Плитка"
             >
-                <FaThLarge />
+                {/* <FaThLarge /> */}
+                <TiThLargeOutline />
             </button>
         </div>
     );

@@ -1,16 +1,60 @@
 .viewmode-toggle {
     display: inline-flex;
-    gap: 6px;
-    margin-bottom: 12px;
+    align-items: center;
+    /* gap: 6px; */
+    /* без внешних отступов — управляем из контейнера */
 }
+
+/* Сброс лишних стилей и увеличение кликабельной зоны */
 .viewmode-toggle .vm-btn {
-    border: 1px solid #ddd;
-    background: #fff;
-    padding: 6px 10px;
-    border-radius: 8px;
+    all: unset;
+    /* убираем дефолтные стили кнопки */
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
+    border-radius: 8px;
+    /* только для красивого focus ring */
+    color: var(--vm-inactive, #c3c8d4);
+    transition: color .15s ease, transform .06s ease;
 }
+
+/* Размер иконок через svg */
+.viewmode-toggle .vm-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Активная — тёмная */
 .viewmode-toggle .vm-btn.active {
-    border-color: #888;
-    background: #f4f4f4;
+    color: var(--vm-active, #595b63);
+}
+
+/* Ховер — чуть темнее, без фона/бордера */
+/* .viewmode-toggle .vm-btn:hover {
+    color: #8a93a6;
+} */
+
+/* .viewmode-toggle .vm-btn.active:hover {
+    color: #000000;
+} */
+
+/* Лёгкий «клик» эффект */
+.viewmode-toggle .vm-btn:active {
+    transform: translateY(0.5px);
+}
+
+/* Доступность: focus ring только при клавиатуре */
+.viewmode-toggle .vm-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(246, 134, 18, .35);
+}
+
+/* Высокие контрасты — пусть система сама управляет */
+@media (forced-colors: active) {
+    .viewmode-toggle .vm-btn {
+        forced-color-adjust: auto;
+        border: 1px solid ButtonText;
+    }
 }
