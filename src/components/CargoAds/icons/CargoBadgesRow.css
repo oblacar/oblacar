@@ -8,23 +8,21 @@
 
 /* .cbr         { --cbr-size:16px; --cbr-gap:6px; --cbr-group-gap:12px; } */
 .cbr--md {
-  --cbr-size: 20px;
-  --cbr-gap: 8px;
-  --cbr-group-gap: 16px;
+    --cbr-size: 20px;
+    --cbr-gap: 8px;
+    --cbr-group-gap: 16px;
 }
 
 .cbr--lg {
-  --cbr-size: 24px;
-  --cbr-gap: 10px;
-  --cbr-group-gap: 20px;
+    --cbr-size: 24px;
+    --cbr-gap: 10px;
+    --cbr-group-gap: 20px;
 }
 
 .cbr {
     display: flex;
     align-items: center;
     gap: var(--cbr-group-gap);
-    /* расстояние между группами */
-    margin-left: 20px;
 }
 
 /* каждая группа — свой flex-контейнер */
@@ -48,7 +46,7 @@
 .cbr__icon {
     width: var(--cbr-size);
     height: var(--cbr-size);
-    
+
     flex: 0 0 auto;
     color: currentColor;
     /* для react-icons */

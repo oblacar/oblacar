@@ -12,6 +12,9 @@
     position: relative;
     box-sizing: border-box;
     text-align: start;
+
+    overflow: hidden;
+    /* чтобы фон подрезался ровно по радиусу карточки */
 }
 
 .cargo-card:hover {
@@ -96,6 +99,7 @@
     flex: 1 1 200px;
     /* тянется, но может ужаться */
     min-width: 200px;
+    padding-bottom: 10px;
 }
 
 .cargo-col--right {
@@ -253,10 +257,25 @@
     gap: 12px;
     align-items: center;
     flex-wrap: wrap;
-    padding: 3px 10px 3px 0;
-    margin: 5px -14px -14px -14px;
+
+    /* Ключ! Прижимаем футер к низу карточки. */
+    margin-top: auto;
+
+    /* Растягиваем футер во всю ширину карточки,
+     синхронизируясь с внутренним паддингом карточки */
+    padding: 3px var(--cc-pad);
+    margin-left: calc(var(--cc-pad) * -1);
+    margin-right: calc(var(--cc-pad) * -1);
+    margin-bottom: calc(var(--cc-pad) * -1);
+
+    background: rgba(0, 0, 0, 0.04);
+
+    /* лёгкая разделительная линия сверху вместо внешнего отступа */
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.06);
+
+    /* скругление можно не ставить — overflow родителя всё подрежет;
+     оставлю на всякий случай, но можно убрать */
     border-radius: 0 0 10px 10px;
-    background: rgba(0, 0, 0, .04);
 }
 
 .cargo-card__foot-left {
