@@ -11,8 +11,8 @@
     /* убираем дефолтные стили кнопки */
     display: inline-grid;
     place-items: center;
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
     border-radius: 8px;
     /* только для красивого focus ring */
@@ -22,8 +22,8 @@
 
 /* Размер иконок через svg */
 .viewmode-toggle .vm-btn svg {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
 }
 
 /* Активная — тёмная */
