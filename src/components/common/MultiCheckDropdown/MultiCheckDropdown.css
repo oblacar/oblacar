@@ -1,0 +1,188 @@
+.mcd {
+    position: relative;
+    display: inline-block;
+    padding-left: 10px;
+}
+
+.mcd__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, .12);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    color: #111827;
+    height: 36px;
+}
+
+.mcd__trigger:hover {
+    background: #fffdf6;
+    border-color: rgba(0, 0, 0, .18);
+}
+
+.mcd__trigger--active {
+    background: #fff7ec;
+    border-color: #f6a65a;
+}
+
+.mcd__caret {
+    transition: transform .15s ease;
+}
+
+.mcd__caret.is-open {
+    transform: rotate(180deg);
+}
+
+/* Панель */
+.mcd__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 260px;
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, .12);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
+    z-index: 30;
+}
+
+.mcd__list {
+    display: grid;
+    gap: 6px;
+    max-height: 240px;
+    overflow: auto;
+    padding-right: 2px;
+}
+
+/* контейнер */
+.mcd__check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    --cb-size: 22px;
+    /* ← поменяй размер квадрата тут */
+    --cb-radius: 6px;
+    --cb-border: #c7ccd6;
+    --cb-bg: #fff;
+    --cb-checked: #f68612;
+    /* цвет заливки при checked */
+    --cb-focus: #fde7c8;
+    /* мягкое свечение фокуса */
+}
+
+/* сам input — полностью рисуем его сами */
+.mcd__check input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--cb-size);
+    height: var(--cb-size);
+    border: 2px solid var(--cb-border);
+    border-radius: var(--cb-radius);
+    background: var(--cb-bg);
+    display: grid;
+    place-items: center;
+    margin: 0;
+    /* сброс нативных отступов */
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s, background-color .15s, transform .06s;
+}
+
+/* галочка (рисуем псевдоэлементом) */
+.mcd__check input[type="checkbox"]::after {
+    content: "";
+    width: calc(var(--cb-size) * 0.55);
+    height: calc(var(--cb-size) * 0.30);
+    border-right: calc(var(--cb-size) * 0.12) solid #fff;
+    border-bottom: calc(var(--cb-size) * 0.12) solid #fff;
+    transform: scale(0) rotate(45deg);
+    transform-origin: center;
+    transition: transform .12s ease-out;
+}
+
+/* состояния */
+.mcd__check input[type="checkbox"]:hover {
+    border-color: #aeb4bf;
+}
+
+.mcd__check input[type="checkbox"]:active {
+    transform: translateY(0.5px);
+}
+
+.mcd__check input[type="checkbox"]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 6px var(--cb-focus);
+}
+
+.mcd__check input[type="checkbox"]:checked {
+    background: var(--cb-checked);
+    border-color: var(--cb-checked);
+}
+
+.mcd__check input[type="checkbox"]:checked::after {
+    transform: scale(1) rotate(45deg);
+}
+
+.mcd__check input[type="checkbox"]:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* подпись справа */
+.mcd__check>span {
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+/* поддержка систем с высокими контрастами */
+@media (forced-colors: active) {
+    .mcd__check input[type="checkbox"] {
+        border: 1px solid ButtonText;
+    }
+
+    .mcd__check input[type="checkbox"]:focus-visible {
+        box-shadow: none;
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+    }
+}
+
+
+
+.mcd__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.mcd__btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+}
+
+.mcd__btn--ghost {
+    border-color: rgba(0, 0, 0, .12);
+}
+
+.mcd__btn--ghost:hover {
+    background: #fafafa;
+}
+
+.mcd__btn--primary {
+    background: #f68612;
+    color: #fff;
+}
+
+.mcd__btn--primary:hover {
+    filter: brightness(0.95);
+}

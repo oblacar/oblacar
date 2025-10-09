@@ -1,121 +1,87 @@
+// src/components/CargoAds/toolbar/CargoListToolbar.jsx
 import React from 'react';
 import './CargoListToolbar.css';
 
-import SortDropdown from '../../common/SortDropdown/SortDropdown'
+import SortDropdown from '../../common/SortDropdown/SortDropdown';
+import MultiCheckDropdown from '../../common/MultiCheckDropdown/MultiCheckDropdown';
+
+import {
+    PACKAGING_OPTIONS_UI,
+    CARGO_TYPE_OPTIONS,
+    LOADING_KIND_OPTIONS,
+} from '../utils/options';
 
 const SORT_OPTIONS = [
-    { value: 'priceAsc', label: 'По возрастанию цены' },
-    { value: 'priceDesc', label: 'По убыванию цены' },
-    { value: 'fromAsc', label: 'По алфавиту (откуда)' },
-    { value: 'fromDesc', label: 'В обратном порядке' },
-    { value: 'soonest', label: 'Сначала ближайшие' },
-    { value: 'latest', label: 'Сначала поздние' },
+    { value: 'price_asc', label: 'По возрастанию цены' },
+    { value: 'price_desc', label: 'По убыванию цены' },
+    { value: 'alpha_asc', label: 'По алфавиту A–Я' },
+    { value: 'alpha_desc', label: 'По алфавиту Я–A' },
+    { value: 'date_new', label: 'Сначала новые' },
+    { value: 'date_old', label: 'Сначала старые' },
 ];
 
 export default function CargoListToolbar({
-    sort = 'priceDesc',
-    onSortChange,
+    className = '',
+    rightSlot = null,
 
-    rightSlot = null, // сюда можно передать переключатель "список/плитка"
-    className = "",
+    // сортировка
+    sort = 'price_desc',
+    onSortChange = () => { },
 
-    loadingTypes = [],            // массив опций загрузки (например: ['верхняя','боковая',...])
-    loadingKinds = [],            // массив опций способа/условий (например: ['гидроборт','кран','налив',...])
-    specialTags = ['опасный', 'хрупкий', 'охлаждение', 'заморозка'],
-    value = {                     // текущее значение фильтров
-        loadTypes: [],              // выбранные типы загрузки
-        loadKinds: [],              // выбранные варианты/способы
-        specials: { all: true, set: [] }, // «все» или избранные
-    },
-    onChangeFilters,
+    // внешнее состояние фильтров (необязательно)
+    filters: externalFilters = null, // { cargoTypes:[], loadKinds:[], packaging:[] }
+    onFiltersChange = () => { },
 }) {
-    const toggleSet = (key, val) => {
-        const next = new Set(value[key]);
-        if (next.has(val)) next.delete(val);
-        else next.add(val);
-        onChangeFilters({ ...value, [key]: Array.from(next) });
-    };
+    // локальный стейт фильтров с синхронизацией извне
+    const [filters, setFilters] = React.useState(
+        externalFilters ?? { cargoTypes: [], loadKinds: [], packaging: [] }
+    );
 
-    const toggleSpecial = (val) => {
-        if (val === 'all') {
-            onChangeFilters({ ...value, specials: { all: !value.specials.all, set: value.specials.set } });
-        } else {
-            const set = new Set(value.specials.set);
-            set.has(val) ? set.delete(val) : set.add(val);
-            onChangeFilters({ ...value, specials: { ...value.specials, set: Array.from(set) } });
-        }
+    React.useEffect(() => {
+        if (externalFilters) setFilters(externalFilters);
+    }, [externalFilters]);
+
+    // единый апдейтер + уведомление родителя
+    const update = (key, arr) => {
+        setFilters(prev => {
+            const next = { ...prev, [key]: arr };
+            onFiltersChange(next);
+            return next;
+        });
     };
 
     return (
-        <div className="cargo-toolbar">
-            {/* Сортировка */}
-            <div className={`cargo-toolbar ${className}`}>
+        <div className={`cargo-toolbar ${className}`}>
+            <div className="ctb-bar">
                 <SortDropdown
-                    options={SORT_OPTIONS}
                     value={sort}
                     onChange={onSortChange}
+                    options={SORT_OPTIONS}
                 />
-                <div style={{ marginLeft: "auto" }}>{rightSlot}</div>
+
+                <MultiCheckDropdown
+                    label="Тип груза"
+                    options={CARGO_TYPE_OPTIONS}
+                    selected={filters.cargoTypes}
+                    onChange={(arr) => update('cargoTypes', arr)}
+                />
+
+                <MultiCheckDropdown
+                    label="Тип загрузки"
+                    options={LOADING_KIND_OPTIONS}
+                    selected={filters.loadKinds}
+                    onChange={(arr) => update('loadKinds', arr)}
+                />
+
+                <MultiCheckDropdown
+                    label="Упаковка"
+                    options={PACKAGING_OPTIONS_UI}
+                    selected={filters.packaging}
+                    onChange={(arr) => update('packaging', arr)}
+                />
+
+                {rightSlot}
             </div>
-
-            {/* Типы загрузки */}
-            <details className="ctb-dd">
-                <summary className="ctb-dd__summary">Тип загрузки</summary>
-                <div className="ctb-dd__panel">
-                    {loadingTypes.map(opt => (
-                        <label key={opt} className="ctb-check">
-                            <input
-                                type="checkbox"
-                                checked={value.loadTypes.includes(opt)}
-                                onChange={() => toggleSet('loadTypes', opt)}
-                            />
-                            <span>{opt}</span>
-                        </label>
-                    ))}
-                </div>
-            </details>
-
-            {/* Варианты/способы */}
-            <details className="ctb-dd">
-                <summary className="ctb-dd__summary">Варианты загрузки</summary>
-                <div className="ctb-dd__panel">
-                    {loadingKinds.map(opt => (
-                        <label key={opt} className="ctb-check">
-                            <input
-                                type="checkbox"
-                                checked={value.loadKinds.includes(opt)}
-                                onChange={() => toggleSet('loadKinds', opt)}
-                            />
-                            <span>{opt}</span>
-                        </label>
-                    ))}
-                </div>
-            </details>
-
-            {/* Особые типы груза */}
-            <details className="ctb-dd">
-                <summary className="ctb-dd__summary">Особые грузы</summary>
-                <div className="ctb-dd__panel">
-                    <label className="ctb-check">
-                        <input
-                            type="checkbox"
-                            checked={value.specials.all}
-                            onChange={() => toggleSpecial('all')}
-                        />
-                        <span>Все</span>
-                    </label>
-                    {specialTags.map(opt => (
-                        <label key={opt} className="ctb-check">
-                            <input
-                                type="checkbox"
-                                checked={value.specials.set.includes(opt)}
-                                onChange={() => toggleSpecial(opt)}
-                            />
-                            <span>{opt}</span>
-                        </label>
-                    ))}
-                </div>
-            </details>
         </div>
     );
 }
