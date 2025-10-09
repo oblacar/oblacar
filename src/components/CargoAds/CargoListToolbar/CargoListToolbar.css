@@ -1,11 +1,39 @@
+/* ===== Toolbar layout only ===== */
 .cargo-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    align-items: center;
+    width: 100%;
     margin-bottom: 10px;
 }
 
+/* Вся панель: в одну строку, перенос на узких экранах */
+.ctb-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px 12px;
+    flex-wrap: wrap;
+}
+
+/* Левая группа: сортировка + фильтры */
+.ctb-left {
+    display: flex;
+    align-items: center;
+    gap: 10px 12px;
+    flex-wrap: wrap;
+}
+
+/* Растяжка между левой группой и правым слотом */
+.ctb-spacer {
+    flex: 1 1 auto;
+    min-width: 8px;
+}
+
+/* Правый слот (переключатель вид/ещё кнопки) */
+.ctb-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- Ниже ЛЕГАСИ-стили можно удалить, если не используются где-то ещё --- */
 .ctb-block {
     display: inline-flex;
     flex-direction: column;
@@ -26,7 +54,7 @@
     font-size: 14px;
 }
 
-/* dropdowns на <details> */
+/* Старые details-дропдауны (если совсем не нужны — смело удаляй) */
 .ctb-dd {
     position: relative;
 }

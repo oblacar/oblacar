@@ -38,3 +38,12 @@ const loadingKindsRaw = [...fromTruck, ...fromPlain]
 export const LOADING_KIND_OPTIONS = uniqueByValue(
     loadingKindsRaw.map((name) => ({ value: name, label: name }))
 );
+
+export const SORT_OPTIONS = [
+    { value: 'price_asc', label: 'По возрастанию цены' },
+    { value: 'price_desc', label: 'По убыванию цены' },
+    { value: 'alpha_asc', label: 'По алфавиту A–Я' },
+    { value: 'alpha_desc', label: 'По алфавиту Я–A' },
+    { value: 'date_new', label: 'Сначала новые' },
+    { value: 'date_old', label: 'Сначала старые' },
+];
