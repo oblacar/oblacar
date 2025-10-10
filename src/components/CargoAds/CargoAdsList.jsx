@@ -7,6 +7,8 @@ import ViewModeToggle from '../common/ViewModeToggle/ViewModeToggle';
 import CargoListToolbar from './CargoListToolbar/CargoListToolbar';
 
 import { sortCargoAds } from '../../utils/sortCargoAds';
+import { filterCargoAds } from '../../utils/filterCargoAds';
+
 import './CargoAdsList.css';
 
 import CargoAdsContext from '../../hooks/CargoAdsContext';
@@ -38,8 +40,16 @@ const CargoAdsList = ({
         localStorage.setItem('cargo_viewMode', viewMode);
     }, [viewMode]);
 
-    // === сортировка (ключи совпадают с utils/cargoSort)
+    // === сортировка (ключи совпадают с utils/sortCargoAds)
     const [sort, setSort] = React.useState('price_desc');
+
+    // === фильтры (синхронизуются с тулбаром)
+    // ожидается форма: { cargoTypes: string[], loadKinds: string[], packaging: string[] }
+    const [filters, setFilters] = React.useState({
+        cargoTypes: [],
+        loadKinds: [],
+        packaging: [],
+    });
 
     // === получение данных
     const loading = items ? false : !!ctx?.loading;
@@ -58,11 +68,11 @@ const CargoAdsList = ({
         );
     }
 
-    // === окончательный список к показу: просто сортируем копию
-    const displayed = React.useMemo(
-        () => sortCargoAds(data, sort),
-        [data, sort]
-    );
+    // === применяем ФИЛЬТРЫ → потом СОРТИРОВКУ
+    const displayed = React.useMemo(() => {
+        const filtered = filterCargoAds(data, filters);
+        return sortCargoAds(filtered, sort);
+    }, [data, filters, sort]);
 
     return (
         <div className='cargo-ads-list'>
@@ -71,6 +81,8 @@ const CargoAdsList = ({
                 <CargoListToolbar
                     sort={sort}
                     onSortChange={setSort}
+                    filters={filters}
+                    onFiltersChange={setFilters}
                     rightSlot={
                         <ViewModeToggle
                             mode={viewMode}
