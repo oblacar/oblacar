@@ -1,17 +1,25 @@
 // utils/options.js
 import { PACKAGING_OPTIONS } from '../../../constants/cargoPackagingOptions';
 import { cargoTypes } from '../../../constants/cagroTypes';
-import { loadingTypes, truckTypesWithLoading } from '../../../constants/transportAdData';
+import {
+    loadingTypes,
+    truckTypesWithLoading,
+} from '../../../constants/transportAdData';
 
 // helper: нормализация + уникализация
 const norm = (s) => String(s).trim().toLowerCase();
-const ucFirst = (s) => s.length ? s[0].toUpperCase() + s.slice(1) : s;
+const ucFirst = (s) => (s.length ? s[0].toUpperCase() + s.slice(1) : s);
 
 const uniqueByValue = (arr) => {
     const map = new Map();
     for (const it of arr) {
         const key = norm(it.value);
-        if (!map.has(key)) map.set(key, { ...it, value: key, label: ucFirst(it.label || it.value) });
+        if (!map.has(key))
+            map.set(key, {
+                ...it,
+                value: key,
+                label: ucFirst(it.label || it.value),
+            });
     }
     return Array.from(map.values());
 };
@@ -46,4 +54,6 @@ export const SORT_OPTIONS = [
     { value: 'alpha_desc', label: 'По алфавиту Я–A' },
     { value: 'date_new', label: 'Сначала новые' },
     { value: 'date_old', label: 'Сначала старые' },
+    { value: 'ready_asc', label: 'Готовность: раньше → позже' },
+    { value: 'ready_desc', label: 'Готовность: позже → раньше' },
 ];
