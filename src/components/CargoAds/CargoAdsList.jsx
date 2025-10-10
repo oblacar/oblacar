@@ -8,19 +8,14 @@ import CargoListToolbar from './CargoListToolbar/CargoListToolbar';
 
 import { sortCargoAds } from '../../utils/sortCargoAds';
 import { filterCargoAds } from '../../utils/filterCargoAds';
+import { debugCargoData } from '../../utils/debugCargo';
 
 import './CargoAdsList.css';
 
 import CargoAdsContext from '../../hooks/CargoAdsContext';
 import Preloader from '../common/Preloader/Preloader';
 
-const NON_ACTIVE_STATUSES = [
-    'work',
-    'completed',
-    'deleted',
-    'archived',
-    'inactive',
-];
+const NON_ACTIVE_STATUSES = ['work', 'completed', 'deleted', 'archived', 'inactive'];
 
 const CargoAdsList = ({
     items = null,
@@ -43,12 +38,13 @@ const CargoAdsList = ({
     // === сортировка (ключи совпадают с utils/sortCargoAds)
     const [sort, setSort] = React.useState('price_desc');
 
-    // === фильтры (синхронизуются с тулбаром)
-    // ожидается форма: { cargoTypes: string[], loadKinds: string[], packaging: string[] }
+    // === фильтры (синхронизируются с тулбаром)
+    // ожидается форма: { cargoTypes: string[], loadTypes: string[], packaging: string[], features: string[] }
     const [filters, setFilters] = React.useState({
         cargoTypes: [],
         loadTypes: [],
         packaging: [],
+        features: [], // особенности (ADR, хрупкий, охлаждение, заморозка, штабелируемый)
     });
 
     // === получение данных
@@ -58,15 +54,24 @@ const CargoAdsList = ({
 
     // поддерживаем "расширенные" элементы {ad: {...}}
     const normalizeAd = (it) => (it && it.ad ? it.ad : it);
-
     let data = rawList.map(normalizeAd).filter(Boolean);
 
     // необязательный фильтр по владельцу
     if (filterOwnerId) {
-        data = data.filter(
-            (ad) => String(ad.ownerId) === String(filterOwnerId)
-        );
+        data = data.filter((ad) => String(ad.ownerId) === String(filterOwnerId));
     }
+
+    // === дев-логирование структуры данных (без нарушения правил хуков)
+    const isDev = process.env.NODE_ENV !== 'production';
+    const loggedRef = React.useRef(false);
+    React.useEffect(() => {
+        if (!isDev) return;
+        if (loggedRef.current) return;
+        if (!data?.length) return;
+        loggedRef.current = true;
+        const info = debugCargoData(data, 15);
+        console.log('[DEBUG] cargo data snapshot:', info);
+    }, [isDev, data]);
 
     // === применяем ФИЛЬТРЫ → потом СОРТИРОВКУ
     const displayed = React.useMemo(() => {
@@ -75,45 +80,36 @@ const CargoAdsList = ({
     }, [data, filters, sort]);
 
     return (
-        <div className='cargo-ads-list'>
+        <div className="cargo-ads-list">
             {/* Панель инструментов: сорт + правый слот (переключатель вида) */}
-            <div className='cargo-ads-list__toolbar'>
+            <div className="cargo-ads-list__toolbar">
                 <CargoListToolbar
                     sort={sort}
                     onSortChange={setSort}
                     filters={filters}
                     onFiltersChange={setFilters}
-                    rightSlot={
-                        <ViewModeToggle
-                            mode={viewMode}
-                            onChange={setViewMode}
-                        />
-                    }
+                    rightSlot={<ViewModeToggle mode={viewMode} onChange={setViewMode} />}
                 />
             </div>
 
             {loading && (
-                <div className='cargo-ads-list__preloader'>
+                <div className="cargo-ads-list__preloader">
                     <Preloader />
                 </div>
             )}
 
             {!loading && error && (
-                <div className='cargo-ads-list__error'>
-                    Ошибка: {String(error)}
-                </div>
+                <div className="cargo-ads-list__error">Ошибка: {String(error)}</div>
             )}
 
             {!loading && !error && displayed.length === 0 && (
-                <div className='cargo-ads-list__empty'>{emptyText}</div>
+                <div className="cargo-ads-list__empty">{emptyText}</div>
             )}
 
             {!loading && !error && displayed.length > 0 && (
                 <div
                     className={
-                        viewMode === 'grid'
-                            ? 'cargo-ads-list__grid'
-                            : 'cargo-ads-list__column'
+                        viewMode === 'grid' ? 'cargo-ads-list__grid' : 'cargo-ads-list__column'
                     }
                 >
                     {displayed.map((ad) => {
@@ -122,12 +118,10 @@ const CargoAdsList = ({
                             `${ad.departureCity}-${ad.destinationCity}-${ad.createdAt}`;
 
                         const status = ad?.status || 'active';
-                        const derivedActive =
-                            !NON_ACTIVE_STATUSES.includes(status);
+                        const derivedActive = !NON_ACTIVE_STATUSES.includes(status);
 
                         const hasAdId = !!ad?.adId;
-                        const isClickableNow =
-                            clickable && derivedActive && hasAdId;
+                        const isClickableNow = clickable && derivedActive && hasAdId;
 
                         const card = (
                             <CargoAdItem
@@ -139,18 +133,13 @@ const CargoAdsList = ({
                         );
 
                         const itemClass =
-                            viewMode === 'grid'
-                                ? 'cargo-ads-list__cell'
-                                : 'cargo-ads-list__item';
+                            viewMode === 'grid' ? 'cargo-ads-list__cell' : 'cargo-ads-list__item';
 
                         return (
-                            <div
-                                className={itemClass}
-                                key={key}
-                            >
+                            <div className={itemClass} key={key}>
                                 {isClickableNow ? (
                                     <Link
-                                        className='cargo-ads-list__link'
+                                        className="cargo-ads-list__link"
                                         to={`${linkBase}/${ad.adId}?type=cargo`}
                                         onClick={(e) => {
                                             if (!derivedActive) {
@@ -163,8 +152,8 @@ const CargoAdsList = ({
                                     </Link>
                                 ) : (
                                     <div
-                                        role='button'
-                                        aria-disabled='true'
+                                        role="button"
+                                        aria-disabled="true"
                                         tabIndex={-1}
                                         onClick={(e) => {
                                             e.preventDefault();

@@ -1,11 +1,11 @@
 // src/utils/filterCargoAds.js
 
-// нормализуем любое значение в массив строк (lowercase)
+// ==== helpers ====
+
 function toArrayLower(val) {
     if (!val) return [];
     if (Array.isArray(val)) return val.map((v) => String(v).toLowerCase());
     if (typeof val === 'object') {
-        // объект-флаги { 'верхняя': true, ... }
         return Object.keys(val)
             .filter((k) => val[k])
             .map((k) => k.toLowerCase());
@@ -13,7 +13,6 @@ function toArrayLower(val) {
     return [String(val).toLowerCase()];
 }
 
-// достаём массив значений по возможным путям
 function pickArray(ad, paths) {
     for (const p of paths) {
         const parts = p.split('.');
@@ -27,14 +26,11 @@ function pickArray(ad, paths) {
                 break;
             }
         }
-        if (ok && cur != null) {
-            return toArrayLower(cur);
-        }
+        if (ok && cur != null) return toArrayLower(cur);
     }
     return [];
 }
 
-// достаём одиночное строковое значение по путям
 function pickOne(ad, paths) {
     for (const p of paths) {
         const parts = p.split('.');
@@ -59,63 +55,110 @@ function intersects(a = [], b = []) {
     return b.some((v) => set.has(v));
 }
 
+// ==== canonical feature keys ====
+
+function normalizeFeature(val) {
+    const s = String(val).trim().toLowerCase();
+
+    if (['adr', 'опасный', 'опасный груз'].includes(s)) return 'adr';
+    if (['хрупкий', 'fragile'].includes(s)) return 'fragile';
+    if (['штабелируемый', 'stackable'].includes(s)) return 'stackable';
+    if (['охлаждение', 'охлажд', 'охлажденный', 'chilled', 'cool', 'cooling'].some((k) => s.includes(k))) return 'cooling';
+    if (['заморозка', 'заморож', 'мороз', 'frozen', 'freeze', 'freezing'].some((k) => s.includes(k))) return 'freezing';
+
+    if (['adr', 'fragile', 'stackable', 'cooling', 'freezing'].includes(s)) return s;
+    return s;
+}
+
+// ==== feature detectors (упрощённые) ====
+// Только по temperature.mode: 'chilled' -> cooling, 'frozen' -> freezing.
+function featuresOf(ad) {
+    const res = new Set();
+
+    // fragile
+    if (ad?.isFragile === true || ad?.fragile === true || ad?.cargo?.fragile === true) {
+        res.add('fragile');
+    }
+
+    // stackable
+    if (ad?.isStackable === true || ad?.stackable === true || ad?.cargo?.isStackable === true) {
+        res.add('stackable');
+    }
+
+    // ADR
+    const adrClassRaw = ad?.adrClass ?? ad?.adr ?? ad?.cargo?.adrClass;
+    const hasAdr =
+        adrClassRaw != null &&
+        String(adrClassRaw).trim() !== '' &&
+        String(adrClassRaw).trim() !== '0';
+    if (hasAdr) res.add('adr');
+
+    // temperature.mode ONLY
+    const mode = String(ad?.temperature?.mode || ad?.cargo?.temperature?.mode || '').toLowerCase();
+    if (mode.includes('frozen')) res.add('freezing');
+    if (mode.includes('chill')) res.add('cooling');
+
+    return res;
+}
+
+// ==== main filter ====
+
 /**
  * filters = {
  *   cargoTypes: string[],
- *   loadTypes: string[],   // ВАЖНО: сюда пишет тулбар «Тип загрузки»
- *   packaging: string[]
+ *   loadTypes: string[],    // "Тип загрузки" из тулбара
+ *   packaging: string[],
+ *   features: string[],     // может приходить на русском — нормализуем
  * }
  */
 export function filterCargoAds(list, filters) {
     const f = {
-        cargoTypes: (filters?.cargoTypes ?? [])
-            .map(String)
-            .map((s) => s.toLowerCase()),
-        loadTypes: (filters?.loadTypes ?? [])
-            .map(String)
-            .map((s) => s.toLowerCase()),
-        packaging: (filters?.packaging ?? [])
-            .map(String)
-            .map((s) => s.toLowerCase()),
+        cargoTypes: (filters?.cargoTypes ?? []).map((s) => String(s).toLowerCase()),
+        loadTypes: (filters?.loadTypes ?? []).map((s) => String(s).toLowerCase()),
+        packaging: (filters?.packaging ?? []).map((s) => String(s).toLowerCase()),
+        features: (filters?.features ?? []).map(normalizeFeature),
     };
 
-    // быстрый выход — если ничего не выбрано
     const noFilters =
-        !f.cargoTypes.length && !f.loadTypes.length && !f.packaging.length;
+        !f.cargoTypes.length &&
+        !f.loadTypes.length &&
+        !f.packaging.length &&
+        !f.features.length;
+
     if (noFilters) return list;
 
     return list.filter((raw) => {
         const ad = raw?.ad ? raw.ad : raw;
 
-        // 1) Тип груза: пытаемся вытащить из разных мест
+        // Тип груза
         if (f.cargoTypes.length) {
-            const cargoType = pickOne(ad, [
-                'cargo.type', // { cargo: { type: ... } }
-                'cargoType', // плоское поле
-                'type', // вдруг так
-            ]);
+            const cargoType = pickOne(ad, ['cargo.type', 'cargoType', 'type']);
             if (!cargoType || !f.cargoTypes.includes(cargoType)) return false;
         }
 
-        // 2) Тип(ы) загрузки: массив/флаги под разными ключами
+        // Тип(ы) загрузки
         if (f.loadTypes.length) {
-            const loadSet = pickArray(ad, [
-                'loadingTypes', // массив строк
-                'loading_types', // альтернативное имя
-                'loadTypes', // ещё один возможный синоним
-            ]);
+            const loadSet = [
+                ...pickArray(ad, ['loadingTypes', 'loading_types', 'loadTypes']),
+                ...pickArray(ad, ['preferredLoadingTypes']),
+            ];
             if (!intersects(loadSet, f.loadTypes)) return false;
         }
 
-        // 3) Упаковка: может быть одно значение, массив или объект-флаги
+        // Упаковка
         if (f.packaging.length) {
-            const packArr = pickArray(ad, [
-                'cargo.packaging', // { cargo: { packaging: [] | {} | '...' } }
-                'cargo.packagingType',
-                'packaging', // плоско
-                'packagingType',
-            ]);
-            if (!intersects(packArr, f.packaging)) return false;
+            const packSet = [
+                ...pickArray(ad, ['cargo.packaging', 'cargo.packagingType', 'packaging', 'packagingType']),
+                ...pickArray(ad, ['packagingTypes']),
+            ];
+            if (!intersects(packSet, f.packaging)) return false;
+        }
+
+        // Особенности (AND внутри группы)
+        if (f.features.length) {
+            const feat = featuresOf(ad);
+            const ok = f.features.every((wanted) => feat.has(wanted));
+            if (!ok) return false;
         }
 
         return true;

@@ -57,3 +57,11 @@ export const SORT_OPTIONS = [
     { value: 'ready_asc', label: 'Готовность: раньше → позже' },
     { value: 'ready_desc', label: 'Готовность: позже → раньше' },
 ];
+
+export const FEATURE_OPTIONS = [
+    { value: 'freeze', label: 'Заморозка' },
+    { value: 'cool', label: 'Охлаждение' },
+    { value: 'fragile', label: 'Хрупкий' },
+    { value: 'stackable', label: 'Штабелируемый' },
+    { value: 'adr', label: 'ADR' },
+];
