@@ -47,7 +47,7 @@ const CargoAdsList = ({
     // ожидается форма: { cargoTypes: string[], loadKinds: string[], packaging: string[] }
     const [filters, setFilters] = React.useState({
         cargoTypes: [],
-        loadKinds: [],
+        loadTypes: [],
         packaging: [],
     });
 

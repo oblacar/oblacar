@@ -16,10 +16,10 @@ export default function CargoListToolbar({
     className = '',
     rightSlot = null,
     sort = 'price_desc',
-    onSortChange = () => {},
+    onSortChange = () => { },
     // важно: дальше фильтры ожидаются с ключом loadTypes
     filters: externalFilters = null, // { cargoTypes:[], loadTypes:[], packaging:[] }
-    onFiltersChange = () => {},
+    onFiltersChange = () => { },
 }) {
     // локальный стейт с корректными ключами
     const [filters, setFilters] = React.useState(
@@ -60,8 +60,8 @@ export default function CargoListToolbar({
                     <MultiCheckDropdown
                         label='Тип загрузки'
                         options={LOADING_KIND_OPTIONS}
-                        selected={filters.loadKinds}
-                        onChange={(arr) => update('loadKinds', arr)}
+                        selected={filters.loadTypes}
+                        onChange={(arr) => update('loadTypes', arr)}
                     />
 
                     <MultiCheckDropdown
