@@ -13,7 +13,7 @@
     box-sizing: border-box;
     text-align: start;
 
-    overflow: hidden;
+    /* overflow: hidden; */
     /* чтобы фон подрезался ровно по радиусу карточки */
 }
 

@@ -13,7 +13,7 @@
 .ctb-bar {
     display: flex;
     align-items: center;
-    gap: 10px 12px;
+    gap: 10px 5px;
     flex-wrap: wrap;
 }
 
