@@ -1,5 +1,4 @@
-/* ===== TransportAdsToolbar ===== */
-
+/* src/components/TransportAds/TransportAdsToolbar.css */
 .transport-ads-toolbar {
     width: 100%;
     display: flex;
@@ -13,8 +12,20 @@
 
 .ta-left {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ta-left-top {
+    display: flex;
     align-items: baseline;
     gap: 10px;
+}
+
+.ta-left-controls {
+    display: flex;
+    gap: 8px;
+    /* на будущее для других фильтров */
 }
 
 .ta-title {
