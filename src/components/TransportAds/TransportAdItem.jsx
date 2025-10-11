@@ -176,22 +176,17 @@ const TransportAdItem = ({
 
                         <div className='finance'>
                             <div className='price'>
-                                {formatNumber(price)} {paymentUnit}
+                                {formatNumber(price)} <span className='price-unit'>
+                                    {paymentUnit}
+                                </span>
                             </div>
                             <div className='finance-details'>
-                                {paymentOptions && paymentOptions.length > 0
-                                    ? paymentOptions.map((option, index) => (
-                                        <span key={option}>
-                                            {option}
-                                            {index < paymentOptions.length - 1 ? ', ' : ''}
-                                        </span>
-                                    ))
-                                    : ''}
+                                {paymentOptions && paymentOptions.length > 0 && paymentOptions.map((option) => (
+                                    <span key={option} className="finance-tag">{option}</span>
+                                ))}
+
                                 {readyToNegotiate && (
-                                    <span>
-                                        {paymentOptions && paymentOptions.length > 0 ? ', ' : ''}
-                                        торг
-                                    </span>
+                                    <span className="finance-tag finance-tag--deal">торг</span>
                                 )}
                             </div>
                         </div>

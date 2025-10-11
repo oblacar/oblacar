@@ -92,8 +92,10 @@
     width: 100%;
     min-height: 60px;
     background: #fff;
-    align-items: flex-end;
+    /* align-items: flex-end; */
     position: relative;
+
+    align-items: flex-start;
 }
 
 /* левая часть верхней строки */
@@ -144,37 +146,90 @@
 }
 
 /* правая часть верхней строки */
-.finance {
+/* .finance {
     margin: 0 40px 10px auto;
-    /* ЛЕВЫЙ auto — прижим к правому краю */
+
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    /* контент вправо */
+
     text-align: right;
-    /* текст вправо */
+
     flex: 0 1 200px;
-    /* базовая ширина правой колонки */
+
     min-width: 200px;
-    /* ключевой порог для переноса */
+ 
+} */
+
+.finance {
+    margin: 0 40px 10px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+
+    /* пусть колонка растёт, когда есть место */
+    flex: 1 1 260px;
+    /* базовая ширина побольше и grow=1 */
+    min-width: 200px;
 }
 
 .price {
     display: flex;
     align-items: center;
     text-align: right;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: #2c2c48;
     padding-bottom: 5px;
-    margin-top: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
-.finance-details {
+.price-unit {
+    margin-left: 5px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* .finance-details {
     color: #949494;
     font-size: 12px;
     text-align: right;
     width: 100%;
+} */
+/* контейнер тегов оплаты: выравниваем вправо, переносим и даём зазоры */
+.finance-details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 100%;
+    text-align: right;
+}
+
+/* базовый чип */
+.finance-tag {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    padding: 3px 10px;
+    border-radius: 999px;
+    /* овал */
+    background: #f2f4f7;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+/* чип «торг» — зелёный акцент */
+.finance-tag--deal {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+    font-weight: 600;
 }
 
 /* -------- Нижняя строка (инфа о машине слева — владелец справа) -------- */
@@ -201,6 +256,7 @@
     align-items: center;
     flex: 1 1 360px;
     min-width: 280px;
+    margin-top: 5px;
 }
 
 /* фото/иконка авто */
@@ -284,14 +340,20 @@
     display: flex;
 }
 
-/* -------- Grid-акценты -------- */
-.ad-item--grid .upper-ad-row {
-    margin-bottom: 8px;
+
+
+/* На узких ширинах можно вернуть прежнюю «узкую» колонку,
+   чтобы блок переезжал вниз и теги аккуратно складывались */
+@media (max-width: 720px) {
+    /* .upper-ad-row .finance {
+        flex: 1 1 100%;
+        min-width: 0;
+        margin: 8px 16px 10px auto;
+        align-items: flex-end;
+        text-align: right;
+    } */
 }
 
-.ad-item--grid .down-ad-row {
-    /* gap: 12px; */
-}
 
 /* -------- Узкие экраны -------- */
 @media (max-width: 420px) {
