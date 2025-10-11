@@ -4,11 +4,35 @@
     position: relative;
 }
 
+/* Контейнер карточки: центрируем и ограничиваем в list-режиме */
+.ad-item-container--list {
+    width: 100%;
+    max-width: 880px;
+    /* рамка */
+    margin-left: auto;
+    /* центрирование контейнера */
+    margin-right: auto;
+    position: relative;
+    /* якорь для абсолютных элементов (флажок и т.д.) */
+    padding: 0 8px;
+    /* лёгкая страховка от прилипания к краям */
+}
+
+/* В гриде контейнер не должен добавлять своих ограничений */
+.ad-item-container--grid {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    position: relative;
+    padding: 0;
+}
+
 /* карточка */
 .ad-item {
     display: flex;
     flex-direction: column;
-    max-width: 800px;
+    width: 100%;
+    max-width: 880px;
     border: 2px solid #d8d8d8;
     border-radius: 10px;
     padding: 0;
@@ -16,6 +40,8 @@
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background: transparent;
 }
+
+
 
 .ad-item-mouse-enter {
     border: 2px solid rgb(148, 148, 234);
@@ -127,7 +153,7 @@
 
 /* правая часть верхней строки */
 .finance {
-    margin: 0 30px 10px auto;
+    margin: 0 40px 10px auto;
     /* ЛЕВЫЙ auto — прижим к правому краю */
     display: flex;
     flex-direction: column;
@@ -319,6 +345,12 @@
 }
 
 /* закладки */
+.transport-ad-book-mark.oap-in-review,
+.transport-ad-book-mark.oap-in-review--is-active {
+    z-index: 3;
+    top: 0px;
+}
+
 .bookmark-icon-outline,
 .bookmark-icon-solid {
     height: 24px;
