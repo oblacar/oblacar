@@ -1,4 +1,3 @@
-// truckTypes.js
 export const truckTypes = [
     {
         name: 'Еврофура',

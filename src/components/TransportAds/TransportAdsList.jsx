@@ -6,45 +6,57 @@ import Preloader from '../common/Preloader/Preloader';
 import TransportAdsToolbar from './TransportAdsToolbar/TransportAdsToolbar';
 import './TransportAdsList.css';
 
-import { SORT_OPTIONS, DEFAULT_SORT } from './utils/options';
+import { SORT_OPTIONS, DEFAULT_SORT, TRUCK_TYPE_OPTIONS, LOADING_TYPE_OPTIONS } from './utils/options';
 import { sortTransportAds } from '../../utils/sortTransportAds';
+import { filterTransportAds } from '../../utils/filterTransportAds';
 
 const STORAGE_KEY = 'transportAdsViewMode';
 
 const TransportAdsList = ({ items = [] }) => {
     const { ads, loading, error } = useContext(TransportAdContext);
 
+    // сортировка
     const [sort, setSort] = useState(DEFAULT_SORT);
+
+    // режим отображения
     const [mode, setMode] = useState(() => {
         const stored = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
         return stored === 'grid' || stored === 'list' ? stored : 'list';
     });
 
-    // если items не передан (или пуст), используем контекст
+    // фильтры
+    const [filters, setFilters] = useState({
+        truckTypes: [],    // массив value из TRUCK_TYPE_OPTIONS
+        loadingTypes: [],  // массив value из LOADING_TYPE_OPTIONS
+    });
+    const updateFilter = (key, arr) =>
+        setFilters(prev => ({ ...prev, [key]: Array.isArray(arr) ? arr : [] }));
+
+    // источник данных
     const useContextData = !items || items.length === 0;
     const list = useContextData ? ads : items;
 
-    // сохраняем режим
+    // сохранить режим
     useEffect(() => {
         try { localStorage.setItem(STORAGE_KEY, mode); } catch { }
     }, [mode]);
 
-    // --- ВСЕ ХУКИ ВЫШЕ ЛЮБЫХ RETURN ---
-    // нормализатор формы элемента
+    // нормализатор формы (на всякий случай, если где-то понадобится extended)
     const toExtended = (item) => (item && item.ad ? item : (item ? { ad: item, isInReviewAds: false } : null));
 
-    const normalized = useMemo(
-        () => (list || []).map(toExtended).filter(Boolean),
-        [list]
+    // 1) фильтрация
+    const filtered = useMemo(
+        () => filterTransportAds(list ?? [], filters),
+        [list, filters]
     );
 
+    // 2) сортировка
     const sorted = useMemo(
-        () => sortTransportAds(list ?? [], sort),   // сортируем исходные данные (plain/extended — не важно)
-        [list, sort]
+        () => sortTransportAds(filtered ?? [], sort),
+        [filtered, sort]
     );
-    // ------------------------------------
 
-    // показываем прелоадер/ошибку только если работаем с контекстом
+    // ранние возвраты
     if (useContextData && loading) {
         return (
             <div className='preloader'>
@@ -61,12 +73,21 @@ const TransportAdsList = ({ items = [] }) => {
             <TransportAdsToolbar
                 mode={mode}
                 onModeChange={setMode}
-                total={normalized.length}
+                total={sorted.length}
 
-                // сортировочные пропсы
+                // сортировка
                 sort={sort}
                 onSortChange={setSort}
                 sortOptions={SORT_OPTIONS}
+
+                // фильтры в панели (сразу после сортировки)
+                truckTypeOptions={TRUCK_TYPE_OPTIONS}
+                selectedTruckTypes={filters.truckTypes}
+                onTruckTypesChange={(arr) => updateFilter('truckTypes', arr)}
+
+                loadingTypeOptions={LOADING_TYPE_OPTIONS}
+                selectedLoadingTypes={filters.loadingTypes}
+                onLoadingTypesChange={(arr) => updateFilter('loadingTypes', arr)}
             />
 
             {sorted.length === 0 ? (
@@ -74,9 +95,8 @@ const TransportAdsList = ({ items = [] }) => {
             ) : (
                 <div className={`ads-list ads-list--${mode}`}>
                     {sorted.map((item, index) => {
-                        // sortTransportAds может вернуть plain или extended — поддержим оба
+                        // поддерживаем plain и extended элементы
                         const ext = item && item.ad ? item : { ad: item, isInReviewAds: false };
-
                         const key = ext.ad?.adId ?? index;
                         const isActive = ext.ad?.status === 'active';
 
