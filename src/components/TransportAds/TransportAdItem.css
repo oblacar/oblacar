@@ -1,51 +1,39 @@
+/* ===== TransportAdItem.css (адаптивная плитка на flex) ===== */
+
 .ad-item-container {
     position: relative;
 }
 
+/* карточка */
 .ad-item {
     display: flex;
     flex-direction: column;
-    margin: 20px 0;
-
     max-width: 800px;
-
-    /* border: 1px solid #ddd; Границы для объявления */
     border: 2px solid #d8d8d8;
     border-radius: 10px;
-    /* background-color: #fff; */
-    padding: 0px;
-    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); Легкая тень */
+    padding: 0;
     cursor: pointer;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: transparent;
 }
 
 .ad-item-mouse-enter {
-    /* transform: scale(1.01); */
     border: 2px solid rgb(148, 148, 234);
 }
 
 .ad-item.ad-item-available-for-click:active {
-    /* -webkit-box-shadow: 0px 0px 0px 4px #d1f1ff;
-    -moz-box-shadow: 0px 0px 0px 4px #d1f1ff;
-    box-shadow: 0px 0px 0px 4px #d1f1ff; */
-    /* -webkit-box-shadow: 0px 0px 0px 4px #6abbf8;
-    -moz-box-shadow: 0px 0px 0px 4px #6abbf8;
-    box-shadow: 0px 0px 0px 4px #6abbf8; */
-    /* -webkit-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53); */
-    -webkit-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 8px rgba(255, 203, 112, 0.53);
+    -webkit-box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
+    -moz-box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
+    box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
 }
-/* недоступность в визуальное отличие недоступных объявлений*/
+
+/* недоступные */
 .ad-item.ad-item-not-available {
     pointer-events: none;
-    opacity: 0.3;
+    opacity: .3;
 }
 
-/*Режим просмотра --->*/
-
+/* режим просмотра */
 .ad-item.view-mode {
     pointer-events: none;
 }
@@ -53,21 +41,8 @@
 .container-icon-add.view-mode {
     visibility: hidden;
 }
-/*<---*/
 
-.upper-ad-row {
-    border-radius: 30px 30px 0 0;
-    display: flex;
-
-    width: 100%;
-    min-height: 60px;
-
-    background-color: white;
-    align-items: flex-end;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    position: relative;
-}
-
+/* статус */
 .ad-item-show-status {
     position: absolute;
     display: none;
@@ -77,11 +52,9 @@
     padding: 5px 10px;
     font-size: 16px;
     font-weight: 600;
-    /* color: #000000; */
     color: rgb(154, 142, 246);
-    background-color: #ffffff; /* полностью белый фон */
+    background: #fff;
     border-radius: 5px;
-
     z-index: 1;
     transform: rotate(-20deg);
 }
@@ -90,198 +63,211 @@
     display: block;
 }
 
-.rating-star {
-    position: absolute;
-    top: 10px;
-    left: 0;
-    margin: 0px 0px 10px 10px;
+/* -------- Верхняя строка (дата/маршрут слева — цена справа) -------- */
+
+.upper-ad-row {
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    /* разрешаем перенос */
+    gap: 12px;
+    width: 100%;
+    min-height: 60px;
+    background: #fff;
+    align-items: flex-end;
+    position: relative;
 }
+
+/* левая часть верхней строки */
+.departure-location-date {
+    flex: 1 1 200px;
+    /* тянется */
+    min-width: 160px;
+    /* нижний порог */
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+/* маршрут (влево, со стрелкой) */
+.departure-location {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.departure,
+.destination {
+    display: inline-block;
+    vertical-align: top;
+}
+
 .city {
     font-size: 16px;
     font-weight: 600;
     color: #f66104;
-    text-align: start;
+    text-align: left;
 }
 
-.departure-location-date {
-    margin-left: 50px;
-    margin-bottom: 10px;
-}
-.departure-location {
-    display: inline-block; /* Или блок, если необходимо */
-}
-
-.departure {
-    display: inline-block;
-    width: 150px;
-    vertical-align: top;
-}
-
-.destination {
-    display: inline-block;
-    width: 150px;
-    vertical-align: top;
+.location-sep {
+    font-size: 16px;
+    line-height: 1;
+    color: #9aa0a6;
+    font-weight: 600;
+    margin: 0 2px;
 }
 
 .availability-date {
     font-size: 14px;
     font-weight: 600;
     color: #373b80;
-    text-align: start;
-    margin: 5px 0px;
+    margin: 10px 0px 5px 0px;
+    text-align: left;
 }
 
+/* правая часть верхней строки */
 .finance {
-    margin-bottom: 5px;
-    margin: 0px 30px 10px auto;
-
+    margin: 0 30px 10px auto;
+    /* ЛЕВЫЙ auto — прижим к правому краю */
     display: flex;
-    flex-direction: column; /* Располагаем блоки вертикально */
-    align-items: flex-end; /* Прижимаем блоки к правому краю */
+    flex-direction: column;
+    align-items: flex-end;
+    /* контент вправо */
+    text-align: right;
+    /* текст вправо */
+    flex: 0 1 200px;
+    /* базовая ширина правой колонки */
+    min-width: 200px;
+    /* ключевой порог для переноса */
 }
 
 .price {
     display: flex;
-    align-items: center; /* Центрирует текст по вертикали */
-    text-align: right; /* Выравнивание текста по правому краю */
-
+    align-items: center;
+    text-align: right;
     font-size: 16px;
     font-weight: 600;
     color: #2c2c48;
     padding-bottom: 5px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin-top: 5px;
 }
 
 .finance-details {
     color: #949494;
     font-size: 12px;
-
-    text-align: right; /* Выравнивание текста по правому краю */
-    width: 100%; /* Убедитесь, что элемент занимает всю доступную ширину */
+    text-align: right;
+    width: 100%;
 }
 
-/*Нижняя полоса*/
-/*стилизуем информацию о транспорте*/
+/* -------- Нижняя строка (инфа о машине слева — владелец справа) -------- */
+
 .down-ad-row {
-    min-height: 40px; /*TODO сделать выравнивание по центру, но что бы все входило*/
+    min-height: 40px;
     color: #414141;
-
-    background-color: #f3f3f3;
-    border-radius: 0px 0px 10px 10px;
-
+    background: #f3f3f3;
+    border-radius: 0 0 10px 10px;
     display: flex;
-    justify-content: space-between; /* Выравнивание боковых блоков */
-    align-items: center; /* Вертикальное центрирование */
+    flex-wrap: wrap;
+    /* разрешаем перенос */
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
 }
 
+/* левая часть нижней строки */
 .car-info {
     text-align: left;
-
     font-size: 14px;
-
     display: flex;
-    justify-content: start; /* Выравнивание боковых блоков */
-    align-items: center; /* Вертикальное центрирование */
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1 1 360px;
+    min-width: 280px;
 }
 
-/*Область фото на объявлении, которая иконка, если нет фото*/
+/* фото/иконка авто */
 .car-photo-icon {
     width: 50px;
     min-width: 50px;
     height: 50px;
-
-    border: 1px rgb(241, 241, 241) solid;
-    /* border-radius: 50%; */
-    /* border-radius: 10px 10px 10px 10px; */
+    border: 1px #f1f1f1 solid;
     border-radius: 5px;
-    
     margin: 5px;
-
-    background-color: #ffffff;
-
+    background: #fff;
     display: flex;
     align-items: center;
-
-    overflow: hidden; /* Скрываем лишнее, если изображение больше круга */
+    overflow: hidden;
 }
 
 .photo-car {
-    width: 100%; /* Задаем ширину и высоту изображения */
+    width: 100%;
     height: 100%;
-    object-fit: cover; /* Обеспечиваем обрезку изображения, чтобы оно заполнило круг */
+    object-fit: cover;
 }
 
 .icon-car {
-    font-size: 20px;
-    color: rgb(190, 190, 193);
-    display: block;
-
+    color: #bebec1;
     text-align: center;
     width: 100%;
     font-size: 22px;
-    padding-left: 5px;
-    padding-top: 5px;
+    padding: 5px 0 0 5px;
 }
-/*Инфомрация о пользователе--->>>*/
-.ad-user-info {
-    margin-right: 50px;
 
+/* правая часть нижней строки */
+.ad-user-info {
     display: flex;
     align-items: center;
-
-    /* width: 200px; */
     min-width: 200px;
     max-width: 200px;
-
+    /* держим компактность справа */
     margin-left: 10px;
+    margin-right: 50px;
+    flex: 0 1 220px;
 }
-.ad-user-photo {
-    border: 1px solid rgb(238, 237, 237);
 
+.ad-user-photo {
+    border: 1px solid #eeeded;
     min-width: 50px;
     min-height: 50px;
     max-width: 50px;
     max-height: 50px;
-
-    background-color: #ffffff;
+    background: #fff;
     font-size: 20px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     color: #d9d9d9;
     border-radius: 50%;
     margin-right: 5px;
-
-    overflow: hidden; /* Скрываем лишнее, если изображение больше круга */
+    overflow: hidden;
 }
 
 .ad-photo-car-owner {
-    width: 100%; /* Задаем ширину и высоту изображения */
+    width: 100%;
     height: 100%;
-    object-fit: cover; /* Обеспечиваем обрезку изображения, чтобы оно заполнило круг */
+    object-fit: cover;
 }
 
 .ad-user-name-rating {
     min-width: 100px;
 }
 
-.ad-user-rating {
-    font-size: 12px;
-    font-weight: 600;
-    color: rgb(114, 114, 114);
-    display: flex;
-}
 .ad-user-name {
     font-size: 14px;
-    display: flex;
     text-align: start;
+    display: flex;
     align-items: center;
     margin: 3px 0;
 }
-/*<<<---*/
 
+.ad-user-rating {
+    font-size: 12px;
+    font-weight: 600;
+    color: #727272;
+    display: flex;
+}
+
+/* добавление в варианты */
 .container-icon-add {
     position: absolute;
     right: 5px;
@@ -289,55 +275,38 @@
 }
 
 .icon-add {
-    /* background-color: #fe914d; */
-    /* background-color: #fdb181; */
-    background-color: #ffffff;
-
-    /* color: white; */
+    background: #fff;
     font-size: 14px;
     height: 28px;
     width: 90px;
     border-radius: 16px;
     border: 1px solid #fc8135;
-    /* float: right; */
     color: #fc8135;
     display: flex;
-    justify-content: center; /* Горизонтальное центрирование */
-    align-items: center; /* Вертикальное центрирование */
-    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
+    justify-content: center;
+    align-items: center;
+    transition: background-color .2s ease, box-shadow .2s ease;
 }
+
 .icon-add:hover {
-    background-color: #fc8135;
-    color: white;
+    background: #fc8135;
+    color: #fff;
 }
 
 .icon-add.in-review-ads {
-    /* background-color: #fe914d; */
-    /* background-color: #fdb181; */
-    background-color: #ffffff;
-
-    /* color: white; */
-    font-size: 14px;
-    height: 28px;
-    width: 90px;
-    border-radius: 16px;
-    border: 1px solid #293049;
-    /* float: right; */
+    border-color: #293049;
     color: #293049;
-    display: flex;
-    justify-content: center; /* Горизонтальное центрирование */
-    align-items: center; /* Вертикальное центрирование */
-    transition: background-color 0.2s ease, box-shadow 0.2s ease; /* Анимация переходов */
 }
+
 .icon-add.in-review-ads:hover {
-    background-color: #293049;
-    color: white;
+    background: #293049;
+    color: #fff;
 }
 
 .icon-add:active {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
-    box-shadow: 0px 0px 0px 4px rgba(255, 203, 112, 0.53);
+    -webkit-box-shadow: 0 0 0 4px rgba(255, 203, 112, .53);
+    -moz-box-shadow: 0 0 0 4px rgba(255, 203, 112, .53);
+    box-shadow: 0 0 0 4px rgba(255, 203, 112, .53);
 }
 
 .ad-item-show-in-review {
@@ -348,22 +317,91 @@
     z-index: 1;
 }
 
-/*Иконки закладок*/
-
-.bookmark-icon-outline {
+/* закладки */
+.bookmark-icon-outline,
+.bookmark-icon-solid {
     height: 24px;
-    color: rgb(195, 195, 195);
     position: absolute;
     top: -3px;
     left: 10px;
     z-index: 2;
 }
 
+.bookmark-icon-outline {
+    color: #c3c3c3;
+}
+
 .bookmark-icon-solid {
-    height: 24px;
     color: red;
-    position: absolute;
-    top: -3px;
-    left: 10px;
-    z-index: 2;
+}
+
+/* -------- Вариант «плитки» как карточки (не обязателен, просто визуал) -------- */
+/* .ad-item--grid {
+    border: 1px solid #e9eef3;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+} */
+
+.ad-item--grid .upper-ad-row {
+    margin-bottom: 8px;
+}
+
+.ad-item--grid .down-ad-row {
+    gap: 12px;
+}
+
+/* -------- Адаптивное поведение -------- */
+/* На ширинах <= 780px «финансы» спускаются вниз, но остаются выровнеными вправо */
+/* @media (max-width: 780px) {
+    .upper-ad-row .finance {
+        flex: 1 1 100%;
+        min-width: 0;
+
+        margin: 8px 30px 10px auto;
+        align-items: flex-end;
+        text-align: right;
+    }
+
+
+    .down-ad-row .ad-user-info {
+        flex: 1 1 100%;
+        min-width: 0;
+        max-width: none;
+        margin: 8px 12px 12px 50px;
+
+        justify-content: flex-start;
+    }
+}
+ */
+/* Ещё компактнее на очень узких ширинах */
+@media (max-width: 420px) {
+
+    .departure,
+    .destination {
+        width: auto;
+    }
+
+    .departure-location-date {
+        margin-left: 16px;
+    }
+
+    .upper-ad-row .finance {
+        margin-right: 16px;
+    }
+
+    /* визуально ровняем поля */
+    .down-ad-row .ad-user-info {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+
+    .departure-location {
+        gap: 6px;
+    }
+
+    .location-sep {
+        font-size: 15px;
+    }
 }

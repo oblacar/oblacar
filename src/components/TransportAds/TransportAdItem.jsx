@@ -31,7 +31,10 @@ const TransportAdItem = ({
     // isHovered = true,
     // isClickable = true,
     isActive = true,
+    viewMode = 'list',  // <— НОВОЕ: 'list' | 'grid'
 }) => {
+    const isGrid = viewMode === 'grid';
+
     const { isInReviewAds } = ad;
     const {
         adId,
@@ -139,7 +142,7 @@ const TransportAdItem = ({
 
     return (
         <div
-            className={'ad-item-container'}
+            className={`ad-item-container ad-item-container--${viewMode}`}
             onMouseEnter={() => setIsSelectedAdItem(() => true)}
             onMouseLeave={() => setIsSelectedAdItem(() => false)}
         >
@@ -150,11 +153,9 @@ const TransportAdItem = ({
                 {status === 'completed' ? 'Доставлено' : null}
             </div>
             <div
-                className={`ad-item ${isViewMode ? 'view-mode' : ''} ${
-                    onReviewAdsAdd ? '' : 'ad-item-available-for-click'
-                }   ${isActive ? '' : 'ad-item-not-available'} ${
-                    isSelectedAdItem ? 'ad-item-mouse-enter' : ''
-                }`}
+                className={`ad-item ${isViewMode ? 'view-mode' : ''} ad-item--${viewMode}  ${onReviewAdsAdd ? '' : 'ad-item-available-for-click'
+                    }   ${isActive ? '' : 'ad-item-not-available'} ${isSelectedAdItem ? 'ad-item-mouse-enter' : ''
+                    }`}
             >
                 {isInReviewAds ? (
                     <>
@@ -172,18 +173,19 @@ const TransportAdItem = ({
                 <Link to={`/transport-ads/${adId}?type='transport'`}>
                     <div className='upper-ad-row'>
                         <div className='departure-location-date'>
-                            <div className='availability-date'>
-                                {availabilityDate}
-                            </div>
+                            <div className='availability-date'>{availabilityDate}</div>
+
                             <div className='departure-location'>
-                                <span className='departure location city'>
-                                    {departureCity}
-                                </span>
-                                <span className='destination city'>
-                                    {destinationCity || 'Россия'}
-                                </span>
+                                <span className='departure location city'>{departureCity}</span>
+
+                                {(departureCity && (destinationCity || 'Россия')) && (
+                                    <span className='location-sep' aria-hidden="true">→</span>
+                                )}
+
+                                <span className='destination city'>{destinationCity || 'Россия'}</span>
                             </div>
                         </div>
+
                         <div className='finance'>
                             <div className='price'>
                                 {formatNumber(price)} {paymentUnit}
@@ -191,13 +193,13 @@ const TransportAdItem = ({
                             <div className='finance-details'>
                                 {paymentOptions && paymentOptions.length > 0
                                     ? paymentOptions.map((option, index) => (
-                                          <span key={option}>
-                                              {option}
-                                              {index < paymentOptions.length - 1
-                                                  ? ', '
-                                                  : ''}
-                                          </span>
-                                      ))
+                                        <span key={option}>
+                                            {option}
+                                            {index < paymentOptions.length - 1
+                                                ? ', '
+                                                : ''}
+                                        </span>
+                                    ))
                                     : ''}
                                 {readyToNegotiate && (
                                     <span>
@@ -230,8 +232,8 @@ const TransportAdItem = ({
 
                                     {transportType ? `${transportType}` : ''}
                                     {truckWeight ||
-                                    loadingTypes.length !== 0 ||
-                                    truckValue ? (
+                                        loadingTypes.length !== 0 ||
+                                        truckValue ? (
                                         <>{', '}</>
                                     ) : (
                                         ''
@@ -274,7 +276,7 @@ const TransportAdItem = ({
                                                         {loadingType}
                                                         {index <
                                                             loadingTypes.length -
-                                                                1 && ', '}
+                                                            1 && ', '}
                                                     </React.Fragment>
                                                 )
                                             )}
@@ -319,9 +321,7 @@ const TransportAdItem = ({
 
             {isActive ? (
                 <div
-                    className={`container-icon-add ${
-                        isViewMode ? 'view-mode' : ''
-                    }`}
+                    className={`container-icon-add ${isViewMode ? 'view-mode' : ''} container-icon-add--${viewMode}`}
                 >
                     <div
                         onMouseLeave={handleMouseLeaveReviewAdsAdd}

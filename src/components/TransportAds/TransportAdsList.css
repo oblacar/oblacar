@@ -1,11 +1,58 @@
-.ads-list-container {
-    display: flex;
-    justify-content: center;
+/* ===== TransportAdsList ===== */
 
-    /* font-family: Verdana, 'Dejavu Sans', Geneva, Tahoma, sans_serif; */
+/* Контейнер списка + панели */
+.ads-list-container {
+    width: 100%;
+    display: flex;
+    /* столбцом: панель сверху, список ниже */
+    flex-direction: column;
+    gap: 12px;
 }
 
+/* Прелоадер */
 .preloader {
     display: inline-block;
     margin: 50px auto;
+}
+
+/* Пустой список */
+.ads-empty {
+    padding: 16px;
+    color: #666;
+}
+
+/* Обёртка коллекции */
+.ads-list {
+    width: 100%;
+}
+
+/* Режим: список (вертикально) */
+.ads-list--list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Режим: плитка (грид) */
+.ads-list--grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+/* Элемент в режиме список — используем базовую разметку компонента */
+.ads-list-item--list {}
+
+/* Элемент в режиме плитка — лёгкая «карточка» */
+.ads-list-item--grid {
+    background: #fff;
+    border: 1px solid #e9eef3;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Неактивные объявления можно подсерить */
+.ads-list-item.is-inactive {
+    opacity: 0.7;
 }

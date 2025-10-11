@@ -1,0 +1,35 @@
+/* ===== TransportAdsToolbar ===== */
+
+.transport-ads-toolbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #fff;
+}
+
+.ta-left {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.ta-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ta-sub {
+    color: #666;
+    font-size: 13px;
+}
+
+.ta-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
