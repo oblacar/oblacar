@@ -1,13 +1,19 @@
-/* src/components/TransportAds/TransportAdsToolbar.css */
 .transport-ads-toolbar {
     width: 100%;
+    max-width: 880px;
+    /* предел ширины */
+    margin: 0 auto;
+    margin-bottom: 10px;
+    /* по центру родителя */
+
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    padding: 8px 12px;
-    /* border-bottom: 1px solid #e8e8e8; */
-    /* background: #fff; */
+
+    padding: 10px 0px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #fff;
 }
 
 .ta-left {
