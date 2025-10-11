@@ -8,9 +8,7 @@
 .ad-item-container--list {
     width: 100%;
     max-width: 880px;
-    /* рамка */
     margin-left: auto;
-    /* центрирование контейнера */
     margin-right: auto;
     position: relative;
     /* якорь для абсолютных элементов (флажок и т.д.) */
@@ -41,16 +39,15 @@
     background: transparent;
 }
 
-
-
 .ad-item-mouse-enter {
     border: 2px solid rgb(148, 148, 234);
 }
 
-.ad-item.ad-item-available-for-click:active {
-    -webkit-box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
-    -moz-box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
-    box-shadow: 0 0 0 8px rgba(255, 203, 112, 0.53);
+
+.transport-ad-book-mark.oap-in-review,
+.transport-ad-book-mark.oap-in-review--is-active {
+    z-index: 3;
+    top: 0px;
 }
 
 /* недоступные */
@@ -64,15 +61,11 @@
     pointer-events: none;
 }
 
-.container-icon-add.view-mode {
-    visibility: hidden;
-}
-
 /* статус */
 .ad-item-show-status {
     position: absolute;
     display: none;
-    right: 20px;
+    right: 170px;
     top: 50px;
     border: 4px double rgb(154, 142, 246);
     padding: 5px 10px;
@@ -96,7 +89,6 @@
     display: flex;
     flex-wrap: wrap;
     /* разрешаем перенос */
-    /* gap: 12px; */
     width: 100%;
     min-height: 60px;
     background: #fff;
@@ -147,7 +139,7 @@
     font-size: 14px;
     font-weight: 600;
     color: #373b80;
-    margin: 10px 0px 5px 0px;
+    margin: 10px 0 5px 0;
     text-align: left;
 }
 
@@ -195,7 +187,7 @@
     display: flex;
     flex-wrap: wrap;
     /* разрешаем перенос */
-    gap: 12px;
+    /* gap: 12px; */
     justify-content: space-between;
     align-items: center;
 }
@@ -218,7 +210,7 @@
     height: 50px;
     border: 1px #f1f1f1 solid;
     border-radius: 5px;
-    margin: 5px;
+    margin: 0 5px;
     background: #fff;
     display: flex;
     align-items: center;
@@ -245,10 +237,8 @@
     align-items: center;
     min-width: 200px;
     max-width: 200px;
-    /* держим компактность справа */
-    margin-left: 10px;
-    margin-right: 50px;
-    margin-bottom: 5px;
+
+    margin: 5px 50px 5px 5px;
     flex: 0 1 220px;
 }
 
@@ -294,121 +284,16 @@
     display: flex;
 }
 
-/* добавление в варианты */
-.container-icon-add {
-    position: absolute;
-    right: 5px;
-    bottom: 10px;
-}
-
-.icon-add {
-    background: #fff;
-    font-size: 14px;
-    height: 28px;
-    width: 90px;
-    border-radius: 16px;
-    border: 1px solid #fc8135;
-    color: #fc8135;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color .2s ease, box-shadow .2s ease;
-}
-
-.icon-add:hover {
-    background: #fc8135;
-    color: #fff;
-}
-
-.icon-add.in-review-ads {
-    border-color: #293049;
-    color: #293049;
-}
-
-.icon-add.in-review-ads:hover {
-    background: #293049;
-    color: #fff;
-}
-
-.icon-add:active {
-    -webkit-box-shadow: 0 0 0 4px rgba(255, 203, 112, .53);
-    -moz-box-shadow: 0 0 0 4px rgba(255, 203, 112, .53);
-    box-shadow: 0 0 0 4px rgba(255, 203, 112, .53);
-}
-
-.ad-item-show-in-review {
-    position: absolute;
-    right: -5px;
-    top: 10px;
-    color: rgb(86, 233, 86);
-    z-index: 1;
-}
-
-/* закладки */
-.transport-ad-book-mark.oap-in-review,
-.transport-ad-book-mark.oap-in-review--is-active {
-    z-index: 3;
-    top: 0px;
-}
-
-.bookmark-icon-outline,
-.bookmark-icon-solid {
-    height: 24px;
-    position: absolute;
-    top: -3px;
-    left: 10px;
-    z-index: 2;
-}
-
-.bookmark-icon-outline {
-    color: #c3c3c3;
-}
-
-.bookmark-icon-solid {
-    color: red;
-}
-
-/* -------- Вариант «плитки» как карточки (не обязателен, просто визуал) -------- */
-/* .ad-item--grid {
-    border: 1px solid #e9eef3;
-    border-radius: 12px;
-    padding: 12px;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-} */
-
+/* -------- Grid-акценты -------- */
 .ad-item--grid .upper-ad-row {
     margin-bottom: 8px;
 }
 
 .ad-item--grid .down-ad-row {
-    gap: 12px;
+    /* gap: 12px; */
 }
 
-/* -------- Адаптивное поведение -------- */
-/* На ширинах <= 780px «финансы» спускаются вниз, но остаются выровнеными вправо */
-/* @media (max-width: 780px) {
-    .upper-ad-row .finance {
-        flex: 1 1 100%;
-        min-width: 0;
-
-        margin: 8px 30px 10px auto;
-        align-items: flex-end;
-        text-align: right;
-    }
-
-
-    .down-ad-row .ad-user-info {
-        flex: 1 1 100%;
-        min-width: 0;
-        max-width: none;
-        margin: 8px 12px 12px 50px;
-
-        justify-content: flex-start;
-    }
-}
- */
-/* Ещё компактнее на очень узких ширинах */
+/* -------- Узкие экраны -------- */
 @media (max-width: 420px) {
 
     .departure,
@@ -424,7 +309,6 @@
         margin-right: 16px;
     }
 
-    /* визуально ровняем поля */
     .down-ad-row .ad-user-info {
         margin-left: 16px;
         margin-right: 16px;
