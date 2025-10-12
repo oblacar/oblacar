@@ -1,6 +1,6 @@
 // src/components/Login/Login.js
 import React, { useState, useContext, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -9,36 +9,63 @@ import ErrorText from '../common/ErrorText/ErrorText';
 import Preloader from '../common/Preloader/Preloader';
 
 import AuthContext from '../../hooks/Authorization/AuthContext';
+import UserContext from '../../hooks/UserContext';
 
 import './Login.css';
 
 const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
-    const { login } = useContext(AuthContext);
     const [rememberMe, setRememberMe] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [postLogin, setPostLogin] = useState(false); // флаг «логин прошёл, ждём профиль»
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const { login, isAuthenticated } = useContext(AuthContext);
+    const { user: profile, isUserLoaded } = useContext(UserContext);
 
     useEffect(() => {
         setErrorMessage('');
     }, []);
 
-    const navigate = useNavigate();
+    // Редирект после логина, когда профиль подгрузился
+    useEffect(() => {
+        // Три условия:
+        // 1) пользователь аутентифицирован (или только что залогинился)
+        // 2) профиль подгружен из UserContext
+        // 3) инициатором был логин отсюда (postLogin) ИЛИ юзер уже был залогинен
+        if (!isUserLoaded) return;
+        if (!(postLogin || isAuthenticated)) return;
+
+        const role = profile?.userRole ?? 'user';
+        const from = location.state?.from?.pathname;
+
+        if (role === 'admin') {
+            navigate('/admin', { replace: true });
+        } else if (from) {
+            navigate(from, { replace: true });
+        } else {
+            navigate('/', { replace: true });
+        }
+    }, [postLogin, isAuthenticated, isUserLoaded, profile, navigate, location.state]);
 
     const formik = useFormik({
         initialValues: { email: '', password: '' },
         validationSchema: Yup.object({
-            email: Yup.string().email('Неверный формат электронной почты').required('Электронная почта обязательна'),
+            email: Yup.string()
+                .email('Неверный формат электронной почты')
+                .required('Электронная почта обязательна'),
             password: Yup.string().required('Пароль обязателен'),
         }),
         onSubmit: async (values) => {
             try {
                 setLoading(true);
-                const user = await login(values.email, values.password, rememberMe);
-                console.log('Вход выполнен успешно!', user);
-                navigate('/');
+                setErrorMessage('');
+                await login(values.email, values.password, rememberMe);
+                setPostLogin(true); // не навигируем сразу — дождёмся профиля в useEffect
             } catch (error) {
-                setLoading(false);
-                setErrorMessage(error.message);
+                setErrorMessage(error?.message || 'Ошибка входа');
             } finally {
                 setLoading(false);
             }
@@ -63,6 +90,7 @@ const Login = () => {
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.email}
+                            autoComplete="username"
                         />
                         {formik.touched.email && formik.errors.email ? (
                             <div style={{ color: 'red' }}>{formik.errors.email}</div>
@@ -79,6 +107,7 @@ const Login = () => {
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.password}
+                            autoComplete="current-password"
                         />
                         {formik.touched.password && formik.errors.password ? (
                             <div style={{ color: 'red' }}>{formik.errors.password}</div>
@@ -94,7 +123,6 @@ const Login = () => {
                             checked={rememberMe}
                             onChange={(e) => setRememberMe(e.target.checked)}
                         />
-                        {/* Можно заменить на <label htmlFor="rememberMe"> для лучшей доступности */}
                         <span
                             className="remember-me-label"
                             onClick={() => setRememberMe((v) => !v)}
@@ -104,7 +132,7 @@ const Login = () => {
                     </div>
 
                     <div>
-                        <Button type="submit" size_width="wide">
+                        <Button type="submit" size_width="wide" disabled={loading}>
                             Войти
                         </Button>
                     </div>
