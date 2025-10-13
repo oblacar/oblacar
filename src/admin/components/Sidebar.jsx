@@ -12,6 +12,10 @@ export default function Sidebar() {
                 <NavLink to="/admin/users">Пользователи</NavLink>
                 {/* будущее: <NavLink to="/admin/transportations">Транспортировки</NavLink> */}
                 {/* будущее: <NavLink to="/admin/reports">Жалобы</NavLink> */}
+                {/* ---- пробел / разделитель ---- */}
+                <div style={{ height: 12 }} />
+
+                <NavLink to="/admin/downloads">Downloads</NavLink>
             </nav>
         </aside>
     );

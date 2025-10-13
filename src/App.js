@@ -12,6 +12,8 @@ import AdminAds from './admin/routes/AdminAds';
 import AdminUsers from './admin/routes/AdminUsers';
 import AdminAdsProvider from './admin/context/AdminAdsContext';
 import AdminUsersProvider from './admin/context/AdminUsersContext';
+import AdminDownloads from './admin/routes/AdminDownloads';
+
 
 import Home from './pages/Home/Home';
 import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
@@ -85,6 +87,10 @@ const App = () => {
                                                                         <AdminUsers />
                                                                     </AdminUsersProvider>
                                                                 }
+                                                            />
+                                                            <Route
+                                                                path="downloads"
+                                                                element={<AdminDownloads />}
                                                             />
                                                         </Route>
 
