@@ -3,10 +3,6 @@
     padding: 0;
 }
 
-/* .personal-info-container{
-background-color: bisque;
-} */
-
 .user-data-container {
     padding: 20px;
     background-color: white;
@@ -19,17 +15,39 @@ background-color: bisque;
     height: 100%;
 }
 
+/* Фото пользователя (img) */
 .personal-info-user-photo {
-    /* max-width: 200px; */
     width: 30%;
     min-width: 100px;
-
-    /* width: 100px;
-    height: 100px;
-    overflow: hidden; */
-    /* border-radius: 10%; */
     border-radius: 5px;
+    display: block; /* убираем лишние пробелы/просветы */
+    object-fit: cover; /* обрезаем аккуратно внутри рамки */
 }
+
+/* --- НОВОЕ: фолбэк без <img>, когда фото нет --- */
+.personal-info-user-photo-fallback {
+    width: 30%;
+    min-width: 100px;
+    min-height: 100px; /* чтобы не схлопывалось, похожая «масса», как у img */
+    border-radius: 5px;
+    background: #eceff3; /* мягко-серый фон */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9aa0a6; /* цвет иконки */
+}
+
+/* кликабельный фолбэк (в режиме редактирования) */
+.personal-info-user-photo-fallback.is-clickable {
+    cursor: pointer;
+}
+
+/* размер иконки внутри фолбэка */
+.personal-info-user-photo-icon {
+    font-size: 48px;
+}
+/* --- КОНЕЦ НОВОГО --- */
+
 .personal-info-user-password {
     padding-top: 30px;
 }
@@ -53,8 +71,8 @@ background-color: bisque;
 .button-container {
     padding-top: 30px;
     display: flex;
-    justify-content: space-between; /* Размещает кнопки по краям */
-    width: 100%; /* Занимает всю ширину родителя */
+    justify-content: space-between;
+    width: 100%;
 }
 
 .user-about {

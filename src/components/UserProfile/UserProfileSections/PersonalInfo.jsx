@@ -7,6 +7,8 @@ import UpdatePassword from '../UpdatePassword/UpdatePassword';
 
 import UserContext from '../../../hooks/UserContext';
 
+import { FaUser } from 'react-icons/fa';
+
 import { userService } from '../../../services/UserService';
 
 const PersonalInfo = () => {
@@ -102,14 +104,24 @@ const PersonalInfo = () => {
                         <h2>Личные данные</h2>
                         {!isEditing ? (
                             <div>
-                                <img
-                                    className='personal-info-user-photo'
-                                    src={
-                                        userData.userPhoto ||
-                                        'https://via.placeholder.com/200'
-                                    }
-                                    alt='Фото пользователя'
-                                />
+                                {userData.userPhoto ? (
+                                    <img
+                                        className='personal-info-user-photo'
+                                        src={userData.userPhoto}
+                                        alt='Фото пользователя'
+                                        onError={(e) => {
+                                            e.currentTarget.style.display =
+                                                'none';
+                                        }}
+                                    />
+                                ) : (
+                                    <div
+                                        className='personal-info-user-photo-fallback'
+                                        aria-label='Нет фото'
+                                    >
+                                        <FaUser className='personal-info-user-photo-icon' />
+                                    </div>
+                                )}
                                 <p className='personal-info-user-name'>
                                     {userData.userName}
                                 </p>
@@ -133,17 +145,39 @@ const PersonalInfo = () => {
                         ) : (
                             <div>
                                 <div>
-                                    <img
-                                        className='personal-info-user-photo'
-                                        src={
-                                            previewPhoto ||
-                                            userData.userPhoto ||
-                                            'https://via.placeholder.com/200'
-                                        }
-                                        alt='Профиль пользователя'
-                                        onClick={handlePhotoClick} // Открываем выбор файла при клике
-                                        style={{ cursor: 'pointer' }} // Курсор указателя для индикации клика
-                                    />
+                                    {previewPhoto || userData.userPhoto ? (
+                                        <img
+                                            className='personal-info-user-photo'
+                                            src={
+                                                previewPhoto ||
+                                                userData.userPhoto
+                                            }
+                                            alt='Профиль пользователя'
+                                            onClick={handlePhotoClick}
+                                            style={{ cursor: 'pointer' }}
+                                            onError={(e) => {
+                                                e.currentTarget.style.display =
+                                                    'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div
+                                            className='personal-info-user-photo-fallback is-clickable'
+                                            onClick={handlePhotoClick}
+                                            role='button'
+                                            tabIndex={0}
+                                            onKeyDown={(e) => {
+                                                if (
+                                                    e.key === 'Enter' ||
+                                                    e.key === ' '
+                                                )
+                                                    handlePhotoClick();
+                                            }}
+                                            aria-label='Загрузить фото'
+                                        >
+                                            <FaUser className='personal-info-user-photo-icon' />
+                                        </div>
+                                    )}
                                     {/* Скрытый input для загрузки фото */}
                                     <input
                                         type='file'

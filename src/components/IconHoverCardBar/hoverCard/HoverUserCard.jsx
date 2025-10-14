@@ -15,6 +15,7 @@ import {
     FaHeart,
     FaHandshake,
     FaReceipt,
+    FaUser,
 } from 'react-icons/fa';
 
 import IconSpanBtn from '../../common/IconSpanBtn/IconSpanBtn';
@@ -86,16 +87,26 @@ export const HoverUserCard = ({
                                     className='huc-personal-data'
                                     onClick={handleMouseLeave}
                                 >
-                                    <div className='huc-user-photo-container '>
-                                        <img
-                                            src={
-                                                user.userPhoto ||
-                                                'https://via.placeholder.com/100'
-                                            }
-                                            alt='Фото пользователя'
-                                            className='huc-user-photo'
-                                            onClick={handleMouseLeave}
-                                        />
+                                    <div className='huc-user-photo-container'>
+                                        {user.userPhoto ? (
+                                            <img
+                                                src={user.userPhoto}
+                                                alt='Фото пользователя'
+                                                className='huc-user-photo'
+                                                onClick={handleMouseLeave}
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display =
+                                                        'none';
+                                                }}
+                                            />
+                                        ) : (
+                                            <div
+                                                className='huc-user-photo-fallback'
+                                                aria-label='Нет фото'
+                                            >
+                                                <FaUser className='huc-user-photo-icon' />
+                                            </div>
+                                        )}
                                     </div>
                                     <div className='huc-personal-info'>
                                         <p className='huc-user-name'>

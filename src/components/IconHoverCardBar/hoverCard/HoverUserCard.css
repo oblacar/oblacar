@@ -2,18 +2,39 @@
     display: flex;
 }
 
+/* Контейнер под фото или иконку */
 .huc-user-photo-container {
-    width: 80px; /* Задаем ширину контейнера */
-    height: 80px; /* Задаем высоту контейнера */
-    border-radius: 50%; /* Делаем контейнер кругом */
-    overflow: hidden; /* Прячем части изображения, выходящие за пределы контейнера */
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0; /* чтобы не сжимался при длинном имени */
 }
 
+/* Фото пользователя */
 .huc-user-photo {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Обрезаем изображение до квадрата, заполняя контейнер */
+    object-fit: cover;
 }
+
+/* --- Новое: fallback, если фото нет --- */
+.huc-user-photo-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #e6e7eb; /* мягкий серо-голубой фон */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9aa0a6; /* цвет иконки */
+}
+
+.huc-user-photo-icon {
+    font-size: 36px; /* размер иконки пользователя */
+}
+
+/* --- конец нового блока --- */
 
 .huc-user-name {
     font-size: 18px;
@@ -39,19 +60,19 @@
     background-color: #fbae7b;
 }
 
-/*Стили, цвета и анимация для иконок-кнопок*/
+/* Стили, цвета и анимация для иконок-кнопок */
 .icon-text-container,
 .icon-text-container .icon,
 .huc-section-name.without-icon {
     font-size: 16px;
     color: rgb(62, 59, 100);
     cursor: pointer;
-    transition: color 0.2s ease; /* Плавное изменение цвета при наведении */
+    transition: color 0.2s ease;
 }
 
 .icon-text-container:hover span,
 .icon-text-container:hover .icon,
 .huc-section-name.without-icon:hover {
-    color: #ff6600; /* Цвет при наведении */
+    color: #ff6600;
     font-weight: 600;
 }

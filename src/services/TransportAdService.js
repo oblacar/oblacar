@@ -22,56 +22,35 @@ import {
     base64ToFile,
     uploadPhoto as uploadPhotoFromHelper,
 } from '../utils/helper';
+
 import testAds from '../constants/testData.json'; // Импортируйте тестовые данные
 
 const transportAdsRef = databaseRef(db, 'transportAds'); // Ссылка на раздел transportAds в Realtime Database
 
+// Удобный хелпер для текущего времени в мс
+const nowTs = () => Date.now();
+
 const TransportAdService = {
-    //В режиме разработки не отправляем данные в базу
-    // createAd: async (adData) => {
-    //     // Здесь можно добавить логику для отправки данных в базу данных
-    //     console.log('Создание нового объявления о транспорте:', adData);
-
-    //     // Пример имитации задержки TODO нужно будет убрать
-    //     return new Promise((resolve) => {
-    //         setTimeout(() => {
-    //             resolve('Объявление успешно создано!');
-    //         }, 1000);
-    //     });
-    // },
-
-    // Метод для создания объявления с использованием ID от Firebase
-    // createAd: async (adData) => {
-    //     try {
-    //         // Создаем ссылку на новый узел в базе данных и добавляем данные с уникальным ключом
-    //         const newAdRef = push(databaseRef(db, 'transportAds'));
-    //         const adId = newAdRef.key; // Получаем уникальный ID
-
-    //         // Добавляем adId в объект объявления
-    //         const adWithId = { ...adData, adId };
-
-    //         // Сохраняем объявление в базе данных по сгенерированному Firebase ID
-    //         await set(newAdRef, adWithId);
-
-    //         // console.log('Объявление успешно создано с ID:', adId);
-    //         return adWithId; // Возвращаем обновленное объявление с ID
-    //     } catch (error) {
-    //         console.error('Ошибка при создании объявления:', error);
-    //         throw error;
-    //     }
-    // },
-
+    /**
+     * Создание объявления.
+     * - загружает фото (если пришли File/base64), заменяет их на URL'ы
+     * - генерирует adId
+     * - проставляет createdAt и updatedAt одинаковыми (Date.now())
+     * - сохраняет в RTDB
+     * Возвращает объект объявления, сохранённый в БД.
+     */
     createAd: async (adData) => {
         try {
-            // Проверяем, есть ли массив фото и загружаем каждое
+            // 1) Загрузка фото в storage (если пришли File/base64)
             if (adData.truckPhotoUrls && adData.truckPhotoUrls.length > 0) {
                 const photoUrls = await Promise.all(
                     adData.truckPhotoUrls.map((file) =>
                         TransportAdService.uploadPhoto(file)
-                    ) // TODO зачем-то берет файл из helper?
+                    )
                 );
-                // Обновляем массив `truckPhotoUrls` ссылками на загруженные фото
-                adData.truckPhotoUrls = photoUrls;
+
+                // Обновляем массив ссылок (фильтруем возможные null)
+                adData.truckPhotoUrls = photoUrls.filter(Boolean);
 
                 if (adData.truckPhotoUrls.length === 0) {
                     console.error('Не удалось загрузить ни одного фото.');
@@ -79,50 +58,89 @@ const TransportAdService = {
                 }
             }
 
-            console.log('Из сериса: ', adData);
-
-            // Создаем ссылку на новый узел в базе данных и добавляем данные с уникальным ключом
+            // 2) Создаём запись
             const newAdRef = push(databaseRef(db, 'transportAds'));
-            const adId = newAdRef.key; // Получаем уникальный ID
+            const adId = newAdRef.key;
 
-            // Добавляем adId в объект объявления
-            const adWithId = { ...adData, adId };
+            // 3) Проставляем метки времени
+            const ts = nowTs();
+            const adWithId = {
+                ...adData,
+                adId,
+                createdAt: ts, // дата создания
+                updatedAt: ts, // на момент создания совпадает с createdAt
+            };
 
-            // Сохраняем объявление в базе данных по сгенерированному Firebase ID
             await set(newAdRef, adWithId);
 
-            // console.log('Объявление успешно создано с ID:', adId);
-            return adWithId; // Возвращаем обновленное объявление с ID
+            return adWithId;
         } catch (error) {
             console.error('Ошибка при создании объявления:', error);
             throw error;
         }
     },
 
+    /**
+     * Частичное обновление объявления.
+     * - принимает patch-объект с изменяемыми полями
+     * - автоматически проставляет updatedAt = Date.now()
+     * - если приходит truckPhotoUrls как File/base64/массив смешанный — перезаливает и сохраняет URL'ы
+     * Возвращает обновлённое объявление из БД.
+     */
+    updateAd: async (adId, patch = {}) => {
+        if (!adId) throw new Error('updateAd: adId is required');
+
+        try {
+            const adRef = databaseRef(db, `transportAds/${adId}`);
+            const dataToUpdate = { ...patch, updatedAt: nowTs() };
+
+            // Поддержка перезаливки фото (если передали File/base64)
+            if (patch.truckPhotoUrls) {
+                const incoming = Array.isArray(patch.truckPhotoUrls)
+                    ? patch.truckPhotoUrls
+                    : [patch.truckPhotoUrls];
+
+                const photoUrls = await Promise.all(
+                    incoming.map((f) => TransportAdService.uploadPhoto(f))
+                );
+
+                dataToUpdate.truckPhotoUrls = photoUrls.filter(Boolean);
+            }
+
+            await update(adRef, dataToUpdate);
+
+            // Вернём актуальные данные
+            const snap = await get(adRef);
+            return snap.exists() ? snap.val() : null;
+        } catch (error) {
+            console.error('Ошибка при обновлении объявления:', error);
+            throw error;
+        }
+    },
+
     // В будущем можно добавить больше методов, таких как:
-    // fetchTransports, updateTransportAd и т.д.
+    // fetchTransports и т.д.
 
     getTestAds: async () => {
         // Например, если вы хотите использовать тестовые данные
         return new Promise((resolve) => {
             setTimeout(() => {
-                // console.log(testAds); // Выводим объект в консоль
-
                 resolve(testAds);
             }, 1000); // Задержка для имитации асинхронной загрузки
         });
     },
 
-    // Метод для получения всех объявлений
+    /**
+     * Получение всех объявлений.
+     * Старые записи (если были без createdAt/updatedAt) здесь можно нормализовать при чтении
+     * или мигрировать отдельно. Ниже — минимальная нормализация массивов.
+     */
     getAllAds: async () => {
         try {
             const snapshot = await get(transportAdsRef);
 
-            console.log();
-
             if (!snapshot.exists()) {
                 console.log('Нет данных в transportAds');
-
                 return [];
             }
 
@@ -130,41 +148,27 @@ const TransportAdService = {
 
             const normalizeReceivedData = (data) => ({
                 ...data,
-                // truckPhotoUrls: Array.isArray(data.truckPhotoUrls)
-                //     ? data.truckPhotoUrls
-                //     : data.truckPhotoUrls
-                //     ? [data.truckPhotoUrls]
-                //     : [],
+                // Приводим поля-массивы к массивам (пустая строка -> [])
                 truckPhotoUrls:
                     data.truckPhotoUrls === '' ? [] : data.truckPhotoUrls,
-
                 loadingTypes: data.loadingTypes === '' ? [] : data.loadingTypes,
-
                 paymentOptions:
                     data.paymentOptions === '' ? [] : data.paymentOptions,
-                // обработка других полей...
+                // createdAt/updatedAt здесь не трогаем специально:
+                // компоненты/контексты ожидают строгую модель; заполняем их на create/update.
             });
 
-            // snapshot.forEach((childSnapshot) => {
-            //     ads.push({
-            //         id: childSnapshot.key, //TODO нужно проверить, где мы используем id
-            //         ...normalizeReceivedData(childSnapshot.val()),
-            //     }); // Добавляем каждое объявление в массив
-            // });
-
-            // не скачиваем Удаленные объявления
+            // Не скачиваем удалённые объявления
             snapshot.forEach((childSnapshot) => {
                 const adData = normalizeReceivedData(childSnapshot.val());
-                // Пропускаем объявления со статусом 'deleted'
                 if (adData.status !== 'deleted') {
                     ads.push({
-                        // id: childSnapshot.key,
                         ...adData,
                     });
                 }
             });
 
-            return ads; // Возвращаем массив объявлений
+            return ads;
         } catch (error) {
             console.error('Ошибка при получении объявлений: ', error);
             throw new Error(
@@ -173,17 +177,19 @@ const TransportAdService = {
         }
     },
 
-    // Метод для получения одного объявления по ID
+    /**
+     * Получение одного объявления по ID.
+     */
     getAdById: async (adId) => {
         try {
             const adRef = databaseRef(db, `transportAds/${adId}`);
             const snapshot = await get(adRef);
 
             if (snapshot.exists()) {
-                return snapshot.val(); // Возвращаем данные объявления, если оно существует
+                return snapshot.val();
             } else {
                 console.log(`Объявление с id ${adId} не найдено.`);
-                return null; // Возвращаем null, если объявление не найдено
+                return null;
             }
         } catch (error) {
             console.error(
@@ -191,105 +197,66 @@ const TransportAdService = {
                 error
             );
             throw new Error(
-                `Не удалось загрузить объявление. Попробуйте еще раз.`
+                'Не удалось загрузить объявление. Попробуйте еще раз.'
             );
         }
     },
 
-    // Метод для поиска объявлений по ownerId
-    // searchAdsByOwnerId: async (ownerId) => {
-    //     try {
-    //         const snapshot = await get(transportAdsRef);
-    //         if (!snapshot.exists()) {
-    //             return [];
-    //         }
-    //         const ads = [];
-    //         snapshot.forEach((childSnapshot) => {
-    //             const adData = childSnapshot.val();
-    //             if (adData.ownerId === ownerId) {
-    //                 ads.push({ id: childSnapshot.key, ...adData }); // Добавляем каждое объявление в массив
-    //             }
-    //         });
-    //         return ads; // Возвращаем отфильтрованные объявления
-    //     } catch (error) {
-    //         console.error('Ошибка при поиске объявлений: ', error);
-    //         throw new Error('Не удалось выполнить поиск. Попробуйте еще раз.');
-    //     }
-    // },
+    // Метод для поиска объявлений по ownerId (пример из прошлого варианта был закомментирован)
+    // при необходимости можно вернуть и ускоренный через orderByChild/equalTo.
 
-    // Быстрый поиск объявлений по ownerId (через индекс RTDB)
-    getAdsByOwnerId: async (ownerId) => {
-        try {
-            if (!ownerId) return [];
-
-            // убедись, что сверху импортировано:
-            // import { get, query, orderByChild, equalTo } from 'firebase/database';
-            const q = query(transportAdsRef, orderByChild('ownerId'), equalTo(ownerId));
-            const snapshot = await get(q);
-
-            if (!snapshot.exists()) return [];
-
-            const ads = [];
-            snapshot.forEach((childSnapshot) => {
-                const data = childSnapshot.val() || {};
-                const adId = childSnapshot.key;
-                // нормализуем ключ: гарантируем наличие adId
-                ads.push({ adId, ...data });
-            });
-
-            return ads;
-        } catch (error) {
-            console.error('Ошибка при поиске объявлений по ownerId:', error);
-            throw new Error('Не удалось получить объявления пользователя. Попробуйте ещё раз.');
-        }
-    },
-
-
-    //Метод загрузки одного фото в storage на firebase. Возвращает ссылку
-    // Обновленный метод uploadPhoto для обработки base64
+    /**
+     * Загрузка одного фото в Firebase Storage.
+     * Принимает File или base64-строку data:image/...
+     * Возвращает публичный URL загруженного файла.
+     */
     uploadPhoto: async (file) => {
         try {
-            // Проверяем, является ли file строкой base64 и конвертируем в File, если это так
+            // Поддержка base64
             if (typeof file === 'string' && file.startsWith('data:image')) {
                 file = base64ToFile(file, `truck_${Date.now()}.jpg`);
-            } else if (!(file instanceof File)) {
+            } else if (typeof File !== 'undefined' && !(file instanceof File)) {
                 console.error('Неверный тип файла:', file);
                 return null;
             }
 
-            // создаем уникальную ссылку для фото
-            const photoRef = storageRef(storage, `truckPhotos/${file.name}`);
+            const name = file?.name || `image_${Date.now()}.jpg`;
+            const photoRef = storageRef(storage, `truckPhotos/${name}`);
 
-            // загружаем фото
             await uploadBytes(photoRef, file);
-
-            // получаем ссылку на загруженное фото
             const photoUrl = await getDownloadURL(photoRef);
 
-            return photoUrl; // возвращаем ссылку
+            return photoUrl;
         } catch (error) {
             console.error('Ошибка при загрузке фото:', error);
-            return null; // Вернем null, чтобы обработать ошибку
+            return null;
         }
     },
 
-    //Изменение структуры всей базы объявлений. Добавили поле status. Назначили всем active
-    // Приходит в 4 этапа: все выгрузили, очистили, изменили и загрузили новую базу----->>>>
+    /**
+     * Массовая загрузка набора объявлений (миграция структуры).
+     * Очищает узел и записывает все объявления заново.
+     * Здесь также можно проставить createdAt/updatedAt, если их нет.
+     */
     uploadAdsToFirebase: async (ads) => {
         try {
-            const dbRef = databaseRef(db, 'transportAds'); // Создаем ссылку на узел "transportAds"
+            const dbRef = databaseRef(db, 'transportAds');
 
             // Очистка предыдущих данных (если нужно)
-            await set(dbRef, null); // Очищаем узел перед загрузкой новых данных
+            await set(dbRef, null);
 
-            // const adsToUpload = adsWithStatus.map(async (ad) => {
             const adsToUpload = ads.map(async (ad) => {
-                const newAdRef = push(dbRef); // Создаем уникальный ключ для нового объявления - если загружаем новое объявление, которого пока нет в базе
+                const newAdRef = push(dbRef);
 
-                // Сохраняем объявление с новыми полями
+                // Проставим метки времени, если их не было
+                const created =
+                    typeof ad.createdAt === 'number' ? ad.createdAt : nowTs();
+                const updated =
+                    typeof ad.updatedAt === 'number' ? ad.updatedAt : created;
+
+                // Сохраняем объявление
                 await set(newAdRef, {
-                    // await set(ad.adId, {
-                    adId: ad.adId,
+                    adId: ad.adId ?? newAdRef.key,
                     ownerId: ad.ownerId,
                     availabilityDate: ad.availabilityDate,
                     departureCity: ad.departureCity,
@@ -308,94 +275,48 @@ const TransportAdService = {
                     truckWidth: ad.truckWidth,
                     truckDepth: ad.truckDepth,
                     status: ad.status,
+
                     // Новые поля:
                     ownerName: ad.ownerName,
                     ownerPhotoUrl: ad.ownerPhotoUrl,
                     ownerRating: ad.ownerRating,
+
+                    // Метки времени:
+                    createdAt: created,
+                    updatedAt: updated,
                 });
 
-                //!!! TODO Тужно быть аккуратней, кажется, что блок с фото удаляет ссылки. Проверяем, есть ли файл в truckPhotoUrl
+                // Осторожно с перезаливкой фото:
                 if (
                     ad.truckPhotoUrls &&
                     ad.truckPhotoUrls[0] &&
+                    typeof File !== 'undefined' &&
                     ad.truckPhotoUrls[0] instanceof File
                 ) {
                     const photoUrl = await uploadPhotoFromHelper(
                         'truckPhotos',
                         ad.truckPhotoUrls[0]
-                    ); // Загрузка фото и получение URL
-                    await update(newAdRef, { truckPhotoUrls: photoUrl }); // TODO неправильное обновление. Нужно отладитьОбновляем ссылку на фото в объявлении
+                    );
+                    await update(newAdRef, {
+                        truckPhotoUrls: [photoUrl],
+                        updatedAt: nowTs(), // апдейтим метку модификации
+                    });
                 }
 
-                return newAdRef.key; // Возвращаем id нового объявления, если нужно
+                return newAdRef.key;
             });
 
-            await Promise.all(adsToUpload); // Ждем завершения загрузки всех объявлений
+            await Promise.all(adsToUpload);
 
             console.log('База обновлена');
         } catch (error) {
             console.error('Error uploading ads:', error);
         }
     },
-    //<<<----------------
 
-    //ReviewAds methods--->>>
-    // addReviewAd: async (userId, adId) => {
-    //     const userReviewAdsRef = databaseRef(
-    //         db,
-    //         `userReviewAds/${userId}/reviewAds`
-    //     );
-
-    //     await userReviewAdsRef.transaction((currentAds) => {
-    //         if (currentAds) {
-    //             // Если объявления уже есть, добавляем новый adId
-    //             if (!currentAds.includes(adId)) {
-    //                 return [...currentAds, adId];
-    //             }
-    //         } else {
-    //             // Если нет, создаем новый массив
-    //             return [adId];
-    //         }
-    //         return currentAds;
-    //     });
-    // },
-
-    // removeReviewAd: async (userId, adId) => {
-    //     const userReviewAdsRef = databaseRef(
-    //         db,
-    //         `userReviewAds/${userId}/reviewAds`
-    //     );
-
-    //     await userReviewAdsRef.transaction((currentAds) => {
-    //         if (currentAds) {
-    //             // Удаляем adId из массива
-    //             return currentAds.filter((id) => id !== adId);
-    //         }
-    //         return [];
-    //     });
-    // },
-
-    // getReviewAds: async (userId) => {
-    //     try {
-    //         const reviewAdsRef = databaseRef(
-    //             db,
-    //             `userReviewAds/${userId}/reviewAds`
-    //         ); // Обращаемся к нужному пути
-
-    //         const snapshot = await get(reviewAdsRef);
-    //         if (snapshot.exists()) {
-    //             return snapshot.val(); // Вернет массив ID объявлений из базы
-    //         } else {
-    //             return []; // Если данных нет, возвращаем пустой массив
-    //         }
-    //     } catch (error) {
-    //         console.error('Ошибка при получении userReviewAds:', error);
-    //         throw error;
-    //     }
-    // },
-    //<<<---
-
-    //Метод для загрузки фото группой, возвращает массив ссылок, которые будет передавать объекту--->>>
+    /**
+     * Групповая загрузка фото — вернёт массив URL'ов.
+     */
     uploadPhotoSet: async (selectedPhotos) => {
         const photoUrls = [];
         for (let photo of selectedPhotos) {
@@ -406,41 +327,40 @@ const TransportAdService = {
         }
         return photoUrls;
     },
-    //<<<---
 
-    //Method for updating photo of user in user's ads -->>
+    /**
+     * Массовое обновление фото пользователя во всех его объявлениях.
+     * При обновлении также проставляем updatedAt.
+     */
     async updateUserPhotoInAds(userId, newPhotoUrl) {
         try {
-            // Создаем ссылку на путь, где находятся объявления с `ownerId`, равным `userId`
             const adsRef = databaseRef(db, 'transportAds');
-
-            // Загружаем все объявления
             const snapshot = await get(adsRef);
 
             if (snapshot.exists()) {
                 const updates = {};
 
-                // Перебираем все объявления и ищем те, у которых `ownerId` совпадает с `userId`
                 snapshot.forEach((childSnapshot) => {
                     const adData = childSnapshot.val();
 
                     if (adData.ownerId === userId) {
-                        // Обновляем photoUrl для объявлений, где `ownerId` совпадает с `userId`
                         updates[
                             `transportAds/${childSnapshot.key}/ownerPhotoUrl`
                         ] = newPhotoUrl;
+                        updates[`transportAds/${childSnapshot.key}/updatedAt`] =
+                            nowTs();
                     }
                 });
 
-                // Выполняем обновление всех подходящих объявлений
-                await update(databaseRef(db), updates);
+                if (Object.keys(updates).length > 0) {
+                    await update(databaseRef(db), updates);
+                }
             }
         } catch (error) {
             console.error('Ошибка при обновлении фото в объявлениях:', error);
             throw error;
         }
     },
-    //<<--
 };
 
 export default TransportAdService;
