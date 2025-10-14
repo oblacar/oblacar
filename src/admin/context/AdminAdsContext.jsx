@@ -72,8 +72,8 @@ export default function AdminAdsProvider({ children }) {
     const bulkHardDelete = async () => {
         const items = selectedPairs();
         if (!items.length) return;
-        await AdminAdsService.hardDelete(items);
-        await AdminAuditService.log('ads.hardDelete', {
+        await AdminAdsService.hardDeleteCascade(items); // 👈 КАСКАД
+        await AdminAuditService.log('ads.hardDeleteCascade', {
             ids: items.map((x) => x.id),
         });
         load();

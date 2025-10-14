@@ -1,5 +1,12 @@
 // src/admin/services/AdminAdsService.js
-import { ref, get, update } from 'firebase/database';
+import {
+    ref,
+    get,
+    update,
+    query,
+    orderByChild,
+    equalTo,
+} from 'firebase/database';
 import { db } from '../../firebase';
 
 const TRANSPORT_ROOT = 'transportAds';
@@ -62,7 +69,6 @@ function toRowCargo(x) {
         _root: CARGO_ROOT,
     };
 }
-
 function toRowTransport(x) {
     return {
         id: x.id,
@@ -99,21 +105,18 @@ function filterType(rows, type) {
 export const AdminAdsService = {
     async list(filters = {}) {
         const { q = '', status = '', type = 'all' } = filters;
-
         const [t, c] = await Promise.all([
             fetchAllIfExists(TRANSPORT_ROOT).catch(() => []),
             fetchAllIfExists(CARGO_ROOT).catch(() => []),
         ]);
-
         let rows = [...t.map(toRowTransport), ...c.map(toRowCargo)];
-
         rows = filterType(rows, type);
         rows = filterStatus(rows, status);
         rows = filterText(rows, q);
         return rows;
     },
 
-    async hide(items /* [{id,_root}] */) {
+    async hide(items) {
         if (!items?.length) return;
         const updates = {};
         items.forEach(({ id, _root }) => {
@@ -140,13 +143,99 @@ export const AdminAdsService = {
         await update(ref(db), updates);
     },
 
-    // ⚠️ Настоящее удаление из БД (безвозвратно)
+    // БЫЛО: простое удаление. Оставляю на всякий случай.
     async hardDelete(items) {
         if (!items?.length) return;
         const updates = {};
         items.forEach(({ id, _root }) => {
-            updates[`${_root}/${id}`] = null; // null в update => удаление узла
+            updates[`${_root}/${id}`] = null;
         });
+        await update(ref(db), updates);
+    },
+
+    // НОВОЕ: каскадное удаление со связанными ветками
+    async hardDeleteCascade(items /* [{id,_root}] */) {
+        if (!items?.length) return;
+
+        // общий мультипатч
+        const updates = {};
+
+        // локальные помощники
+        const delPath = (p) => {
+            updates[p] = null;
+        };
+
+        // 1) сразу пометим к удалению сами объявления
+        for (const { id, _root } of items) {
+            delPath(`${_root}/${id}`);
+
+            // 2) каскад для cargo: заявки владельцу + зеркала драйверов
+            if (_root === CARGO_ROOT) {
+                // cargoRequests/{ownerId}/{adId}
+                try {
+                    const crSnap = await get(ref(db, 'cargoRequests'));
+                    if (crSnap.exists()) {
+                        const cr = crSnap.val();
+                        for (const ownerId of Object.keys(cr)) {
+                            if (cr[ownerId] && cr[ownerId][id]) {
+                                delPath(`cargoRequests/${ownerId}/${id}`);
+                            }
+                        }
+                    }
+                } catch {}
+
+                // cargoRequestsSent/{driverId}/{adId}
+                try {
+                    const crsSnap = await get(ref(db, 'cargoRequestsSent'));
+                    if (crsSnap.exists()) {
+                        const crs = crsSnap.val();
+                        for (const driverId of Object.keys(crs)) {
+                            if (crs[driverId] && crs[driverId][id]) {
+                                delPath(`cargoRequestsSent/${driverId}/${id}`);
+                            }
+                        }
+                    }
+                } catch {}
+            }
+
+            // 3) общие разговоры по объявлению: conversations + messages
+            try {
+                const convSnap = await get(ref(db, 'conversations'));
+                if (convSnap.exists()) {
+                    const convs = convSnap.val();
+                    for (const convId of Object.keys(convs)) {
+                        const conv = convs[convId];
+                        if (conv?.adId === id) {
+                            // удалить сам convo
+                            delPath(`conversations/${convId}`);
+                            // удалить все сообщения этого convo (по индексу conversationId)
+                            try {
+                                const qMsgs = query(
+                                    ref(db, 'messages'),
+                                    orderByChild('conversationId'),
+                                    equalTo(convId)
+                                );
+                                const msgSnap = await get(qMsgs);
+                                if (msgSnap.exists()) {
+                                    const msgs = msgSnap.val();
+                                    for (const mId of Object.keys(msgs)) {
+                                        delPath(`messages/${mId}`);
+                                    }
+                                }
+                            } catch {}
+                        }
+                    }
+                }
+            } catch {}
+
+            // 4) TODO: если потребуется, подчистим и эти ветки (по полю adId):
+            // - transportationRequests
+            // - transportationRequestsSent
+            // - transportations
+            // Логика аналогичная: пройтись по корню и удалить узлы, где adId === id.
+        }
+
+        // одним выстрелом — всё
         await update(ref(db), updates);
     },
 };
