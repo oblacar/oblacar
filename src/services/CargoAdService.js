@@ -1,5 +1,4 @@
 // src/services/CargoAdService.js
-
 import {
     ref,
     child,
@@ -13,19 +12,23 @@ import {
 import { db, storage } from '../firebase';
 import { ref as storageRef, deleteObject } from 'firebase/storage';
 
-// 💡 Импортируем нормализацию и миграцию
+// 🔗 нормализация/миграции
 import {
     sanitizeAdForRead,
     normalizeForDb,
 } from './cargoAdsUtils/cargoAdNormalizer';
-import { extractPhotoUrls } from './cargoAdsUtils/dataMappers';
 import * as Migrator from './cargoAdsUtils/cargoAdMigrator';
+
+// 🔧 утилиты
+import { extractPhotoUrls } from './cargoAdsUtils/dataMappers';
+
+// 👇 каскад по обратным ссылкам (adsRefs)
+import { AdsRefsService } from './AdsRefsService';
 
 const cargoAdsRef = ref(db, 'cargoAds');
 
-/* ===================== МЕТОДЫ ЧТЕНИЯ С МИГРАЦИЕЙ ===================== */
+/* ===================== ВСПОМОГАТЕЛЬНОЕ ===================== */
 
-/** Сбор всех патчей из Migrator для одного объявления */
 function buildCombinedPatch(raw) {
     const patches = [
         Migrator.buildOwnerMigrationPatch(raw),
@@ -40,19 +43,13 @@ function buildCombinedPatch(raw) {
         (acc, { patch, changed }) => (changed ? { ...acc, ...patch } : acc),
         {}
     );
-
     const changed = patches.some((p) => p.changed);
-
-    // ВНИМАНИЕ: Для корректной миграции в getAll/getById нужно применить патчи
-    // к сырому объекту raw, чтобы sanitizeAdForRead получил актуальные данные
-    // (логика применения патчей - сложная, поэтому она остается в методах getAll/getById,
-    // чтобы не дублировать код, который был в исходнике, но тут она упрощена).
-
     return { mergedPatch, changed };
 }
 
-/** Прочитать все объявления + миграции */
-async function getAll() {
+/* ===================== ЧТЕНИЕ (с on-the-fly миграцией) ===================== */
+
+export async function getAll() {
     const snap = await get(cargoAdsRef);
     if (!snap.exists()) return [];
 
@@ -64,12 +61,10 @@ async function getAll() {
         const raw = childSnap.val();
 
         const { mergedPatch, changed } = buildCombinedPatch(raw);
+        // ВАЖНО: даём sanitize уже «применённый» объект, чтобы UI не ждал записи в БД
+        const base = changed ? { ...raw, ...mergedPatch } : raw;
 
-        const base = raw;
         if (changed) {
-            // Здесь должна быть сложная логика мерджа, которая была в исходнике,
-            // чтобы получить 'merged' объект для sanitizeAdForRead.
-            // Для упрощения, просто отправляем патч на запись.
             updates.push(update(child(cargoAdsRef, key), mergedPatch));
         }
 
@@ -80,13 +75,13 @@ async function getAll() {
     try {
         await Promise.all(updates);
     } catch (_) {
-        /* игнор */
+        /* ignore */
     }
+
     return result;
 }
 
-/** Прочитать объявление по id + миграции */
-async function getById(adId) {
+export async function getById(adId) {
     if (!adId) return null;
     const adRef = child(cargoAdsRef, adId);
     const snap = await get(adRef);
@@ -94,13 +89,11 @@ async function getById(adId) {
 
     const raw = snap.val();
     const { mergedPatch, changed } = buildCombinedPatch(raw);
+    const base = changed ? { ...raw, ...mergedPatch } : raw;
 
-    const base = raw;
     if (changed) {
-        // Здесь должна быть логика мерджа, аналогичная getAll,
-        // плюс запись в БД
         try {
-            update(adRef, mergedPatch);
+            await update(adRef, mergedPatch);
         } catch (_) {}
     }
 
@@ -108,10 +101,9 @@ async function getById(adId) {
     return { adId, ...clean };
 }
 
-/* ===================== МЕТОДЫ CRUD ===================== */
+/* ===================== CRUD ===================== */
 
-/** Создать объявление */
-async function create(adData = {}) {
+export async function create(adData = {}) {
     const newRef = push(cargoAdsRef);
     const payload = normalizeForDb(
         {
@@ -123,13 +115,16 @@ async function create(adData = {}) {
         { clearLegacyOnWrite: true }
     );
     await set(newRef, payload);
+
+    // (не обязательно) можешь инициализировать служебный блок ссылок
+    // await AdsRefsService.addRef(newRef.key, '_meta', 'created');
+
     const snap = await get(newRef);
     const clean = sanitizeAdForRead(snap.val() || {});
     return { adId: newRef.key, ...clean };
 }
 
-/** Обновить объявление (с удалением фоток из Storage) */
-async function updateById(adId, patch = {}) {
+export async function updateById(adId, patch = {}) {
     if (!adId) throw new Error('updateById: adId is required');
     const adRef = child(cargoAdsRef, adId);
 
@@ -137,32 +132,24 @@ async function updateById(adId, patch = {}) {
     if (!curSnap.exists()) throw new Error('updateById: ad not found');
     const current = curSnap.val() || {};
 
-    // Список URL «до»
     const beforeUrls = new Set(extractPhotoUrls(current.photos));
 
-    // 1) мерджим пользовательский patch
     const merged = {
         ...current,
         ...patch,
         updatedAt: serverTimestamp(),
     };
 
-    // 2) нормализуем к формату БД
     const payload = normalizeForDb(merged, { clearLegacyOnWrite: true });
 
-    // Список URL «после»
     const afterUrls = new Set(extractPhotoUrls(payload.photos));
-
-    // 3) считаем, какие фото удалились
     const removedUrls = [];
     beforeUrls.forEach((u) => {
         if (!afterUrls.has(u)) removedUrls.push(u);
     });
 
-    // 4) обновляем запись
     await update(adRef, payload);
 
-    // 5) удаляем лишние файлы из Storage — не блокируем ответ
     if (removedUrls.length) {
         Promise.allSettled(
             removedUrls.map((url) => {
@@ -176,26 +163,56 @@ async function updateById(adId, patch = {}) {
         ).catch(() => {});
     }
 
-    // 6) читаем обратно для UI
     const snap = await get(adRef);
     const clean = sanitizeAdForRead(snap.val() || {});
     return { adId, ...clean };
 }
 
-/** Жёстко удалить объявление */
-async function deleteById(adId) {
+/** Жёстко удалить объявление (каскад по links + фото + сам узел) */
+export async function deleteById(adId) {
     if (!adId) throw new Error('deleteById: adId is required');
     const adRef = child(cargoAdsRef, adId);
+
+    // 1) снимем текущие данные, чтобы удалить фото
+    let current = null;
+    try {
+        const snap = await get(adRef);
+        current = snap.exists() ? snap.val() || null : null;
+    } catch {}
+
+    // 2) каскад по обратным ссылкам (удалит cargoRequests*, conversations*, etc.)
+    try {
+        await AdsRefsService.cascadeDeleteByRefs(adId);
+    } catch (e) {
+        console.warn('AdsRefs cascade failed (continue anyway):', e);
+    }
+
+    // 3) удалить сам узел объявления
     await remove(adRef);
+
+    // 4) удалить фото из Storage (не блокируем)
+    if (current) {
+        const urls = extractPhotoUrls(current.photos);
+        if (urls.length) {
+            Promise.allSettled(
+                urls.map((url) => {
+                    try {
+                        const objRef = storageRef(storage, url);
+                        return deleteObject(objRef);
+                    } catch {
+                        return Promise.resolve();
+                    }
+                })
+            ).catch(() => {});
+        }
+    }
+
     return true;
 }
 
-/* ============ СТАТУСЫ (закрыть/архивировать/активировать) ============ */
-// ... (Функции setStatusById, closeById, archiveById, reopenById остаются здесь
-// и используют normalizeForDb и sanitizeAdForRead) ...
+/* ===================== СТАТУСЫ ===================== */
 
-/** Базовый сеттер статуса; extra — дополнительные поля (причины и т.п.) */
-async function setStatusById(adId, status, extra = {}) {
+export async function setStatusById(adId, status, extra = {}) {
     if (!adId || !status)
         throw new Error('setStatusById: adId и status обязательны');
     const adRef = child(cargoAdsRef, adId);
@@ -211,7 +228,7 @@ async function setStatusById(adId, status, extra = {}) {
         updatedAt: serverTimestamp(),
     };
 
-    // Логика подстраховки owner ↔ плоские поля
+    // подстрахуем owner ↔ плоские поля
     if (merged.owner && typeof merged.owner === 'object') {
         const o = merged.owner;
         if (o.id && !merged.ownerId) merged.ownerId = o.id;
@@ -234,7 +251,6 @@ async function setStatusById(adId, status, extra = {}) {
         };
     }
 
-    // нормализация без агрессивной зачистки легаси
     const payload = normalizeForDb(merged, { clearLegacyOnWrite: false });
 
     await update(adRef, payload);
@@ -243,22 +259,16 @@ async function setStatusById(adId, status, extra = {}) {
     return { adId, ...clean };
 }
 
-async function closeById(adId, reason) {
-    return setStatusById(adId, 'completed', { closedReason: reason ?? '' });
-}
-async function archiveById(adId, reason) {
-    return setStatusById(adId, 'archived', { archivedReason: reason ?? '' });
-}
-async function reopenById(adId) {
-    return setStatusById(adId, 'active', {
-        closedReason: '',
-        archivedReason: '',
-    });
-}
+export const closeById = (adId, reason) =>
+    setStatusById(adId, 'completed', { closedReason: reason ?? '' });
+export const archiveById = (adId, reason) =>
+    setStatusById(adId, 'archived', { archivedReason: reason ?? '' });
+export const reopenById = (adId) =>
+    setStatusById(adId, 'active', { closedReason: '', archivedReason: '' });
 
-/* ===================== МИГРАЦИЯ ВСЕЙ БАЗЫ ===================== */
+/* ===================== МИГРАЦИЯ ===================== */
 
-async function migrateAllToCanonical(options = {}) {
+export async function migrateAllToCanonical(options = {}) {
     const { dryRun = true } = options;
     const snap = await get(cargoAdsRef);
     if (!snap.exists()) return { total: 0, changed: 0, ids: [] };
@@ -273,12 +283,9 @@ async function migrateAllToCanonical(options = {}) {
         const key = childSnap.key;
         const raw = childSnap.val() || {};
 
-        const { mergedPatch: beforeCleanup, changed: wasMigrated } =
-            buildCombinedPatch(raw);
+        const { mergedPatch: beforeCleanup } = buildCombinedPatch(raw);
 
-        // Применяем все миграционные патчи (если есть) перед проверкой на Cleanup
         const mergedPreview = { ...raw, ...beforeCleanup };
-
         const { patch: pClean, changed: chClean } =
             Migrator.buildLegacyCleanupPatch(mergedPreview);
 
@@ -288,15 +295,12 @@ async function migrateAllToCanonical(options = {}) {
         if (willChange) {
             changed += 1;
             ids.push(key);
-            if (!dryRun) {
+            if (!dryRun)
                 updates.push(update(child(cargoAdsRef, key), finalPatch));
-            }
         }
     });
 
-    if (!dryRun && updates.length) {
-        await Promise.allSettled(updates);
-    }
+    if (!dryRun && updates.length) await Promise.allSettled(updates);
 
     return { total, changed, ids };
 }

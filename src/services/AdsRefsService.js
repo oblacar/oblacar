@@ -1,6 +1,6 @@
 // src/admin/services/AdsRefsService.js
 import { ref, update, get } from 'firebase/database';
-import { db } from '../../firebase';
+import { db } from '../firebase';
 
 const setAt = (obj, path, value) => {
     obj[path] = value;

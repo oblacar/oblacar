@@ -1,5 +1,4 @@
-// src/services/cargoAds/cargoAdNormalizer.js
-
+// src/services/cargoAdsUtils/cargoAdNormalizer.js
 import {
     arrToMap,
     mapToArr,
@@ -9,7 +8,6 @@ import {
 
 // ===================== НОРМАЛИЗАЦИЯ ПЕРЕД ЧТЕНИЕМ (UI) =====================
 
-/** Локальная миграция автора в объекте после чтения (без записи в БД) */
 function migrateOwnerInSnapshot(raw = {}) {
     const ad = { ...raw };
 
@@ -32,10 +30,9 @@ function migrateOwnerInSnapshot(raw = {}) {
     if ('ownerPhotoUrl' in ad) delete ad.ownerPhotoUrl;
     if ('ownerRating' in ad) delete ad.ownerRating;
 
-    return { ad, changed: true }; // changed всегда true, т.к. это read-migration
+    return { ad, changed: true };
 }
 
-/** КЛИЕНТСКИЙ: Преобразование мультиселектов из Map в Array */
 function toClientArrays(raw = {}) {
     const ad = { ...raw };
 
@@ -50,12 +47,9 @@ function toClientArrays(raw = {}) {
     return ad;
 }
 
-/** Приведение объявления к формату UI (для чтения) */
 export function sanitizeAdForRead(raw = {}) {
-    // 1) локально переносим легаси в owner
     const { ad } = migrateOwnerInSnapshot(raw);
 
-    // 2) гарантируем owner-объект и делаем алиасы для фото/имени
     if (!ad.owner || typeof ad.owner !== 'object') ad.owner = {};
 
     const resolvedName =
@@ -82,16 +76,13 @@ export function sanitizeAdForRead(raw = {}) {
         ad.ownerPhotoUrl = ad.ownerPhotoUrl ?? resolvedPhoto;
     }
 
-    // 3) мультиселекты: map -> array для UI
     const uiReady = toClientArrays(ad);
 
-    // 4) photos: map -> array для UI
     const arrPhotos = Array.isArray(uiReady.photos)
         ? uiReady.photos
         : photosMapToArr(uiReady.photos);
     uiReady.photos = arrPhotos;
 
-    // 5) availabilityDate -> pickup/delivery (для UI)
     if (
         typeof uiReady.availabilityDate === 'string' &&
         uiReady.availabilityDate.trim()
@@ -122,7 +113,6 @@ export function sanitizeAdForRead(raw = {}) {
 
 // ===================== НОРМАЛИЗАЦИЯ ПЕРЕД ЗАПИСЬЮ (DB) =====================
 
-/** Нормализация владельца перед записью */
 function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
     const p = { ...payload };
 
@@ -153,15 +143,12 @@ function normalizeOwnerForWrite(payload = {}, { clearLegacy = true } = {}) {
     return p;
 }
 
-/** Общая нормализация payload перед записью в БД */
 export function normalizeForDb(ad = {}, opts = {}) {
     const { clearLegacyOnWrite = true } = opts;
     let copy = { ...ad };
 
-    // 1) Автор: переносим легаси в owner-объект
     copy = normalizeOwnerForWrite(copy, { clearLegacy: clearLegacyOnWrite });
 
-    // 2) Синхронизация owner.id <-> ownerId
     if (copy.owner && copy.owner.id == null && copy.ownerId != null) {
         copy.owner = { ...copy.owner, id: copy.ownerId };
     }
@@ -169,7 +156,6 @@ export function normalizeForDb(ad = {}, opts = {}) {
         copy.ownerId = copy.owner.id;
     }
 
-    // 3) Мультиселекты: массив -> map
     if (Array.isArray(copy.preferredLoadingTypes)) {
         copy.preferredLoadingTypes = arrToMap(copy.preferredLoadingTypes);
     }
@@ -180,12 +166,10 @@ export function normalizeForDb(ad = {}, opts = {}) {
         copy.loadingTypes = arrToMap(copy.loadingTypes);
     }
 
-    // 4) Photos: массив -> map
     if (Array.isArray(copy.photos)) {
         copy.photos = photosArrToMap(copy.photos);
     }
 
-    // 5) AvailabilityDate: собрать из pickup/delivery (или availabilityFrom/To)
     const from = copy.pickupDate || copy.availabilityFrom || '';
     const to = copy.deliveryDate || copy.availabilityTo || '';
     if (from && to) copy.availabilityDate = `${from}—${to}`;

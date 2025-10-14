@@ -1,6 +1,5 @@
-// src/services/cargoAds/cargoAdMigrator.js
-
-import { arrToMap, mapToArr, photosArrToMap } from './dataMappers';
+// src/services/cargoAdsUtils/cargoAdMigrator.js
+import { arrToMap, photosArrToMap } from './dataMappers';
 
 // ======================= МИГРАЦИИ (Patch Builders) =======================
 
@@ -8,10 +7,6 @@ import { arrToMap, mapToArr, photosArrToMap } from './dataMappers';
 export function buildOwnerMigrationPatch(raw = {}) {
     const patch = {};
     let changed = false;
-
-    // ... (весь код функции buildOwnerMigrationPatch) ...
-    // [80 строк, включая сложную логику миграции legacy-полей]
-    // Чтобы не дублировать 80 строк: здесь оставляем ВЕСЬ код этой функции.
 
     const ownerObj =
         raw.owner && typeof raw.owner === 'object' ? { ...raw.owner } : {};
@@ -59,7 +54,7 @@ export function buildOwnerMigrationPatch(raw = {}) {
         patch['owner'] = { ...(patch['owner'] || {}), ...ownerPatch };
     }
 
-    // Удаляем легаси на верхнем уровне
+    // убрать легаси на верхнем уровне
     if ('ownerName' in raw) {
         patch['ownerName'] = null;
         changed = true;
@@ -73,13 +68,13 @@ export function buildOwnerMigrationPatch(raw = {}) {
         changed = true;
     }
 
-    // Удаляем legacy owner.avatarUrl
+    // удалить legacy owner.avatarUrl
     if ('owner' in raw && raw.owner && 'avatarUrl' in raw.owner) {
         patch['owner/avatarUrl'] = null;
         changed = true;
     }
 
-    // Синхронизация ownerId (топ-левел) с owner.id
+    // синхронизировать ownerId с owner.id
     if (targetOwner.id != null && ownerIdTop !== targetOwner.id) {
         patch['ownerId'] = targetOwner.id;
         changed = true;
@@ -188,7 +183,7 @@ export function buildPriceFlattenPatch(raw = {}) {
     return { patch, changed };
 }
 
-/** зачистка явных легаси-полей после миграции (когда новые поля уже заполнены) */
+/** зачистка явных легаси-полей (после заполнения новых) */
 export function buildLegacyCleanupPatch(raw = {}) {
     const patch = {};
     let changed = false;
