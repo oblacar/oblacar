@@ -13,7 +13,7 @@ import AdminUsers from './admin/routes/AdminUsers';
 import AdminAdsProvider from './admin/context/AdminAdsContext';
 import AdminUsersProvider from './admin/context/AdminUsersContext';
 import AdminDownloads from './admin/routes/AdminDownloads';
-
+import AdminAdPage from './admin/pages/AdminAdPage';
 
 import Home from './pages/Home/Home';
 import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
@@ -21,7 +21,7 @@ import AuthPage from './pages/AuthPage/AuthPage'; // Импорт страниц
 import NewTransportAd from './pages/Ads/NewTransportAd/NewTransportAd';
 import AdPage from './pages/Ads/AdPage';
 import MyTransportAdsPage from './pages/Ads/MyTransportAdsPage';
-import MyCargoAdsPage from './pages/Ads/Cargo/MyCargoAds/MyCargoAdsPage'
+import MyCargoAdsPage from './pages/Ads/Cargo/MyCargoAds/MyCargoAdsPage';
 import EditCargoAdPage from './pages/Ads/Cargo/CargoAdEditPage/EditCargoAdPage';
 import NewVehiclePage from './pages/Vehicles/NewVehicle/NewVehiclePage';
 import VehiclePage from './pages/Vehicles/VehiclePage';
@@ -35,7 +35,7 @@ import MigrateCargoAdsPage from './pages/Ads/dev/MigrateCargoAdsPage';
 import { AuthProvider } from './hooks/Authorization/AuthContext'; // Импортируем AuthProvider
 import { UserProvider } from './hooks/UserContext';
 import { TransportAdProvider } from './hooks/TransportAdContext';
-import { CargoAdsProvider } from './hooks/CargoAdsContext'
+import { CargoAdsProvider } from './hooks/CargoAdsContext';
 import { CargoRequestsProvider } from './hooks/CargoRequestsContext';
 import { ConversationProvider } from './hooks/ConversationContext';
 import { TransportationProvider } from './hooks/TransportationContext';
@@ -54,24 +54,29 @@ const App = () => {
                                     <TransportAdProvider>
                                         <CargoAdsProvider>
                                             <CargoRequestsProvider>
-
                                                 <TransportationProvider>
                                                     <Routes>
                                                         {/* ====== АДМИН-МОДУЛЬ (вариант B) ====== */}
                                                         <Route
-                                                            path="/admin/*"
+                                                            path='/admin/*'
                                                             element={
                                                                 <AdminAuthGuard>
-                                                                    <AdminApp /> {/* Sidebar + Topbar + <Outlet/> */}
+                                                                    <AdminApp />{' '}
+                                                                    {/* Sidebar + Topbar + <Outlet/> */}
                                                                 </AdminAuthGuard>
                                                             }
                                                         >
                                                             {/* /admin — пустая стартовая страница админа */}
-                                                            <Route index element={<AdminLanding />} />
+                                                            <Route
+                                                                index
+                                                                element={
+                                                                    <AdminLanding />
+                                                                }
+                                                            />
 
                                                             {/* /admin/ads */}
                                                             <Route
-                                                                path="ads"
+                                                                path='ads'
                                                                 element={
                                                                     <AdminAdsProvider>
                                                                         <AdminAds />
@@ -79,9 +84,16 @@ const App = () => {
                                                                 }
                                                             />
 
+                                                            <Route
+                                                                path='ads/:adId'
+                                                                element={
+                                                                    <AdminAdPage />
+                                                                }
+                                                            />
+
                                                             {/* /admin/users */}
                                                             <Route
-                                                                path="users"
+                                                                path='users'
                                                                 element={
                                                                     <AdminUsersProvider>
                                                                         <AdminUsers />
@@ -89,34 +101,135 @@ const App = () => {
                                                                 }
                                                             />
                                                             <Route
-                                                                path="downloads"
-                                                                element={<AdminDownloads />}
+                                                                path='downloads'
+                                                                element={
+                                                                    <AdminDownloads />
+                                                                }
                                                             />
                                                         </Route>
 
                                                         {/* ====== ОСНОВНОЙ САЙТ ====== */}
-                                                        <Route element={<Layout />}>
-                                                            <Route path="/" element={<Home />} />
-                                                            <Route path="/__dev__/migrate-cargo" element={<MigrateCargoAdsPage />} />
-                                                            <Route path="/register" element={<AuthPage isLogin={false} />} />
-                                                            <Route path="/login" element={<AuthPage isLogin={true} />} />
-                                                            <Route path="/auth" element={<AuthPage />} />
-                                                            <Route path="/user-profile" element={<ProfileUserPage />} />
-                                                            <Route path="/new-tansport-ad" element={<NewTransportAd />} />
-                                                            <Route path="/new-cargo-ad" element={<NewCargoAdPage />} />
-                                                            <Route path="/ads/:adId" element={<AdPage />} />
-                                                            <Route path="/transport-ads/:adId" element={<AdPage />} />
-                                                            <Route path="/my-transport-ads" element={<MyTransportAdsPage />} />
-                                                            <Route path="/cargo-ads/:adId" element={<AdPage />} />
-                                                            <Route path="/my-cargo-ads" element={<MyCargoAdsPage />} />
-                                                            <Route path="/cargo-ads/:adId/edit" element={<EditCargoAdPage />} />
-                                                            <Route path="/dialogs" element={<ConversationsPage />} />
-                                                            <Route path="/new-vehicle" element={<NewVehiclePage />} />
-                                                            <Route path="/vehicles/:truckId" element={<VehiclePage />} />
-                                                            <Route path="/vehicles" element={<VehiclesPage />} />
+                                                        <Route
+                                                            element={<Layout />}
+                                                        >
+                                                            <Route
+                                                                path='/'
+                                                                element={
+                                                                    <Home />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/__dev__/migrate-cargo'
+                                                                element={
+                                                                    <MigrateCargoAdsPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/register'
+                                                                element={
+                                                                    <AuthPage
+                                                                        isLogin={
+                                                                            false
+                                                                        }
+                                                                    />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/login'
+                                                                element={
+                                                                    <AuthPage
+                                                                        isLogin={
+                                                                            true
+                                                                        }
+                                                                    />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/auth'
+                                                                element={
+                                                                    <AuthPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/user-profile'
+                                                                element={
+                                                                    <ProfileUserPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/new-tansport-ad'
+                                                                element={
+                                                                    <NewTransportAd />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/new-cargo-ad'
+                                                                element={
+                                                                    <NewCargoAdPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/ads/:adId'
+                                                                element={
+                                                                    <AdPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/transport-ads/:adId'
+                                                                element={
+                                                                    <AdPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/my-transport-ads'
+                                                                element={
+                                                                    <MyTransportAdsPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/cargo-ads/:adId'
+                                                                element={
+                                                                    <AdPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/my-cargo-ads'
+                                                                element={
+                                                                    <MyCargoAdsPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/cargo-ads/:adId/edit'
+                                                                element={
+                                                                    <EditCargoAdPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/dialogs'
+                                                                element={
+                                                                    <ConversationsPage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/new-vehicle'
+                                                                element={
+                                                                    <NewVehiclePage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/vehicles/:truckId'
+                                                                element={
+                                                                    <VehiclePage />
+                                                                }
+                                                            />
+                                                            <Route
+                                                                path='/vehicles'
+                                                                element={
+                                                                    <VehiclesPage />
+                                                                }
+                                                            />
                                                         </Route>
                                                     </Routes>
-
                                                 </TransportationProvider>
                                             </CargoRequestsProvider>
                                         </CargoAdsProvider>
