@@ -6,8 +6,14 @@ export default function Sidebar() {
         <aside className='admin-sidebar'>
             <div className='admin-logo'>oblacar • admin</div>
             <nav className='admin-nav'>
-                <NavLink
+                {/* <NavLink
                     to='/admin'
+                    end
+                >
+                    Dashboard
+                </NavLink> */}
+                 <NavLink
+                    to='/admin/dashboard'
                     end
                 >
                     Dashboard

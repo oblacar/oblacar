@@ -23,6 +23,25 @@ export default function AdminDashboard() {
 
 
     if (loading) return <div>Загрузка…</div>;
+
+    //TODO эмуляция данных. Для дизайна. После настроки, удалить.
+    if (stats) {
+        const fakeStats = {
+            usersWeek: 42,
+            adsActive: 128,
+            transportationsActive: 8,
+            reportsNew: 3,
+        };
+        return (
+            <div className="admin-grid-4">
+                <StatCard title="Пользователи (7д)" value={fakeStats.usersWeek} />
+                <StatCard title="Объявления активные" value={fakeStats.adsActive} />
+                <StatCard title="Транспортировки активные" value={fakeStats.transportationsActive} />
+                <StatCard title="Жалобы новые" value={fakeStats.reportsNew} />
+            </div>
+        );
+    }
+
     if (!stats) return <div>Нет данных</div>;
 
 

@@ -13,6 +13,7 @@ import AdminUsers from './admin/routes/AdminUsers';
 import AdminAdsProvider from './admin/context/AdminAdsContext';
 import AdminUsersProvider from './admin/context/AdminUsersContext';
 import AdminDownloads from './admin/routes/AdminDownloads';
+import AdminDashboard from './admin/routes/AdminDashboard';
 // import AdminAdPage from './admin/pages/AdminAdPage';
 
 import Home from './pages/Home/Home';
@@ -71,6 +72,16 @@ const App = () => {
                                                                 index
                                                                 element={
                                                                     <AdminLanding />
+                                                                }
+                                                            />
+
+                                                            {/* /admin/dashboard */}
+                                                            <Route
+                                                                path='dashboard'
+                                                                element={
+                                                                    <AdminUsersProvider>
+                                                                        <AdminDashboard />
+                                                                    </AdminUsersProvider>
                                                                 }
                                                             />
 
