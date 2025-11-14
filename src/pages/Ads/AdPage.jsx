@@ -4,14 +4,19 @@ import { useParams, useSearchParams } from 'react-router-dom';
 
 import TransportAdContext from '../../hooks/TransportAdContext';
 import CargoAdsContext from '../../hooks/CargoAdsContext';
+import UserContext from '../../hooks/UserContext';
 
 import AdProfile from '../../components/AdProfile/AdProfile';
+import AdminAdPage from '../../admin/pages/AdminAdPage';
 
 const AdPage = () => {
+    const { user } = useContext(UserContext);
     const { adId } = useParams();
     const [sp] = useSearchParams();
 
-    const requestedType = (sp.get('type') || '').replace(/['"]/g, '').toLowerCase(); // 'cargo' | 'transport' | ''
+    const requestedType = (sp.get('type') || '')
+        .replace(/['"]/g, '')
+        .toLowerCase(); // 'cargo' | 'transport' | ''
 
     const tCtx = useContext(TransportAdContext) || {};
     const cCtx = useContext(CargoAdsContext) || {};
@@ -73,7 +78,21 @@ const AdPage = () => {
     if (!ad && !contextsReady) return <p>Загрузка…</p>;
     if (!ad) return <p>Объявление не найдено</p>;
 
-    return <AdProfile adType={resolvedType} ad={ad} />;
+    return (
+        <>
+            {user !== null && user.userRole === 'admin' ? (
+                <AdminAdPage
+                    adType={resolvedType}
+                    ad={ad}
+                />
+            ) : (
+                <AdProfile
+                    adType={resolvedType}
+                    ad={ad}
+                />
+            )}
+        </>
+    );
 };
 
 export default AdPage;

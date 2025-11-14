@@ -1,0 +1,85 @@
+/* Панель */
+.admin-panel {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 5px;
+    padding: 10px 16px;
+    margin: 20px 0px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    box-shadow: 0px 0px 0px 2px rgba(255, 151, 71, 0.5);
+    /* -webkit-box-shadow: 1px 1px 5px 3px rgba(162, 188, 212, 0.94);
+    -moz-box-shadow: 1px 1px 5px 3px rgba(162, 188, 212, 0.94); */
+    /* background-color: #ffe6bb; */
+}
+
+/* Тогл Режима */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    /* background: #abc6fa; */
+    background: rgb(253, 131, 50);
+}
+
+.toggle-label {
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.toggle-btn.active {
+    background: #e0f2fe;
+}
+
+.spacer {
+    flex: 1;
+}
+
+/* Действия */
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Используем классы, как в TableToolbar */
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    color: #111;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.btn:hover {
+    background: #f3f4f6;
+}
+
+.btn-danger {
+    border-color: #ef4444;
+    color: #ef4444;
+}

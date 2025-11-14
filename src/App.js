@@ -13,7 +13,7 @@ import AdminUsers from './admin/routes/AdminUsers';
 import AdminAdsProvider from './admin/context/AdminAdsContext';
 import AdminUsersProvider from './admin/context/AdminUsersContext';
 import AdminDownloads from './admin/routes/AdminDownloads';
-import AdminAdPage from './admin/pages/AdminAdPage';
+// import AdminAdPage from './admin/pages/AdminAdPage';
 
 import Home from './pages/Home/Home';
 import ProfileUserPage from './pages/profiles/ProfileUser/ProfileUserPage';
@@ -84,12 +84,12 @@ const App = () => {
                                                                 }
                                                             />
 
-                                                            <Route
+                                                            {/* <Route
                                                                 path='ads/:adId'
                                                                 element={
                                                                     <AdminAdPage />
                                                                 }
-                                                            />
+                                                            /> */}
 
                                                             {/* /admin/users */}
                                                             <Route

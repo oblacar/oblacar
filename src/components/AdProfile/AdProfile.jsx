@@ -24,7 +24,7 @@ function unwrapAd(input) {
     return out;
 }
 
-const AdProfile = ({ adType, ad }) => {
+const AdProfile = ({ adType, ad, isOwnAdMode = false }) => {
     const { isAuthenticated } = useContext(AuthContext) || {};
     const { user, isUserLoaded } = useContext(UserContext) || {};
 
@@ -39,12 +39,16 @@ const AdProfile = ({ adType, ad }) => {
         return <div className='loading'>Загрузка объявления...</div>;
     }
 
+    //TODO нужно еще добавить проверку на селектор от администратора, что он нажал Вид хозяина объявления
     const isOwnAd =
         Boolean(isAuthenticated && isUserLoaded) &&
-        String(ownerId || '') === String(user?.userId || '');
+        (String(ownerId || '') === String(user?.userId || '') || isOwnAdMode);
 
     return (
         <div>
+            {/* TODO Нужно сделать режим администратора, 
+что бы Администратор мог выбрать вариант Хозяин или Нехозяин для просмотра профиля */}
+
             {isOwnAd ? (
                 <PersonalAdProfile
                     adType={adType}

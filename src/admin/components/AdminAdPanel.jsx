@@ -1,78 +1,101 @@
-import React from 'react';
+// src/admin/components/AdminAdPanel.jsx
+import React, { useState, useEffect } from 'react';
+import { useAdminAds } from '../context/AdminAdsContext';
+import {
+    FaTrash,
+    FaUndo,
+    FaEyeSlash,
+    FaSkull,
+    FaUserCheck,
+    FaUser,
+} from 'react-icons/fa';
+import './AdminAdPanel.css'; // используем обычный css, как в TableToolbar
 
 export default function AdminAdPanel({
-    ad,
-    type,
-    onDelete,
-    onBlock,
-    onRestore,
-    viewMode,
-    onViewModeChange,
+    adId,
+    adRoot,
+    isAdmin,
+    isOwnAd,
+    onToggleOwnerMode,
 }) {
-    const statusColor =
+    const { setSelection, bulkHide, bulkDelete, bulkRestore, bulkHardDelete } =
+        useAdminAds();
+
+    const [ownerMode, setOwnerMode] = useState(isOwnAd);
+
+    useEffect(() => {
+        setOwnerMode(isOwnAd);
+    }, [isOwnAd]);
+
+    if (!isAdmin) return null;
+
+    const runAction = async (action) => {
+        setSelection([adId]);
+        await action();
+        setSelection([]);
+    };
+
+    const actions = [
         {
-            active: 'green',
-            blocked: 'red',
-            deleted: 'gray',
-            hidden: 'orange',
-            work: 'blue',
-        }[ad.status] || 'black';
+            icon: <FaEyeSlash />,
+            label: 'Скрыть',
+            onClick: () => runAction(bulkHide),
+        },
+        {
+            icon: <FaTrash />,
+            label: 'Удалить',
+            onClick: () => runAction(bulkDelete),
+            variant: 'danger',
+        },
+        {
+            icon: <FaUndo />,
+            label: 'Восстановить',
+            onClick: () => runAction(bulkRestore),
+        },
+        {
+            icon: <FaSkull />,
+            label: 'Удалить навсегда',
+            onClick: () => {
+                if (window.confirm('Удалить навсегда? Это необратимо.')) {
+                    runAction(bulkHardDelete);
+                }
+            },
+            variant: 'danger',
+        },
+    ];
 
     return (
-        <div
-            className='admin-ad-panel flex items-center justify-between p-3 rounded-xl'
-            style={{ background: '#f4f4f4', border: '1px solid #ddd' }}
-        >
-            <div>
-                <div>
-                    <b>ID:</b> {ad.id}
-                </div>
-                <div>
-                    <b>Тип:</b> {type}
-                </div>
-                <div>
-                    <b>Статус:</b>{' '}
-                    <span style={{ color: statusColor }}>
-                        {ad.status || '—'}
-                    </span>
-                </div>
-                <div>
-                    <b>Владелец:</b> {ad.ownerName || ad.ownerId || '-'}
-                </div>
+        <div className='admin-panel'>
+            <div className='toggle-container'>
+                <span className='toggle-label'>Режим:</span>
+                <button
+                    className={`toggle-btn ${ownerMode ? 'active' : ''}`}
+                    onClick={() => {
+                        const newValue = !ownerMode;
+                        setOwnerMode(newValue);
+                        onToggleOwnerMode(newValue);
+                    }}
+                >
+                    {ownerMode ? <FaUserCheck /> : <FaUser />}
+                    {ownerMode ? 'Хозяин объявления' : 'Обычный посетитель'}
+                </button>
             </div>
 
-            <div className='flex gap-2'>
-                <button
-                    className='btn'
-                    onClick={onBlock}
-                >
-                    🚫 Заблокировать
-                </button>
-                <button
-                    className='btn'
-                    onClick={onRestore}
-                >
-                    ✅ Восстановить
-                </button>
-                <button
-                    className='btn btn-danger'
-                    onClick={onDelete}
-                >
-                    🗑️ Удалить навсегда
-                </button>
+            <div className='spacer' />
 
-                <div className='ml-6'>
-                    <label>
-                        Режим просмотра:&nbsp;
-                        <select
-                            value={viewMode}
-                            onChange={(e) => onViewModeChange(e.target.value)}
-                        >
-                            <option value='owner'>Владелец</option>
-                            <option value='public'>Посетитель</option>
-                        </select>
-                    </label>
-                </div>
+            <div className='actions'>
+                {actions.map((a, i) => (
+                    <button
+                        key={i}
+                        className={`btn ${
+                            a.variant === 'danger' ? 'btn-danger' : ''
+                        }`}
+                        onClick={a.onClick}
+                    >
+                        {a.icon}
+                        {a.label}
+                    </button>
+                ))}
             </div>
         </div>
     );
