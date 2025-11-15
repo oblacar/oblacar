@@ -4,7 +4,18 @@ import { NavLink } from 'react-router-dom';
 export default function Sidebar() {
     return (
         <aside className='admin-sidebar'>
-            <div className='admin-logo'>oblacar • admin</div>
+            <div className='admin-logo'>
+                <NavLink to='/'>
+                    oblacar
+                </NavLink>
+                {' '}•{' '}
+                <NavLink
+                    to='/admin'
+                    end
+                >
+                    admin
+                </NavLink>
+            </div>
             <nav className='admin-nav'>
                 {/* <NavLink
                     to='/admin'
@@ -12,7 +23,7 @@ export default function Sidebar() {
                 >
                     Dashboard
                 </NavLink> */}
-                 <NavLink
+                <NavLink
                     to='/admin/dashboard'
                     end
                 >
