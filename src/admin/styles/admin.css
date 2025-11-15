@@ -156,3 +156,109 @@
     gap: 20px;
     padding: 10px 0;
 }
+
+/* Стили для начальной закладке админки */
+
+.admin-home-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Адаптив */
+@media (max-width: 1024px) {
+    .admin-home-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-home-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Карточки */
+.admin-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.admin-card-header {
+    margin-bottom: 10px;
+}
+
+.admin-card-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.admin-card-content {
+    font-size: 14px;
+    color: #444;
+}
+
+/* Списки */
+.admin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-list-item:last-child {
+    border-bottom: none;
+}
+
+.admin-number {
+    background: #f3f3f3;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* Tools */
+.admin-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.admin-tool {
+    padding: 12px;
+    border: 1px solid #eee;
+    background: #fafafa;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-tool:hover {
+    background: #f0f0f0;
+}
+
+.admin-emoji {
+    font-size: 18px;
+}
+
+/* Docs */
+.admin-docs {
+    list-style: disc;
+    padding-left: 18px;
+}
+
+.admin-docs li {
+    margin-bottom: 6px;
+}

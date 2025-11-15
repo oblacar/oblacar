@@ -7,7 +7,7 @@ import Layout from './components/Layout'; // Импортируем новый �
 
 import AdminAuthGuard from './admin/context/AdminAuthGuard';
 import AdminApp from './admin/routes/AdminApp';
-import AdminLanding from './admin/routes/AdminLanding';
+import AdminHome from './admin/routes/AdminHome';
 import AdminAds from './admin/routes/AdminAds';
 import AdminUsers from './admin/routes/AdminUsers';
 import AdminAdsProvider from './admin/context/AdminAdsContext';
@@ -71,7 +71,7 @@ const App = () => {
                                                             <Route
                                                                 index
                                                                 element={
-                                                                    <AdminLanding />
+                                                                    <AdminHome />
                                                                 }
                                                             />
 
