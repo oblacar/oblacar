@@ -5,10 +5,7 @@ export default function Sidebar() {
     return (
         <aside className='admin-sidebar'>
             <div className='admin-logo'>
-                <NavLink to='/'>
-                    oblacar
-                </NavLink>
-                {' '}•{' '}
+                <NavLink to='/'>oblacar</NavLink> •{' '}
                 <NavLink
                     to='/admin'
                     end
